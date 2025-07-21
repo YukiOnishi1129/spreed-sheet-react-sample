@@ -862,21 +862,43 @@ const ChatGPTSpreadsheet: React.FC = () => {
           }}>
             {selectedCellAddress || 'A1'}
           </div>
-          <div className="formula-display" style={{
-            flex: 1,
-            padding: '4px 8px',
-            backgroundColor: 'white',
-            border: '1px solid #ced4da',
-            borderRadius: '4px',
-            fontFamily: 'Monaco, Consolas, "Lucida Console", monospace',
-            fontSize: '13px',
-            color: selectedCellFormula.startsWith('=') ? '#d73a49' : '#333',
-            minHeight: '22px',
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            {selectedCellFormula || ''}
-          </div>
+          <input 
+            type="text"
+            className="formula-display"
+            value={selectedCellFormula || ''}
+            readOnly
+            onClick={(e) => {
+              // イベントの伝播を停止してSpreadsheetへの影響を防ぐ
+              e.preventDefault();
+              e.stopPropagation();
+              // 入力フィールドにフォーカスして全選択
+              e.currentTarget.focus();
+              e.currentTarget.select();
+            }}
+            onMouseDown={(e) => {
+              // マウスダウン時もイベントの伝播を停止
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onFocus={(e) => {
+              // フォーカス時に全選択
+              e.currentTarget.select();
+            }}
+            style={{
+              flex: 1,
+              padding: '4px 8px',
+              backgroundColor: 'white',
+              border: '1px solid #ced4da',
+              borderRadius: '4px',
+              fontFamily: 'Monaco, Consolas, "Lucida Console", monospace',
+              fontSize: '13px',
+              color: selectedCellFormula.startsWith('=') ? '#d73a49' : '#333',
+              minHeight: '22px',
+              cursor: 'text',
+              outline: 'none'
+            }}
+            title="クリックして数式をコピーできます"
+          />
         </div>
       </div>
       
@@ -938,9 +960,9 @@ const ChatGPTSpreadsheet: React.FC = () => {
                 setValue('selectedCell.formula', '');
               }
             } else {
-              // Could not get coordinates
-              setValue('selectedCell.address', '');
-              setValue('selectedCell.formula', '');
+              // Could not get coordinates - 数式バーをクリックした場合など
+              // 選択状態をクリアしない（現在の選択を保持）
+              console.log('座標を取得できませんでした - 選択状態を保持します');
             }
           }}
           onActivate={(point) => {
