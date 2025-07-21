@@ -9,7 +9,8 @@
       "Bash(npm install:*)",
       "Bash(npm cache clean:*)",
       "Bash(pnpm add:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   }

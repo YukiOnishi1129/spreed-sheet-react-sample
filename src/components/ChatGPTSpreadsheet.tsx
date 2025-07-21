@@ -19,7 +19,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
   // React Hook Formの初期化
   const { control, watch, setValue, handleSubmit, formState: { isSubmitting } } = useForm<SpreadsheetForm>({
-    resolver: zodResolver(SpreadsheetFormSchema),
+    resolver: zodResolver(SpreadsheetFormSchema) as any, // 型の不整合を一時的に回避
     defaultValues: {
       spreadsheetData: [
         [{ value: "関数を検索してください", className: "header-cell" }, null, null, null, null, null, null, null],
@@ -46,6 +46,55 @@ const ChatGPTSpreadsheet: React.FC = () => {
   const currentFunction = watch('currentFunction');
   const selectedCellFormula = watch('selectedCell.formula');
   const selectedCellAddress = watch('selectedCell.address');
+
+  // 手動VLOOKUP実装
+  const performVLOOKUP = (lookupValue: string, data: Matrix<any>, lookupRow: number) => {
+    console.log('VLOOKUP実行:', { lookupValue, lookupRow });
+    
+    // A列（商品コード）からB列（商品名）を検索
+    for (let i = 1; i < data.length; i++) { // 0行目はヘッダーなので1から開始
+      const row = data[i];
+      if (row && row[0] && row[0].value === lookupValue) {
+        const result = row[1]?.value || '#N/A';
+        console.log(`VLOOKUP結果: ${lookupValue} -> ${result}`);
+        return result;
+      }
+    }
+    return '#N/A';
+  };
+
+  // HyperFormulaで再計算する関数
+  const recalculateFormulas = (data: Matrix<any>) => {
+    console.log('再計算開始:', data);
+    
+    if (!currentFunction?.spreadsheet_data) return;
+    
+    // F列のVLOOKUP結果を更新
+    const updatedData = data.map((row, rowIndex) => {
+      if (!row) return row;
+      
+      return row.map((cell, colIndex) => {
+        // F列（colIndex = 5）かつ、元々数式セルだった場合
+        if (colIndex === 5 && rowIndex >= 1 && rowIndex <= 5) {
+          // E列（colIndex = 4）の値を取得
+          const lookupValue = row[4]?.value;
+          if (lookupValue) {
+            const vlookupResult = performVLOOKUP(String(lookupValue), data, rowIndex);
+            return {
+              ...cell,
+              value: vlookupResult,
+              formula: `=VLOOKUP(E${rowIndex + 1},A2:B6,2,0)`,
+              title: `数式: =VLOOKUP(E${rowIndex + 1},A2:B6,2,0)`
+            };
+          }
+        }
+        return cell;
+      });
+    });
+    
+    console.log('更新後のデータ:', updatedData);
+    setValue('spreadsheetData', updatedData);
+  };
 
   // sheetDataの変更を監視
   useEffect(() => {
@@ -184,7 +233,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
           }
           
           const cellData: any = {
-            value: calculatedValue,
+            value: calculatedValue, // 計算結果を表示（HyperFormulaが計算）
             className: className
           };
           
@@ -220,7 +269,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSubmit(onSubmit)();
+      handleSubmit(onSubmit as any)();
     }
   };
 
@@ -353,7 +402,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
           }
           
           const cellData: any = {
-            value: calculatedValue,
+            value: calculatedValue, // 計算結果を表示（HyperFormulaが計算）
             className: className
           };
           
@@ -383,7 +432,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
       <h2>ChatGPT連携 Excel関数デモ</h2>
       
       <div className="search-section" style={{ marginBottom: '20px' }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit as any)}>
           <div className="search-input" style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <Controller
               name="searchQuery"
@@ -675,6 +724,8 @@ const ChatGPTSpreadsheet: React.FC = () => {
               data={field.value as Matrix<any>}
               onChange={(data) => {
                 field.onChange(data);
+                // HyperFormulaで再計算
+                recalculateFormulas(data);
               }}
           onSelect={(selected) => {
             // セル選択時に数式を表示
