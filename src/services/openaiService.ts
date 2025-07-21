@@ -50,6 +50,13 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 7. 空セルはnullにしてください
 8. 各行は必ず8つの要素を持つ配列にしてください
 
+**売上管理表の正しいレイアウト例：**
+- 1行目：ヘッダー行（営業担当者名、売上金額、評価）※3列構成
+- 2-6行目：各営業担当者のデータ行（A列=名前、B列=売上、C列=IF関数での評価）
+- 7行目：合計行（A7="合計", B7=SUM(B2:B6), C7は空）
+- 8行目：空行
+- **重要**: D列の「合計」は不要です。シンプルな3列構成にしてください
+
 **良い例（SUM関数の場合）：**
 - 1行目：ヘッダー行（項目名など）
 - 2-5行目：数値データ
@@ -204,6 +211,59 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [null, null, null, null, null, null, null, null]
   ],
   "examples": ["=IF(A1>10,\"大\",\"小\")", "=IF(B1=\"\",0,B1*2)"]
+}
+
+**営業担当者売上管理表の完全な例：**
+{
+  "function_name": "IF & SUM",
+  "description": "IF関数で売上目標達成判定とSUM関数で合計計算を行います",
+  "syntax": "IF(logical_test, value_if_true, value_if_false), SUM(range)",
+  "category": "論理・数学関数",
+  "spreadsheet_data": [
+    [
+      {"v": "営業担当者名", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "売上金額", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "評価", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      null, null, null, null, null
+    ],
+    [
+      {"v": "田中", "ct": {"t": "s"}},
+      {"v": 80000, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B2>=100000,\"目標達成\",\"要改善\")", "bg": "#E8F5E8", "fc": "#2E7D32"},
+      null, null, null, null, null
+    ],
+    [
+      {"v": "佐藤", "ct": {"t": "s"}},
+      {"v": 120000, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B3>=100000,\"目標達成\",\"要改善\")", "bg": "#E8F5E8", "fc": "#2E7D32"},
+      null, null, null, null, null
+    ],
+    [
+      {"v": "鈴木", "ct": {"t": "s"}},
+      {"v": 95000, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B4>=100000,\"目標達成\",\"要改善\")", "bg": "#E8F5E8", "fc": "#2E7D32"},
+      null, null, null, null, null
+    ],
+    [
+      {"v": "山田", "ct": {"t": "s"}},
+      {"v": 150000, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B5>=100000,\"目標達成\",\"要改善\")", "bg": "#E8F5E8", "fc": "#2E7D32"},
+      null, null, null, null, null
+    ],
+    [
+      {"v": "伊藤", "ct": {"t": "s"}},
+      {"v": 110000, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B6>=100000,\"目標達成\",\"要改善\")", "bg": "#E8F5E8", "fc": "#2E7D32"},
+      null, null, null, null, null
+    ],
+    [
+      {"v": "合計", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      {"v": null, "f": "=SUM(B2:B6)", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null, null, null, null
+    ],
+    [null, null, null, null, null, null, null, null]
+  ],
+  "examples": ["=IF(B2>=100000,\"目標達成\",\"要改善\")", "=SUM(B2:B6)"]
 }
 
 これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。
