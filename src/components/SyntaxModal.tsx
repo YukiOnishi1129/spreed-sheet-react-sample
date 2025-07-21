@@ -45,12 +45,12 @@ const SyntaxModal: React.FC<SyntaxModalProps> = ({
   const isMultipleFunctions = parsedFunctions.length > 1;
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-[10000] backdrop-blur-sm">
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 max-w-3xl w-full mx-6 max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-[10000] backdrop-blur-sm p-4">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 max-w-3xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-y-auto">
         {/* ヘッダー */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-t-3xl">
+        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 sm:p-6 rounded-t-3xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold flex items-center gap-3">
+            <h2 className="text-lg sm:text-2xl font-bold flex items-center gap-2 sm:gap-3">
               📚 {functionName} 関数の詳細
             </h2>
             <button
@@ -64,10 +64,10 @@ const SyntaxModal: React.FC<SyntaxModalProps> = ({
         </div>
 
         {/* コンテンツ */}
-        <div className="p-8 space-y-8">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
           {/* 基本構文 - 複数関数の場合は個別に表示 */}
-          <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border border-pink-200">
-            <h3 className="text-xl font-bold text-pink-700 mb-4 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-4 sm:p-6 border border-pink-200">
+            <h3 className="text-lg sm:text-xl font-bold text-pink-700 mb-3 sm:mb-4 flex items-center gap-2">
               🔧 {isMultipleFunctions ? '使用する関数' : '基本構文'}
             </h3>
             {isMultipleFunctions ? (

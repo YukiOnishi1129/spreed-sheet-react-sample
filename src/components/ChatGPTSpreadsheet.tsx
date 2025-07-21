@@ -675,7 +675,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
   };
 
   return (
-    <div className="chatgpt-spreadsheet relative max-w-7xl mx-auto px-6 py-8 space-y-8">
+    <div className="chatgpt-spreadsheet relative max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* ローディングオーバーレイ */}
       {isSubmitting && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[9999] backdrop-blur-sm">
@@ -694,9 +694,9 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
       <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">ChatGPT連携 Excel関数デモ</h2>
       
-      <div className="search-section bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/30 p-8 space-y-6 hover:shadow-2xl transition-all duration-300">
+      <div className="search-section bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/30 p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 hover:shadow-2xl transition-all duration-300">
         <form onSubmit={handleSubmit(onSubmit as any)}>
-          <div className="search-input flex gap-3 mb-4">
+          <div className="search-input flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
             <Controller
               name="searchQuery"
               control={control}
@@ -706,7 +706,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
                   type="text"
                   onKeyDown={handleKeyDown}
                   placeholder="例：「営業の売上データで目標達成を判定したい」「在庫が少ない商品をチェックしたい」"
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 w-full sm:w-auto px-4 sm:px-5 py-3 sm:py-4 border border-gray-200 rounded-xl text-sm sm:text-base bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white disabled:bg-gray-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
                   disabled={isSubmitting}
                 />
               )}
@@ -714,10 +714,10 @@ const ChatGPTSpreadsheet: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting || !userInput.trim()}
-              className={`px-6 py-3 text-white border-none rounded-lg font-medium transition-all duration-200 ${
+              className={`w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-white border-none rounded-xl font-semibold transition-all duration-200 shadow-lg ${
                 isSubmitting || !userInput.trim() 
                   ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5'
+                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl transform hover:-translate-y-0.5 hover:scale-105'
               }`}
             >
               {isSubmitting ? '検索中...' : '関数を検索'}
@@ -741,7 +741,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
           <div className="text-sm font-medium text-gray-700 mt-4">
             または、フリー入力:
           </div>
-          <div className="quick-buttons flex gap-2 flex-wrap">
+          <div className="quick-buttons flex gap-2 sm:gap-3 flex-wrap">
             {[
               '営業の売上で目標達成を判定したい',
               '在庫管理で発注判定をしたい', 
@@ -753,7 +753,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
                 onClick={() => { 
                   setValue('searchQuery', query); // 入力欄にテキストを設定するだけ
                 }}
-                className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer text-sm hover:bg-gray-100 hover:border-gray-300 transition-colors duration-200"
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl cursor-pointer text-xs sm:text-sm hover:from-white hover:to-gray-50 hover:border-gray-300 hover:shadow-md transition-all duration-200 font-medium"
               >
                 {query}
               </button>
@@ -950,7 +950,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
         </div>
       )}
       
-      <div className="spreadsheet-container bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/40 p-8 min-h-[500px] hover:shadow-2xl transition-all duration-300">
+      <div className="spreadsheet-container bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/40 p-4 sm:p-6 lg:p-8 min-h-[400px] sm:min-h-[500px] hover:shadow-2xl transition-all duration-300 overflow-x-auto">
         <Controller
           name="spreadsheetData"
           control={control}
