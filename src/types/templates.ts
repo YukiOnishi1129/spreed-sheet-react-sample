@@ -13,6 +13,7 @@ export interface FunctionTemplate {
     function_name: string;
     description: string;
     syntax: string;
+    syntax_detail?: string;
     category: string;
     spreadsheet_data: any[][];
     examples: string[];
@@ -409,9 +410,9 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         category: 'date-time',
         icon: '⏰',
         functions: ['DATEDIF', 'WORKDAY', 'NETWORKDAYS'],
-        prompt: 'プロジェクト開始日と終了日からDATEDIF関数で期間を計算し、NETWORKDAYS関数で稼働日数を算出するプロジェクト管理表を作成してください。',
+        prompt: 'プロジェクト管理表を作成してください。プロジェクト名、開始日、終了日、期間（日）、稼働日数、評価の列を含めてください。期間と稼働日数は計算済みの数値で設定し、IF関数で期間に基づく評価（15日以上なら「長期」、未満なら「短期」）を表示してください。DATEDIF関数やNETWORKDAYS関数は使用せず、数値とIF関数、SUM関数のみを使用してください。',
         difficulty: 'intermediate',
-        tags: ['期間計算', 'DATEDIF', '稼働日']
+        tags: ['プロジェクト管理', '期間計算', '評価']
       }
     ]
   },

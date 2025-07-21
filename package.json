@@ -13,6 +13,7 @@
     "@fortune-sheet/react": "^1.0.2",
     "@hookform/resolvers": "^5.1.1",
     "autoprefixer": "^10.4.21",
+    "dayjs": "^1.11.13",
     "hyperformula": "^3.0.0",
     "openai": "^5.10.1",
     "react": "^19.1.0",

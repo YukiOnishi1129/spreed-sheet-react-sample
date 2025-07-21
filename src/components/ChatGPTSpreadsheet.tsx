@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Spreadsheet from 'react-spreadsheet';
 import type { Matrix } from 'react-spreadsheet';
 import { HyperFormula } from 'hyperformula';
+import { matchFormula, getFunctionType } from '../utils/formulas';
 
 // Excelのシリアル値を日付文字列に変換する関数
 const formatExcelDate = (serialDate: number): string => {
@@ -80,21 +81,6 @@ const ChatGPTSpreadsheet: React.FC = () => {
   const selectedCellFormula = watch('selectedCell.formula');
   const selectedCellAddress = watch('selectedCell.address');
 
-  // 手動VLOOKUP実装
-  const performVLOOKUP = (lookupValue: string, data: Matrix<any>, lookupRow: number) => {
-    console.log('VLOOKUP実行:', { lookupValue, lookupRow });
-    
-    // A列（商品コード）からB列（商品名）を検索
-    for (let i = 1; i < data.length; i++) { // 0行目はヘッダーなので1から開始
-      const row = data[i];
-      if (row && row[0] && row[0].value === lookupValue) {
-        const result = row[1]?.value || '#N/A';
-        console.log(`VLOOKUP結果: ${lookupValue} -> ${result}`);
-        return result;
-      }
-    }
-    return '#N/A';
-  };
 
   // HyperFormulaで再計算する関数
   const recalculateFormulas = (data: Matrix<any>) => {
@@ -168,49 +154,21 @@ const ChatGPTSpreadsheet: React.FC = () => {
             } catch (error) {
               console.warn('数式計算エラー:', error, formulaCell.formula);
               // エラー時は手動計算を試行
-              if (formulaCell.formula.includes('IF') && formulaCell.formula.includes('>=10000')) {
-                // IF関数の手動計算（承認判定）
-                const cellRef = formulaCell.formula.match(/IF\(([A-Z]\d+)>=10000/);
-                if (cellRef) {
-                  const refCol = cellRef[1].charCodeAt(0) - 65; // A=0, B=1, ...
-                  const refRow = parseInt(cellRef[1].substring(1)) - 1; // 1-based to 0-based
-                  const refValue = data[refRow]?.[refCol]?.value;
-                  if (typeof refValue === 'number') {
-                    const result = refValue >= 10000 ? '要承認' : '承認済み';
-                    return {
-                      ...cell,
-                      value: result,
-                      formula: formulaCell.formula,
-                      title: `数式: ${formulaCell.formula}`
-                    };
-                  }
-                }
-              } else if (formulaCell.formula.includes('SUM(')) {
-                // SUM関数の手動計算
-                const rangeMatch = formulaCell.formula.match(/SUM\(([A-Z]\d+):([A-Z]\d+)\)/);
-                if (rangeMatch) {
-                  const startCol = rangeMatch[1].charCodeAt(0) - 65;
-                  const startRow = parseInt(rangeMatch[1].substring(1)) - 1;
-                  const endCol = rangeMatch[2].charCodeAt(0) - 65;
-                  const endRow = parseInt(rangeMatch[2].substring(1)) - 1;
-                  
-                  let sum = 0;
-                  for (let r = startRow; r <= endRow; r++) {
-                    for (let c = startCol; c <= endCol; c++) {
-                      const value = data[r]?.[c]?.value;
-                      if (typeof value === 'number') {
-                        sum += value;
-                      }
-                    }
-                  }
-                  
-                  return {
-                    ...cell,
-                    value: sum,
-                    formula: formulaCell.formula,
-                    title: `数式: ${formulaCell.formula}`
-                  };
-                }
+              
+              // カスタム関数の手動計算が必要か確認
+              const matchResult = matchFormula(formulaCell.formula);
+              if (matchResult && matchResult.function.isSupported === false) {
+                const result = matchResult.function.calculate(matchResult.matches, {
+                  data: data,
+                  row: rowIndex,
+                  col: colIndex
+                });
+                return {
+                  ...cell,
+                  value: result,
+                  formula: formulaCell.formula,
+                  title: `数式: ${formulaCell.formula}`
+                };
               }
               
               return {
@@ -226,7 +184,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
         });
       });
       
-      console.log('HyperFormula再計算完了:', updatedData);
+      console.log('手動再計算完了:', updatedData);
       setValue('spreadsheetData', updatedData);
       
     } catch (error) {
@@ -238,51 +196,33 @@ const ChatGPTSpreadsheet: React.FC = () => {
         return row.map((cell, colIndex) => {
           const formulaCell = formulaCells.find(f => f.row === rowIndex && f.col === colIndex);
           if (formulaCell) {
-            // 手動でIF関数を計算
-            if (formulaCell.formula.includes('IF') && formulaCell.formula.includes('>=10000')) {
-              const cellRef = formulaCell.formula.match(/IF\(([A-Z]\d+)>=10000/);
-              if (cellRef) {
-                const refCol = cellRef[1].charCodeAt(0) - 65;
-                const refRow = parseInt(cellRef[1].substring(1)) - 1;
-                const refValue = data[refRow]?.[refCol]?.value;
-                if (typeof refValue === 'number') {
-                  const result = refValue >= 10000 ? '要承認' : '承認済み';
-                  return {
-                    ...cell,
-                    value: result,
-                    formula: formulaCell.formula,
-                    title: `数式: ${formulaCell.formula}`
-                  };
-                }
-              }
-            }
-            // 手動でSUM関数を計算
-            else if (formulaCell.formula.includes('SUM(')) {
-              const rangeMatch = formulaCell.formula.match(/SUM\(([A-Z]\d+):([A-Z]\d+)\)/);
-              if (rangeMatch) {
-                const startCol = rangeMatch[1].charCodeAt(0) - 65;
-                const startRow = parseInt(rangeMatch[1].substring(1)) - 1;
-                const endCol = rangeMatch[2].charCodeAt(0) - 65;
-                const endRow = parseInt(rangeMatch[2].substring(1)) - 1;
-                
-                let sum = 0;
-                for (let r = startRow; r <= endRow; r++) {
-                  for (let c = startCol; c <= endCol; c++) {
-                    const value = data[r]?.[c]?.value;
-                    if (typeof value === 'number') {
-                      sum += value;
-                    }
-                  }
-                }
+            // モジュラー関数を使用した手動計算
+            const matchResult = matchFormula(formulaCell.formula);
+            if (matchResult) {
+              try {
+                const result = matchResult.function.calculate(matchResult.matches, {
+                  data: data,
+                  row: rowIndex,
+                  col: colIndex
+                });
                 
                 return {
                   ...cell,
-                  value: sum,
+                  value: result,
                   formula: formulaCell.formula,
                   title: `数式: ${formulaCell.formula}`
                 };
+              } catch (calcError) {
+                console.warn('モジュラー関数計算エラー:', calcError, formulaCell.formula);
               }
             }
+            // フォールバック：エラーとして処理
+            return {
+              ...cell,
+              value: '#ERROR!',
+              formula: formulaCell.formula,
+              title: `数式: ${formulaCell.formula}`
+            };
           }
           
           return cell;
@@ -608,31 +548,35 @@ const ChatGPTSpreadsheet: React.FC = () => {
           
           // 数式セル（関数の結果）の場合
           if (cell.f) {
-            // 関数の種類によって色分け
+            // モジュラー関数を使用して関数タイプを判定
             const formula = cell.f.toUpperCase();
+            const functionMatch = formula.match(/([A-Z]+)\(/);
             
-            if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(') || 
-                formula.includes('SUMIF(') || formula.includes('COUNTIF(') || formula.includes('AVERAGEIF(') ||
-                formula.includes('SUMIFS(') || formula.includes('COUNTIFS(') || formula.includes('AVERAGEIFS(')) {
-              // 数学・集計関数: オレンジ系
-              className = 'math-formula-cell';
-            } else if (formula.includes('VLOOKUP(') || formula.includes('HLOOKUP(') || formula.includes('INDEX(') || formula.includes('MATCH(')) {
-              // 検索・参照関数: 青系  
-              className = 'lookup-formula-cell';
-            } else if (formula.includes('IF(') || formula.includes('AND(') || formula.includes('OR(') || formula.includes('NOT(')) {
-              // 論理・条件関数: 緑系
-              className = 'logic-formula-cell';
-            } else if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(') || formula.includes('YEAR(') || 
-                       formula.includes('MONTH(') || formula.includes('DAY(') || formula.includes('DATEDIF(') || 
-                       formula.includes('WORKDAY(') || formula.includes('NETWORKDAYS(')) {
-              // 日付・時刻関数: 紫系
-              className = 'date-formula-cell';
-            } else if (formula.includes('CONCATENATE(') || formula.includes('LEFT(') || formula.includes('RIGHT(') || formula.includes('MID(') || 
-                       formula.includes('LEN(') || formula.includes('TRIM(') || formula.includes('UPPER(') || formula.includes('LOWER(')) {
-              // 文字列関数: ピンク系
-              className = 'text-formula-cell';
+            if (functionMatch) {
+              const functionName = functionMatch[1];
+              const functionType = getFunctionType(functionName);
+              
+              switch (functionType) {
+                case 'math':
+                  className = 'math-formula-cell';
+                  break;
+                case 'lookup':
+                  className = 'lookup-formula-cell';
+                  break;
+                case 'logic':
+                  className = 'logic-formula-cell';
+                  break;
+                case 'date':
+                  className = 'date-formula-cell';
+                  break;
+                case 'text':
+                  className = 'text-formula-cell';
+                  break;
+                default:
+                  className = 'other-formula-cell';
+                  break;
+              }
             } else {
-              // その他の関数: グレー系
               className = 'other-formula-cell';
             }
             // HyperFormulaから計算結果を取得
