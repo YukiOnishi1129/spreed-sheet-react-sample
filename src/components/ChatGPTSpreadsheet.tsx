@@ -1,42 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Spreadsheet from 'react-spreadsheet';
 import type { Matrix } from 'react-spreadsheet';
 import { HyperFormula } from 'hyperformula';
-
-// ChatGPT APIのレスポンス型定義
-interface ExcelFunctionResponse {
-  function_name: string;
-  description: string;
-  syntax: string;
-  category: string;
-  spreadsheet_data: any[][];
-  examples?: string[];
-}
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { 
+  SpreadsheetFormSchema, 
+  type SpreadsheetForm, 
+  type ExcelFunctionResponse 
+} from '../types/spreadsheet';
 
 
 const ChatGPTSpreadsheet: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [userInput, setUserInput] = useState('');
-  const [currentFunction, setCurrentFunction] = useState<ExcelFunctionResponse | null>(null);
-  const [selectedCellFormula, setSelectedCellFormula] = useState<string>('');
-  const [selectedCellAddress, setSelectedCellAddress] = useState<string>('');
-  
-  
-  // react-spreadsheet用のデータ構造
-  const [sheetData, setSheetData] = useState<Matrix<any>>([
-    [{ value: "関数を検索してください", className: "header-cell" }, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null]
-  ]);
+  // React Hook Formの初期化
+  const { control, watch, setValue, handleSubmit, formState: { isSubmitting } } = useForm<SpreadsheetForm>({
+    resolver: zodResolver(SpreadsheetFormSchema),
+    defaultValues: {
+      spreadsheetData: [
+        [{ value: "関数を検索してください", className: "header-cell" }, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null]
+      ],
+      searchQuery: '',
+      selectedCell: {
+        address: '',
+        formula: ''
+      },
+      currentFunction: null
+    }
+  });
+
+  // フォームの値を監視
+  const sheetData = watch('spreadsheetData');
+  const userInput = watch('searchQuery');
+  const currentFunction = watch('currentFunction');
+  const selectedCellFormula = watch('selectedCell.formula');
+  const selectedCellAddress = watch('selectedCell.address');
 
   // sheetDataの変更を監視
   useEffect(() => {
-    // console.log removed
+    // React Hook Formが管理するため、特別な処理は不要
   }, [sheetData]);
 
   // ChatGPT APIを呼び出す（模擬実装）
@@ -243,16 +251,13 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
   // 共通の検索実行関数
   const executeSearch = async (query: string) => {
-    if (isLoading) return; // 既に実行中の場合は何もしない
-    
-    // console.log removed - search start
-    setIsLoading(true);
+    if (isSubmitting) return; // 既に実行中の場合は何もしない
     
     try {
       const response = await fetchExcelFunction(query);
       // console.log removed - API response logging
       
-      setCurrentFunction(response);
+      setValue('currentFunction', response);
       
       // HyperFormulaにデータを設定して計算
       const rawData = response.spreadsheet_data.map(row => 
@@ -356,7 +361,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
       // Data conversion complete
       
-      setSheetData(convertedData);
+      setValue('spreadsheetData', convertedData);
       // Sheet data set
       
     } catch (error) {
@@ -364,18 +369,16 @@ const ChatGPTSpreadsheet: React.FC = () => {
       const errorMessage = error instanceof Error ? error.message : '不明なエラー';
       alert('関数の検索中にエラーが発生しました: ' + errorMessage);
     }
-    
-    setIsLoading(false);
   };
 
-  const handleSearch = async () => {
-    if (!userInput.trim()) return;
-    await executeSearch(userInput);
+  const onSubmit = async (data: SpreadsheetForm) => {
+    if (!data.searchQuery.trim()) return;
+    await executeSearch(data.searchQuery);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSearch();
+      handleSubmit(onSubmit)();
     }
   };
 
@@ -384,37 +387,44 @@ const ChatGPTSpreadsheet: React.FC = () => {
       <h2>ChatGPT連携 Excel関数デモ</h2>
       
       <div className="search-section" style={{ marginBottom: '20px' }}>
-        <div className="search-input" style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-          <input
-            type="text"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="例：「合計を計算する関数を知りたい」「条件分岐の関数」「データを検索する関数」"
-            style={{ 
-              flex: 1, 
-              padding: '10px', 
-              border: '1px solid #ddd', 
-              borderRadius: '4px',
-              fontSize: '14px'
-            }}
-            disabled={isLoading}
-          />
-          <button
-            onClick={handleSearch}
-            disabled={isLoading || !userInput.trim()}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: isLoading ? '#ccc' : '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: isLoading ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {isLoading ? '検索中...' : '関数を検索'}
-          </button>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="search-input" style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <Controller
+              name="searchQuery"
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="text"
+                  onKeyDown={handleKeyDown}
+                  placeholder="例：「合計を計算する関数を知りたい」「条件分岐の関数」「データを検索する関数」"
+                  style={{ 
+                    flex: 1, 
+                    padding: '10px', 
+                    border: '1px solid #ddd', 
+                    borderRadius: '4px',
+                    fontSize: '14px'
+                  }}
+                  disabled={isSubmitting}
+                />
+              )}
+            />
+            <button
+              type="submit"
+              disabled={isSubmitting || !userInput.trim()}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: isSubmitting ? '#ccc' : '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {isSubmitting ? '検索中...' : '関数を検索'}
+            </button>
+          </div>
+        </form>
         
         <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>
           クイック入力:
@@ -424,7 +434,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
             <button
               key={query}
               onClick={() => { 
-                setUserInput(query); // 入力欄にテキストを設定するだけ
+                setValue('searchQuery', query); // 入力欄にテキストを設定するだけ
               }}
               style={{
                 padding: '5px 10px',
@@ -632,11 +642,15 @@ const ChatGPTSpreadsheet: React.FC = () => {
       </div>
       
       <div className="spreadsheet-container" style={{ height: '500px' }}>
-        <Spreadsheet
-          data={sheetData}
-          onChange={(data) => {
-            setSheetData(data);
-          }}
+        <Controller
+          name="spreadsheetData"
+          control={control}
+          render={({ field }) => (
+            <Spreadsheet
+              data={field.value as Matrix<any>}
+              onChange={(data) => {
+                field.onChange(data);
+              }}
           onSelect={(selected) => {
             // セル選択時に数式を表示
             
@@ -673,19 +687,19 @@ const ChatGPTSpreadsheet: React.FC = () => {
               
               // Process selected cell
               
-              setSelectedCellAddress(cellAddress);
+              setValue('selectedCell.address', cellAddress);
               
               if (cell && cell.formula) {
-                setSelectedCellFormula(cell.formula);
+                setValue('selectedCell.formula', cell.formula);
               } else if (cell && cell.value !== undefined && cell.value !== null) {
-                setSelectedCellFormula(String(cell.value));
+                setValue('selectedCell.formula', String(cell.value));
               } else {
-                setSelectedCellFormula('');
+                setValue('selectedCell.formula', '');
               }
             } else {
               // Could not get coordinates
-              setSelectedCellAddress('');
-              setSelectedCellFormula('');
+              setValue('selectedCell.address', '');
+              setValue('selectedCell.formula', '');
             }
           }}
           onActivate={(point) => {
@@ -697,19 +711,21 @@ const ChatGPTSpreadsheet: React.FC = () => {
               
               // Process active cell
               
-              setSelectedCellAddress(cellAddress);
+              setValue('selectedCell.address', cellAddress);
               
               if (cell && cell.formula) {
-                setSelectedCellFormula(cell.formula);
+                setValue('selectedCell.formula', cell.formula);
               } else if (cell && cell.value !== undefined && cell.value !== null) {
-                setSelectedCellFormula(String(cell.value));
+                setValue('selectedCell.formula', String(cell.value));
               } else {
-                setSelectedCellFormula('');
+                setValue('selectedCell.formula', '');
               }
             }
           }}
-          columnLabels={['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}
-          rowLabels={['1', '2', '3', '4', '5', '6', '7', '8']}
+              columnLabels={['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']}
+              rowLabels={['1', '2', '3', '4', '5', '6', '7', '8']}
+            />
+          )}
         />
       </div>
       
