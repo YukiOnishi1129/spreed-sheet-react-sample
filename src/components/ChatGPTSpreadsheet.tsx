@@ -642,64 +642,28 @@ const ChatGPTSpreadsheet: React.FC = () => {
   };
 
   return (
-    <div className="chatgpt-spreadsheet" style={{ position: 'relative' }}>
+    <div className="chatgpt-spreadsheet relative">
       {/* ローディングオーバーレイ */}
       {isSubmitting && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999,
-          backdropFilter: 'blur(2px)'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '30px 40px',
-            borderRadius: '12px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '20px'
-          }}>
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[9999] backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center gap-5">
             {/* スピナーアニメーション */}
-            <div style={{
-              width: '40px',
-              height: '40px',
-              border: '4px solid #f3f3f3',
-              borderTop: '4px solid #007bff',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }}></div>
-            <div style={{
-              fontSize: '16px',
-              fontWeight: '500',
-              color: '#333'
-            }}>
+            <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+            <div className="text-base font-medium text-gray-800">
               ChatGPTが関数を生成中...
             </div>
-            <div style={{
-              fontSize: '14px',
-              color: '#666',
-              textAlign: 'center'
-            }}>
+            <div className="text-sm text-gray-600 text-center">
               少々お待ちください
             </div>
           </div>
         </div>
       )}
 
-      <h2>ChatGPT連携 Excel関数デモ</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">ChatGPT連携 Excel関数デモ</h2>
       
-      <div className="search-section" style={{ marginBottom: '20px' }}>
+      <div className="search-section mb-5">
         <form onSubmit={handleSubmit(onSubmit as any)}>
-          <div className="search-input" style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+          <div className="search-input flex gap-3 mb-3">
             <Controller
               name="searchQuery"
               control={control}
@@ -709,13 +673,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
                   type="text"
                   onKeyDown={handleKeyDown}
                   placeholder="例：「営業の売上データで目標達成を判定したい」「在庫が少ない商品をチェックしたい」"
-                  style={{ 
-                    flex: 1, 
-                    padding: '10px', 
-                    border: '1px solid #ddd', 
-                    borderRadius: '4px',
-                    fontSize: '14px'
-                  }}
+                  className="flex-1 px-3 py-2.5 border border-gray-300 rounded-md text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   disabled={isSubmitting}
                 />
               )}
@@ -723,48 +681,33 @@ const ChatGPTSpreadsheet: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting || !userInput.trim()}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: isSubmitting ? '#ccc' : '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer'
-              }}
+              className={`px-5 py-2.5 text-white border-none rounded-md font-medium ${
+                isSubmitting || !userInput.trim() 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
+              }`}
             >
               {isSubmitting ? '検索中...' : '関数を検索'}
             </button>
           </div>
         </form>
         
-        <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>
+        <div className="text-xs text-gray-600 mb-1">
           関数テンプレート:
         </div>
-        <div className="template-buttons" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
+        <div className="template-buttons flex gap-2.5 flex-wrap mb-4">
           <button
             onClick={() => setShowTemplateSelector(true)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
+            className="px-4 py-2 bg-blue-600 text-white border-none rounded-md cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:bg-blue-700"
           >
             📚 テンプレートから選ぶ
           </button>
         </div>
         
-        <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>
+        <div className="text-xs text-gray-600 mb-1">
           または、フリー入力:
         </div>
-        <div className="quick-buttons" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div className="quick-buttons flex gap-2.5 flex-wrap">
           {[
             '営業の売上で目標達成を判定したい',
             '在庫管理で発注判定をしたい', 
@@ -776,14 +719,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
               onClick={() => { 
                 setValue('searchQuery', query); // 入力欄にテキストを設定するだけ
               }}
-              style={{
-                padding: '5px 10px',
-                backgroundColor: '#f8f9fa',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
+              className="px-2.5 py-1.5 bg-gray-100 border border-gray-300 rounded cursor-pointer text-xs hover:bg-gray-200"
             >
               {query}
             </button>
@@ -792,144 +728,63 @@ const ChatGPTSpreadsheet: React.FC = () => {
       </div>
 
       {currentFunction && (
-        <div className="function-info" style={{ 
-          backgroundColor: '#ffffff', 
-          padding: '20px', 
-          borderRadius: '8px', 
-          marginBottom: '20px',
-          border: '2px solid #e0e0e0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          color: '#333333'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', color: '#007bff' }}>
+        <div className="function-info bg-white p-5 rounded-lg mb-5 border-2 border-gray-200 shadow-lg text-gray-800">
+          <h3 className="m-0 mb-2.5 text-blue-600 text-lg font-semibold">
             {currentFunction.function_name} 関数
           </h3>
-          <p style={{ margin: '8px 0', color: '#555555', fontSize: '14px' }}>
-            <strong style={{ color: '#333333' }}>説明:</strong> {currentFunction.description}
+          <p className="my-2 text-gray-600 text-sm">
+            <strong className="text-gray-800">説明:</strong> {currentFunction.description}
           </p>
-          <p style={{ margin: '8px 0', color: '#555555', fontSize: '14px' }}>
-            <strong style={{ color: '#333333' }}>構文:</strong> 
-            <code style={{ 
-              backgroundColor: '#f5f5f5', 
-              padding: '2px 6px', 
-              borderRadius: '3px', 
-              color: '#d63384',
-              fontFamily: 'monospace',
-              fontSize: '13px'
-            }}>
+          <p className="my-2 text-gray-600 text-sm">
+            <strong className="text-gray-800">構文:</strong> 
+            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-pink-600 font-mono text-xs ml-1">
               {currentFunction.syntax}
             </code>
           </p>
-          <p style={{ margin: '8px 0', color: '#555555', fontSize: '14px' }}>
-            <strong style={{ color: '#333333' }}>カテゴリ:</strong> 
-            <span style={{ 
-              backgroundColor: '#e7f3ff', 
-              color: '#0066cc', 
-              padding: '2px 8px', 
-              borderRadius: '12px', 
-              fontSize: '12px',
-              fontWeight: '500'
-            }}>
+          <p className="my-2 text-gray-600 text-sm">
+            <strong className="text-gray-800">カテゴリ:</strong> 
+            <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium ml-1">
               {currentFunction.category}
             </span>
           </p>
-          <div style={{ 
-            margin: '15px 0', 
-            padding: '15px', 
-            backgroundColor: '#f8f9fa', 
-            borderRadius: '6px',
-            border: '1px solid #e9ecef'
-          }}>
-            <strong style={{ color: '#495057', fontSize: '14px' }}>🎨 スプレッドシートの色分け:</strong>
-            <ul style={{ 
-              margin: '8px 0 0 0', 
-              padding: '0', 
-              listStyle: 'none',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '8px'
-            }}>
-              <li style={{ display: 'flex', alignItems: 'center', margin: '4px 0' }}>
-                <span style={{ 
-                  backgroundColor: '#FFE0B2', 
-                  color: '#D84315',
-                  padding: '3px 8px', 
-                  borderRadius: '4px',
-                  fontSize: '11px',
-                  fontWeight: 'bold',
-                  border: '2px solid #FF9800',
-                  marginRight: '6px'
-                }}>📊 オレンジ枠</span>
-                <span style={{ fontSize: '13px', color: '#666666' }}>✨ <strong>SUM・VLOOKUP関数の結果</strong></span>
+          <div className="my-4 p-4 bg-gray-50 rounded-md border border-gray-200">
+            <strong className="text-gray-700 text-sm block mb-2">🎨 スプレッドシートの色分け:</strong>
+            <ul className="mt-2 p-0 list-none flex flex-wrap gap-2">
+              <li className="flex items-center my-1">
+                <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold border-2 border-orange-500 mr-1.5">
+                  📊 オレンジ枠
+                </span>
+                <span className="text-xs text-gray-600">✨ <strong>SUM・VLOOKUP関数の結果</strong></span>
               </li>
-              <li style={{ display: 'flex', alignItems: 'center', margin: '4px 0' }}>
-                <span style={{ 
-                  backgroundColor: '#E8F5E8', 
-                  color: '#2E7D32',
-                  padding: '3px 8px', 
-                  borderRadius: '4px',
-                  fontSize: '11px',
-                  fontWeight: 'bold',
-                  border: '1px solid #4CAF50',
-                  marginRight: '6px'
-                }}>🔢 緑枠</span>
-                <span style={{ fontSize: '13px', color: '#666666' }}>✨ <strong>その他の関数</strong></span>
+              <li className="flex items-center my-1">
+                <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold border border-green-500 mr-1.5">
+                  🔢 緑枠
+                </span>
+                <span className="text-xs text-gray-600">✨ <strong>その他の関数</strong></span>
               </li>
-              <li style={{ display: 'flex', alignItems: 'center', margin: '4px 0' }}>
-                <span style={{ 
-                  backgroundColor: '#E3F2FD', 
-                  color: '#1976D2',
-                  padding: '3px 8px', 
-                  borderRadius: '4px',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  marginRight: '6px'
-                }}>薄青</span>
-                <span style={{ fontSize: '13px', color: '#666666' }}>ヘッダー行</span>
+              <li className="flex items-center my-1">
+                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold mr-1.5">
+                  薄青
+                </span>
+                <span className="text-xs text-gray-600">ヘッダー行</span>
               </li>
-              <li style={{ display: 'flex', alignItems: 'center', margin: '4px 0' }}>
-                <span style={{ 
-                  backgroundColor: '#F0F4C3', 
-                  color: '#689F38',
-                  padding: '3px 8px', 
-                  borderRadius: '4px',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  marginRight: '6px'
-                }}>薄緑</span>
-                <span style={{ fontSize: '13px', color: '#666666' }}>データ行</span>
+              <li className="flex items-center my-1">
+                <span className="bg-lime-100 text-lime-700 px-2 py-0.5 rounded text-xs font-semibold mr-1.5">
+                  薄緑
+                </span>
+                <span className="text-xs text-gray-600">データ行</span>
               </li>
             </ul>
-            <div style={{ 
-              marginTop: '8px', 
-              padding: '8px', 
-              backgroundColor: '#FFF3E0', 
-              borderRadius: '4px',
-              fontSize: '12px'
-            }}>
+            <div className="mt-2 p-2 bg-orange-50 rounded text-xs">
               💡 <strong>ヒント:</strong> オレンジ枠（SUM関数）や緑枠（その他関数）のセルにマウスを置くと、使用している数式が表示されます
             </div>
           </div>
           {currentFunction.examples && (
-            <div style={{ marginTop: '15px' }}>
-              <strong style={{ color: '#495057', fontSize: '14px' }}>💡 使用例:</strong>
-              <div style={{ 
-                margin: '8px 0', 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: '8px' 
-              }}>
+            <div className="mt-4">
+              <strong className="text-gray-700 text-sm">💡 使用例:</strong>
+              <div className="my-2 flex flex-wrap gap-2">
                 {currentFunction.examples.map((example, index) => (
-                  <code key={index} style={{
-                    backgroundColor: '#f1f3f4',
-                    color: '#d73a49',
-                    padding: '6px 10px',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    fontFamily: 'Monaco, Consolas, monospace',
-                    border: '1px solid #e1e4e8',
-                    display: 'inline-block'
-                  }}>
+                  <code key={index} className="bg-gray-100 text-pink-600 px-2.5 py-1.5 rounded text-xs font-mono border border-gray-300 inline-block">
                     {example}
                   </code>
                 ))}
@@ -940,32 +795,16 @@ const ChatGPTSpreadsheet: React.FC = () => {
       )}
 
       {/* 数式バー */}
-      <div className="formula-bar-container" style={{ marginBottom: '15px' }}>
-        <div className="formula-bar" style={{
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor: '#f8f9fa',
-          border: '1px solid #dee2e6',
-          borderRadius: '6px',
-          padding: '8px 12px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
-          <div className="cell-address" style={{
-            minWidth: '60px',
-            padding: '4px 8px',
-            backgroundColor: '#e9ecef',
-            border: '1px solid #ced4da',
-            borderRadius: '4px',
-            fontWeight: 'bold',
-            fontSize: '13px',
-            color: '#495057',
-            marginRight: '8px'
-          }}>
+      <div className="formula-bar-container mb-4">
+        <div className="formula-bar flex items-center bg-gray-50 border border-gray-300 rounded-md px-3 py-2 shadow-sm">
+          <div className="cell-address min-w-[60px] px-2 py-1 bg-gray-200 border border-gray-400 rounded font-bold text-xs text-gray-700 mr-2 text-center">
             {selectedCellAddress || 'A1'}
           </div>
           <input 
             type="text"
-            className="formula-display"
+            className={`formula-display flex-1 px-2 py-1 bg-white border border-gray-400 rounded font-mono text-xs min-h-[22px] cursor-text outline-none ${
+              selectedCellFormula.startsWith('=') ? 'text-pink-600' : 'text-gray-800'
+            }`}
             value={selectedCellFormula || ''}
             readOnly
             onClick={(e) => {
@@ -985,19 +824,6 @@ const ChatGPTSpreadsheet: React.FC = () => {
               // フォーカス時に全選択
               e.currentTarget.select();
             }}
-            style={{
-              flex: 1,
-              padding: '4px 8px',
-              backgroundColor: 'white',
-              border: '1px solid #ced4da',
-              borderRadius: '4px',
-              fontFamily: 'Monaco, Consolas, "Lucida Console", monospace',
-              fontSize: '13px',
-              color: selectedCellFormula.startsWith('=') ? '#d73a49' : '#333',
-              minHeight: '22px',
-              cursor: 'text',
-              outline: 'none'
-            }}
             title="クリックして数式をコピーできます"
           />
         </div>
@@ -1005,31 +831,17 @@ const ChatGPTSpreadsheet: React.FC = () => {
       
       {/* コピーボタン */}
       {currentFunction && (
-        <div style={{ 
-          marginBottom: '10px', 
-          display: 'flex', 
-          justifyContent: 'flex-end',
-          gap: '10px'
-        }}>
+        <div className="mb-2.5 flex justify-end gap-2.5">
           <button
             onClick={copyWithFormulas}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
+            className="px-4 py-2 bg-green-600 text-white border-none rounded cursor-pointer text-sm font-medium hover:bg-green-700"
           >
             📋 数式付きでコピー
           </button>
         </div>
       )}
       
-      <div className="spreadsheet-container" style={{ height: '500px' }}>
+      <div className="spreadsheet-container h-[500px]">
         <Controller
           name="spreadsheetData"
           control={control}
@@ -1119,18 +931,18 @@ const ChatGPTSpreadsheet: React.FC = () => {
         />
       </div>
       
-      <div className="tips" style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-        <h4>使い方:</h4>
-        <ol>
-          <li><strong>クイック入力ボタン</strong>をクリックして検索欄にテキストを入力</li>
+      <div className="tips mt-5 text-sm text-gray-600">
+        <h4 className="text-base font-semibold text-gray-800 mb-3">使い方:</h4>
+        <ol className="list-decimal list-inside space-y-1 mb-4">
+          <li><strong className="text-gray-800">クイック入力ボタン</strong>をクリックして検索欄にテキストを入力</li>
           <li>または検索欄に直接、知りたい関数について自然言語で入力</li>
-          <li><strong>「関数を検索」ボタン</strong>をクリックしてデモを実行</li>
+          <li><strong className="text-gray-800">「関数を検索」ボタン</strong>をクリックしてデモを実行</li>
           <li>スプレッドシートに関数とサンプルデータが表示されます</li>
           <li>セルをダブルクリックして数式を編集・確認可能</li>
         </ol>
         
-        <h4>対応予定の機能:</h4>
-        <ul>
+        <h4 className="text-base font-semibold text-gray-800 mb-3">対応予定の機能:</h4>
+        <ul className="list-disc list-inside space-y-1">
           <li>すべてのExcel/Google Sheets関数</li>
           <li>複雑な数式の組み合わせ</li>
           <li>実用的なビジネスシナリオ</li>

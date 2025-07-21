@@ -10,7 +10,10 @@
       "Bash(npm cache clean:*)",
       "Bash(pnpm add:*)",
       "Bash(pkill:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(./node_modules/.bin/tailwindcss:*)"
     ],
     "deny": []
   }
