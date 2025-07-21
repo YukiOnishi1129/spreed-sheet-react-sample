@@ -642,7 +642,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
   };
 
   return (
-    <div className="chatgpt-spreadsheet relative">
+    <div className="chatgpt-spreadsheet relative max-w-7xl mx-auto px-6 py-8 space-y-8">
       {/* ローディングオーバーレイ */}
       {isSubmitting && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[9999] backdrop-blur-sm">
@@ -659,11 +659,11 @@ const ChatGPTSpreadsheet: React.FC = () => {
         </div>
       )}
 
-      <h2 className="text-2xl font-bold text-center mb-6">ChatGPT連携 Excel関数デモ</h2>
+      <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">ChatGPT連携 Excel関数デモ</h2>
       
-      <div className="search-section mb-5">
+      <div className="search-section bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/30 p-8 space-y-6 hover:shadow-2xl transition-all duration-300">
         <form onSubmit={handleSubmit(onSubmit as any)}>
-          <div className="search-input flex gap-3 mb-3">
+          <div className="search-input flex gap-3 mb-4">
             <Controller
               name="searchQuery"
               control={control}
@@ -673,7 +673,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
                   type="text"
                   onKeyDown={handleKeyDown}
                   placeholder="例：「営業の売上データで目標達成を判定したい」「在庫が少ない商品をチェックしたい」"
-                  className="flex-1 px-3 py-2.5 border border-gray-300 rounded-md text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
                   disabled={isSubmitting}
                 />
               )}
@@ -681,10 +681,10 @@ const ChatGPTSpreadsheet: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting || !userInput.trim()}
-              className={`px-5 py-2.5 text-white border-none rounded-md font-medium ${
+              className={`px-6 py-3 text-white border-none rounded-lg font-medium transition-all duration-200 ${
                 isSubmitting || !userInput.trim() 
                   ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
+                  : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5'
               }`}
             >
               {isSubmitting ? '検索中...' : '関数を検索'}
@@ -692,99 +692,124 @@ const ChatGPTSpreadsheet: React.FC = () => {
           </div>
         </form>
         
-        <div className="text-xs text-gray-600 mb-1">
-          関数テンプレート:
-        </div>
-        <div className="template-buttons flex gap-2.5 flex-wrap mb-4">
-          <button
-            onClick={() => setShowTemplateSelector(true)}
-            className="px-4 py-2 bg-blue-600 text-white border-none rounded-md cursor-pointer text-sm font-medium flex items-center gap-1.5 hover:bg-blue-700"
-          >
-            📚 テンプレートから選ぶ
-          </button>
-        </div>
-        
-        <div className="text-xs text-gray-600 mb-1">
-          または、フリー入力:
-        </div>
-        <div className="quick-buttons flex gap-2.5 flex-wrap">
-          {[
-            '営業の売上で目標達成を判定したい',
-            '在庫管理で発注判定をしたい', 
-            '成績データで合否判定をしたい',
-            '商品検索機能を作りたい'
-          ].map(query => (
+        <div className="space-y-3">
+          <div className="text-sm font-medium text-gray-700">
+            関数テンプレート:
+          </div>
+          <div className="template-buttons flex gap-3 flex-wrap">
             <button
-              key={query}
-              onClick={() => { 
-                setValue('searchQuery', query); // 入力欄にテキストを設定するだけ
-              }}
-              className="px-2.5 py-1.5 bg-gray-100 border border-gray-300 rounded cursor-pointer text-xs hover:bg-gray-200"
+              onClick={() => setShowTemplateSelector(true)}
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white border-none rounded-lg cursor-pointer text-sm font-medium flex items-center gap-2 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg"
             >
-              {query}
+              📚 テンプレートから選ぶ
             </button>
-          ))}
+          </div>
+          
+          <div className="text-sm font-medium text-gray-700 mt-4">
+            または、フリー入力:
+          </div>
+          <div className="quick-buttons flex gap-2 flex-wrap">
+            {[
+              '営業の売上で目標達成を判定したい',
+              '在庫管理で発注判定をしたい', 
+              '成績データで合否判定をしたい',
+              '商品検索機能を作りたい'
+            ].map(query => (
+              <button
+                key={query}
+                onClick={() => { 
+                  setValue('searchQuery', query); // 入力欄にテキストを設定するだけ
+                }}
+                className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer text-sm hover:bg-gray-100 hover:border-gray-300 transition-colors duration-200"
+              >
+                {query}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {currentFunction && (
-        <div className="function-info bg-white p-5 rounded-lg mb-5 border-2 border-gray-200 shadow-lg text-gray-800">
-          <h3 className="m-0 mb-2.5 text-blue-600 text-lg font-semibold">
-            {currentFunction.function_name} 関数
-          </h3>
-          <p className="my-2 text-gray-600 text-sm">
-            <strong className="text-gray-800">説明:</strong> {currentFunction.description}
-          </p>
-          <p className="my-2 text-gray-600 text-sm">
-            <strong className="text-gray-800">構文:</strong> 
-            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-pink-600 font-mono text-xs ml-1">
-              {currentFunction.syntax}
-            </code>
-          </p>
-          <p className="my-2 text-gray-600 text-sm">
-            <strong className="text-gray-800">カテゴリ:</strong> 
-            <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium ml-1">
-              {currentFunction.category}
-            </span>
-          </p>
-          <div className="my-4 p-4 bg-gray-50 rounded-md border border-gray-200">
-            <strong className="text-gray-700 text-sm block mb-2">🎨 スプレッドシートの色分け:</strong>
-            <ul className="mt-2 p-0 list-none flex flex-wrap gap-2">
-              <li className="flex items-center my-1">
-                <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold border-2 border-orange-500 mr-1.5">
+        <div className="function-info bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/40 p-8 space-y-6 hover:shadow-2xl transition-all duration-300">
+          <div className="border-b border-gray-100 pb-4">
+            <h3 className="text-xl font-bold text-blue-600 mb-2">
+              {currentFunction.function_name} 関数
+            </h3>
+            <p className="text-gray-700 leading-relaxed">
+              <strong className="text-gray-900">説明:</strong> {currentFunction.description}
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-700">
+                <strong className="text-gray-900">構文:</strong>
+              </p>
+              <code className="block mt-1 bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg text-pink-600 font-mono text-sm">
+                {currentFunction.syntax}
+              </code>
+            </div>
+            
+            <div>
+              <p className="text-gray-700">
+                <strong className="text-gray-900">カテゴリ:</strong>
+              </p>
+              <span className="inline-block mt-1 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium border border-blue-200">
+                {currentFunction.category}
+              </span>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
+            <strong className="text-gray-800 text-sm block mb-3 flex items-center gap-2">
+              🎨 スプレッドシートの色分け
+            </strong>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex items-center gap-3">
+                <span className="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-orange-400 shadow-sm">
                   📊 オレンジ枠
                 </span>
-                <span className="text-xs text-gray-600">✨ <strong>SUM・VLOOKUP関数の結果</strong></span>
-              </li>
-              <li className="flex items-center my-1">
-                <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold border border-green-500 mr-1.5">
+                <span className="text-sm text-gray-700"><strong>SUM・VLOOKUP関数の結果</strong></span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-400 shadow-sm">
                   🔢 緑枠
                 </span>
-                <span className="text-xs text-gray-600">✨ <strong>その他の関数</strong></span>
-              </li>
-              <li className="flex items-center my-1">
-                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold mr-1.5">
-                  薄青
+                <span className="text-sm text-gray-700"><strong>その他の関数</strong></span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm">
+                  📘 薄青
                 </span>
-                <span className="text-xs text-gray-600">ヘッダー行</span>
-              </li>
-              <li className="flex items-center my-1">
-                <span className="bg-lime-100 text-lime-700 px-2 py-0.5 rounded text-xs font-semibold mr-1.5">
-                  薄緑
+                <span className="text-sm text-gray-700">ヘッダー行</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="bg-lime-100 text-lime-700 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm">
+                  📗 薄緑
                 </span>
-                <span className="text-xs text-gray-600">データ行</span>
-              </li>
-            </ul>
-            <div className="mt-2 p-2 bg-orange-50 rounded text-xs">
-              💡 <strong>ヒント:</strong> オレンジ枠（SUM関数）や緑枠（その他関数）のセルにマウスを置くと、使用している数式が表示されます
+                <span className="text-sm text-gray-700">データ行</span>
+              </div>
+            </div>
+            
+            <div className="mt-4 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-200">
+              <div className="flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">💡</span>
+                <span className="text-sm text-gray-700">
+                  <strong>ヒント:</strong> オレンジ枠（SUM関数）や緑枠（その他関数）のセルにマウスを置くと、使用している数式が表示されます
+                </span>
+              </div>
             </div>
           </div>
           {currentFunction.examples && (
-            <div className="mt-4">
-              <strong className="text-gray-700 text-sm">💡 使用例:</strong>
-              <div className="my-2 flex flex-wrap gap-2">
+            <div className="space-y-3">
+              <strong className="text-gray-800 text-sm flex items-center gap-2">
+                💡 使用例:
+              </strong>
+              <div className="flex flex-wrap gap-3">
                 {currentFunction.examples.map((example, index) => (
-                  <code key={index} className="bg-gray-100 text-pink-600 px-2.5 py-1.5 rounded text-xs font-mono border border-gray-300 inline-block">
+                  <code key={index} className="bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 px-3 py-2 rounded-lg text-sm font-mono border border-pink-200 shadow-sm hover:shadow-md transition-shadow">
                     {example}
                   </code>
                 ))}
@@ -795,53 +820,69 @@ const ChatGPTSpreadsheet: React.FC = () => {
       )}
 
       {/* 数式バー */}
-      <div className="formula-bar-container mb-4">
-        <div className="formula-bar flex items-center bg-gray-50 border border-gray-300 rounded-md px-3 py-2 shadow-sm">
-          <div className="cell-address min-w-[60px] px-2 py-1 bg-gray-200 border border-gray-400 rounded font-bold text-xs text-gray-700 mr-2 text-center">
-            {selectedCellAddress || 'A1'}
+      <div className="formula-bar-container">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/40 p-6 hover:shadow-2xl transition-all duration-300">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">セル:</span>
+              <div className="cell-address min-w-[70px] px-3 py-2 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg font-bold text-sm text-blue-800 text-center shadow-sm">
+                {selectedCellAddress || 'A1'}
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-medium text-gray-700">数式:</span>
+                <span className="text-xs text-gray-500">(クリックでコピー)</span>
+              </div>
+              <input 
+                type="text"
+                className={`formula-display w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm min-h-[40px] cursor-text outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                  selectedCellFormula.startsWith('=') 
+                    ? 'text-pink-600 bg-pink-50 border-pink-300' 
+                    : 'text-gray-800'
+                }`}
+                value={selectedCellFormula || ''}
+                readOnly
+                placeholder="セルを選択すると数式が表示されます..."
+                onClick={(e) => {
+                  // イベントの伝播を停止してSpreadsheetへの影響を防ぐ
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // 入力フィールドにフォーカスして全選択
+                  e.currentTarget.focus();
+                  e.currentTarget.select();
+                }}
+                onMouseDown={(e) => {
+                  // マウスダウン時もイベントの伝播を停止
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onFocus={(e) => {
+                  // フォーカス時に全選択
+                  e.currentTarget.select();
+                }}
+                title="クリックして数式をコピーできます"
+              />
+            </div>
           </div>
-          <input 
-            type="text"
-            className={`formula-display flex-1 px-2 py-1 bg-white border border-gray-400 rounded font-mono text-xs min-h-[22px] cursor-text outline-none ${
-              selectedCellFormula.startsWith('=') ? 'text-pink-600' : 'text-gray-800'
-            }`}
-            value={selectedCellFormula || ''}
-            readOnly
-            onClick={(e) => {
-              // イベントの伝播を停止してSpreadsheetへの影響を防ぐ
-              e.preventDefault();
-              e.stopPropagation();
-              // 入力フィールドにフォーカスして全選択
-              e.currentTarget.focus();
-              e.currentTarget.select();
-            }}
-            onMouseDown={(e) => {
-              // マウスダウン時もイベントの伝播を停止
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onFocus={(e) => {
-              // フォーカス時に全選択
-              e.currentTarget.select();
-            }}
-            title="クリックして数式をコピーできます"
-          />
         </div>
       </div>
       
       {/* コピーボタン */}
       {currentFunction && (
-        <div className="mb-2.5 flex justify-end gap-2.5">
+        <div className="flex justify-end">
           <button
             onClick={copyWithFormulas}
-            className="px-4 py-2 bg-green-600 text-white border-none rounded cursor-pointer text-sm font-medium hover:bg-green-700"
+            className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white border-none rounded-lg cursor-pointer text-sm font-medium hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2"
           >
-            📋 数式付きでコピー
+            <span>📋</span>
+            数式付きでコピー
           </button>
         </div>
       )}
       
-      <div className="spreadsheet-container h-[500px]">
+      <div className="spreadsheet-container bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/40 p-8 min-h-[500px] hover:shadow-2xl transition-all duration-300">
         <Controller
           name="spreadsheetData"
           control={control}
@@ -931,23 +972,60 @@ const ChatGPTSpreadsheet: React.FC = () => {
         />
       </div>
       
-      <div className="tips mt-5 text-sm text-gray-600">
-        <h4 className="text-base font-semibold text-gray-800 mb-3">使い方:</h4>
-        <ol className="list-decimal list-inside space-y-1 mb-4">
-          <li><strong className="text-gray-800">クイック入力ボタン</strong>をクリックして検索欄にテキストを入力</li>
-          <li>または検索欄に直接、知りたい関数について自然言語で入力</li>
-          <li><strong className="text-gray-800">「関数を検索」ボタン</strong>をクリックしてデモを実行</li>
-          <li>スプレッドシートに関数とサンプルデータが表示されます</li>
-          <li>セルをダブルクリックして数式を編集・確認可能</li>
-        </ol>
-        
-        <h4 className="text-base font-semibold text-gray-800 mb-3">対応予定の機能:</h4>
-        <ul className="list-disc list-inside space-y-1">
-          <li>すべてのExcel/Google Sheets関数</li>
-          <li>複雑な数式の組み合わせ</li>
-          <li>実用的なビジネスシナリオ</li>
-          <li>関数の学習履歴</li>
-        </ul>
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              📖 使い方
+            </h4>
+            <ol className="space-y-3 text-gray-700">
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                <span><strong className="text-gray-900">クイック入力ボタン</strong>をクリックして検索欄にテキストを入力</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <span>または検索欄に直接、知りたい関数について自然言語で入力</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <span><strong className="text-gray-900">「関数を検索」ボタン</strong>をクリックしてデモを実行</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                <span>スプレッドシートに関数とサンプルデータが表示されます</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">5</span>
+                <span>セルをダブルクリックして数式を編集・確認可能</span>
+              </li>
+            </ol>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              🚀 対応予定の機能
+            </h4>
+            <ul className="space-y-2 text-gray-700">
+              <li className="flex items-center gap-3">
+                <span className="text-green-500">✅</span>
+                <span>すべてのExcel/Google Sheets関数</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="text-green-500">✅</span>
+                <span>複雑な数式の組み合わせ</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="text-green-500">✅</span>
+                <span>実用的なビジネスシナリオ</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="text-yellow-500">🔄</span>
+                <span>関数の学習履歴</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       
       {/* テンプレート選択モーダル */}

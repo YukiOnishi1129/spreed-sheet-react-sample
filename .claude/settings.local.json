@@ -13,7 +13,9 @@
       "Bash(npx tsc:*)",
       "Bash(npm uninstall:*)",
       "Bash(npx tailwindcss:*)",
-      "Bash(./node_modules/.bin/tailwindcss:*)"
+      "Bash(./node_modules/.bin/tailwindcss:*)",
+      "Bash(mv:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }
