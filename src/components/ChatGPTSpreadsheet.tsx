@@ -98,8 +98,8 @@ const ChatGPTSpreadsheet: React.FC = () => {
         
         
         // 計算結果を取得
-        calculationResults = rawData.map((row, rowIndex) => 
-          row.map((cell, colIndex) => {
+        calculationResults = rawData.map((row: any[], rowIndex: number) => 
+          row.map((cell: any, colIndex: number) => {
             try {
               const result = tempHf.getCellValue({ sheet: 0, row: rowIndex, col: colIndex });
               
@@ -269,8 +269,8 @@ const ChatGPTSpreadsheet: React.FC = () => {
         });
         
         // 計算結果を取得
-        calculationResults = rawData.map((row, rowIndex) => 
-          row.map((cell, colIndex) => {
+        calculationResults = rawData.map((row: any[], rowIndex: number) => 
+          row.map((cell: any, colIndex: number) => {
             try {
               const result = tempHf.getCellValue({ sheet: 0, row: rowIndex, col: colIndex });
               return result;

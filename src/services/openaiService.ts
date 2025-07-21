@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import type { ExcelFunctionResponse } from '../types/spreadsheet';
+import { OPENAI_JSON_SCHEMA, ExcelFunctionResponseSchema } from '../types/spreadsheet';
 import { getMockFunction } from './mockData';
 import { enhanceUserPrompt } from './promptEnhancer';
 
@@ -11,9 +12,9 @@ const openai = new OpenAI({
 
 const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門家です。
 
-【最重要】ユーザーの自由な要求に基づいて、確実に動作するスプレッドシートデータをJSON形式で生成してください。エラーが発生しない、実用的なデモデータを作成することが最も重要です。
+【最重要】ユーザーの要求に基づいて、確実に動作するスプレッドシートデータを生成してください。エラーが発生しない、実用的なデモデータを作成することが最も重要です。
 
-以下の形式で厳密にJSONを返してください：
+Structured Outputsにより、レスポンスは自動的に指定されたJSON形式に変換されます。以下の要件に従ってデータを生成してください：
 {
   "function_name": "関数名（例：SUM, AVERAGE, VLOOKUP）",
   "description": "関数の分かりやすい説明",
@@ -212,12 +213,35 @@ const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門
 - 複数の関数を組み合わせた実用的なデータ構造にする
 - 各関数の役割を明確にする
 
-**JSON構文の注意点：**
-- 数式内の文字列は必ずエスケープしてください（例："=IF(A1>10,\\"大\\",\\"小\\")"）
-- 文字列内にダブルクォートがある場合は \\" を使用
-- 正しいJSON形式を厳守してください
+**重要な注意事項：**
+- Structured Outputsにより自動的にJSON形式で出力されます
+- 8行×8列の配列構造を必ず守ってください
+- 循環参照を絶対に避けてください
+- 数式は具体的なセル参照を使用してください（例：=SUM(B2:B5)）
+- 数式内の文字列は適切にエスケープしてください
 
-JSONのみを返してください。`;
+実用的で教育的なデモデータを作成してください。`;
+
+// Retry機能（指数バックオフ）
+const retryWithBackoff = async <T>(
+  fn: () => Promise<T>, 
+  maxRetries = 3,
+  baseDelay = 100
+): Promise<T> => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      
+      // 指数バックオフ（100ms, 200ms, 400ms）
+      const delay = baseDelay * Math.pow(2, i);
+      console.log(`リトライ ${i + 1}/${maxRetries} - ${delay}ms待機中...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Unreachable'); // TypeScript用
+};
 
 export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionResponse> => {
   // APIキーが設定されていない場合はモック関数を返す
@@ -227,20 +251,46 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
   }
 
   try {
-    const response = await openai.chat.completions.create({
-      model: import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: SYSTEM_PROMPT
-        },
-        {
-          role: 'user',
-          content: enhanceUserPrompt(query)
-        }
-      ],
-      temperature: 0.3, // より一貫した結果のために温度を下げる
-      max_tokens: 3000, // より長いレスポンスに対応
+    const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+    
+    // 一時的にStructured Outputsを無効化して従来の方法を使用
+    const supportsStructuredOutputs = false;
+    const isLegacyModel = false;
+    
+    console.log(`使用モデル: ${model}, Structured Outputs対応: ${supportsStructuredOutputs}`);
+    
+    // Structured Outputsでretryロジックを使用
+    const response = await retryWithBackoff(async () => {
+      const params: any = {
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: SYSTEM_PROMPT
+          },
+          {
+            role: 'user',
+            content: enhanceUserPrompt(query)
+          }
+        ],
+        temperature: 0.1, // より一貫した結果のために温度を大幅に下げる
+        seed: 12345, // 再現性のためのseed値
+        max_tokens: 4000, // より長いレスポンスに対応
+      };
+      
+      // Structured Outputs対応モデルの場合のみresponse_formatを追加
+      if (supportsStructuredOutputs && !isLegacyModel) {
+        params.response_format = {
+          type: "json_schema",
+          json_schema: {
+            name: "excel_function_response",
+            schema: OPENAI_JSON_SCHEMA,
+            strict: true
+          }
+        };
+      }
+      
+      return await openai.chat.completions.create(params);
     });
 
     const content = response.choices[0]?.message?.content;
@@ -248,61 +298,84 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
       throw new Error('OpenAI APIからレスポンスが取得できませんでした');
     }
 
-    // JSONを解析
+    // Structured Outputs対応モデルかどうかでパース処理を分岐
     try {
-      // JSONの抽出を試行
-      let jsonData;
+      let rawData;
       
-      // まず```json```で囲まれているかチェック
-      const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch) {
-        jsonData = codeBlockMatch[1];
+      if (supportsStructuredOutputs && !isLegacyModel) {
+        // Structured OutputsでJSONが保証されているので直接パース
+        console.log('Structured Output レスポンス:', content);
+        rawData = JSON.parse(content);
       } else {
-        // 通常のJSONパターンを探す
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-          throw new Error('有効なJSONが見つかりませんでした');
+        // 従来の方法：JSONを抽出してパース
+        console.log('従来のJSONパース レスポンス:', content);
+        
+        // JSONの抽出を試行
+        let jsonData;
+        
+        // まず```json```で囲まれているかチェック
+        const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
+        if (codeBlockMatch) {
+          jsonData = codeBlockMatch[1];
+        } else {
+          // 通常のJSONパターンを探す
+          const jsonMatch = content.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) {
+            throw new Error('有効なJSONが見つかりませんでした');
+          }
+          jsonData = jsonMatch[0];
         }
-        jsonData = jsonMatch[0];
-      }
-      
-      // 一般的なJSON構文エラーを自動修正
-      // まず、不正な制御文字を削除
-      jsonData = jsonData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-      
-      // より安全なJSON修正：JSONをパースできるまで修正を試行
-      let attempts = 0;
-      while (attempts < 3) {
-        try {
-          JSON.parse(jsonData);
-          break; // パースに成功したら終了
-        } catch (error) {
-          attempts++;
-          // 数式内の引用符を段階的に修正
-          if (attempts === 1) {
-            // エスケープされていない引用符を修正
-            jsonData = jsonData.replace(/"f":\s*"=([^"]*)"([^"]*)"([^"]*)"/g, '"f": "=$1\\"$2\\"$3"');
-          } else if (attempts === 2) {
-            // より広範囲の引用符を修正
-            jsonData = jsonData.replace(/([^\\])"([^\\])/g, '$1\\"$2');
+        
+        // 一般的なJSON構文エラーを自動修正
+        jsonData = jsonData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+        
+        // より安全なJSON修正：JSONをパースできるまで修正を試行
+        let attempts = 0;
+        while (attempts < 3) {
+          try {
+            JSON.parse(jsonData);
+            break; // パースに成功したら終了
+          } catch (error) {
+            attempts++;
+            // 数式内の引用符を段階的に修正
+            if (attempts === 1) {
+              // エスケープされていない引用符を修正
+              jsonData = jsonData.replace(/"f":\s*"=([^"]*)"([^"]*)"([^"]*)"/g, '"f": "=$1\\"$2\\"$3"');
+            } else if (attempts === 2) {
+              // より広範囲の引用符を修正
+              jsonData = jsonData.replace(/([^\\])"([^\\])/g, '$1\\"$2');
+            }
           }
         }
+        
+        console.log('修正後のJSON:', jsonData);
+        rawData = JSON.parse(jsonData);
       }
       
-      console.log('修正後のJSON:', jsonData);
+      // Zodでバリデーション（空文字をデフォルト値で補完）
+      const preprocessedData = {
+        ...rawData,
+        function_name: rawData.function_name || "Excel関数",
+        description: rawData.description || "Excel関数の説明",
+        syntax: rawData.syntax || "関数の構文",
+        category: rawData.category || "Excel関数",
+      };
       
-      const functionData = JSON.parse(jsonData) as ExcelFunctionResponse;
+      const functionData = ExcelFunctionResponseSchema.parse(preprocessedData);
       
-      // データの検証
-      if (!functionData.function_name || !functionData.spreadsheet_data) {
-        throw new Error('不正なレスポンス形式です');
-      }
-
+      console.log('バリデーション済みデータ:', functionData);
       return functionData;
+      
     } catch (parseError) {
       console.error('JSON解析エラー:', parseError);
       console.error('レスポンス内容:', content);
-      throw new Error('APIレスポンスの解析に失敗しました');
+      
+      // Zodのバリデーションエラーの場合、詳細を表示
+      if (parseError instanceof Error && parseError.name === 'ZodError') {
+        console.error('Zodバリデーションエラーの詳細:', JSON.stringify((parseError as any).issues, null, 2));
+      }
+      
+      throw new Error('APIレスポンスの解析に失敗しました: ' + parseError);
     }
 
   } catch (error) {

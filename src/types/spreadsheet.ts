@@ -26,15 +26,103 @@ export const CellSelectionSchema = z.object({
   formula: z.string(),
 });
 
-// ChatGPT APIレスポンスのスキーマ
+// ChatGPT APIのセルデータスキーマ（厳密なスキーマ）
+export const APIResponseCellSchema = z.object({
+  v: z.union([z.string(), z.number(), z.null()]).optional(), // 値
+  f: z.string().optional(), // 数式
+  ct: z.object({ t: z.enum(['s', 'n']) }).optional(), // セルタイプ
+  bg: z.string().optional(), // 背景色
+  fc: z.string().optional(), // フォントカラー
+}).nullable();
+
+// ChatGPT APIレスポンスのスキーマ（柔軟なスキーマ）
 export const ExcelFunctionResponseSchema = z.object({
-  function_name: z.string(),
-  description: z.string(),
-  syntax: z.string(),
-  category: z.string(),
-  spreadsheet_data: z.array(z.array(z.any())),
+  function_name: z.string().default("Excel関数"),
+  description: z.string().default("Excel関数の説明"),
+  syntax: z.string().default("関数の構文"),
+  category: z.string().default("Excel関数"),
+  spreadsheet_data: z.array(
+    z.array(APIResponseCellSchema).min(1, "各行は最低1列必要です")
+  ).min(1, "最低1行必要です"),
   examples: z.array(z.string()).optional(),
 });
+
+// JSON Schema用のスキーマ定義（OpenAI Structured Outputs用）
+export const OPENAI_JSON_SCHEMA = {
+  type: "object",
+  properties: {
+    function_name: {
+      type: "string",
+      description: "Excel関数名（例：SUM, VLOOKUP, IF）"
+    },
+    description: {
+      type: "string",
+      description: "関数の分かりやすい説明"
+    },
+    syntax: {
+      type: "string",
+      description: "関数の構文"
+    },
+    category: {
+      type: "string",
+      description: "関数のカテゴリ"
+    },
+    spreadsheet_data: {
+      type: "array",
+      description: "8行×8列のスプレッドシートデータ",
+      items: {
+        type: "array",
+        items: {
+          type: ["object", "null"],
+          properties: {
+            v: {
+              type: ["string", "number", "null"],
+              description: "セルの値"
+            },
+            f: {
+              type: "string",
+              description: "数式（=で始まる）"
+            },
+            ct: {
+              type: "object",
+              properties: {
+                t: {
+                  type: "string",
+                  enum: ["s", "n"],
+                  description: "セルタイプ（s:文字列, n:数値）"
+                }
+              },
+              required: ["t"],
+              additionalProperties: false
+            },
+            bg: {
+              type: "string",
+              description: "背景色（#RRGGBB形式）"
+            },
+            fc: {
+              type: "string",
+              description: "フォント色（#RRGGBB形式）"
+            }
+          },
+          additionalProperties: false
+        },
+        minItems: 8,
+        maxItems: 8
+      },
+      minItems: 8,
+      maxItems: 8
+    },
+    examples: {
+      type: "array",
+      items: {
+        type: "string"
+      },
+      description: "使用例の配列"
+    }
+  },
+  required: ["function_name", "description", "syntax", "category", "spreadsheet_data"],
+  additionalProperties: false
+} as const;
 
 // フォーム全体のスキーマ
 export const SpreadsheetFormSchema = z.object({

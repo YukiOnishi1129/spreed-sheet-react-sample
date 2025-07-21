@@ -38,9 +38,9 @@ export const mockFunctions: { [key: string]: ExcelFunctionResponse } = {
       ],
       [
         { v: "合計", ct: { t: "s" }, bg: "#E8F5E8" },
-        { v: 370000, f: "=SUM(B2:B4)", bg: "#FFE0B2", fc: "#D84315", bl: 1 },
-        { v: 105000, f: "=SUM(C2:C4)", bg: "#FFE0B2", fc: "#D84315", bl: 1 },
-        { v: 265000, f: "=SUM(D2:D4)", bg: "#FFE0B2", fc: "#D84315", bl: 1 },
+        { v: 370000, f: "=SUM(B2:B4)", bg: "#FFE0B2", fc: "#D84315" },
+        { v: 105000, f: "=SUM(C2:C4)", bg: "#FFE0B2", fc: "#D84315" },
+        { v: 265000, f: "=SUM(D2:D4)", bg: "#FFE0B2", fc: "#D84315" },
         null, null, null, null
       ],
       [null, null, null, null, null, null, null, null],
@@ -68,7 +68,7 @@ export const mockFunctions: { [key: string]: ExcelFunctionResponse } = {
         { v: "ノートPC", ct: { t: "s" }, bg: "#F0F4C3" },
         { v: 80000, ct: { t: "n" }, bg: "#F0F4C3" },
         { v: "P002", ct: { t: "s" }, bg: "#FFECB3" },
-        { v: null, f: "=VLOOKUP(D2,A2:C4,2,0)", bg: "#FFE0B2", fc: "#D84315", bl: 1 },
+        { v: null, f: "=VLOOKUP(D2,A2:C4,2,0)", bg: "#FFE0B2", fc: "#D84315" },
         null, null, null
       ],
       [
@@ -76,7 +76,7 @@ export const mockFunctions: { [key: string]: ExcelFunctionResponse } = {
         { v: "タブレット", ct: { t: "s" }, bg: "#F0F4C3" },
         { v: 45000, ct: { t: "n" }, bg: "#F0F4C3" },
         { v: "P003", ct: { t: "s" }, bg: "#FFECB3" },
-        { v: null, f: "=VLOOKUP(D3,A2:C4,2,0)", bg: "#FFE0B2", fc: "#D84315", bl: 1 },
+        { v: null, f: "=VLOOKUP(D3,A2:C4,2,0)", bg: "#FFE0B2", fc: "#D84315" },
         null, null, null
       ],
       [
@@ -108,22 +108,22 @@ export const mockFunctions: { [key: string]: ExcelFunctionResponse } = {
       [
         { v: "田中", ct: { t: "s" } },
         { v: 85, ct: { t: "n" } },
-        { v: "合格", f: '=IF(B2>=60,"合格","不合格")', bg: "#4CAF50", fc: "#FFFFFF", bl: 1 },
-        { v: "A", f: '=IF(B2>=90,"S",IF(B2>=80,"A",IF(B2>=70,"B","C")))', bg: "#9C27B0", fc: "#FFFFFF", bl: 1 },
+        { v: "合格", f: '=IF(B2>=60,"合格","不合格")', bg: "#4CAF50", fc: "#FFFFFF",  },
+        { v: "A", f: '=IF(B2>=90,"S",IF(B2>=80,"A",IF(B2>=70,"B","C")))', bg: "#9C27B0", fc: "#FFFFFF",  },
         null, null, null, null
       ],
       [
         { v: "佐藤", ct: { t: "s" } },
         { v: 45, ct: { t: "n" } },
-        { v: "不合格", f: '=IF(B3>=60,"合格","不合格")', bg: "#4CAF50", fc: "#FFFFFF", bl: 1 },
-        { v: "C", f: '=IF(B3>=90,"S",IF(B3>=80,"A",IF(B3>=70,"B","C")))', bg: "#9C27B0", fc: "#FFFFFF", bl: 1 },
+        { v: "不合格", f: '=IF(B3>=60,"合格","不合格")', bg: "#4CAF50", fc: "#FFFFFF",  },
+        { v: "C", f: '=IF(B3>=90,"S",IF(B3>=80,"A",IF(B3>=70,"B","C")))', bg: "#9C27B0", fc: "#FFFFFF",  },
         null, null, null, null
       ],
       [
         { v: "鈴木", ct: { t: "s" } },
         { v: 92, ct: { t: "n" } },
-        { v: "合格", f: '=IF(B4>=60,"合格","不合格")', bg: "#4CAF50", fc: "#FFFFFF", bl: 1 },
-        { v: "S", f: '=IF(B4>=90,"S",IF(B4>=80,"A",IF(B4>=70,"B","C")))', bg: "#9C27B0", fc: "#FFFFFF", bl: 1 },
+        { v: "合格", f: '=IF(B4>=60,"合格","不合格")', bg: "#4CAF50", fc: "#FFFFFF",  },
+        { v: "S", f: '=IF(B4>=90,"S",IF(B4>=80,"A",IF(B4>=70,"B","C")))', bg: "#9C27B0", fc: "#FFFFFF",  },
         null, null, null, null
       ],
       [null, null, null, null, null, null, null, null],
