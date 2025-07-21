@@ -56,6 +56,9 @@ const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門
 - 循環参照（#CYCLE!エラーの原因）
 - 不正なセル参照
 - 配列の要素数不一致
+- VLOOKUP関数での範囲外参照（#NAME?エラーの原因）
+- 存在しない関数名や構文エラー
+- 引用符の不適切な使用
 
 **SUM関数の完全な例：**
 {
@@ -106,7 +109,95 @@ const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門
   "examples": ["=SUM(A1:A10)", "=SUM(A1,B1,C1)", "=SUM(A1:A5,C1:C5)"]
 }
 
-この例のように、実用的で循環参照のないデータを生成してください。JSONのみを返してください。`;
+**VLOOKUP関数の完全な例：**
+{
+  "function_name": "VLOOKUP",
+  "description": "テーブルの左端の列で値を検索し、同じ行の指定した列から値を返します",
+  "syntax": "VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])",
+  "category": "検索関数",
+  "spreadsheet_data": [
+    [
+      {"v": "商品コード", "ct": {"t": "s"}, "bg": "#E1F5FE"},
+      {"v": "商品名", "ct": {"t": "s"}, "bg": "#E1F5FE"},
+      {"v": "価格", "ct": {"t": "s"}, "bg": "#E1F5FE"},
+      {"v": "検索コード", "ct": {"t": "s"}, "bg": "#FFF8E1"},
+      {"v": "検索結果", "ct": {"t": "s"}, "bg": "#FFF8E1"},
+      null, null, null
+    ],
+    [
+      {"v": "P001", "ct": {"t": "s"}, "bg": "#F0F4C3"},
+      {"v": "ノートPC", "ct": {"t": "s"}, "bg": "#F0F4C3"},
+      {"v": 80000, "ct": {"t": "n"}, "bg": "#F0F4C3"},
+      {"v": "P002", "ct": {"t": "s"}, "bg": "#FFECB3"},
+      {"v": null, "f": "=VLOOKUP(D2,A2:C4,2,0)", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": "P002", "ct": {"t": "s"}, "bg": "#F0F4C3"},
+      {"v": "タブレット", "ct": {"t": "s"}, "bg": "#F0F4C3"},
+      {"v": 45000, "ct": {"t": "n"}, "bg": "#F0F4C3"},
+      {"v": "P003", "ct": {"t": "s"}, "bg": "#FFECB3"},
+      {"v": null, "f": "=VLOOKUP(D3,A2:C4,2,0)", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": "P003", "ct": {"t": "s"}, "bg": "#F0F4C3"},
+      {"v": "スマートフォン", "ct": {"t": "s"}, "bg": "#F0F4C3"},
+      {"v": 65000, "ct": {"t": "n"}, "bg": "#F0F4C3"},
+      null, null, null, null, null
+    ],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null]
+  ],
+  "examples": ["=VLOOKUP(\"P001\",A2:C4,2,0)", "=VLOOKUP(D2,A2:C4,3,0)"]
+}
+
+**IF関数の完全な例：**
+{
+  "function_name": "IF",
+  "description": "条件に基づいて異なる値を返します",
+  "syntax": "IF(logical_test, value_if_true, value_if_false)",
+  "category": "論理関数",
+  "spreadsheet_data": [
+    [
+      {"v": "学生名", "ct": {"t": "s"}, "bg": "#E8EAF6"},
+      {"v": "点数", "ct": {"t": "s"}, "bg": "#E8EAF6"},
+      {"v": "合否", "ct": {"t": "s"}, "bg": "#E1F5FE"},
+      {"v": "評価", "ct": {"t": "s"}, "bg": "#F3E5F5"},
+      null, null, null, null
+    ],
+    [
+      {"v": "田中", "ct": {"t": "s"}},
+      {"v": 85, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B2>=60,\"合格\",\"不合格\")", "bg": "#4CAF50", "fc": "#FFFFFF"},
+      {"v": null, "f": "=IF(B2>=90,\"優\",IF(B2>=80,\"良\",IF(B2>=70,\"可\",\"不可\")))", "bg": "#9C27B0", "fc": "#FFFFFF"},
+      null, null, null, null
+    ],
+    [
+      {"v": "佐藤", "ct": {"t": "s"}},
+      {"v": 45, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B3>=60,\"合格\",\"不合格\")", "bg": "#4CAF50", "fc": "#FFFFFF"},
+      {"v": null, "f": "=IF(B3>=90,\"優\",IF(B3>=80,\"良\",IF(B3>=70,\"可\",\"不可\")))", "bg": "#9C27B0", "fc": "#FFFFFF"},
+      null, null, null, null
+    ],
+    [
+      {"v": "鈴木", "ct": {"t": "s"}},
+      {"v": 92, "ct": {"t": "n"}},
+      {"v": null, "f": "=IF(B4>=60,\"合格\",\"不合格\")", "bg": "#4CAF50", "fc": "#FFFFFF"},
+      {"v": null, "f": "=IF(B4>=90,\"優\",IF(B4>=80,\"良\",IF(B4>=70,\"可\",\"不可\")))", "bg": "#9C27B0", "fc": "#FFFFFF"},
+      null, null, null, null
+    ],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null]
+  ],
+  "examples": ["=IF(A1>10,\"大\",\"小\")", "=IF(B1=\"\",0,B1*2)"]
+}
+
+これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。JSONのみを返してください。`;
 
 export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionResponse> => {
   // APIキーが設定されていない場合はモック関数を返す
@@ -125,7 +216,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         },
         {
           role: 'user',
-          content: `ユーザー要求: "${query}"\n\n上記の要求に基づいて、実用的で循環参照のないスプレッドシートデータを含むJSONを生成してください。必ず8行8列の配列にし、数式は具体的なセル参照を使用してください。`
+          content: `ユーザー要求: "${query}"\n\n上記の要求に基づいて、実用的で循環参照のないスプレッドシートデータを含むJSONを生成してください。必ず8行8列の配列にし、数式は具体的なセル参照を使用してください。\n\n特に検索関数（VLOOKUP等）を生成する場合は：\n1. 検索範囲は実際に存在するセル範囲を指定\n2. 列番号は1から始まる整数を使用\n3. 検索値は実際にテーブル内に存在する値を使用\n4. VLOOKUP関数の最後の引数は必ず数値（0または1）を使用し、FALSEやTRUEは使わない\n5. 構文例: =VLOOKUP(D2,A2:C4,2,0)\n6. #NAME?や#N/Aエラーが発生しないよう注意深く設計してください`
         }
       ],
       temperature: 0.3, // より一貫した結果のために温度を下げる
