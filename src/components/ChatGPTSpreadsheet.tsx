@@ -69,31 +69,196 @@ const ChatGPTSpreadsheet: React.FC = () => {
     
     if (!currentFunction?.spreadsheet_data) return;
     
-    // F列のVLOOKUP結果を更新
-    const updatedData = data.map((row, rowIndex) => {
-      if (!row) return row;
+    // すべての数式セルを特定し、HyperFormulaで再計算
+    const formulaCells: {row: number, col: number, formula: string}[] = [];
+    
+    // 元のテンプレートから数式セルを特定
+    currentFunction.spreadsheet_data.forEach((row, rowIndex) => {
+      if (row) {
+        row.forEach((cell, colIndex) => {
+          if (cell && cell.f) {
+            formulaCells.push({
+              row: rowIndex,
+              col: colIndex,
+              formula: cell.f
+            });
+          }
+        });
+      }
+    });
+    
+    if (formulaCells.length === 0) return;
+    
+    // HyperFormulaで計算するためのデータ準備
+    const rawData = data.map((row, rowIndex) => {
+      if (!row) return new Array(8).fill('');
       
       return row.map((cell, colIndex) => {
-        // F列（colIndex = 5）かつ、元々数式セルだった場合
-        if (colIndex === 5 && rowIndex >= 1 && rowIndex <= 5) {
-          // E列（colIndex = 4）の値を取得
-          const lookupValue = row[4]?.value;
-          if (lookupValue) {
-            const vlookupResult = performVLOOKUP(String(lookupValue), data, rowIndex);
-            return {
-              ...cell,
-              value: vlookupResult,
-              formula: `=VLOOKUP(E${rowIndex + 1},A2:B6,2,0)`,
-              title: `数式: =VLOOKUP(E${rowIndex + 1},A2:B6,2,0)`
-            };
-          }
+        // 数式セルの場合は数式を返す
+        const formulaCell = formulaCells.find(f => f.row === rowIndex && f.col === colIndex);
+        if (formulaCell) {
+          return formulaCell.formula;
         }
-        return cell;
+        // 通常のセルの場合は値を返す
+        return cell?.value || '';
       });
     });
     
-    console.log('更新後のデータ:', updatedData);
-    setValue('spreadsheetData', updatedData);
+    // HyperFormulaで再計算
+    try {
+      const hf = HyperFormula.buildFromArray(rawData, {
+        licenseKey: 'gpl-v3',
+        useColumnIndex: false,
+        useArrayArithmetic: true,
+        smartRounding: true,
+        useStats: true,
+        precisionEpsilon: 1e-13,
+        precisionRounding: 14
+      });
+      
+      // 更新されたデータを作成
+      const updatedData = data.map((row, rowIndex) => {
+        if (!row) return row;
+        
+        return row.map((cell, colIndex) => {
+          // 数式セルの場合は再計算結果を使用
+          const formulaCell = formulaCells.find(f => f.row === rowIndex && f.col === colIndex);
+          if (formulaCell) {
+            try {
+              const result = hf.getCellValue({ sheet: 0, row: rowIndex, col: colIndex });
+              return {
+                ...cell,
+                value: result !== null && result !== undefined ? result : '#ERROR!',
+                formula: formulaCell.formula,
+                title: `数式: ${formulaCell.formula}`
+              };
+            } catch (error) {
+              console.warn('数式計算エラー:', error, formulaCell.formula);
+              // エラー時は手動計算を試行
+              if (formulaCell.formula.includes('IF') && formulaCell.formula.includes('>=10000')) {
+                // IF関数の手動計算（承認判定）
+                const cellRef = formulaCell.formula.match(/IF\(([A-Z]\d+)>=10000/);
+                if (cellRef) {
+                  const refCol = cellRef[1].charCodeAt(0) - 65; // A=0, B=1, ...
+                  const refRow = parseInt(cellRef[1].substring(1)) - 1; // 1-based to 0-based
+                  const refValue = data[refRow]?.[refCol]?.value;
+                  if (typeof refValue === 'number') {
+                    const result = refValue >= 10000 ? '要承認' : '承認済み';
+                    return {
+                      ...cell,
+                      value: result,
+                      formula: formulaCell.formula,
+                      title: `数式: ${formulaCell.formula}`
+                    };
+                  }
+                }
+              } else if (formulaCell.formula.includes('SUM(')) {
+                // SUM関数の手動計算
+                const rangeMatch = formulaCell.formula.match(/SUM\(([A-Z]\d+):([A-Z]\d+)\)/);
+                if (rangeMatch) {
+                  const startCol = rangeMatch[1].charCodeAt(0) - 65;
+                  const startRow = parseInt(rangeMatch[1].substring(1)) - 1;
+                  const endCol = rangeMatch[2].charCodeAt(0) - 65;
+                  const endRow = parseInt(rangeMatch[2].substring(1)) - 1;
+                  
+                  let sum = 0;
+                  for (let r = startRow; r <= endRow; r++) {
+                    for (let c = startCol; c <= endCol; c++) {
+                      const value = data[r]?.[c]?.value;
+                      if (typeof value === 'number') {
+                        sum += value;
+                      }
+                    }
+                  }
+                  
+                  return {
+                    ...cell,
+                    value: sum,
+                    formula: formulaCell.formula,
+                    title: `数式: ${formulaCell.formula}`
+                  };
+                }
+              }
+              
+              return {
+                ...cell,
+                value: '#ERROR!',
+                formula: formulaCell.formula,
+                title: `数式: ${formulaCell.formula}`
+              };
+            }
+          }
+          
+          return cell;
+        });
+      });
+      
+      console.log('HyperFormula再計算完了:', updatedData);
+      setValue('spreadsheetData', updatedData);
+      
+    } catch (error) {
+      console.error('HyperFormula再計算エラー:', error);
+      // エラー時は手動計算のみ実行
+      const updatedData = data.map((row, rowIndex) => {
+        if (!row) return row;
+        
+        return row.map((cell, colIndex) => {
+          const formulaCell = formulaCells.find(f => f.row === rowIndex && f.col === colIndex);
+          if (formulaCell) {
+            // 手動でIF関数を計算
+            if (formulaCell.formula.includes('IF') && formulaCell.formula.includes('>=10000')) {
+              const cellRef = formulaCell.formula.match(/IF\(([A-Z]\d+)>=10000/);
+              if (cellRef) {
+                const refCol = cellRef[1].charCodeAt(0) - 65;
+                const refRow = parseInt(cellRef[1].substring(1)) - 1;
+                const refValue = data[refRow]?.[refCol]?.value;
+                if (typeof refValue === 'number') {
+                  const result = refValue >= 10000 ? '要承認' : '承認済み';
+                  return {
+                    ...cell,
+                    value: result,
+                    formula: formulaCell.formula,
+                    title: `数式: ${formulaCell.formula}`
+                  };
+                }
+              }
+            }
+            // 手動でSUM関数を計算
+            else if (formulaCell.formula.includes('SUM(')) {
+              const rangeMatch = formulaCell.formula.match(/SUM\(([A-Z]\d+):([A-Z]\d+)\)/);
+              if (rangeMatch) {
+                const startCol = rangeMatch[1].charCodeAt(0) - 65;
+                const startRow = parseInt(rangeMatch[1].substring(1)) - 1;
+                const endCol = rangeMatch[2].charCodeAt(0) - 65;
+                const endRow = parseInt(rangeMatch[2].substring(1)) - 1;
+                
+                let sum = 0;
+                for (let r = startRow; r <= endRow; r++) {
+                  for (let c = startCol; c <= endCol; c++) {
+                    const value = data[r]?.[c]?.value;
+                    if (typeof value === 'number') {
+                      sum += value;
+                    }
+                  }
+                }
+                
+                return {
+                  ...cell,
+                  value: sum,
+                  formula: formulaCell.formula,
+                  title: `数式: ${formulaCell.formula}`
+                };
+              }
+            }
+          }
+          
+          return cell;
+        });
+      });
+      
+      console.log('手動再計算完了:', updatedData);
+      setValue('spreadsheetData', updatedData);
+    }
   };
 
   // sheetDataの変更を監視
