@@ -18,7 +18,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 {
   "function_name": "関数名（例：SUM, AVERAGE, VLOOKUP）",
   "description": "関数の分かりやすい説明",
-  "syntax": "関数の構文",
+  "syntax": "関数の構文（日本語で分かりやすく）",
+  "syntax_detail": "構文の詳細説明（英語構文 + 各引数の説明）",
   "category": "関数のカテゴリ",
   "spreadsheet_data": [
     [
@@ -80,7 +81,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 {
   "function_name": "SUM",
   "description": "範囲内の数値の合計を計算します",
-  "syntax": "SUM(range1, [range2], ...)",
+  "syntax": "SUM(数値範囲1, [数値範囲2], ...)",
+  "syntax_detail": "SUM(range1, [range2], ...) - range1:合計する数値の範囲やセル, range2:追加の範囲(省略可能)",
   "category": "数学関数",
   "spreadsheet_data": [
     [
@@ -129,7 +131,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 {
   "function_name": "VLOOKUP",
   "description": "テーブルの左端の列で値を検索し、同じ行の指定した列から値を返します",
-  "syntax": "VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])",
+  "syntax": "VLOOKUP(検索値, 検索範囲, 列番号, [検索方法])",
+  "syntax_detail": "VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup]) - lookup_value:検索する値, table_array:検索するテーブル範囲, col_index_num:取得する列の番号(1から開始), range_lookup:完全一致は0またはFALSE",
   "category": "検索関数",
   "spreadsheet_data": [
     [
@@ -174,7 +177,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 {
   "function_name": "IF",
   "description": "条件に基づいて異なる値を返します",
-  "syntax": "IF(logical_test, value_if_true, value_if_false)",
+  "syntax": "IF(条件, 真の場合の値, 偽の場合の値)",
+  "syntax_detail": "IF(logical_test, value_if_true, value_if_false) - logical_test:判定する条件式, value_if_true:条件が真の時の戻り値, value_if_false:条件が偽の時の戻り値",
   "category": "論理関数",
   "spreadsheet_data": [
     [
@@ -217,7 +221,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 {
   "function_name": "IF & SUM",
   "description": "IF関数で売上目標達成判定とSUM関数で合計計算を行います",
-  "syntax": "IF(logical_test, value_if_true, value_if_false), SUM(range)",
+  "syntax": "IF(条件, 真の場合, 偽の場合) + SUM(数値範囲)",
+  "syntax_detail": "IF(logical_test, value_if_true, value_if_false) + SUM(range) - 条件判定と数値合計の組み合わせ",
   "category": "論理・数学関数",
   "spreadsheet_data": [
     [
@@ -266,10 +271,21 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
   "examples": ["=IF(B2>=100000,\"目標達成\",\"要改善\")", "=SUM(B2:B6)"]
 }
 
+**複数関数を使用する場合の例：**
+{
+  "function_name": "AVERAGE & IF & MAX & MIN",
+  "description": "平均、条件判定、最大値、最小値を組み合わせたデータ分析",
+  "syntax": "AVERAGE(数値範囲) + IF(条件, 真の場合, 偽の場合) + MAX(数値範囲) + MIN(数値範囲)",
+  "syntax_detail": "AVERAGE(range) - 数値範囲の平均値を計算 + IF(logical_test, value_if_true, value_if_false) - 条件に基づく判定 + MAX(range) - 数値範囲の最大値を取得 + MIN(range) - 数値範囲の最小値を取得",
+  "category": "統計・論理関数"
+}
+
 これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。
 
 **重要：複数の関数を使用する場合**
-- function_nameは主要な関数名または組み合わせ名を記載（例："IF & SUM"）
+- function_nameは主要な関数名または組み合わせ名を記載（例："AVERAGE & IF & MAX & MIN"）
+- syntaxは各関数を " + " で区切って記載（例："AVERAGE(数値範囲) + IF(条件, 真の場合, 偽の場合) + MAX(数値範囲) + MIN(数値範囲)"）
+- syntax_detailも各関数の詳細を " + " で区切って記載
 - 複数の関数を組み合わせた実用的なデータ構造にする
 - 各関数の役割を明確にする
 

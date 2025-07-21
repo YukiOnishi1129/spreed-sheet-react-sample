@@ -10,12 +10,15 @@ import {
 } from '../types/spreadsheet';
 import { fetchExcelFunction } from '../services/openaiService';
 import TemplateSelector from './TemplateSelector';
+import SyntaxModal from './SyntaxModal';
 import type { FunctionTemplate } from '../types/templates';
 
 
 const ChatGPTSpreadsheet: React.FC = () => {
   // テンプレート選択モーダルの状態
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  // 構文詳細モーダルの状態
+  const [showSyntaxModal, setShowSyntaxModal] = useState(false);
 
   // React Hook Formの初期化
   const { control, watch, setValue, handleSubmit, formState: { isSubmitting } } = useForm<SpreadsheetForm>({
@@ -745,7 +748,11 @@ const ChatGPTSpreadsheet: React.FC = () => {
               <p className="text-gray-700">
                 <strong className="text-gray-900">構文:</strong>
               </p>
-              <code className="block mt-1 bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg text-pink-600 font-mono text-sm">
+              <code 
+                className="block mt-1 bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-200 px-4 py-3 rounded-xl text-pink-600 font-mono text-sm shadow-sm hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:-translate-y-0.5"
+                onClick={() => setShowSyntaxModal(true)}
+                title="クリックで詳細説明を表示"
+              >
                 {currentFunction.syntax}
               </code>
             </div>
@@ -1033,6 +1040,19 @@ const ChatGPTSpreadsheet: React.FC = () => {
         <TemplateSelector
           onTemplateSelect={handleTemplateSelect}
           onClose={() => setShowTemplateSelector(false)}
+        />
+      )}
+
+      {/* 構文詳細モーダル */}
+      {showSyntaxModal && currentFunction && (
+        <SyntaxModal
+          isOpen={showSyntaxModal}
+          onClose={() => setShowSyntaxModal(false)}
+          functionName={currentFunction.function_name}
+          syntax={currentFunction.syntax}
+          syntaxDetail={currentFunction.syntax_detail}
+          description={currentFunction.description}
+          examples={currentFunction.examples}
         />
       )}
     </div>

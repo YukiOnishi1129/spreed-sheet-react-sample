@@ -40,6 +40,7 @@ export const ExcelFunctionResponseSchema = z.object({
   function_name: z.string().default("Excel関数"),
   description: z.string().default("Excel関数の説明"),
   syntax: z.string().default("関数の構文"),
+  syntax_detail: z.string().optional(),
   category: z.string().default("Excel関数"),
   spreadsheet_data: z.array(
     z.array(APIResponseCellSchema).min(1, "各行は最低1列必要です")
@@ -62,6 +63,10 @@ export const OPENAI_JSON_SCHEMA = {
     syntax: {
       type: "string",
       description: "関数の構文"
+    },
+    syntax_detail: {
+      type: "string",
+      description: "構文の詳細説明（各引数の説明）"
     },
     category: {
       type: "string",
