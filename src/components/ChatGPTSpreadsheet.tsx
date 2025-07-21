@@ -379,11 +379,26 @@ const ChatGPTSpreadsheet: React.FC = () => {
           
           // 数式セル（関数の結果）の場合
           if (cell.f) {
-            // SUM関数やVLOOKUP関数の場合はオレンジ枠にする
-            if (cell.f.toUpperCase().includes('SUM(') || cell.f.toUpperCase().includes('VLOOKUP(')) {
-              className = 'formula-result-cell';
+            // 関数の種類によって色分け
+            const formula = cell.f.toUpperCase();
+            
+            if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(')) {
+              // 数学・集計関数: オレンジ系
+              className = 'math-formula-cell';
+            } else if (formula.includes('VLOOKUP(') || formula.includes('HLOOKUP(') || formula.includes('INDEX(') || formula.includes('MATCH(')) {
+              // 検索・参照関数: 青系  
+              className = 'lookup-formula-cell';
+            } else if (formula.includes('IF(') || formula.includes('AND(') || formula.includes('OR(') || formula.includes('NOT(')) {
+              // 論理・条件関数: 緑系
+              className = 'logic-formula-cell';
+            } else if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(') || formula.includes('YEAR(') || formula.includes('MONTH(') || formula.includes('DAY(')) {
+              // 日付・時刻関数: 紫系
+              className = 'date-formula-cell';
+            } else if (formula.includes('CONCATENATE(') || formula.includes('LEFT(') || formula.includes('RIGHT(') || formula.includes('MID(') || formula.includes('LEN(')) {
+              // 文字列関数: ピンク系
+              className = 'text-formula-cell';
             } else {
-              // その他の関数は緑系の色にする
+              // その他の関数: グレー系
               className = 'other-formula-cell';
             }
             // HyperFormulaから計算結果を取得
@@ -548,11 +563,26 @@ const ChatGPTSpreadsheet: React.FC = () => {
           
           // 数式セル（関数の結果）の場合
           if (cell.f) {
-            // SUM関数やVLOOKUP関数の場合はオレンジ枠にする
-            if (cell.f.toUpperCase().includes('SUM(') || cell.f.toUpperCase().includes('VLOOKUP(')) {
-              className = 'formula-result-cell';
+            // 関数の種類によって色分け
+            const formula = cell.f.toUpperCase();
+            
+            if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(')) {
+              // 数学・集計関数: オレンジ系
+              className = 'math-formula-cell';
+            } else if (formula.includes('VLOOKUP(') || formula.includes('HLOOKUP(') || formula.includes('INDEX(') || formula.includes('MATCH(')) {
+              // 検索・参照関数: 青系  
+              className = 'lookup-formula-cell';
+            } else if (formula.includes('IF(') || formula.includes('AND(') || formula.includes('OR(') || formula.includes('NOT(')) {
+              // 論理・条件関数: 緑系
+              className = 'logic-formula-cell';
+            } else if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(') || formula.includes('YEAR(') || formula.includes('MONTH(') || formula.includes('DAY(')) {
+              // 日付・時刻関数: 紫系
+              className = 'date-formula-cell';
+            } else if (formula.includes('CONCATENATE(') || formula.includes('LEFT(') || formula.includes('RIGHT(') || formula.includes('MID(') || formula.includes('LEN(')) {
+              // 文字列関数: ピンク系
+              className = 'text-formula-cell';
             } else {
-              // その他の関数は緑系の色にする
+              // その他の関数: グレー系
               className = 'other-formula-cell';
             }
             // HyperFormulaから計算結果を取得
@@ -770,33 +800,64 @@ const ChatGPTSpreadsheet: React.FC = () => {
             <strong className="text-gray-800 text-sm block mb-3 flex items-center gap-2">
               🎨 スプレッドシートの色分け
             </strong>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex items-center gap-3">
-                <span className="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-orange-400 shadow-sm">
-                  📊 オレンジ枠
-                </span>
-                <span className="text-sm text-gray-700"><strong>SUM・VLOOKUP関数の結果</strong></span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-semibold text-gray-800 mb-3">関数の種類別色分け</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-lg text-xs font-bold border-2 border-orange-400 shadow-sm">
+                      📊 オレンジ
+                    </span>
+                    <span className="text-xs text-gray-700">数学・集計関数 (SUM, AVERAGE, MAX, MIN)</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-bold border-2 border-blue-400 shadow-sm">
+                      🔍 青
+                    </span>
+                    <span className="text-xs text-gray-700">検索・参照関数 (VLOOKUP, INDEX, MATCH)</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-bold border-2 border-green-400 shadow-sm">
+                      ⚡ 緑
+                    </span>
+                    <span className="text-xs text-gray-700">論理・条件関数 (IF, AND, OR)</span>
+                  </div>
+                </div>
               </div>
               
-              <div className="flex items-center gap-3">
-                <span className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-400 shadow-sm">
-                  🔢 緑枠
-                </span>
-                <span className="text-sm text-gray-700"><strong>その他の関数</strong></span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <span className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm">
-                  📘 薄青
-                </span>
-                <span className="text-sm text-gray-700">ヘッダー行</span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <span className="bg-lime-100 text-lime-700 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm">
-                  📗 薄緑
-                </span>
-                <span className="text-sm text-gray-700">データ行</span>
+              <div>
+                <h4 className="text-sm font-semibold text-gray-800 mb-3">その他の色分け</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-bold border-2 border-purple-400 shadow-sm">
+                      📅 紫
+                    </span>
+                    <span className="text-xs text-gray-700">日付・時刻関数 (TODAY, DATE, YEAR)</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <span className="bg-pink-100 text-pink-700 px-2 py-1 rounded-lg text-xs font-bold border-2 border-pink-400 shadow-sm">
+                      📝 ピンク
+                    </span>
+                    <span className="text-xs text-gray-700">文字列関数 (CONCATENATE, LEFT, RIGHT)</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-lg text-xs font-bold border-2 border-gray-400 shadow-sm">
+                      🔧 グレー
+                    </span>
+                    <span className="text-xs text-gray-700">その他の関数 (ROUND, COUNTA等)</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-semibold shadow-sm">
+                      📘 薄青
+                    </span>
+                    <span className="text-xs text-gray-700">ヘッダー行</span>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -804,7 +865,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
               <div className="flex items-start gap-2">
                 <span className="text-orange-500 mt-0.5">💡</span>
                 <span className="text-sm text-gray-700">
-                  <strong>ヒント:</strong> オレンジ枠（SUM関数）や緑枠（その他関数）のセルにマウスを置くと、使用している数式が表示されます
+                  <strong>ヒント:</strong> 色付き枠の関数セルにマウスを置くと、使用している数式が表示されます
                 </span>
               </div>
             </div>
