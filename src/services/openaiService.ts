@@ -345,6 +345,74 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
   "examples": ["=TODAY()", "=YEAR(TODAY())", "=MONTH(TODAY())", "=DAY(TODAY())", "=DATEDIF(DATE(1990,5,15),TODAY(),\"Y\")"]
 }
 
+**INDEX関数とMATCH関数組み合わせの完全な例：**
+{
+  "function_name": "INDEX & MATCH",
+  "description": "INDEX関数とMATCH関数を組み合わせてVLOOKUPより柔軟な検索を実現します",
+  "syntax": "INDEX(配列, MATCH(検索値, 検索配列, 0))",
+  "syntax_detail": "INDEX(array, row_num) - 配列から指定した位置の値を取得 + MATCH(lookup_value, lookup_array, [match_type]) - 検索値の位置を返す",
+  "category": "検索関数",
+  "spreadsheet_data": [
+    [
+      {"v": "社員ID", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "社員名", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "部署名", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "検索ID", "ct": {"t": "s"}, "bg": "#FFF8E1"},
+      {"v": "検索結果", "ct": {"t": "s"}, "bg": "#FFF8E1"},
+      null, null, null
+    ],
+    [
+      {"v": 101, "ct": {"t": "n"}},
+      {"v": "田中", "ct": {"t": "s"}},
+      {"v": "営業部", "ct": {"t": "s"}},
+      {"v": 102, "ct": {"t": "n"}},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D2,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": 102, "ct": {"t": "n"}},
+      {"v": "佐藤", "ct": {"t": "s"}},
+      {"v": "開発部", "ct": {"t": "s"}},
+      {"v": 103, "ct": {"t": "n"}},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D3,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": 103, "ct": {"t": "n"}},
+      {"v": "鈴木", "ct": {"t": "s"}},
+      {"v": "人事部", "ct": {"t": "s"}},
+      {"v": 104, "ct": {"t": "n"}},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D4,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": 104, "ct": {"t": "n"}},
+      {"v": "山田", "ct": {"t": "s"}},
+      {"v": "総務部", "ct": {"t": "s"}},
+      {"v": 105, "ct": {"t": "n"}},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D5,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": 105, "ct": {"t": "n"}},
+      {"v": "伊藤", "ct": {"t": "s"}},
+      {"v": "マーケティング部", "ct": {"t": "s"}},
+      {"v": 101, "ct": {"t": "n"}},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D6,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null]
+  ],
+  "examples": ["=INDEX(C2:C6,MATCH(D2,A2:A6,0))", "=MATCH(102,A2:A6,0)", "=INDEX(B2:B6,MATCH(103,A2:A6,0))"]
+}
+
+**重要：INDEX+MATCH関数の注意事項**
+- INDEX関数では配列範囲と検索範囲を正確に指定してください
+- MATCH関数の第3引数は完全一致の場合は0を指定してください
+- 循環参照を避けるため、検索結果列は別の列に配置してください
+- INDEX(戻り値の配列, MATCH(検索値, 検索する配列, 0))の形式で使用してください
+
 **重要：日付計算の注意事項**
 - 生年月日は"YYYY-MM-DD"形式またはDATE(年,月,日)関数を使用してください
 - DATEDIF関数は正確な年齢計算に使用します：DATEDIF(生年月日, TODAY(), "Y")
