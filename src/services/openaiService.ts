@@ -280,6 +280,77 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
   "category": "統計・論理関数"
 }
 
+**TODAY関数と年齢計算の完全な例：**
+{
+  "function_name": "TODAY & YEAR & MONTH & DAY & DATEDIF",
+  "description": "TODAY関数で現在の日付を取得し、YEAR・MONTH・DAY関数で日付要素を抽出、DATEDIF関数で年齢を計算します",
+  "syntax": "TODAY() + YEAR(日付) + MONTH(日付) + DAY(日付) + DATEDIF(開始日, 終了日, \"Y\")",
+  "syntax_detail": "TODAY() - 現在の日付を取得 + YEAR(date) - 日付から年を抽出 + MONTH(date) - 日付から月を抽出 + DAY(date) - 日付から日を抽出 + DATEDIF(start_date, end_date, \"Y\") - 2つの日付間の年数を計算",
+  "category": "日付関数",
+  "spreadsheet_data": [
+    [
+      {"v": "社員名", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "生年月日", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "年齢", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "今日の日付", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "年", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "月", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "日", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      null
+    ],
+    [
+      {"v": "田中", "ct": {"t": "s"}},
+      {"v": "1990-05-15", "ct": {"t": "s"}},
+      {"v": null, "f": "=DATEDIF(DATE(1990,5,15),TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      null
+    ],
+    [
+      {"v": "佐藤", "ct": {"t": "s"}},
+      {"v": "1985-11-20", "ct": {"t": "s"}},
+      {"v": null, "f": "=DATEDIF(DATE(1985,11,20),TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      null
+    ],
+    [
+      {"v": "鈴木", "ct": {"t": "s"}},
+      {"v": "1992-02-10", "ct": {"t": "s"}},
+      {"v": null, "f": "=DATEDIF(DATE(1992,2,10),TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      null
+    ],
+    [
+      {"v": "山田", "ct": {"t": "s"}},
+      {"v": "1995-08-30", "ct": {"t": "s"}},
+      {"v": null, "f": "=DATEDIF(DATE(1995,8,30),TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      null
+    ],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null]
+  ],
+  "examples": ["=TODAY()", "=YEAR(TODAY())", "=MONTH(TODAY())", "=DAY(TODAY())", "=DATEDIF(DATE(1990,5,15),TODAY(),\"Y\")"]
+}
+
+**重要：日付計算の注意事項**
+- 生年月日は"YYYY-MM-DD"形式またはDATE(年,月,日)関数を使用してください
+- DATEDIF関数は正確な年齢計算に使用します：DATEDIF(生年月日, TODAY(), "Y")
+- HyperFormulaでの日付処理では、シリアル値ではなく適切な日付関数を使用してください
+- 年齢計算では必ずDATE関数で生年月日を正しい日付形式に変換してください
+
 これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。
 
 **重要：複数の関数を使用する場合**

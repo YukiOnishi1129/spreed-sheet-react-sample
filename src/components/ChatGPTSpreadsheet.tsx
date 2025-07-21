@@ -2,6 +2,36 @@ import { useEffect, useState } from 'react';
 import Spreadsheet from 'react-spreadsheet';
 import type { Matrix } from 'react-spreadsheet';
 import { HyperFormula } from 'hyperformula';
+
+// Excelのシリアル値を日付文字列に変換する関数
+const formatExcelDate = (serialDate: number): string => {
+  if (typeof serialDate !== 'number' || isNaN(serialDate)) {
+    return serialDate?.toString() || '';
+  }
+  
+  // Excelのシリアル値は1900年1月1日を1とする（ただし1900年はうるう年ではないのでずれがある）
+  // 一般的な変換式を使用
+  const excelEpoch = new Date(1899, 11, 30); // 1899年12月30日
+  const date = new Date(excelEpoch.getTime() + serialDate * 24 * 60 * 60 * 1000);
+  
+  // 日付として有効かチェック
+  if (isNaN(date.getTime())) {
+    return serialDate.toString();
+  }
+  
+  // 現在の年に近い値の場合のみ日付として表示
+  const currentYear = new Date().getFullYear();
+  if (date.getFullYear() < currentYear - 50 || date.getFullYear() > currentYear + 50) {
+    return serialDate.toString();
+  }
+  
+  // YYYY/MM/DD形式で返す
+  return date.toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).replace(/\//g, '/');
+};
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
@@ -382,7 +412,9 @@ const ChatGPTSpreadsheet: React.FC = () => {
             // 関数の種類によって色分け
             const formula = cell.f.toUpperCase();
             
-            if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(')) {
+            if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(') || 
+                formula.includes('SUMIF(') || formula.includes('COUNTIF(') || formula.includes('AVERAGEIF(') ||
+                formula.includes('SUMIFS(') || formula.includes('COUNTIFS(') || formula.includes('AVERAGEIFS(')) {
               // 数学・集計関数: オレンジ系
               className = 'math-formula-cell';
             } else if (formula.includes('VLOOKUP(') || formula.includes('HLOOKUP(') || formula.includes('INDEX(') || formula.includes('MATCH(')) {
@@ -391,10 +423,13 @@ const ChatGPTSpreadsheet: React.FC = () => {
             } else if (formula.includes('IF(') || formula.includes('AND(') || formula.includes('OR(') || formula.includes('NOT(')) {
               // 論理・条件関数: 緑系
               className = 'logic-formula-cell';
-            } else if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(') || formula.includes('YEAR(') || formula.includes('MONTH(') || formula.includes('DAY(')) {
+            } else if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(') || formula.includes('YEAR(') || 
+                       formula.includes('MONTH(') || formula.includes('DAY(') || formula.includes('DATEDIF(') || 
+                       formula.includes('WORKDAY(') || formula.includes('NETWORKDAYS(')) {
               // 日付・時刻関数: 紫系
               className = 'date-formula-cell';
-            } else if (formula.includes('CONCATENATE(') || formula.includes('LEFT(') || formula.includes('RIGHT(') || formula.includes('MID(') || formula.includes('LEN(')) {
+            } else if (formula.includes('CONCATENATE(') || formula.includes('LEFT(') || formula.includes('RIGHT(') || formula.includes('MID(') || 
+                       formula.includes('LEN(') || formula.includes('TRIM(') || formula.includes('UPPER(') || formula.includes('LOWER(')) {
               // 文字列関数: ピンク系
               className = 'text-formula-cell';
             } else {
@@ -403,7 +438,17 @@ const ChatGPTSpreadsheet: React.FC = () => {
             }
             // HyperFormulaから計算結果を取得
             const result = calculationResults[rowIndex]?.[colIndex];
-            calculatedValue = result !== null && result !== undefined ? result : '#ERROR!';
+            
+            // 日付関数の場合は日付フォーマットを適用
+            if (result !== null && result !== undefined) {
+              if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(')) {
+                calculatedValue = formatExcelDate(result);
+              } else {
+                calculatedValue = result;
+              }
+            } else {
+              calculatedValue = '#ERROR!';
+            }
           } else if (cell.bg) {
             // 背景色がある通常のセル
             if (cell.bg.includes('E3F2FD') || cell.bg.includes('E1F5FE')) {
@@ -566,7 +611,9 @@ const ChatGPTSpreadsheet: React.FC = () => {
             // 関数の種類によって色分け
             const formula = cell.f.toUpperCase();
             
-            if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(')) {
+            if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(') || 
+                formula.includes('SUMIF(') || formula.includes('COUNTIF(') || formula.includes('AVERAGEIF(') ||
+                formula.includes('SUMIFS(') || formula.includes('COUNTIFS(') || formula.includes('AVERAGEIFS(')) {
               // 数学・集計関数: オレンジ系
               className = 'math-formula-cell';
             } else if (formula.includes('VLOOKUP(') || formula.includes('HLOOKUP(') || formula.includes('INDEX(') || formula.includes('MATCH(')) {
@@ -575,10 +622,13 @@ const ChatGPTSpreadsheet: React.FC = () => {
             } else if (formula.includes('IF(') || formula.includes('AND(') || formula.includes('OR(') || formula.includes('NOT(')) {
               // 論理・条件関数: 緑系
               className = 'logic-formula-cell';
-            } else if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(') || formula.includes('YEAR(') || formula.includes('MONTH(') || formula.includes('DAY(')) {
+            } else if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(') || formula.includes('YEAR(') || 
+                       formula.includes('MONTH(') || formula.includes('DAY(') || formula.includes('DATEDIF(') || 
+                       formula.includes('WORKDAY(') || formula.includes('NETWORKDAYS(')) {
               // 日付・時刻関数: 紫系
               className = 'date-formula-cell';
-            } else if (formula.includes('CONCATENATE(') || formula.includes('LEFT(') || formula.includes('RIGHT(') || formula.includes('MID(') || formula.includes('LEN(')) {
+            } else if (formula.includes('CONCATENATE(') || formula.includes('LEFT(') || formula.includes('RIGHT(') || formula.includes('MID(') || 
+                       formula.includes('LEN(') || formula.includes('TRIM(') || formula.includes('UPPER(') || formula.includes('LOWER(')) {
               // 文字列関数: ピンク系
               className = 'text-formula-cell';
             } else {
@@ -587,7 +637,17 @@ const ChatGPTSpreadsheet: React.FC = () => {
             }
             // HyperFormulaから計算結果を取得
             const result = calculationResults[rowIndex]?.[colIndex];
-            calculatedValue = result !== null && result !== undefined ? result : '#ERROR!';
+            
+            // 日付関数の場合は日付フォーマットを適用
+            if (result !== null && result !== undefined) {
+              if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(')) {
+                calculatedValue = formatExcelDate(result);
+              } else {
+                calculatedValue = result;
+              }
+            } else {
+              calculatedValue = '#ERROR!';
+            }
           } else if (cell.bg) {
             // 背景色がある通常のセル
             if (cell.bg.includes('E3F2FD') || cell.bg.includes('E1F5FE')) {

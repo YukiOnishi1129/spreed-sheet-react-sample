@@ -201,5 +201,248 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         tags: ['成績', '学生', '統計']
       }
     ]
+  },
+  {
+    id: 'lookup',
+    name: '検索関数',
+    icon: '🔍',
+    description: 'VLOOKUP・INDEX・MATCH等の検索関数',
+    templates: [
+      {
+        id: 'vlookup-basic',
+        title: 'VLOOKUP基本',
+        description: 'VLOOKUP関数による商品マスター検索',
+        category: 'lookup',
+        icon: '🔎',
+        functions: ['VLOOKUP'],
+        prompt: '商品コードから商品名と価格を検索するVLOOKUP関数を使用したスプレッドシートを作成してください。商品マスターテーブルと検索テーブルを含む8行8列の構造で作成してください。',
+        difficulty: 'intermediate',
+        tags: ['VLOOKUP', '検索', '商品マスター']
+      },
+      {
+        id: 'index-match',
+        title: 'INDEX・MATCH組み合わせ',
+        description: 'INDEX関数とMATCH関数の組み合わせ',
+        category: 'lookup',
+        icon: '🎯',
+        functions: ['INDEX', 'MATCH'],
+        prompt: 'INDEX関数とMATCH関数を組み合わせて、社員IDから部署名を検索するスプレッドシートを作成してください。VLOOKUPより柔軟な検索機能を示してください。',
+        difficulty: 'advanced',
+        tags: ['INDEX', 'MATCH', '社員管理']
+      }
+    ]
+  },
+  {
+    id: 'math-stats',
+    name: '数学・統計',
+    icon: '📊',
+    description: 'SUM・AVERAGE・MAX・MIN等の数学統計関数',
+    templates: [
+      {
+        id: 'statistics-basic',
+        title: '基本統計',
+        description: 'AVERAGE・MAX・MIN・COUNTによる統計分析',
+        category: 'math-stats',
+        icon: '📈',
+        functions: ['AVERAGE', 'MAX', 'MIN', 'COUNT'],
+        prompt: '売上データからAVERAGE関数で平均売上、MAX関数で最高売上、MIN関数で最低売上、COUNT関数でデータ数を計算するスプレッドシートを作成してください。',
+        difficulty: 'beginner',
+        tags: ['統計', '平均', '最大', '最小']
+      },
+      {
+        id: 'conditional-stats',
+        title: '条件付き統計',
+        description: 'SUMIF・COUNTIF・AVERAGEIFによる条件集計',
+        category: 'math-stats',
+        icon: '🎲',
+        functions: ['SUMIF', 'COUNTIF', 'AVERAGEIF'],
+        prompt: '部門別売上データでSUMIF関数による部門別合計、COUNTIF関数による部門別人数、AVERAGEIF関数による部門別平均を計算するスプレッドシートを作成してください。',
+        difficulty: 'intermediate',
+        tags: ['条件集計', 'SUMIF', 'COUNTIF']
+      }
+    ]
+  },
+  {
+    id: 'date-time',
+    name: '日付・時刻',
+    icon: '📅',
+    description: 'TODAY・DATE・YEAR等の日付時刻関数',
+    templates: [
+      {
+        id: 'date-functions',
+        title: '日付関数基本',
+        description: 'TODAY・YEAR・MONTH・DAYによる日付処理',
+        category: 'date-time',
+        icon: '📆',
+        functions: ['TODAY', 'YEAR', 'MONTH', 'DAY'],
+        prompt: 'TODAY関数で今日の日付を取得し、YEAR・MONTH・DAY関数で年月日を個別に抽出し、社員の年齢計算を行うスプレッドシートを作成してください。',
+        difficulty: 'beginner',
+        tags: ['日付', '年齢計算', 'TODAY'],
+        fixedData: {
+          function_name: 'TODAY & YEAR & MONTH & DAY',
+          description: 'TODAY関数で現在の日付を取得し、YEAR・MONTH・DAY関数で日付要素を抽出します',
+          syntax: 'TODAY() + YEAR(日付) + MONTH(日付) + DAY(日付)',
+          syntax_detail: 'TODAY() - 現在の日付を取得 + YEAR(date) - 日付から年を抽出 + MONTH(date) - 日付から月を抽出 + DAY(date) - 日付から日を抽出',
+          category: '日付関数',
+          spreadsheet_data: [
+            [
+              { v: "社員名", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "生年月日", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "年齢", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "今日の日付", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "年", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "月", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "日", ct: { t: "s" }, bg: "#E3F2FD" },
+              null
+            ],
+            [
+              { v: "田中", ct: { t: "s" } },
+              { v: "1990/05/15", ct: { t: "s" } },
+              { v: null, f: "=(YEAR(TODAY())-1990)", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=TODAY()", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=YEAR(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=MONTH(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=DAY(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              null
+            ],
+            [
+              { v: "佐藤", ct: { t: "s" } },
+              { v: "1985/11/20", ct: { t: "s" } },
+              { v: null, f: "=(YEAR(TODAY())-1985)", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=TODAY()", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=YEAR(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=MONTH(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=DAY(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              null
+            ],
+            [
+              { v: "鈴木", ct: { t: "s" } },
+              { v: "1992/02/10", ct: { t: "s" } },
+              { v: null, f: "=(YEAR(TODAY())-1992)", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=TODAY()", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=YEAR(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=MONTH(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=DAY(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              null
+            ],
+            [
+              { v: "山田", ct: { t: "s" } },
+              { v: "1995/08/30", ct: { t: "s" } },
+              { v: null, f: "=(YEAR(TODAY())-1995)", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=TODAY()", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=YEAR(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=MONTH(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              { v: null, f: "=DAY(TODAY())", bg: "#FFE0B2", fc: "#D84315" },
+              null
+            ],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null]
+          ],
+          examples: ['=TODAY()', '=YEAR(TODAY())', '=MONTH(TODAY())', '=DAY(TODAY())', '=(YEAR(TODAY())-1990)']
+        }
+      },
+      {
+        id: 'date-calculations',
+        title: '日付計算',
+        description: 'DATEDIF・WORKDAY等による期間計算',
+        category: 'date-time',
+        icon: '⏰',
+        functions: ['DATEDIF', 'WORKDAY', 'NETWORKDAYS'],
+        prompt: 'プロジェクト開始日と終了日からDATEDIF関数で期間を計算し、NETWORKDAYS関数で稼働日数を算出するプロジェクト管理表を作成してください。',
+        difficulty: 'intermediate',
+        tags: ['期間計算', 'DATEDIF', '稼働日']
+      }
+    ]
+  },
+  {
+    id: 'text-functions',
+    name: '文字列関数',
+    icon: '📝',
+    description: 'CONCATENATE・LEFT・RIGHT等の文字列処理',
+    templates: [
+      {
+        id: 'text-basic',
+        title: '文字列基本',
+        description: 'CONCATENATE・LEFT・RIGHT・MIDによる文字列操作',
+        category: 'text-functions',
+        icon: '✂️',
+        functions: ['CONCATENATE', 'LEFT', 'RIGHT', 'MID'],
+        prompt: '社員の姓名をCONCATENATE関数で結合し、LEFT関数で姓の最初の文字、RIGHT関数で名の最後の文字を抽出する文字列処理のスプレッドシートを作成してください。',
+        difficulty: 'beginner',
+        tags: ['文字列', '結合', '抽出']
+      },
+      {
+        id: 'text-advanced',
+        title: '高度な文字列処理',
+        description: 'TRIM・UPPER・LOWER・LEN等の文字列関数',
+        category: 'text-functions',
+        icon: '🔤',
+        functions: ['TRIM', 'UPPER', 'LOWER', 'LEN'],
+        prompt: '顧客データの整理でTRIM関数で余分なスペース除去、UPPER/LOWER関数で大文字小文字変換、LEN関数で文字数カウントを行うデータクリーニング表を作成してください。',
+        difficulty: 'intermediate',
+        tags: ['データクリーニング', 'TRIM', '文字変換']
+      }
+    ]
+  },
+  {
+    id: 'logical',
+    name: '論理関数',
+    icon: '⚡',
+    description: 'IF・AND・OR・NOT等の論理処理',
+    templates: [
+      {
+        id: 'logical-basic',
+        title: 'IF関数基本',
+        description: 'IF関数による条件分岐と判定',
+        category: 'logical',
+        icon: '🔀',
+        functions: ['IF'],
+        prompt: '学生の点数からIF関数で合否判定（60点以上で合格）を行い、さらにネストしたIF関数で優良可の評価を付けるスプレッドシートを作成してください。',
+        difficulty: 'beginner',
+        tags: ['条件分岐', '判定', 'IF関数']
+      },
+      {
+        id: 'logical-advanced',
+        title: '複合論理判定',
+        description: 'AND・OR・NOT関数との組み合わせ',
+        category: 'logical',
+        icon: '🧠',
+        functions: ['IF', 'AND', 'OR', 'NOT'],
+        prompt: '商品の在庫管理でAND関数（在庫数<10かつ売れ筋商品）、OR関数（季節商品または特価商品）の条件でアラート表示するスプレッドシートを作成してください。',
+        difficulty: 'advanced',
+        tags: ['複合条件', 'AND', 'OR', '在庫管理']
+      }
+    ]
+  },
+  {
+    id: 'advanced',
+    name: '高度な関数',
+    icon: '🚀',
+    description: '複数関数の組み合わせや高度な機能',
+    templates: [
+      {
+        id: 'pivot-simulation',
+        title: 'ピボット風集計',
+        description: 'SUMIFS・COUNTIFS等による多条件集計',
+        category: 'advanced',
+        icon: '📋',
+        functions: ['SUMIFS', 'COUNTIFS', 'AVERAGEIFS'],
+        prompt: '売上データから地域×商品カテゴリーのマトリックス集計をSUMIFS関数で作成し、COUNTIFS関数で件数、AVERAGEIFS関数で平均単価を計算するピボット風の集計表を作成してください。',
+        difficulty: 'advanced',
+        tags: ['多条件集計', 'SUMIFS', 'マトリックス']
+      },
+      {
+        id: 'dashboard-kpi',
+        title: 'KPIダッシュボード',
+        description: '複数関数を組み合わせたKPI計算',
+        category: 'advanced',
+        icon: '📊',
+        functions: ['IF', 'VLOOKUP', 'SUM', 'AVERAGE', 'COUNTIF'],
+        prompt: '売上目標達成率、顧客満足度、商品回転率などのKPIを複数の関数（IF、VLOOKUP、SUM、AVERAGE、COUNTIF）を組み合わせて計算するダッシュボードを作成してください。',
+        difficulty: 'advanced',
+        tags: ['KPI', 'ダッシュボード', '複合関数']
+      }
+    ]
   }
 ];
