@@ -8,6 +8,15 @@ export interface FunctionTemplate {
   prompt: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   tags: string[];
+  // 固定のスプレッドシートデータ（ChatGPT APIに依存しない）
+  fixedData?: {
+    function_name: string;
+    description: string;
+    syntax: string;
+    category: string;
+    spreadsheet_data: any[][];
+    examples: string[];
+  };
 }
 
 export interface TemplateCategory {
@@ -34,7 +43,53 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         functions: ['IF', 'SUM', 'AVERAGE'],
         prompt: '営業担当者の売上管理表を作成してください。以下の要件で8行8列のスプレッドシートを作成してください：1) 営業担当者名、売上金額、評価、合計の列を含める 2) IF関数で売上100000以上なら「目標達成」、未満なら「要改善」と表示 3) SUM関数で全体の売上合計を計算 4) 5人の営業担当者データを含める',
         difficulty: 'beginner',
-        tags: ['売上', '目標管理', 'KPI']
+        tags: ['売上', '目標管理', 'KPI'],
+        fixedData: {
+          function_name: 'IF & SUM',
+          description: '営業担当者の売上を評価し、合計を計算します',
+          syntax: 'IF(logical_test, value_if_true, value_if_false) & SUM(range)',
+          category: '論理関数 & 数学関数',
+          spreadsheet_data: [
+            [
+              { v: "営業担当者", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "売上", ct: { t: "s" }, bg: "#E3F2FD" },
+              { v: "評価", ct: { t: "s" }, bg: "#E3F2FD" },
+              null, null, null, null, null
+            ],
+            [
+              { v: "田中", ct: { t: "s" } },
+              { v: 120000, ct: { t: "n" } },
+              { v: null, f: "=IF(B2>=100000,\"目標達成\",\"要改善\")", bg: "#E8F5E8", fc: "#2E7D32" },
+              null, null, null, null, null
+            ],
+            [
+              { v: "佐藤", ct: { t: "s" } },
+              { v: 85000, ct: { t: "n" } },
+              { v: null, f: "=IF(B3>=100000,\"目標達成\",\"要改善\")", bg: "#E8F5E8", fc: "#2E7D32" },
+              null, null, null, null, null
+            ],
+            [
+              { v: "鈴木", ct: { t: "s" } },
+              { v: 150000, ct: { t: "n" } },
+              { v: null, f: "=IF(B4>=100000,\"目標達成\",\"要改善\")", bg: "#E8F5E8", fc: "#2E7D32" },
+              null, null, null, null, null
+            ],
+            [
+              { v: "山田", ct: { t: "s" } },
+              { v: 95000, ct: { t: "n" } },
+              { v: null, f: "=IF(B5>=100000,\"目標達成\",\"要改善\")", bg: "#E8F5E8", fc: "#2E7D32" },
+              null, null, null, null, null
+            ],
+            [
+              { v: "合計", ct: { t: "s" }, bg: "#E8F5E8" },
+              { v: null, f: "=SUM(B2:B5)", bg: "#FFE0B2", fc: "#D84315" },
+              null, null, null, null, null, null
+            ],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null]
+          ],
+          examples: ['=IF(B2>=100000,"目標達成","要改善")', '=SUM(B2:B5)']
+        }
       },
       {
         id: 'sales-ranking',

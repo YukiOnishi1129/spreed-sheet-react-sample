@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import type { ExcelFunctionResponse } from '../types/spreadsheet';
 import { getMockFunction } from './mockData';
+import { enhanceUserPrompt } from './promptEnhancer';
 
 // OpenAI クライアントの初期化
 const openai = new OpenAI({
@@ -8,7 +9,9 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true // ブラウザ環境でのAPI利用を許可
 });
 
-const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門家です。ユーザーの要求に基づいて、Excel/スプレッドシート関数の実用的なデモデータをJSON形式で生成してください。
+const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門家です。
+
+【最重要】ユーザーの自由な要求に基づいて、確実に動作するスプレッドシートデータをJSON形式で生成してください。エラーが発生しない、実用的なデモデータを作成することが最も重要です。
 
 以下の形式で厳密にJSONを返してください：
 {
@@ -233,7 +236,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         },
         {
           role: 'user',
-          content: `ユーザー要求: "${query}"\n\n上記の要求に基づいて、実用的で循環参照のないスプレッドシートデータを含むJSONを生成してください。必ず8行8列の配列にし、数式は具体的なセル参照を使用してください。\n\n特に検索関数（VLOOKUP等）を生成する場合は：\n1. 検索範囲は実際に存在するセル範囲を指定\n2. 列番号は1から始まる整数を使用\n3. 検索値は実際にテーブル内に存在する値を使用\n4. VLOOKUP関数の最後の引数は必ず数値（0または1）を使用し、FALSEやTRUEは使わない\n5. 構文例: =VLOOKUP(D2,A2:C4,2,0)\n6. #NAME?や#N/Aエラーが発生しないよう注意深く設計してください`
+          content: enhanceUserPrompt(query)
         }
       ],
       temperature: 0.3, // より一貫した結果のために温度を下げる
@@ -305,8 +308,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
   } catch (error) {
     console.error('OpenAI API呼び出しエラー:', error);
     
-    // エラー時はモック関数にフォールバック
-    console.warn('APIエラーのためモックデータを使用します');
-    return getMockFunction(query);
+    // エラー時は例外をそのまま投げる
+    throw new Error('関数の生成に失敗しました。しばらく時間をおいて再度お試しください。');
   }
 };
