@@ -103,3 +103,204 @@
   outline: none;
   border-color: #4CAF50;
 }
+
+/* react-spreadsheet用のセルスタイル */
+.Spreadsheet__cell.formula-result-cell {
+  background-color: #FFE0B2 !important;
+  color: #D84315 !important;
+  font-weight: bold !important;
+  border: 2px solid #FF9800 !important;
+  position: relative;
+  cursor: pointer;
+}
+
+.Spreadsheet__cell.formula-result-cell:hover {
+  background-color: #FFCC80 !important;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  z-index: 10;
+}
+
+.Spreadsheet__cell.formula-result-cell::before {
+  content: "📊";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  font-size: 10px;
+  background-color: #FF9800;
+  color: white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ツールチップ用のスタイル */
+.Spreadsheet__cell.formula-result-cell::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1000;
+  font-family: 'Monaco', 'Consolas', 'Lucida Console', monospace;
+  font-weight: normal;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.Spreadsheet__cell.formula-result-cell:hover::after {
+  opacity: 1;
+  animation: tooltipFadeIn 0.3s ease-in-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.Spreadsheet__cell.header-cell {
+  background-color: #E3F2FD !important;
+  color: #1976D2 !important;
+  font-weight: 600 !important;
+}
+
+.Spreadsheet__cell.data-cell {
+  background-color: #F0F4C3 !important;
+  color: #689F38 !important;
+}
+
+.Spreadsheet__cell.input-cell {
+  background-color: #FFF8E1 !important;
+  color: #F57F17 !important;
+}
+
+/* その他の関数用（非SUM関数）のスタイル */
+.Spreadsheet__cell.other-formula-cell {
+  background-color: #E8F5E8 !important;
+  color: #2E7D32 !important;
+  font-weight: bold !important;
+  border: 1px solid #4CAF50 !important;
+  position: relative;
+  cursor: pointer;
+}
+
+.Spreadsheet__cell.other-formula-cell:hover {
+  background-color: #C8E6C9 !important;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.Spreadsheet__cell.other-formula-cell::before {
+  content: "🔢";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  font-size: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* その他の関数のツールチップ */
+.Spreadsheet__cell.other-formula-cell::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2E7D32;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1000;
+  font-family: 'Monaco', 'Consolas', 'Lucida Console', monospace;
+  font-weight: normal;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.Spreadsheet__cell.other-formula-cell:hover::after {
+  opacity: 1;
+  animation: tooltipFadeIn 0.3s ease-in-out;
+}
+
+/* 数式バー用のスタイル */
+.formula-bar-container {
+  margin-bottom: 15px;
+}
+
+.formula-bar {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: border-color 0.3s ease;
+}
+
+.formula-bar:focus-within {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.cell-address {
+  min-width: 60px;
+  padding: 4px 8px;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #495057;
+  margin-right: 8px;
+  text-align: center;
+}
+
+.formula-display {
+  flex: 1;
+  padding: 4px 8px;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Consolas', 'Lucida Console', monospace;
+  font-size: 13px;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  word-break: break-all;
+}
+
+.formula-display:empty::before {
+  content: '数式または値を表示';
+  color: #6c757d;
+  font-style: italic;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
