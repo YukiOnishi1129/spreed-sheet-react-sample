@@ -53,12 +53,17 @@ const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門
 - 7-8行目：空行またはその他のデータ
 
 **絶対に避けること：**
-- 循環参照（#CYCLE!エラーの原因）
-- 不正なセル参照
-- 配列の要素数不一致
+- 循環参照（#CYCLE!エラーの原因）：セルが自分自身や、自分を参照するセルを参照しない
+- 不正なセル参照：存在しないセルを参照しない
+- 配列の要素数不一致：必ず8行8列にする
 - VLOOKUP関数での範囲外参照（#NAME?エラーの原因）
 - 存在しない関数名や構文エラー
 - 引用符の不適切な使用
+
+**循環参照の具体例（これを避ける）：**
+- A1がB1を参照し、B1がA1を参照する
+- SUM関数が自分自身のセルを含む範囲を参照する
+- 合計行のセルが、その合計を含む範囲を参照する
 
 **SUM関数の完全な例：**
 {
@@ -197,7 +202,19 @@ const SYSTEM_PROMPT = `あなたはExcel/スプレッドシート関数の専門
   "examples": ["=IF(A1>10,\"大\",\"小\")", "=IF(B1=\"\",0,B1*2)"]
 }
 
-これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。JSONのみを返してください。`;
+これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。
+
+**重要：複数の関数を使用する場合**
+- function_nameは主要な関数名または組み合わせ名を記載（例："IF & SUM"）
+- 複数の関数を組み合わせた実用的なデータ構造にする
+- 各関数の役割を明確にする
+
+**JSON構文の注意点：**
+- 数式内の文字列は必ずエスケープしてください（例："=IF(A1>10,\\"大\\",\\"小\\")"）
+- 文字列内にダブルクォートがある場合は \\" を使用
+- 正しいJSON形式を厳守してください
+
+JSONのみを返してください。`;
 
 export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionResponse> => {
   // APIキーが設定されていない場合はモック関数を返す
@@ -230,12 +247,48 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
 
     // JSONを解析
     try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('有効なJSONが見つかりませんでした');
+      // JSONの抽出を試行
+      let jsonData;
+      
+      // まず```json```で囲まれているかチェック
+      const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        jsonData = codeBlockMatch[1];
+      } else {
+        // 通常のJSONパターンを探す
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('有効なJSONが見つかりませんでした');
+        }
+        jsonData = jsonMatch[0];
       }
-
-      const functionData = JSON.parse(jsonMatch[0]) as ExcelFunctionResponse;
+      
+      // 一般的なJSON構文エラーを自動修正
+      // まず、不正な制御文字を削除
+      jsonData = jsonData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+      
+      // より安全なJSON修正：JSONをパースできるまで修正を試行
+      let attempts = 0;
+      while (attempts < 3) {
+        try {
+          JSON.parse(jsonData);
+          break; // パースに成功したら終了
+        } catch (error) {
+          attempts++;
+          // 数式内の引用符を段階的に修正
+          if (attempts === 1) {
+            // エスケープされていない引用符を修正
+            jsonData = jsonData.replace(/"f":\s*"=([^"]*)"([^"]*)"([^"]*)"/g, '"f": "=$1\\"$2\\"$3"');
+          } else if (attempts === 2) {
+            // より広範囲の引用符を修正
+            jsonData = jsonData.replace(/([^\\])"([^\\])/g, '$1\\"$2');
+          }
+        }
+      }
+      
+      console.log('修正後のJSON:', jsonData);
+      
+      const functionData = JSON.parse(jsonData) as ExcelFunctionResponse;
       
       // データの検証
       if (!functionData.function_name || !functionData.spreadsheet_data) {
