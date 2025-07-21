@@ -36,7 +36,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
   // sheetDataの変更を監視
   useEffect(() => {
-    console.log('sheetData変更検知:', sheetData);
+    // console.log removed
   }, [sheetData]);
 
   // ChatGPT APIを呼び出す（模擬実装）
@@ -224,15 +224,12 @@ const ChatGPTSpreadsheet: React.FC = () => {
   const executeSearch = async (query: string) => {
     if (isLoading) return; // 既に実行中の場合は何もしない
     
-    console.log('検索開始:', query);
+    // console.log removed - search start
     setIsLoading(true);
     
     try {
       const response = await fetchExcelFunction(query);
-      console.log('APIレスポンス:', response);
-      console.log('スプレッドシートデータの構造:', response.spreadsheet_data);
-      console.log('最初の行:', response.spreadsheet_data[0]);
-      console.log('最初のセル:', response.spreadsheet_data[0]?.[0]);
+      // console.log removed - API response logging
       
       setCurrentFunction(response);
       
@@ -244,8 +241,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
         })
       );
       
-      console.log('VLOOKUPデバッグ - rawData:', rawData);
-      console.log('元データ構造:', response.spreadsheet_data);
+      // console.log removed - VLOOKUP debug
 
       // HyperFormulaでデータを処理
       let calculationResults: any[][] = [];
@@ -260,9 +256,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
           precisionRounding: 14
         });
         
-        // デバッグ: HyperFormulaインスタンスをチェック
-        console.log('HyperFormulaインスタンス作成完了:', !!tempHf);
-        console.log('HyperFormula v3.0.0 使用中');
+        // HyperFormula instance created
         
         // 計算結果を取得
         calculationResults = rawData.map((row, rowIndex) => 
@@ -270,38 +264,14 @@ const ChatGPTSpreadsheet: React.FC = () => {
             try {
               const result = tempHf.getCellValue({ sheet: 0, row: rowIndex, col: colIndex });
               
-              // VLOOKUPセルの場合は詳細デバッグ
-              if (typeof cell === 'string' && cell.includes('VLOOKUP')) {
-                console.log(`=== VLOOKUP詳細デバッグ ===`);
-                console.log(`セル位置: [${rowIndex}][${colIndex}]`);
-                console.log(`数式: ${cell}`);
-                console.log(`計算結果: ${result}`);
-                console.log(`結果の型: ${typeof result}`);
-                console.log(`検索値 D${rowIndex+1}の値:`, rawData[rowIndex]?.[3]); // D列は4番目（インデックス3）
-                console.log(`検索テーブル A2:C4:`);
-                for (let i = 1; i <= 3; i++) { // A2:C4 = 行1-3
-                  console.log(`  行${i+1}:`, rawData[i]?.slice(0, 3));
-                }
-                
-                // セルの座標も確認
-                console.log(`HyperFormulaセル座標確認:`);
-                console.log(`  D${rowIndex+1} = `, tempHf.getCellValue({ sheet: 0, row: rowIndex, col: 3 }));
-                console.log(`  A2 = `, tempHf.getCellValue({ sheet: 0, row: 1, col: 0 }));
-                console.log(`  B2 = `, tempHf.getCellValue({ sheet: 0, row: 1, col: 1 }));
-                console.log(`  A3 = `, tempHf.getCellValue({ sheet: 0, row: 2, col: 0 }));
-                console.log(`  B3 = `, tempHf.getCellValue({ sheet: 0, row: 2, col: 1 }));
-                console.log(`  A4 = `, tempHf.getCellValue({ sheet: 0, row: 3, col: 0 }));
-                console.log(`  B4 = `, tempHf.getCellValue({ sheet: 0, row: 3, col: 1 }));
-                console.log(`========================`);
-              }
+              // VLOOKUP cell processing
               
               return result;
             } catch (cellError) {
-              console.error(`セル[${rowIndex}][${colIndex}]でエラー:`, cellError);
+              // Cell error occurred
               
               // VLOOKUPの場合はマニュアル計算を試す
               if (typeof cell === 'string' && cell.includes('VLOOKUP')) {
-                console.log('VLOOKUPの手動計算を試行中...');
                 return '#MANUAL_CALC_NEEDED';
               }
               
@@ -310,7 +280,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
           })
         );
       } catch (error) {
-        console.error('HyperFormula計算エラー:', error);
+        // HyperFormula calculation error
         calculationResults = rawData; // フォールバック
       }
 
@@ -363,16 +333,13 @@ const ChatGPTSpreadsheet: React.FC = () => {
         })
       );
 
-      console.log('元のスプレッドシートデータ:', response.spreadsheet_data);
-      console.log('HyperFormulaで処理したデータ:', rawData);
-      console.log('変換後のデータ:', convertedData);
-      console.log('現在のシートデータ:', sheetData);
+      // Data conversion complete
       
       setSheetData(convertedData);
-      console.log('シートデータ設定完了');
+      // Sheet data set
       
     } catch (error) {
-      console.error('関数検索エラー:', error);
+      // Function search error
       const errorMessage = error instanceof Error ? error.message : '不明なエラー';
       alert('関数の検索中にエラーが発生しました: ' + errorMessage);
     }
@@ -647,25 +614,17 @@ const ChatGPTSpreadsheet: React.FC = () => {
         <Spreadsheet
           data={sheetData}
           onChange={(data) => {
-            console.log('Spreadsheet onChange:', data);
             setSheetData(data);
           }}
           onSelect={(selected) => {
             // セル選択時に数式を表示
-            console.log('Selected cells:', selected);
-            console.log('Selected object structure:', {
-              type: typeof selected,
-              constructor: selected?.constructor?.name,
-              hasRange: !!(selected as any)?.range,
-              range: (selected as any)?.range
-            });
             
             let row, column;
             
             // RangeSelection2 の場合
             if (selected && (selected as any).range) {
               const range = (selected as any).range;
-              console.log('Range structure:', range);
+              // Process range structure
               
               // PointRange2 の場合
               if (range.start) {
@@ -685,28 +644,25 @@ const ChatGPTSpreadsheet: React.FC = () => {
               column = min.column;
             }
             
-            console.log('Extracted coordinates:', { row, column });
+            // Coordinates extracted
             
             if (row !== undefined && column !== undefined) {
               const cell = sheetData[row]?.[column];
               const cellAddress = `${String.fromCharCode(65 + column)}${row + 1}`;
               
-              console.log(`選択セル ${cellAddress}:`, cell);
+              // Process selected cell
               
               setSelectedCellAddress(cellAddress);
               
               if (cell && cell.formula) {
                 setSelectedCellFormula(cell.formula);
-                console.log(`セル ${cellAddress} の数式:`, cell.formula);
               } else if (cell && cell.value !== undefined && cell.value !== null) {
                 setSelectedCellFormula(String(cell.value));
-                console.log(`セル ${cellAddress} の値:`, cell.value);
               } else {
                 setSelectedCellFormula('');
-                console.log(`セル ${cellAddress} は空`);
               }
             } else {
-              console.log('座標を取得できませんでした');
+              // Could not get coordinates
               setSelectedCellAddress('');
               setSelectedCellFormula('');
             }
@@ -718,19 +674,16 @@ const ChatGPTSpreadsheet: React.FC = () => {
               const cell = sheetData[row]?.[column];
               const cellAddress = `${String.fromCharCode(65 + column)}${row + 1}`;
               
-              console.log(`アクティブセル ${cellAddress}:`, cell);
+              // Process active cell
               
               setSelectedCellAddress(cellAddress);
               
               if (cell && cell.formula) {
                 setSelectedCellFormula(cell.formula);
-                console.log(`アクティブセル ${cellAddress} の数式:`, cell.formula);
               } else if (cell && cell.value !== undefined && cell.value !== null) {
                 setSelectedCellFormula(String(cell.value));
-                console.log(`アクティブセル ${cellAddress} の値:`, cell.value);
               } else {
                 setSelectedCellFormula('');
-                console.log(`アクティブセル ${cellAddress} は空`);
               }
             }
           }}
