@@ -262,13 +262,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
         
         // デバッグ: HyperFormulaインスタンスをチェック
         console.log('HyperFormulaインスタンス作成完了:', !!tempHf);
-        
-        // 利用可能な関数をチェック（メソッドが存在する場合のみ）
-        if (typeof tempHf.getFunctionNames === 'function') {
-          console.log('HyperFormula利用可能な関数:', tempHf.getFunctionNames());
-        } else {
-          console.log('getFunctionNames メソッドは利用できません（古いバージョンの可能性）');
-        }
+        console.log('HyperFormula v3.0.0 使用中');
         
         // 計算結果を取得
         calculationResults = rawData.map((row, rowIndex) => 
@@ -659,21 +653,60 @@ const ChatGPTSpreadsheet: React.FC = () => {
           onSelect={(selected) => {
             // セル選択時に数式を表示
             console.log('Selected cells:', selected);
-            if (selected && typeof selected === 'object' && 'min' in selected) {
-              const { row, column } = selected.min as { row: number; column: number };
+            console.log('Selected object structure:', {
+              type: typeof selected,
+              constructor: selected?.constructor?.name,
+              hasRange: !!(selected as any)?.range,
+              range: (selected as any)?.range
+            });
+            
+            let row, column;
+            
+            // RangeSelection2 の場合
+            if (selected && (selected as any).range) {
+              const range = (selected as any).range;
+              console.log('Range structure:', range);
+              
+              // PointRange2 の場合
+              if (range.start) {
+                row = range.start.row;
+                column = range.start.column;
+              }
+              // 他の構造の場合
+              else if (range.row !== undefined && range.column !== undefined) {
+                row = range.row;
+                column = range.column;
+              }
+            }
+            // 古い形式（min プロパティ）の場合
+            else if (selected && typeof selected === 'object' && 'min' in selected) {
+              const min = selected.min as { row: number; column: number };
+              row = min.row;
+              column = min.column;
+            }
+            
+            console.log('Extracted coordinates:', { row, column });
+            
+            if (row !== undefined && column !== undefined) {
               const cell = sheetData[row]?.[column];
               const cellAddress = `${String.fromCharCode(65 + column)}${row + 1}`;
+              
+              console.log(`選択セル ${cellAddress}:`, cell);
+              
               setSelectedCellAddress(cellAddress);
               
               if (cell && cell.formula) {
                 setSelectedCellFormula(cell.formula);
                 console.log(`セル ${cellAddress} の数式:`, cell.formula);
-              } else if (cell && cell.value !== undefined) {
-                setSelectedCellFormula(cell.value.toString());
+              } else if (cell && cell.value !== undefined && cell.value !== null) {
+                setSelectedCellFormula(String(cell.value));
+                console.log(`セル ${cellAddress} の値:`, cell.value);
               } else {
                 setSelectedCellFormula('');
+                console.log(`セル ${cellAddress} は空`);
               }
             } else {
+              console.log('座標を取得できませんでした');
               setSelectedCellAddress('');
               setSelectedCellFormula('');
             }
@@ -684,15 +717,20 @@ const ChatGPTSpreadsheet: React.FC = () => {
               const { row, column } = point;
               const cell = sheetData[row]?.[column];
               const cellAddress = `${String.fromCharCode(65 + column)}${row + 1}`;
+              
+              console.log(`アクティブセル ${cellAddress}:`, cell);
+              
               setSelectedCellAddress(cellAddress);
               
               if (cell && cell.formula) {
                 setSelectedCellFormula(cell.formula);
                 console.log(`アクティブセル ${cellAddress} の数式:`, cell.formula);
-              } else if (cell && cell.value !== undefined) {
-                setSelectedCellFormula(cell.value.toString());
+              } else if (cell && cell.value !== undefined && cell.value !== null) {
+                setSelectedCellFormula(String(cell.value));
+                console.log(`アクティブセル ${cellAddress} の値:`, cell.value);
               } else {
                 setSelectedCellFormula('');
+                console.log(`アクティブセル ${cellAddress} は空`);
               }
             }
           }}
