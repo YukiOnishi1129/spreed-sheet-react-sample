@@ -47,24 +47,45 @@ const ChatGPTSpreadsheet: React.FC = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        prompt: `以下のユーザーの要求に基づいて、Excel/スプレッドシート関数とサンプルデータを JSON 形式で返してください：
-        
-        ユーザー要求: "${query}"
-        
-        回答は以下の形式で返してください：
-        {
-          "function_name": "関数名",
-          "description": "関数の説明",
-          "syntax": "関数の構文",
-          "category": "関数のカテゴリ",
-          "spreadsheet_data": [
-            // Fortune Sheet形式のデータ配列
-            // 例：[{"v": "値", "ct": {"t": "s"}}, {"v": 100, "f": "=A1+10"}]
-          ],
-          "examples": ["使用例1", "使用例2"]
-        }
-        
-        spreadsheet_dataは、関数の使用例が分かりやすい実用的なデータにしてください。`
+        prompt: `以下のユーザーの要求に基づいて、Excel/スプレッドシート関数の実用的なデモデータをJSON形式で生成してください。
+
+ユーザー要求: "${query}"
+
+以下の形式で厳密にJSONを返してください：
+{
+  "function_name": "関数名（例：VLOOKUP, SUM, IF）",
+  "description": "関数の分かりやすい説明",
+  "syntax": "関数の構文（例：VLOOKUP(検索値, 範囲, 列番号, [検索方法])）",
+  "category": "関数のカテゴリ（例：検索関数、数学関数、論理関数）",
+  "spreadsheet_data": [
+    // 8x8の配列（8行×8列）
+    // 各セルは以下の形式：
+    // - 通常の値: {"v": "値", "ct": {"t": "s"または"n"}}
+    // - 数式セル: {"v": null, "f": "=数式", "bg": "背景色", "fc": "文字色"}
+    // - 空セル: null
+    [
+      {"v": "ヘッダー1", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "ヘッダー2", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      null, null, null, null, null, null
+    ],
+    // ... 残り7行
+  ],
+  "examples": [
+    "=関数の使用例1",
+    "=関数の使用例2"
+  ]
+}
+
+重要な注意事項：
+1. spreadsheet_dataは必ず8x8の配列にしてください
+2. 数式セルは該当する関数を使った実際の数式を含めてください
+3. データは関数の動作が分かりやすい実用的な例にしてください
+4. ヘッダーを含めて、ビジネスや日常で使えるリアルなデータを使用してください
+5. 色の使い分け：
+   - ヘッダー: #E3F2FD（薄青）
+   - 通常データ: #F0F4C3（薄緑）
+   - 関数の結果: #FFE0B2（オレンジ）
+   - その他の数式: #E8F5E8（薄い緑）`
       })
     });
     return response.json();
