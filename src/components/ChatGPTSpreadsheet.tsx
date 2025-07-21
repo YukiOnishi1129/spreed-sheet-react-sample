@@ -592,6 +592,55 @@ const ChatGPTSpreadsheet: React.FC = () => {
     }
   };
 
+  // 数式付きでデータをコピーする関数
+  const copyWithFormulas = async () => {
+    if (!currentFunction?.spreadsheet_data) return;
+    
+    let tsvData = '';
+    
+    for (let rowIndex = 0; rowIndex < sheetData.length; rowIndex++) {
+      const row = sheetData[rowIndex];
+      if (!row) continue;
+      
+      const rowData: string[] = [];
+      
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const cell = row[colIndex];
+        
+        if (cell && cell.formula) {
+          // 数式セルの場合は数式をそのまま使用
+          rowData.push(cell.formula);
+        } else if (cell && cell.value !== undefined && cell.value !== null) {
+          // 値セルの場合は値を使用
+          rowData.push(String(cell.value));
+        } else {
+          // 空セル
+          rowData.push('');
+        }
+      }
+      
+      // 空の行はスキップ
+      if (rowData.some(cell => cell !== '')) {
+        tsvData += rowData.join('\t') + '\n';
+      }
+    }
+    
+    try {
+      await navigator.clipboard.writeText(tsvData);
+      alert('数式付きでコピーしました！Excelに貼り付けてください。');
+    } catch (error) {
+      console.error('コピーに失敗しました:', error);
+      // フォールバック: テキストエリアを使用
+      const textarea = document.createElement('textarea');
+      textarea.value = tsvData;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('数式付きでコピーしました！Excelに貼り付けてください。');
+    }
+  };
+
   return (
     <div className="chatgpt-spreadsheet">
       <h2>ChatGPT連携 Excel関数デモ</h2>
@@ -901,6 +950,32 @@ const ChatGPTSpreadsheet: React.FC = () => {
           />
         </div>
       </div>
+      
+      {/* コピーボタン */}
+      {currentFunction && (
+        <div style={{ 
+          marginBottom: '10px', 
+          display: 'flex', 
+          justifyContent: 'flex-end',
+          gap: '10px'
+        }}>
+          <button
+            onClick={copyWithFormulas}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            📋 数式付きでコピー
+          </button>
+        </div>
+      )}
       
       <div className="spreadsheet-container" style={{ height: '500px' }}>
         <Controller
