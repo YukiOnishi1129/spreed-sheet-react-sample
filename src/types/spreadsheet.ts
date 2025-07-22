@@ -35,6 +35,9 @@ export const APIResponseCellSchema = z.object({
   fc: z.string().optional(), // フォントカラー
 }).nullable();
 
+// API セルデータの型
+export type ApiCellData = z.infer<typeof APIResponseCellSchema>;
+
 // ChatGPT APIレスポンスのスキーマ（柔軟なスキーマ）
 export const ExcelFunctionResponseSchema = z.object({
   function_name: z.string().optional(),
