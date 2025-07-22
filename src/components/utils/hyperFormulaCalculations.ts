@@ -1,6 +1,6 @@
 import type { Matrix } from 'react-spreadsheet';
 import { HyperFormula } from 'hyperformula';
-import type { SpreadsheetData } from '../../types/spreadsheet';
+import type { SpreadsheetData, ExcelFunctionResponse } from '../../types/spreadsheet';
 import { matchFormula } from '../../utils/formulas';
 import { 
   hasSpreadsheetValue, 
@@ -14,7 +14,7 @@ import {
 // HyperFormulaで再計算する関数
 export const recalculateFormulas = (
   data: Matrix<unknown>, 
-  currentFunction: { spreadsheet_data: unknown[][] } | null,
+  currentFunction: ExcelFunctionResponse | null,
   setValue: (name: 'spreadsheetData', value: SpreadsheetData) => void
 ) => {
   console.log('再計算開始:', data);
@@ -25,15 +25,14 @@ export const recalculateFormulas = (
   const formulaCells: {row: number, col: number, formula: string}[] = [];
   
   // 元のテンプレートから数式セルを特定
-  currentFunction.spreadsheet_data.forEach((row: unknown[], rowIndex: number) => {
+  currentFunction.spreadsheet_data.forEach((row, rowIndex) => {
     if (row) {
-      row.forEach((cell: unknown, colIndex: number) => {
-        const apiCell = cell as { v?: string | number | null; f?: string; ct?: { t: 's' | 'n' }; bg?: string; fc?: string } | null;
-        if (isFormulaCell(apiCell)) {
+      row.forEach((cell, colIndex) => {
+        if (isFormulaCell(cell)) {
           formulaCells.push({
             row: rowIndex,
             col: colIndex,
-            formula: apiCell.f
+            formula: cell.f
           });
         }
       });
@@ -139,7 +138,6 @@ export const recalculateFormulas = (
       });
     });
     
-    console.log('手動再計算完了:', updatedData);
     setValue('spreadsheetData', updatedData);
     
   } catch (error) {
@@ -200,7 +198,6 @@ export const recalculateFormulas = (
       });
     });
     
-    console.log('手動再計算完了:', updatedData);
     setValue('spreadsheetData', updatedData);
   }
 };

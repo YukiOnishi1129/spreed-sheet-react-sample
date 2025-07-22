@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import Spreadsheet from 'react-spreadsheet';
-import type { Matrix } from 'react-spreadsheet';
+import type { Matrix, Selection } from 'react-spreadsheet';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
@@ -15,7 +15,8 @@ import type { FunctionTemplate } from '../types/templates';
 
 // Utility imports
 import {
-  isExcelFunctionResponse
+  isExcelFunctionResponse,
+  isRangeSelection
 } from './utils/typeGuards';
 import {
   convertToMatrixCellBase,
@@ -116,22 +117,23 @@ const ChatGPTSpreadsheet: React.FC = () => {
   }, [setValue, executeSearch, processSpreadsheetData]);
 
   // セル選択時のハンドラー
-  const handleCellSelect = useCallback((selected: unknown, fieldValue: SpreadsheetData) => {
-    if (Array.isArray(selected) && selected.length > 0) {
-      const firstSelection = selected[0] as { row: number; column: number };
-      if (firstSelection && typeof firstSelection === 'object' && 'row' in firstSelection && 'column' in firstSelection) {
-        const row = Number(firstSelection.row);
-        const column = Number(firstSelection.column);
-        const cellAddress = `${String.fromCharCode(65 + column)}${row + 1}`;
-        const cell = fieldValue[row]?.[column];
-        
-        setValue('selectedCell.address', cellAddress);
-        
-        if (cell?.value !== undefined && cell.value !== null) {
-          setValue('selectedCell.formula', String(cell.value));
-        } else {
-          setValue('selectedCell.formula', '');
-        }
+  const handleCellSelect = useCallback((selected: Selection, fieldValue: SpreadsheetData) => {
+    // Selectionがnullまたは空の場合は何もしない
+    if (!selected) return;
+    
+    // RangeSelectionの場合（型定義に基づく正しい実装）
+    if (isRangeSelection(selected)) {
+      const row = selected.range.start.row;
+      const column = selected.range.start.column;
+      const cellAddress = `${String.fromCharCode(65 + column)}${row + 1}`;
+      const cell = fieldValue[row]?.[column];
+      
+      setValue('selectedCell.address', cellAddress);
+      
+      if (cell?.value !== undefined && cell.value !== null) {
+        setValue('selectedCell.formula', String(cell.value));
+      } else {
+        setValue('selectedCell.formula', '');
       }
     }
   }, [setValue]);

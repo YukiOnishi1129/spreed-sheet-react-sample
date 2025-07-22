@@ -50,3 +50,36 @@ export const isExcelFunctionResponse = (value: unknown): value is ExcelFunctionR
   // TypeScriptは'in'チェック後にプロパティの存在を認識する
   return Array.isArray(value.spreadsheet_data);
 };
+
+// Spreadsheet selection type guard
+export const isSpreadsheetSelection = (value: unknown): value is { row: number; column: number } => {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    'row' in value &&
+    'column' in value &&
+    typeof value.row === 'number' &&
+    typeof value.column === 'number'
+  );
+};
+
+// RangeSelection type guard
+export const isRangeSelection = (value: unknown): value is { range: { start: { row: number; column: number }; end: { row: number; column: number } } } => {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    'range' in value &&
+    typeof value.range === 'object' &&
+    value.range !== null &&
+    'start' in value.range &&
+    'end' in value.range &&
+    typeof value.range.start === 'object' &&
+    typeof value.range.end === 'object' &&
+    value.range.start !== null &&
+    value.range.end !== null &&
+    'row' in value.range.start &&
+    'column' in value.range.start &&
+    typeof value.range.start.row === 'number' &&
+    typeof value.range.start.column === 'number'
+  );
+};
