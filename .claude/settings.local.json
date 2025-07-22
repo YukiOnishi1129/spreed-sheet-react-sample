@@ -18,7 +18,13 @@
       "Bash(curl:*)",
       "Bash(mkdir:*)",
       "Bash(node:*)",
-      "mcp__ide__executeCode"
+      "mcp__ide__executeCode",
+      "WebFetch(domain:dekiru.net)",
+      "Bash(npm run lint)",
+      "Bash(sed:*)",
+      "Bash(grep:*)",
+      "Bash(npm run typecheck:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": []
   }

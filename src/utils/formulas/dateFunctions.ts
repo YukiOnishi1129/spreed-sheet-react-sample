@@ -88,11 +88,12 @@ export const DATEDIF: CustomFormula = {
       case 'Y':
         // 年数の差
         return endDate.diff(startDate, 'year');
-      case 'YM':
+      case 'YM': {
         // 年を無視した月数の差
         const monthDiff = endDate.month() - startDate.month();
         return monthDiff < 0 ? monthDiff + 12 : monthDiff;
-      case 'YD':
+      }
+      case 'YD': {
         // 年を無視した日数の差
         const sameYearEnd = endDate.year(startDate.year());
         let dayDiff = sameYearEnd.diff(startDate, 'day');
@@ -101,7 +102,8 @@ export const DATEDIF: CustomFormula = {
           dayDiff = nextYearEnd.diff(startDate, 'day');
         }
         return dayDiff;
-      case 'MD':
+      }
+      case 'MD': {
         // 月を無視した日数の差
         const dayOfMonthDiff = endDate.date() - startDate.date();
         if (dayOfMonthDiff < 0) {
@@ -109,9 +111,11 @@ export const DATEDIF: CustomFormula = {
           return prevMonthDays - startDate.date() + endDate.date();
         }
         return dayOfMonthDiff;
-      default:
+      }
+      default: {
         console.error('DATEDIF: 無効な単位', unit);
         return FormulaError.VALUE;
+      }
     }
   }
 };

@@ -37,14 +37,14 @@ export const APIResponseCellSchema = z.object({
 
 // ChatGPT APIレスポンスのスキーマ（柔軟なスキーマ）
 export const ExcelFunctionResponseSchema = z.object({
-  function_name: z.string().default("Excel関数"),
-  description: z.string().default("Excel関数の説明"),
-  syntax: z.string().default("関数の構文"),
+  function_name: z.string().optional(),
+  description: z.string().optional(),
+  syntax: z.string().optional(),
   syntax_detail: z.string().optional(),
-  category: z.string().default("Excel関数"),
+  category: z.string().optional(),
   spreadsheet_data: z.array(
-    z.array(APIResponseCellSchema).min(1, "各行は最低1列必要です")
-  ).min(1, "最低1行必要です"),
+    z.array(APIResponseCellSchema)
+  ),
   examples: z.array(z.string()).optional(),
 });
 
@@ -144,3 +144,6 @@ export type SearchForm = z.infer<typeof SearchFormSchema>;
 export type CellSelection = z.infer<typeof CellSelectionSchema>;
 export type ExcelFunctionResponse = z.infer<typeof ExcelFunctionResponseSchema>;
 export type SpreadsheetForm = z.infer<typeof SpreadsheetFormSchema>;
+
+// processSpreadsheetData関数用の型（ExcelFunctionResponseと同じ構造）
+export type ProcessSpreadsheetDataInput = ExcelFunctionResponse;

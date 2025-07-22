@@ -15,7 +15,7 @@ export interface FunctionTemplate {
     syntax: string;
     syntax_detail?: string;
     category: string;
-    spreadsheet_data: any[][];
+    spreadsheet_data: unknown[][];
     examples: string[];
   };
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import OpenAI from 'openai';
 import type { ExcelFunctionResponse } from '../types/spreadsheet';
 import { OPENAI_JSON_SCHEMA, ExcelFunctionResponseSchema } from '../types/spreadsheet';
@@ -171,7 +172,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null]
   ],
-  "examples": ["=VLOOKUP(\"P001\",A2:C4,2,0)", "=VLOOKUP(D2,A2:C4,3,0)"]
+  "examples": ["=VLOOKUP("P001",A2:C4,2,0)", "=VLOOKUP(D2,A2:C4,3,0)"]
 }
 
 **IF関数の完全な例：**
@@ -192,22 +193,22 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "田中", "ct": {"t": "s"}},
       {"v": 85, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B2>=60,\"合格\",\"不合格\")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=IF(B2>=90,\"優\",IF(B2>=80,\"良\",IF(B2>=70,\"可\",\"不可\")))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B2>=60,"合格","不合格")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B2>=90,"優",IF(B2>=80,"良",IF(B2>=70,"可","不可")))", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null
     ],
     [
       {"v": "佐藤", "ct": {"t": "s"}},
       {"v": 45, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B3>=60,\"合格\",\"不合格\")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=IF(B3>=90,\"優\",IF(B3>=80,\"良\",IF(B3>=70,\"可\",\"不可\")))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B3>=60,"合格","不合格")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B3>=90,"優",IF(B3>=80,"良",IF(B3>=70,"可","不可")))", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null
     ],
     [
       {"v": "鈴木", "ct": {"t": "s"}},
       {"v": 92, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B4>=60,\"合格\",\"不合格\")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=IF(B4>=90,\"優\",IF(B4>=80,\"良\",IF(B4>=70,\"可\",\"不可\")))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B4>=60,"合格","不合格")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B4>=90,"優",IF(B4>=80,"良",IF(B4>=70,"可","不可")))", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null
     ],
     [null, null, null, null, null, null, null, null],
@@ -215,7 +216,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null]
   ],
-  "examples": ["=IF(A1>10,\"大\",\"小\")", "=IF(B1=\"\",0,B1*2)"]
+  "examples": ["=IF(A1>10,"大","小")", "=IF(B1="",0,B1*2)"]
 }
 
 **営業担当者売上管理表の完全な例：**
@@ -235,31 +236,31 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "田中", "ct": {"t": "s"}},
       {"v": 80000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B2>=100000,\"目標達成\",\"要改善\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B2>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null, null
     ],
     [
       {"v": "佐藤", "ct": {"t": "s"}},
       {"v": 120000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B3>=100000,\"目標達成\",\"要改善\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B3>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null, null
     ],
     [
       {"v": "鈴木", "ct": {"t": "s"}},
       {"v": 95000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B4>=100000,\"目標達成\",\"要改善\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B4>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null, null
     ],
     [
       {"v": "山田", "ct": {"t": "s"}},
       {"v": 150000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B5>=100000,\"目標達成\",\"要改善\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B5>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null, null
     ],
     [
       {"v": "伊藤", "ct": {"t": "s"}},
       {"v": 110000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B6>=100000,\"目標達成\",\"要改善\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B6>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null, null, null, null
     ],
     [
@@ -269,7 +270,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     ],
     [null, null, null, null, null, null, null, null]
   ],
-  "examples": ["=IF(B2>=100000,\"目標達成\",\"要改善\")", "=SUM(B2:B6)"]
+  "examples": ["=IF(B2>=100000,"目標達成","要改善")", "=SUM(B2:B6)"]
 }
 
 **複数関数を使用する場合の例：**
@@ -285,8 +286,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 {
   "function_name": "TODAY & YEAR & MONTH & DAY & DATEDIF",
   "description": "TODAY関数で現在の日付を取得し、YEAR・MONTH・DAY関数で日付要素を抽出、DATEDIF関数で年齢を計算します",
-  "syntax": "TODAY() + YEAR(日付) + MONTH(日付) + DAY(日付) + DATEDIF(開始日, 終了日, \"Y\")",
-  "syntax_detail": "TODAY() - 現在の日付を取得 + YEAR(date) - 日付から年を抽出 + MONTH(date) - 日付から月を抽出 + DAY(date) - 日付から日を抽出 + DATEDIF(start_date, end_date, \"Y\") - 2つの日付間の年数を計算",
+  "syntax": "TODAY() + YEAR(日付) + MONTH(日付) + DAY(日付) + DATEDIF(開始日, 終了日, "Y")",
+  "syntax_detail": "TODAY() - 現在の日付を取得 + YEAR(date) - 日付から年を抽出 + MONTH(date) - 日付から月を抽出 + DAY(date) - 日付から日を抽出 + DATEDIF(start_date, end_date, "Y") - 2つの日付間の年数を計算",
   "category": "日付関数",
   "spreadsheet_data": [
     [
@@ -302,7 +303,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "田中", "ct": {"t": "s"}},
       {"v": "1990-05-15", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(\"1990-05-15\",TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF("1990-05-15",TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
@@ -312,7 +313,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "佐藤", "ct": {"t": "s"}},
       {"v": "1985-11-20", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(DATE(1985,11,20),TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(DATE(1985,11,20),TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
@@ -322,7 +323,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "鈴木", "ct": {"t": "s"}},
       {"v": "1992-02-10", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(DATE(1992,2,10),TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(DATE(1992,2,10),TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
@@ -332,7 +333,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "山田", "ct": {"t": "s"}},
       {"v": "1995-08-30", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(DATE(1995,8,30),TODAY(),\"Y\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(DATE(1995,8,30),TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
@@ -343,7 +344,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null]
   ],
-  "examples": ["=TODAY()", "=YEAR(TODAY())", "=MONTH(TODAY())", "=DAY(TODAY())", "=DATEDIF(DATE(1990,5,15),TODAY(),\"Y\")"]
+  "examples": ["=TODAY()", "=YEAR(TODAY())", "=MONTH(TODAY())", "=DAY(TODAY())", "=DATEDIF(DATE(1990,5,15),TODAY(),"Y")"]
 }
 
 **INDEX関数とMATCH関数組み合わせの完全な例：**
@@ -415,11 +416,12 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 - INDEX(戻り値の配列, MATCH(検索値, 検索する配列, 0))の形式で使用してください
 
 **プロジェクト管理表の完全な例（DATEDIF/NETWORKDAYS使用）：**
+// eslint-disable-next-line no-useless-escape
 {
   "function_name": "DATEDIF & NETWORKDAYS & IF",
   "description": "DATEDIF関数で期間計算、NETWORKDAYS関数で営業日数計算、IF関数で評価を行います",
-  "syntax": "DATEDIF(開始日, 終了日, \"D\") + NETWORKDAYS(開始日, 終了日) + IF(条件, 真の場合, 偽の場合)",
-  "syntax_detail": "DATEDIF(start_date, end_date, \"D\") - 日数差を計算 + NETWORKDAYS(start_date, end_date) - 営業日数を計算 + IF関数による評価判定",
+  "syntax": "DATEDIF(開始日, 終了日, "D") + NETWORKDAYS(開始日, 終了日) + IF(条件, 真の場合, 偽の場合)",
+  "syntax_detail": "DATEDIF(start_date, end_date, "D") - 日数差を計算 + NETWORKDAYS(start_date, end_date) - 営業日数を計算 + IF関数による評価判定",
   "category": "プロジェクト管理",
   "spreadsheet_data": [
     [
@@ -435,27 +437,27 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "プロジェクトA", "ct": {"t": "s"}},
       {"v": "2023-01-01", "ct": {"t": "s"}},
       {"v": "2023-01-10", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(B2,C2,\\\"D\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(B2,C2,""D"")"", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=NETWORKDAYS(B2,C2)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=IF(D2>=15,\\\"長期\\\",\\\"短期\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(D2>=15,\"長期\",\"短期\")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null
     ],
     [
       {"v": "プロジェクトB", "ct": {"t": "s"}},
       {"v": "2023-02-01", "ct": {"t": "s"}},
       {"v": "2023-02-20", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(B3,C3,\\\"D\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(B3,C3,\"D\")", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=NETWORKDAYS(B3,C3)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=IF(D3>=15,\\\"長期\\\",\\\"短期\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(D3>=15,\"長期\",\"短期\")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null
     ],
     [
       {"v": "プロジェクトC", "ct": {"t": "s"}},
       {"v": "2023-03-01", "ct": {"t": "s"}},
       {"v": "2023-03-08", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(B4,C4,\\\"D\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(B4,C4,\"D\")", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=NETWORKDAYS(B4,C4)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=IF(D4>=15,\\\"長期\\\",\\\"短期\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(D4>=15,\"長期\",\"短期\")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null
     ],
     [
@@ -479,7 +481,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 - **NETWORKDAYS関数**: 手動計算でサポートされています
   - 使用例: =NETWORKDAYS(B2,C2) - 平日のみの日数を計算
 - **使用可能な関数**: IF、SUM、AVERAGE、MAX、MIN、COUNT、VLOOKUP、INDEX、MATCH、DATEDIF、NETWORKDAYSなど
-- **文字列リテラル**: 数式内では\\\"でエスケープしてください（例：=IF(A1>10,\\\"大\\\",\\\"小\\\")）
+- **文字列リテラル**: 数式内では\"でエスケープしてください（例：=IF(A1>10,\"大\",\"小\")）
 
 **超重要：日付データの形式**
 - **必須**: すべての日付データは必ず「YYYY-MM-DD」形式で統一してください
@@ -561,7 +563,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
     
     // Structured Outputsでretryロジックを使用
     const response = await retryWithBackoff(async () => {
-      const params: any = {
+      const params = {
         model,
         messages: [
           {
@@ -627,6 +629,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         }
         
         // 一般的なJSON構文エラーを自動修正
+        // eslint-disable-next-line no-control-regex
         jsonData = jsonData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
         
         // より安全なJSON修正：JSONをパースできるまで修正を試行
@@ -635,15 +638,15 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
           try {
             JSON.parse(jsonData);
             break; // パースに成功したら終了
-          } catch (error) {
+          } catch {
             attempts++;
             // 数式内の引用符を段階的に修正
             if (attempts === 1) {
               // エスケープされていない引用符を修正
-              jsonData = jsonData.replace(/"f":\s*"=([^"]*)"([^"]*)"([^"]*)"/g, '"f": "=$1\\"$2\\"$3"');
+              jsonData = jsonData.replace(/"f":\s*"=([^"]*)"([^"]*)"([^"]*)"/g, '"f": "=$1"$2"$3"');
             } else if (attempts === 2) {
               // より広範囲の引用符を修正
-              jsonData = jsonData.replace(/([^\\])"([^\\])/g, '$1\\"$2');
+              jsonData = jsonData.replace(/([^\\])"([^\\])/g, '$1"$2');
             }
           }
         }
@@ -672,7 +675,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
       
       // Zodのバリデーションエラーの場合、詳細を表示
       if (parseError instanceof Error && parseError.name === 'ZodError') {
-        console.error('Zodバリデーションエラーの詳細:', JSON.stringify((parseError as any).issues, null, 2));
+        console.error('Zodバリデーションエラーの詳細:', JSON.stringify((parseError as unknown as { issues: unknown }).issues, null, 2));
       }
       
       throw new Error('APIレスポンスの解析に失敗しました: ' + parseError);

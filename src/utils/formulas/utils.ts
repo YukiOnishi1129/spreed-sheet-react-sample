@@ -39,7 +39,7 @@ export const parseCellRange = (range: string): { start: { col: number; row: numb
 };
 
 // セル参照から値を取得
-export const getCellValue = (cellRef: string, context: FormulaContext): any => {
+export const getCellValue = (cellRef: string, context: FormulaContext): unknown => {
   const coords = parseCellReference(cellRef);
   if (!coords) return FormulaError.REF;
   
@@ -66,12 +66,12 @@ export const getCellValue = (cellRef: string, context: FormulaContext): any => {
 };
 
 // セル範囲から値の配列を取得
-export const getCellRangeValues = (range: string, context: FormulaContext): any[] => {
+export const getCellRangeValues = (range: string, context: FormulaContext): unknown[] => {
   const rangeCoords = parseCellRange(range);
   if (!rangeCoords) return [];
   
   const { start, end } = rangeCoords;
-  const values: any[] = [];
+  const values: unknown[] = [];
   
   for (let row = start.row; row <= end.row; row++) {
     for (let col = start.col; col <= end.col; col++) {
@@ -88,7 +88,7 @@ export const getCellRangeValues = (range: string, context: FormulaContext): any[
 };
 
 // 日付文字列をdayjsオブジェクトに変換
-export const parseDate = (dateValue: any): dayjs.Dayjs | null => {
+export const parseDate = (dateValue: unknown): dayjs.Dayjs | null => {
   console.log('parseDate: 入力値', { dateValue, type: typeof dateValue });
   
   if (!dateValue) {
@@ -161,7 +161,7 @@ export const toDate = (dayjsObj: dayjs.Dayjs | null): Date | null => {
 };
 
 // 値を数値に変換
-export const toNumber = (value: any): number | null => {
+export const toNumber = (value: unknown): number | null => {
   if (typeof value === 'number') return value;
   if (typeof value === 'string') {
     const num = parseFloat(value);

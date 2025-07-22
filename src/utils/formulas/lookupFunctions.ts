@@ -49,17 +49,17 @@ export const XLOOKUP: CustomFormula = {
   name: 'XLOOKUP',
   pattern: /XLOOKUP\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   isSupported: false, // HyperFormulaでサポートされていない
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, lookupValue, lookupArray, returnArray, ifNotFound] = matches;
     
     console.log('XLOOKUP計算:', { lookupValue, lookupArray, returnArray });
     
     // セル参照から値を取得
-    let searchValue: any;
+    let searchValue: unknown;
     if (lookupValue.match(/^[A-Z]+\d+$/)) {
       searchValue = getCellValue(lookupValue, context);
     } else {
-      searchValue = lookupValue.replace(/^\"|\"$/g, '');
+      searchValue = lookupValue.replace(/^"|"$/g, '');
     }
     
     // 検索配列の値を取得
@@ -80,7 +80,7 @@ export const XLOOKUP: CustomFormula = {
     
     // 見つからない場合
     if (ifNotFound) {
-      return ifNotFound.replace(/^\"|\"$/g, '');
+      return ifNotFound.replace(/^"|"$/g, '');
     }
     
     return FormulaError.NA;

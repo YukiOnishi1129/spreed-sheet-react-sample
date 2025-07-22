@@ -110,7 +110,7 @@ export const TEXTJOIN: CustomFormula = {
     
     console.log('TEXTJOIN計算:', { delimiter, ignoreEmpty, rangeOrValues });
     
-    let values: any[] = [];
+    let values: unknown[] = [];
     
     // セル範囲の場合
     if (rangeOrValues.match(/^[A-Z]+\d+:[A-Z]+\d+$/)) {

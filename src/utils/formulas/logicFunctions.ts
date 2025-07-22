@@ -41,7 +41,7 @@ export const IFS: CustomFormula = {
   name: 'IFS',
   pattern: /IFS\(([^)]+)\)/i,
   isSupported: false, // HyperFormulaでサポートされていない可能性
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const argsString = matches[1];
     
     // 引数をパースする（カンマで分割、ただし関数内のカンマは無視）
@@ -92,17 +92,19 @@ export const IFS: CustomFormula = {
         // 簡単な比較演算子の処理
         const comparisonMatch = conditionArg.match(/([A-Z]+\d+|"[^"]*"|\d+)\s*([><=!]+)\s*([A-Z]+\d+|"[^"]*"|\d+)/);
         if (comparisonMatch) {
-          let [, left, operator, right] = comparisonMatch;
+          const [, leftParam, operator, rightParam] = comparisonMatch;
+          let left = leftParam;
+          let right = rightParam;
           
           // セル参照の場合は値を取得
           if (left.match(/^[A-Z]+\d+$/)) {
-            left = getCellValue(left, context);
+            left = String(getCellValue(left, context));
           } else if (left.startsWith('"') && left.endsWith('"')) {
             left = left.slice(1, -1);
           }
           
           if (right.match(/^[A-Z]+\d+$/)) {
-            right = getCellValue(right, context);
+            right = String(getCellValue(right, context));
           } else if (right.startsWith('"') && right.endsWith('"')) {
             right = right.slice(1, -1);
           }

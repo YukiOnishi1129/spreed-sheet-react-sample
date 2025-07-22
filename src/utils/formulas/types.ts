@@ -1,9 +1,9 @@
 // 関数処理の共通型定義
 
 export interface CellData {
-  value: any;
+  value: unknown;
   formula?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export type FormulaResult = number | string | boolean | Date | null;
