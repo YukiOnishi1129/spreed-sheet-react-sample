@@ -21,7 +21,7 @@ export const MEDIAN: CustomFormula = {
   name: 'MEDIAN',
   pattern: /MEDIAN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches, context) => {
+  calculate: (__matches, context) => {
     const numbers = extractNumbers(context.data);
     if (numbers.length === 0) return '#NUM!';
     
@@ -41,7 +41,7 @@ export const MODE: CustomFormula = {
   name: 'MODE',
   pattern: /MODE\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches, context) => {
+  calculate: (__matches, context) => {
     const numbers = extractNumbers(context.data);
     if (numbers.length === 0) return '#N/A';
     
@@ -70,7 +70,7 @@ export const COUNTA: CustomFormula = {
   name: 'COUNTA',
   pattern: /COUNTA\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches, context) => {
+  calculate: (__matches, context) => {
     let count = 0;
     context.data.forEach(row => {
       row.forEach(cell => {
@@ -88,7 +88,7 @@ export const COUNTBLANK: CustomFormula = {
   name: 'COUNTBLANK',
   pattern: /COUNTBLANK\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches, context) => {
+  calculate: (__matches, context) => {
     let count = 0;
     context.data.forEach(row => {
       row.forEach(cell => {
@@ -106,7 +106,7 @@ export const STDEV: CustomFormula = {
   name: 'STDEV',
   pattern: /STDEV\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches, context) => {
+  calculate: (__matches, context) => {
     const numbers = extractNumbers(context.data);
     if (numbers.length < 2) return '#DIV/0!';
     
@@ -123,7 +123,7 @@ export const VAR: CustomFormula = {
   name: 'VAR',
   pattern: /VAR\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches, context) => {
+  calculate: (__matches, context) => {
     const numbers = extractNumbers(context.data);
     if (numbers.length < 2) return '#DIV/0!';
     

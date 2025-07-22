@@ -21,15 +21,19 @@ interface UseExcelFunctionSearchProps {
     (name: 'currentFunction', value: ExcelFunctionResponse): void;
     (name: 'spreadsheetData', value: SpreadsheetData): void;
   };
+  setLoadingMessage: (message: string) => void;
 }
 
-export const useExcelFunctionSearch = ({ isSubmitting, setValue }: UseExcelFunctionSearchProps) => {
+export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessage }: UseExcelFunctionSearchProps) => {
   
   const executeSearch = useCallback(async (query: string) => {
     if (isSubmitting) return; // 既に実行中の場合は何もしない
     
     try {
+      setLoadingMessage('AIがあなたのリクエストを分析しています');
       const response = await fetchExcelFunction(query);
+      
+      setLoadingMessage('スプレッドシートデータを準備しています');
       setValue('currentFunction', response);
       
       // 手動計算用の元データを準備
@@ -42,6 +46,8 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue }: UseExcelFunct
           return { value: '' };
         })
       );
+      
+      setLoadingMessage('数式を解析しています');
       
       // HyperFormulaにデータを設定して計算
       const rawData: (string | number | null)[][] = response.spreadsheet_data.map(row => 
@@ -76,6 +82,41 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue }: UseExcelFunct
       
       console.log('HyperFormulaに渡すデータ:', rawData);
 
+      setLoadingMessage('カスタム関数を実行しています');
+      // まず手動計算が必要な関数を実行
+      const manualCalculationResults: unknown[][] = rawData.map(() => []);
+      
+      // 手動計算のパス
+      response.spreadsheet_data.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          if (cell && hasFormulaProperty(cell)) {
+            const matchResult = matchFormula(cell.f);
+            if (matchResult && matchResult.function.isSupported === false) {
+              try {
+                const result = matchResult.function.calculate(matchResult.matches, {
+                  data: originalDataForManualCalc,
+                  row: rowIndex,
+                  col: colIndex
+                });
+                if (!manualCalculationResults[rowIndex]) {
+                  manualCalculationResults[rowIndex] = [];
+                }
+                manualCalculationResults[rowIndex][colIndex] = result;
+                
+                // 手動計算の結果をrawDataに反映（HyperFormulaが参照できるように）
+                if (typeof result === 'number') {
+                  rawData[rowIndex][colIndex] = result;
+                }
+              } catch (error) {
+                console.error('手動計算エラー:', error);
+                manualCalculationResults[rowIndex][colIndex] = '#ERROR!';
+              }
+            }
+          }
+        });
+      });
+
+      setLoadingMessage('Excel関数を計算しています');
       // HyperFormulaでデータを処理 
       let calculationResults: unknown[][] = [];
       try {
@@ -140,6 +181,7 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue }: UseExcelFunct
         calculationResults = rawData;
       }
 
+      setLoadingMessage('スプレッドシート表示を準備しています');
       // react-spreadsheet用のデータに変換
       const convertedData: SpreadsheetData = response.spreadsheet_data.map((row, rowIndex) => 
         row.map((cell, colIndex) => {
@@ -175,23 +217,15 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue }: UseExcelFunct
             // 手動計算が必要な関数かチェック
             const matchResult = matchFormula(cell.f);
             if (matchResult && matchResult.function.isSupported === false) {
-              console.log('手動計算実行:', cell.f);
-              try {
-                const result = matchResult.function.calculate(matchResult.matches, {
-                  data: originalDataForManualCalc,
-                  row: rowIndex,
-                  col: colIndex
-                });
-                console.log('手動計算結果:', result);
-                
-                if (!calculationResults[rowIndex]) {
-                  calculationResults[rowIndex] = [];
+              // 手動計算結果を使用
+              const manualResult = manualCalculationResults[rowIndex]?.[colIndex];
+              if (manualResult !== undefined) {
+                if (isFormulaResult(manualResult)) {
+                  calculatedValue = convertFormulaResult(manualResult);
+                } else {
+                  calculatedValue = String(manualResult);
                 }
-                calculationResults[rowIndex][colIndex] = result ;
-                
-                calculatedValue = isFormulaResult(result) ? convertFormulaResult(result) : String(result);
-              } catch (calcError) {
-                console.error('手動計算エラー:', calcError);
+              } else {
                 calculatedValue = '#ERROR!';
               }
             } else {
@@ -237,12 +271,13 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue }: UseExcelFunct
       );
 
       setValue('spreadsheetData', convertedData);
+      setLoadingMessage('完了しました');
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '不明なエラー';
       alert('関数の検索中にエラーが発生しました: ' + errorMessage);
     }
-  }, [isSubmitting, setValue]);
+  }, [isSubmitting, setValue, setLoadingMessage]);
 
   return { executeSearch };
 };
