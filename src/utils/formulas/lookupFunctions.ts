@@ -1,6 +1,6 @@
 // 検索関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
+import type { CustomFormula, FormulaContext, FormulaResult } from './types';
 import { FormulaError } from './types';
 import { getCellValue, getCellRangeValues } from './utils';
 

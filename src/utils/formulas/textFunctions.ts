@@ -151,7 +151,7 @@ export const SPLIT: CustomFormula = {
     
     let text: string;
     if (textRef.match(/^[A-Z]+\d+$/)) {
-      text = String(getCellValue(textRef, context) || '');
+      text = String(getCellValue(textRef, context) ?? '');
     } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
       text = textRef.slice(1, -1);
     } else {

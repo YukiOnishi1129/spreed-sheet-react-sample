@@ -7,7 +7,7 @@ import { enhanceUserPrompt } from './promptEnhancer';
 
 // OpenAI クライアントの初期化
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey: String(import.meta.env.VITE_OPENAI_API_KEY),
   dangerouslyAllowBrowser: true // ブラウザ環境でのAPI利用を許可
 });
 
@@ -553,7 +553,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
   }
 
   try {
-    const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+    const model = String(import.meta.env.VITE_OPENAI_MODEL ?? 'gpt-4o');
     
     // 一時的にStructured Outputsを無効化して従来の方法を使用
     const supportsStructuredOutputs = false;
@@ -563,15 +563,15 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
     
     // Structured Outputsでretryロジックを使用
     const response = await retryWithBackoff(async () => {
-      const params = {
+      const params: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
         model,
         messages: [
           {
-            role: 'system',
+            role: 'system' as const,
             content: SYSTEM_PROMPT
           },
           {
-            role: 'user',
+            role: 'user' as const,
             content: enhanceUserPrompt(query)
           }
         ],
@@ -582,14 +582,18 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
       
       // Structured Outputs対応モデルの場合のみresponse_formatを追加
       if (supportsStructuredOutputs && !isLegacyModel) {
-        params.response_format = {
-          type: "json_schema",
-          json_schema: {
-            name: "excel_function_response",
-            schema: OPENAI_JSON_SCHEMA,
-            strict: true
+        const paramsWithResponseFormat = {
+          ...params,
+          response_format: {
+            type: "json_schema" as const,
+            json_schema: {
+              name: "excel_function_response",
+              schema: OPENAI_JSON_SCHEMA,
+              strict: true
+            }
           }
         };
+        return await openai.chat.completions.create(paramsWithResponseFormat);
       }
       
       return await openai.chat.completions.create(params);
@@ -602,18 +606,18 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
 
     // Structured Outputs対応モデルかどうかでパース処理を分岐
     try {
-      let rawData;
+      let rawData: unknown;
       
       if (supportsStructuredOutputs && !isLegacyModel) {
         // Structured OutputsでJSONが保証されているので直接パース
         console.log('Structured Output レスポンス:', content);
-        rawData = JSON.parse(content);
+        rawData = JSON.parse(content) as Record<string, unknown>;
       } else {
         // 従来の方法：JSONを抽出してパース
         console.log('従来のJSONパース レスポンス:', content);
         
         // JSONの抽出を試行
-        let jsonData;
+        let jsonData: string;
         
         // まず```json```で囲まれているかチェック
         const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
@@ -652,16 +656,17 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         }
         
         console.log('修正後のJSON:', jsonData);
-        rawData = JSON.parse(jsonData);
+        rawData = JSON.parse(jsonData) as Record<string, unknown>;
       }
       
       // Zodでバリデーション（空文字をデフォルト値で補完）
+      const rawDataRecord = rawData as Record<string, unknown>;
       const preprocessedData = {
-        ...rawData,
-        function_name: rawData.function_name || "Excel関数",
-        description: rawData.description || "Excel関数の説明",
-        syntax: rawData.syntax || "関数の構文",
-        category: rawData.category || "Excel関数",
+        ...rawDataRecord,
+        function_name: rawDataRecord.function_name ?? "Excel関数",
+        description: rawDataRecord.description ?? "Excel関数の説明",
+        syntax: rawDataRecord.syntax ?? "関数の構文",
+        category: rawDataRecord.category ?? "Excel関数",
       };
       
       const functionData = ExcelFunctionResponseSchema.parse(preprocessedData);
@@ -678,7 +683,7 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         console.error('Zodバリデーションエラーの詳細:', JSON.stringify((parseError as unknown as { issues: unknown }).issues, null, 2));
       }
       
-      throw new Error('APIレスポンスの解析に失敗しました: ' + parseError);
+      throw new Error('APIレスポンスの解析に失敗しました: ' + String(parseError));
     }
 
   } catch (error) {

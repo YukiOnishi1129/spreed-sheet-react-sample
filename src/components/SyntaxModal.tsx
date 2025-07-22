@@ -15,18 +15,18 @@ const parseFunctionSyntax = (syntax: string, syntaxDetail?: string) => {
   // 複数関数の場合（+ で区切られている場合）
   if (syntax.includes(' + ')) {
     const functions = syntax.split(' + ').map(s => s.trim());
-    const details = syntaxDetail?.split(' + ') || [];
+    const details = syntaxDetail?.split(' + ') ?? [];
     
     return functions.map((func, index) => ({
       syntax: func,
-      detail: details[index]?.trim() || ''
+      detail: details[index]?.trim() ?? ''
     }));
   }
   
   // 単一関数の場合
   return [{
     syntax: syntax,
-    detail: syntaxDetail || ''
+    detail: syntaxDetail ?? ''
   }];
 };
 
