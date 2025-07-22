@@ -74,7 +74,7 @@ export const XLOOKUP: CustomFormula = {
     // 完全一致で検索（デフォルト）
     for (let i = 0; i < lookupValues.length; i++) {
       if (String(lookupValues[i]).toLowerCase() === String(searchValue).toLowerCase()) {
-        return returnValues[i];
+        return returnValues[i] as FormulaResult;
       }
     }
     

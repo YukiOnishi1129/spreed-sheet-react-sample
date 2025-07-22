@@ -168,3 +168,70 @@ export const SPLIT: CustomFormula = {
     return result[0] || '';
   }
 };
+
+// PROPER関数の実装（先頭大文字変換） - stringFunctions.tsから移動
+export const PROPER: CustomFormula = {
+  name: 'PROPER',
+  pattern: /PROPER\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches) => {
+    const text = matches[1].replace(/"/g, '');
+    return text.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  }
+};
+
+// VALUE関数の実装（文字列を数値に変換） - stringFunctions.tsから移動
+export const VALUE: CustomFormula = {
+  name: 'VALUE',
+  pattern: /VALUE\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches) => {
+    const text = matches[1].replace(/"/g, '');
+    const number = parseFloat(text);
+    
+    if (isNaN(number)) return '#VALUE!';
+    return number;
+  }
+};
+
+// TEXT関数の実装（数値を書式付き文字列に変換） - stringFunctions.tsから移動
+export const TEXT: CustomFormula = {
+  name: 'TEXT',
+  pattern: /TEXT\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches) => {
+    const value = parseFloat(matches[1]);
+    const format = matches[2].replace(/"/g, '');
+    
+    if (isNaN(value)) return '#VALUE!';
+    
+    // 簡単な書式対応（完全なExcel書式ではない）
+    if (format.includes('%')) {
+      return (value * 100).toFixed(2) + '%';
+    } else if (format.includes('0.00')) {
+      return value.toFixed(2);
+    } else if (format.includes('0')) {
+      return Math.round(value).toString();
+    }
+    
+    return value.toString();
+  }
+};
+
+// REPT関数の実装（文字列繰り返し） - stringFunctions.tsから移動
+export const REPT: CustomFormula = {
+  name: 'REPT',
+  pattern: /REPT\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches) => {
+    const text = matches[1].replace(/"/g, '');
+    const times = parseInt(matches[2]);
+    
+    if (isNaN(times) || times < 0) return '#VALUE!';
+    if (times > 32767) return '#VALUE!';
+    
+    return text.repeat(times);
+  }
+};

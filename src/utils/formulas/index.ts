@@ -3,18 +3,40 @@
 import type { CustomFormula } from './types';
 
 // 各カテゴリから関数をインポート
-import { DATEDIF, NETWORKDAYS, TODAY } from './dateFunctions';
-import { SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND } from './mathFunctions';
+import { DATEDIF, NETWORKDAYS, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE } from './dateFunctions';
+import { 
+  SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND,
+  ABS, SQRT, POWER, MOD, INT, TRUNC, RAND, RANDBETWEEN, PI, DEGREES, RADIANS,
+  SIN, COS, TAN, LOG, LOG10, LN, EXP, ASIN, ACOS, ATAN, ATAN2, ROUNDUP, ROUNDDOWN,
+  CEILING, FLOOR, SIGN, FACT
+} from './mathFunctions';
 import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP } from './lookupFunctions';
-import { IF, AND, OR, NOT, IFS } from './logicFunctions';
-import { CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT } from './textFunctions';
+import { IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA } from './logicFunctions';
+import { 
+  CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT,
+  PROPER, VALUE, TEXT, REPT
+} from './textFunctions';
+import { 
+  MEDIAN, MODE, COUNTA, COUNTBLANK, STDEV, VAR, LARGE, SMALL, RANK
+} from './statisticsFunctions';
+import {
+  ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N
+} from './informationFunctions';
 
 // すべての関数を配列にまとめる
-export const ALL_FUNCTIONS: CustomFormula[] = [
+export const ALL_FUNCTIONS = [
   // 日付関数
   DATEDIF,
   NETWORKDAYS,
   TODAY,
+  NOW,
+  DATE,
+  YEAR,
+  MONTH,
+  DAY,
+  WEEKDAY,
+  DAYS,
+  EDATE,
   
   // 数学関数
   SUMIF,
@@ -26,6 +48,45 @@ export const ALL_FUNCTIONS: CustomFormula[] = [
   MAX,
   MIN,
   ROUND,
+  ABS,
+  SQRT,
+  POWER,
+  MOD,
+  INT,
+  TRUNC,
+  RAND,
+  RANDBETWEEN,
+  PI,
+  DEGREES,
+  RADIANS,
+  SIN,
+  COS,
+  TAN,
+  LOG,
+  LOG10,
+  LN,
+  EXP,
+  ASIN,
+  ACOS,
+  ATAN,
+  ATAN2,
+  ROUNDUP,
+  ROUNDDOWN,
+  CEILING,
+  FLOOR,
+  SIGN,
+  FACT,
+  
+  // 統計関数
+  MEDIAN,
+  MODE,
+  COUNTA,
+  COUNTBLANK,
+  STDEV,
+  VAR,
+  LARGE,
+  SMALL,
+  RANK,
   
   // 検索関数
   VLOOKUP,
@@ -41,6 +102,11 @@ export const ALL_FUNCTIONS: CustomFormula[] = [
   OR,
   NOT,
   IFS,
+  XOR,
+  TRUE,
+  FALSE,
+  IFERROR,
+  IFNA,
   
   // テキスト関数
   CONCATENATE,
@@ -56,16 +122,34 @@ export const ALL_FUNCTIONS: CustomFormula[] = [
   FIND,
   SEARCH,
   TEXTJOIN,
-  SPLIT
-];
+  SPLIT,
+  PROPER,
+  VALUE,
+  TEXT,
+  REPT,
+  
+  // 情報関数
+  ISBLANK,
+  ISERROR,
+  ISNA,
+  ISTEXT,
+  ISNUMBER,
+  ISLOGICAL,
+  ISEVEN,
+  ISODD,
+  TYPE,
+  N
+] as CustomFormula[];
 
 // カテゴリ別の関数分類
 export const FUNCTION_CATEGORIES = {
-  date: [DATEDIF, NETWORKDAYS, TODAY],
-  math: [SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND],
-  lookup: [VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP],
-  logic: [IF, AND, OR, NOT, IFS],
-  text: [CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT]
+  date: [DATEDIF, NETWORKDAYS, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE] as CustomFormula[],
+  math: [SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND, ABS, SQRT, POWER, MOD, INT, TRUNC, RAND, RANDBETWEEN, PI, DEGREES, RADIANS, SIN, COS, TAN, LOG, LOG10, LN, EXP, ASIN, ACOS, ATAN, ATAN2, ROUNDUP, ROUNDDOWN, CEILING, FLOOR, SIGN, FACT] as CustomFormula[],
+  statistics: [MEDIAN, MODE, COUNTA, COUNTBLANK, STDEV, VAR, LARGE, SMALL, RANK] as CustomFormula[],
+  lookup: [VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP] as CustomFormula[],
+  logic: [IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA] as CustomFormula[],
+  text: [CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT, PROPER, VALUE, TEXT, REPT] as CustomFormula[],
+  information: [ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N] as CustomFormula[]
 };
 
 // HyperFormulaでサポートされていない関数（手動計算が必要）
@@ -96,9 +180,11 @@ export const getFunctionType = (functionName: string): string => {
   
   if (FUNCTION_CATEGORIES.date.some(f => f.name === name)) return 'date';
   if (FUNCTION_CATEGORIES.math.some(f => f.name === name)) return 'math';
+  if (FUNCTION_CATEGORIES.statistics.some(f => f.name === name)) return 'statistics';
   if (FUNCTION_CATEGORIES.lookup.some(f => f.name === name)) return 'lookup';
   if (FUNCTION_CATEGORIES.logic.some(f => f.name === name)) return 'logic';
   if (FUNCTION_CATEGORIES.text.some(f => f.name === name)) return 'text';
+  if (FUNCTION_CATEGORIES.information.some(f => f.name === name)) return 'information';
   
   return 'other';
 };
@@ -111,3 +197,5 @@ export * from './mathFunctions';
 export * from './lookupFunctions';
 export * from './logicFunctions';
 export * from './textFunctions';
+export * from './statisticsFunctions';
+export * from './informationFunctions';

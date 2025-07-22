@@ -137,7 +137,7 @@ export const IFS: CustomFormula = {
       if (conditionResult) {
         // 戻り値を処理
         if (valueArg.match(/^[A-Z]+\d+$/)) {
-          return getCellValue(valueArg, context);
+          return getCellValue(valueArg, context) as FormulaResult;
         } else if (valueArg.startsWith('"') && valueArg.endsWith('"')) {
           return valueArg.slice(1, -1);
         } else {
@@ -148,5 +148,132 @@ export const IFS: CustomFormula = {
     }
     
     return FormulaError.NA;
+  }
+};
+
+// XOR関数の実装（排他的論理和）
+export const XOR: CustomFormula = {
+  name: 'XOR',
+  pattern: /XOR\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const args = matches[1].split(',').map(arg => arg.trim());
+    let trueCount = 0;
+    
+    for (const arg of args) {
+      let value = false;
+      
+      // セル参照の場合
+      if (arg.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(arg, context);
+        value = Boolean(cellValue);
+      } else {
+        // 値の評価
+        const trimmed = arg.replace(/"/g, '');
+        if (trimmed === 'TRUE' || trimmed === '1') {
+          value = true;
+        } else if (trimmed === 'FALSE' || trimmed === '0') {
+          value = false;
+        } else {
+          const numValue = parseFloat(trimmed);
+          value = !isNaN(numValue) ? numValue !== 0 : trimmed.length > 0;
+        }
+      }
+      
+      if (value) {
+        trueCount++;
+      }
+    }
+    
+    // XORは奇数個の引数がtrueの場合にtrueを返す
+    return trueCount % 2 === 1;
+  }
+};
+
+// TRUE関数の実装
+export const TRUE: CustomFormula = {
+  name: 'TRUE',
+  pattern: /TRUE\(\)/i,
+  isSupported: false,
+  calculate: (): FormulaResult => {
+    return true;
+  }
+};
+
+// FALSE関数の実装
+export const FALSE: CustomFormula = {
+  name: 'FALSE',
+  pattern: /FALSE\(\)/i,
+  isSupported: false,
+  calculate: (): FormulaResult => {
+    return false;
+  }
+};
+
+// IFERROR関数の実装（エラー時の値指定）
+export const IFERROR: CustomFormula = {
+  name: 'IFERROR',
+  pattern: /IFERROR\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const valueArg = matches[1].trim();
+    const errorValue = matches[2].replace(/"/g, '').trim();
+    
+    // セル参照の場合
+    if (valueArg.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueArg, context);
+      // エラーチェック（文字列でエラーを表現）
+      if (typeof cellValue === 'string' && cellValue.startsWith('#') && cellValue.endsWith('!')) {
+        return errorValue;
+      }
+      return cellValue as FormulaResult;
+    }
+    
+    // 値がエラーかどうかをチェック
+    if (valueArg.startsWith('#') && valueArg.endsWith('!')) {
+      return errorValue;
+    }
+    
+    // 数値変換を試す
+    const numValue = parseFloat(valueArg);
+    if (!isNaN(numValue)) {
+      return numValue;
+    }
+    
+    return valueArg.replace(/"/g, '');
+  }
+};
+
+// IFNA関数の実装（#N/Aエラー時の値）
+export const IFNA: CustomFormula = {
+  name: 'IFNA',
+  pattern: /IFNA\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const valueArg = matches[1].trim();
+    const naValue = matches[2].replace(/"/g, '').trim();
+    
+    // セル参照の場合
+    if (valueArg.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueArg, context);
+      // #N/Aエラーチェック
+      if (cellValue === '#N/A' || cellValue === '#N/A!') {
+        return naValue;
+      }
+      return cellValue as FormulaResult;
+    }
+    
+    // #N/Aエラーの場合のみ置換
+    if (valueArg === '#N/A' || valueArg === '#N/A!') {
+      return naValue;
+    }
+    
+    // 数値変換を試す
+    const numValue = parseFloat(valueArg);
+    if (!isNaN(numValue)) {
+      return numValue;
+    }
+    
+    return valueArg.replace(/"/g, '');
   }
 };
