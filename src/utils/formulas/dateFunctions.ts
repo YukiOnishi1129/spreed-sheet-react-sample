@@ -311,20 +311,70 @@ export const EDATE: CustomFormula = {
   name: 'EDATE',
   pattern: /EDATE\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const serialDate = parseFloat(matches[1]);
-    const months = parseInt(matches[2]);
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, dateRef, monthsRef] = matches;
+    const months = parseInt(monthsRef.trim());
     
-    if (isNaN(serialDate) || isNaN(months)) return FormulaError.VALUE;
+    console.log('EDATE: 計算開始', { dateRef: dateRef.trim(), monthsRef: monthsRef.trim(), months });
     
-    // Excelシリアル値から日付に変換
-    const excelEpoch = dayjs('1899-12-30');
-    const date = excelEpoch.add(Math.floor(serialDate), 'day');
+    if (isNaN(months)) {
+      console.error('EDATE: 月数が無効', { monthsRef, months });
+      return FormulaError.VALUE;
+    }
     
-    const newDate = date.add(months, 'month');
+    let startDate;
+    const cleanDateRef = dateRef.trim();
     
-    // 新しい日付をExcelシリアル値に変換
-    return newDate.diff(excelEpoch, 'day');
+    // セル参照かチェック
+    if (cleanDateRef.match(/^[A-Z]+\d+$/)) {
+      console.log('EDATE: セル参照を検出', cleanDateRef);
+      const dateValue = getCellValue(cleanDateRef, context);
+      console.log('EDATE: セル値取得', { cellRef: cleanDateRef, value: dateValue, type: typeof dateValue });
+      startDate = parseDate(dateValue);
+    } else {
+      // 直接値の場合（文字列の日付や数値）
+      const unquotedRef = cleanDateRef.replace(/^["']|["']$/g, ''); // 引用符を除去
+      console.log('EDATE: 直接値を処理', { original: cleanDateRef, unquoted: unquotedRef });
+      
+      const numericDate = parseFloat(unquotedRef);
+      
+      if (!isNaN(numericDate)) {
+        // Excelシリアル値の場合
+        console.log('EDATE: Excelシリアル値として処理', numericDate);
+        const excelEpoch = dayjs('1899-12-30');
+        startDate = excelEpoch.add(Math.floor(numericDate), 'day');
+      } else {
+        // 文字列日付の場合
+        console.log('EDATE: 文字列日付として処理', unquotedRef);
+        startDate = parseDate(unquotedRef);
+      }
+    }
+    
+    console.log('EDATE: 日付解析結果', { 
+      startDate: startDate ? startDate.format() : 'null', 
+      isValid: startDate?.isValid() 
+    });
+    
+    if (!startDate?.isValid()) {
+      console.error('EDATE: 日付解析失敗', { 
+        dateRef: cleanDateRef, 
+        startDate, 
+        context: { dataLength: context.data.length, row: context.row, col: context.col }
+      });
+      return FormulaError.VALUE;
+    }
+    
+    const newDate = startDate.add(months, 'month');
+    const result = newDate.format('YYYY-MM-DD');
+    
+    console.log('EDATE: 計算完了', { 
+      originalDate: startDate.format(), 
+      months, 
+      newDate: newDate.format(), 
+      result 
+    });
+    
+    return result;
   }
 };
 

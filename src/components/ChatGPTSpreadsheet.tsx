@@ -37,7 +37,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
     resolver: zodResolver(SpreadsheetFormSchema),
     defaultValues: {
       spreadsheetData: [
-        [{ value: "関数を検索してください", className: "header-cell" }, null, null, null, null, null, null, null],
+        [{ value: "Excel関数を作成してください", className: "header-cell" }, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null],
@@ -79,10 +79,11 @@ const ChatGPTSpreadsheet: React.FC = () => {
   }, [executeSearch]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit(onSubmit)();
+    // Enterキーでの実行を無効化（textareaで改行できるように）
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // 実行を防ぐ
     }
-  }, [handleSubmit, onSubmit]);
+  }, []);
 
   // スプレッドシートデータを処理する共通関数
   const processSpreadsheetData = useCallback((response: ProcessSpreadsheetDataInput) => {
@@ -108,6 +109,48 @@ const ChatGPTSpreadsheet: React.FC = () => {
       console.error('スプレッドシートデータ処理エラー:', error);
     }
   }, [setValue]);
+
+  // 数式付きでスプレッドシートをコピーする関数
+  const copySpreadsheetWithFormulas = useCallback(() => {
+    const spreadsheetData = watch('spreadsheetData');
+    if (!spreadsheetData || spreadsheetData.length === 0) return;
+
+    // TSV形式で数式を含むデータを作成
+    const tsvData = spreadsheetData.map((row) => {
+      return row.map((cell) => {
+        if (!cell) return '';
+        
+        // 数式があるセルの場合は数式をそのまま使用
+        if (cell.formula) {
+          return cell.formula;
+        } else if (cell['data-formula']) {
+          return String(cell['data-formula']);
+        } else if (cell.value !== undefined && cell.value !== null) {
+          return String(cell.value);
+        } else {
+          return '';
+        }
+      }).join('\t');
+    }).join('\n');
+
+    // クリップボードにコピー
+    navigator.clipboard.writeText(tsvData).then(() => {
+      alert('数式付きスプレッドシートがクリップボードにコピーされました！\nExcelやGoogleスプレッドシートに貼り付けて関数を実行できます。');
+    }).catch(() => {
+      // フォールバック: テキストエリアを作成してコピー
+      const textArea = document.createElement('textarea');
+      textArea.value = tsvData;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
+      document.body.removeChild(textArea);
+      alert('数式付きスプレッドシートがクリップボードにコピーされました！\nExcelやGoogleスプレッドシートに貼り付けて関数を実行できます。');
+    });
+  }, [watch]);
 
   const handleTemplateSelect = useCallback((template: FunctionTemplate) => {
     setValue('searchQuery', template.prompt);
@@ -196,15 +239,15 @@ const ChatGPTSpreadsheet: React.FC = () => {
             Excel関数デモンストレーター
           </h1>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
-            Excel関数を検索して、実際のスプレッドシートで動作を確認できます
+            Excel関数を作成して、実際のスプレッドシートで動作を確認できます
           </p>
         </div>
 
         {/* Search Section */}
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/40 p-4 sm:p-6 lg:p-8 hover:shadow-2xl transition-all duration-300">
           <div className="space-y-4 sm:space-y-6">
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <div className="flex-1 space-y-2">
+            <div className="space-y-4">
+              <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   関数名または用途を入力してください
                 </label>
@@ -212,44 +255,54 @@ const ChatGPTSpreadsheet: React.FC = () => {
                   name="searchQuery"
                   control={control}
                   render={({ field }) => (
-                    <input
+                    <textarea
                       {...field}
-                      type="text"
-                      placeholder="例: SUM, 合計, データの平均を求める"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base"
+                      rows={3}
+                      placeholder="例: SUM, 合計, データの平均を求める&#10;&#10;複数行で詳しく説明することもできます"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base resize-y min-h-[80px]"
                       onKeyDown={handleKeyDown}
                     />
                   )}
                 />
               </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleSubmit(onSubmit)}
-                  disabled={isSubmitting || !userInput.trim()}
-                  className={`px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 text-sm sm:text-base ${
-                    isSubmitting || !userInput.trim() 
-                      ? 'bg-gray-400 cursor-not-allowed' 
-                      : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105'
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      作成中...
-                    </span>
-                  ) : '⚡ 作成'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowTemplateSelector(true)}
-                  className="px-4 py-3 rounded-xl font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 transition-all duration-200 text-sm sm:text-base border border-purple-200 hover:border-purple-300"
-                >
-                  📝 テンプレート
-                </button>
+              
+              {/* ボタンエリア */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleSubmit(onSubmit)}
+                    disabled={isSubmitting || !userInput.trim()}
+                    className={`px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 text-base ${
+                      isSubmitting || !userInput.trim() 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105'
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        作成中...
+                      </span>
+                    ) : '⚡ Excel関数を作成'}
+                  </button>
+                </div>
+                
+                {/* ヘルプエリア */}
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <span>迷ったら</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowTemplateSelector(true)}
+                    className="px-3 py-1 rounded-lg font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 transition-all duration-200 text-sm border border-purple-200 hover:border-purple-300"
+                  >
+                    📝 テンプレート
+                  </button>
+                  <span>をご利用ください</span>
+                </div>
               </div>
             </div>
           </div>
@@ -319,6 +372,22 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
         {/* Spreadsheet Section */}
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/40 p-4 sm:p-6 lg:p-8 min-h-[400px] sm:min-h-[500px] hover:shadow-2xl transition-all duration-300 overflow-x-auto">
+          {/* スプレッドシートヘッダー */}
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <span className="text-xl">📊</span>
+              スプレッドシート
+            </h3>
+            {currentFunction && (
+              <button
+                onClick={copySpreadsheetWithFormulas}
+                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+                title="数式付きでコピーして、ExcelやGoogleスプレッドシートに貼り付けできます"
+              >
+                📋 Excel用コピー
+              </button>
+            )}
+          </div>
           <Controller
             name="spreadsheetData"
             control={control}

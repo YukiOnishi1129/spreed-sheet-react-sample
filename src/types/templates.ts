@@ -272,7 +272,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
     ]
   },
   {
-    id: 'inventory',
+    id: 'inventory-advanced',
     name: '在庫管理',
     icon: '📦',
     description: '商品在庫の監視とアラート管理',
@@ -281,7 +281,7 @@ export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
         id: 'inventory-alert',
         title: '商品在庫アラート管理',
         description: 'AND・OR関数で複合条件による在庫アラートシステム',
-        category: 'inventory',
+        category: 'inventory-advanced',
         icon: '🚨',
         functions: ['AND', 'OR', 'IF', 'CONCATENATE'],
         prompt: '商品の在庫管理でAND関数（在庫数<10かつ売れ筋商品）、OR関数（季節商品または特価商品）の条件でアラート表示するスプレッドシートを作成してください。',

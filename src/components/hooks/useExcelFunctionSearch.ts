@@ -90,25 +90,44 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
       response.spreadsheet_data.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
           if (cell && hasFormulaProperty(cell)) {
+            console.log(`手動計算チェック[${rowIndex},${colIndex}]:`, { formula: cell.f });
             const matchResult = matchFormula(cell.f);
+            console.log('マッチ結果:', { 
+              matched: !!matchResult,
+              functionName: matchResult?.function.name,
+              isSupported: matchResult?.function.isSupported 
+            });
+            
             if (matchResult && matchResult.function.isSupported === false) {
+              console.log(`手動計算実行開始[${rowIndex},${colIndex}]:`, { 
+                function: matchResult.function.name,
+                formula: cell.f 
+              });
+              
               try {
                 const result = matchResult.function.calculate(matchResult.matches, {
                   data: originalDataForManualCalc,
                   row: rowIndex,
                   col: colIndex
                 });
+                
+                console.log(`手動計算完了[${rowIndex},${colIndex}]:`, { 
+                  result, 
+                  type: typeof result 
+                });
+                
                 if (!manualCalculationResults[rowIndex]) {
                   manualCalculationResults[rowIndex] = [];
                 }
                 manualCalculationResults[rowIndex][colIndex] = result;
                 
                 // 手動計算の結果をrawDataに反映（HyperFormulaが参照できるように）
-                if (typeof result === 'number') {
+                if (typeof result === 'number' || typeof result === 'string') {
                   rawData[rowIndex][colIndex] = result;
+                  console.log('手動計算結果をrawDataに反映:', { rowIndex, colIndex, result, type: typeof result });
                 }
               } catch (error) {
-                console.error('手動計算エラー:', error);
+                console.error(`手動計算エラー[${rowIndex},${colIndex}]:`, error);
                 manualCalculationResults[rowIndex][colIndex] = '#ERROR!';
               }
             }
@@ -216,17 +235,32 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
             
             // 手動計算が必要な関数かチェック
             const matchResult = matchFormula(cell.f);
+            console.log(`セル[${rowIndex},${colIndex}]の数式チェック:`, { 
+              formula: cell.f, 
+              matchResult: matchResult ? matchResult.function.name : 'none',
+              isSupported: matchResult?.function.isSupported 
+            });
+            
             if (matchResult && matchResult.function.isSupported === false) {
               // 手動計算結果を使用
               const manualResult = manualCalculationResults[rowIndex]?.[colIndex];
+              console.log(`手動計算結果使用:`, { 
+                rowIndex, 
+                colIndex, 
+                manualResult, 
+                type: typeof manualResult 
+              });
+              
               if (manualResult !== undefined) {
                 if (isFormulaResult(manualResult)) {
                   calculatedValue = convertFormulaResult(manualResult);
                 } else {
                   calculatedValue = String(manualResult);
                 }
+                console.log(`計算値設定完了:`, { calculatedValue });
               } else {
                 calculatedValue = '#ERROR!';
+                console.log('手動計算結果がundefined、#ERROR!を設定');
               }
             } else {
               // HyperFormulaから計算結果を取得
