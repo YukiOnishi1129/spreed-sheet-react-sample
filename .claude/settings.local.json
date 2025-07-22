@@ -16,7 +16,9 @@
       "Bash(./node_modules/.bin/tailwindcss:*)",
       "Bash(mv:*)",
       "Bash(curl:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "mcp__ide__executeCode"
     ],
     "deny": []
   }

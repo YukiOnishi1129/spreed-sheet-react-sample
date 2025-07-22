@@ -19,6 +19,14 @@ export const DATEDIF: CustomFormula = {
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, startRef, endRef, unit] = matches;
     
+    console.log('DATEDIF: 計算開始', { startRef, endRef, unit });
+    console.log('DATEDIF: コンテキスト', { 
+      dataLength: context.data.length, 
+      firstRowLength: context.data[0]?.length,
+      currentRow: context.row,
+      currentCol: context.col
+    });
+    
     // セル参照か直接値かを判定
     let startValue, endValue;
     
@@ -26,31 +34,42 @@ export const DATEDIF: CustomFormula = {
     if (startRef.startsWith('"') && startRef.endsWith('"')) {
       // 直接文字列の場合
       startValue = startRef.slice(1, -1);
+      console.log('DATEDIF: 開始日（直接文字列）', startValue);
     } else if (startRef.match(/^[A-Z]+\d+$/)) {
       // セル参照の場合
       startValue = getCellValue(startRef, context);
+      console.log('DATEDIF: 開始日（セル参照）', { cellRef: startRef, value: startValue });
     } else {
       startValue = startRef;
+      console.log('DATEDIF: 開始日（その他）', startValue);
     }
     
     // 終了日の取得
     if (endRef.startsWith('"') && endRef.endsWith('"')) {
       // 直接文字列の場合
       endValue = endRef.slice(1, -1);
+      console.log('DATEDIF: 終了日（直接文字列）', endValue);
     } else if (endRef.match(/^[A-Z]+\d+$/)) {
       // セル参照の場合
       endValue = getCellValue(endRef, context);
+      console.log('DATEDIF: 終了日（セル参照）', { cellRef: endRef, value: endValue });
     } else {
       endValue = endRef;
+      console.log('DATEDIF: 終了日（その他）', endValue);
     }
     
-    console.log('DATEDIF計算:', { startValue, endValue, unit });
+    console.log('DATEDIF: 日付解析前の値', { startValue, endValue, startType: typeof startValue, endType: typeof endValue });
     
     const startDate = parseDate(startValue);
     const endDate = parseDate(endValue);
     
+    console.log('DATEDIF: 日付解析結果', { 
+      startDate: startDate ? startDate.format() : 'null', 
+      endDate: endDate ? endDate.format() : 'null' 
+    });
+    
     if (!startDate || !endDate) {
-      console.error('DATEDIF: 無効な日付', { startValue, endValue });
+      console.error('DATEDIF: 日付解析失敗', { startValue, endValue, startDate, endDate });
       return FormulaError.VALUE;
     }
     
@@ -122,13 +141,11 @@ export const NETWORKDAYS: CustomFormula = {
       endValue = endRef.replace(/^"|"$/g, '');
     }
     
-    console.log('NETWORKDAYS計算:', { startValue, endValue });
-    
     const startDate = parseDate(startValue);
     const endDate = parseDate(endValue);
     
     if (!startDate || !endDate) {
-      console.error('NETWORKDAYS: 無効な日付', { startValue, endValue });
+      console.warn('NETWORKDAYS: 日付解析失敗', { startValue, endValue });
       return FormulaError.VALUE;
     }
     

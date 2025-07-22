@@ -414,12 +414,12 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 - 循環参照を避けるため、検索結果列は別の列に配置してください
 - INDEX(戻り値の配列, MATCH(検索値, 検索する配列, 0))の形式で使用してください
 
-**プロジェクト管理表の完全な例（HyperFormula対応）：**
+**プロジェクト管理表の完全な例（DATEDIF/NETWORKDAYS使用）：**
 {
-  "function_name": "プロジェクト管理 & IF",
-  "description": "プロジェクトの期間と評価を管理します（DATEDIF/NETWORKDAYS関数は使用しません）",
-  "syntax": "数値データ + IF(条件, 真の場合, 偽の場合) + SUM(数値範囲)",
-  "syntax_detail": "期間は計算済み数値で設定 + IF関数による評価判定 + SUM関数による合計計算",
+  "function_name": "DATEDIF & NETWORKDAYS & IF",
+  "description": "DATEDIF関数で期間計算、NETWORKDAYS関数で営業日数計算、IF関数で評価を行います",
+  "syntax": "DATEDIF(開始日, 終了日, \"D\") + NETWORKDAYS(開始日, 終了日) + IF(条件, 真の場合, 偽の場合)",
+  "syntax_detail": "DATEDIF(start_date, end_date, \"D\") - 日数差を計算 + NETWORKDAYS(start_date, end_date) - 営業日数を計算 + IF関数による評価判定",
   "category": "プロジェクト管理",
   "spreadsheet_data": [
     [
@@ -435,8 +435,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "プロジェクトA", "ct": {"t": "s"}},
       {"v": "2023-01-01", "ct": {"t": "s"}},
       {"v": "2023-01-10", "ct": {"t": "s"}},
-      {"v": 10, "ct": {"t": "n"}, "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": 7, "ct": {"t": "n"}, "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(B2,C2,\\\"D\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=NETWORKDAYS(B2,C2)", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=IF(D2>=15,\\\"長期\\\",\\\"短期\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null
     ],
@@ -444,8 +444,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "プロジェクトB", "ct": {"t": "s"}},
       {"v": "2023-02-01", "ct": {"t": "s"}},
       {"v": "2023-02-20", "ct": {"t": "s"}},
-      {"v": 20, "ct": {"t": "n"}, "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": 14, "ct": {"t": "n"}, "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(B3,C3,\\\"D\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=NETWORKDAYS(B3,C3)", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=IF(D3>=15,\\\"長期\\\",\\\"短期\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null
     ],
@@ -453,8 +453,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "プロジェクトC", "ct": {"t": "s"}},
       {"v": "2023-03-01", "ct": {"t": "s"}},
       {"v": "2023-03-08", "ct": {"t": "s"}},
-      {"v": 8, "ct": {"t": "n"}, "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": 6, "ct": {"t": "n"}, "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(B4,C4,\\\"D\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=NETWORKDAYS(B4,C4)", "bg": "#FFE0B2", "fc": "#D84315"},
       {"v": null, "f": "=IF(D4>=15,\\\"長期\\\",\\\"短期\\\")", "bg": "#FFE0B2", "fc": "#D84315"},
       null, null
     ],
@@ -469,7 +469,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null]
   ],
-  "examples": ["=10", "=SUM(D2:D4)", "=IF(D2>=15,\\\"長期\\\",\\\"短期\\\")"]
+  "examples": ["=DATEDIF(B2,C2,\\\"D\\\")", "=NETWORKDAYS(B2,C2)", "=IF(D2>=15,\\\"長期\\\",\\\"短期\\\")", "=SUM(D2:D4)"]
 }
 
 **重要：日付関数の対応状況**
@@ -487,6 +487,21 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 - **NG例**: 2023/01/01、01/01/2023、1-1-2023
 - **理由**: 日付計算の確実性を保証するため、ISO 8601形式に統一
 - **セルのタイプ**: {"v": "2023-01-01", "ct": {"t": "s"}} として文字列で保存
+
+**DATEDIF・NETWORKDAYS関数の特別な要件：**
+- **DATEDIF関数**: 勤続年数、期間計算に使用。単位は「Y」(年)、「M」(月)、「D」(日)
+- **NETWORKDAYS関数**: 営業日数計算に使用。土日を自動的に除外
+- **使用例**: =DATEDIF(C2,TODAY(),"Y") で入社日から現在までの勤続年数を計算
+- **営業日例**: =NETWORKDAYS(E2,F2) で有給開始日から終了日までの営業日数を計算
+- **今日の日付**: TODAY()関数を使用して現在日付を取得
+
+**AND・OR論理関数の正しい構文：**
+- **AND関数**: =AND(条件1, 条件2, ...) - すべての条件がTRUEの場合にTRUE
+- **OR関数**: =OR(条件1, 条件2, ...) - いずれかの条件がTRUEの場合にTRUE
+- **正しい例**: =IF(AND(B2<10,E2="売れ筋"),"要発注","充分")
+- **誤った例**: =IF(AND(B2<10,"要発注","充分"),"結果","") ← 第2・第3引数が論理値ではない
+- **文字列比較**: セル参照="文字列" の形式で比較（例：D2="季節商品"）
+- **複合条件**: =IF(AND(条件,OR(条件1,条件2)),"結果1","結果2") のような入れ子も可能
 
 これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。
 

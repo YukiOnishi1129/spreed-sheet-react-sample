@@ -143,33 +143,33 @@ const ChatGPTSpreadsheet: React.FC = () => {
           // 数式セルの場合は再計算結果を使用
           const formulaCell = formulaCells.find(f => f.row === rowIndex && f.col === colIndex);
           if (formulaCell) {
+            // 手動計算処理は後の段階で実行されるため、ここでは通常の処理を行う
+            
+            // HyperFormulaで計算を試行
             try {
               const result = hf.getCellValue({ sheet: 0, row: rowIndex, col: colIndex });
+              
+              // HyperFormula結果のフォーマット処理
+              let displayValue = result !== null && result !== undefined ? result : '#ERROR!';
+              const formula = formulaCell.formula;
+              
+              if (typeof result === 'number' && !isNaN(result)) {
+                // TODAY関数の場合は日付文字列に変換
+                if (formula.includes('TODAY()') && !formula.includes('DATEDIF(')) {
+                  const excelEpoch = new Date(1899, 11, 30);
+                  const date = new Date(excelEpoch.getTime() + result * 24 * 60 * 60 * 1000);
+                  displayValue = date.toLocaleDateString('ja-JP');
+                }
+              }
+              
               return {
                 ...cell,
-                value: result !== null && result !== undefined ? result : '#ERROR!',
+                value: displayValue,
                 formula: formulaCell.formula,
                 title: `数式: ${formulaCell.formula}`
               };
             } catch (error) {
-              console.warn('数式計算エラー:', error, formulaCell.formula);
-              // エラー時は手動計算を試行
-              
-              // カスタム関数の手動計算が必要か確認
-              const matchResult = matchFormula(formulaCell.formula);
-              if (matchResult && matchResult.function.isSupported === false) {
-                const result = matchResult.function.calculate(matchResult.matches, {
-                  data: data,
-                  row: rowIndex,
-                  col: colIndex
-                });
-                return {
-                  ...cell,
-                  value: result,
-                  formula: formulaCell.formula,
-                  title: `数式: ${formulaCell.formula}`
-                };
-              }
+              console.warn('HyperFormula計算エラー:', error, formulaCell.formula);
               
               return {
                 ...cell,
@@ -251,13 +251,30 @@ const ChatGPTSpreadsheet: React.FC = () => {
       
       setValue('currentFunction', response);
       
+      // 手動計算用の元データを準備
+      const originalDataForManualCalc = response.spreadsheet_data.map(row => 
+        row.map(cell => {
+          if (!cell) return '';
+          return cell.v || '';
+        })
+      );
+      
       // HyperFormulaにデータを設定して計算
       const rawData = response.spreadsheet_data.map(row => 
         row.map(cell => {
           if (!cell) return '';
           if (cell.f) {
-            // HyperFormulaとの互換性のためにFALSE/TRUEを0/1に置換
             let formula = cell.f;
+            
+            // 手動計算が必要な関数かチェック
+            const matchResult = matchFormula(formula);
+            if (matchResult && matchResult.function.isSupported === false) {
+              console.log('手動計算関数を検出、HyperFormulaから除外:', formula);
+              // HyperFormulaには空文字列を渡して、後で手動計算で置き換える
+              return '';
+            }
+            
+            // HyperFormulaとの互換性のためにFALSE/TRUEを0/1に置換
             formula = formula.replace(/FALSE/g, '0');
             formula = formula.replace(/TRUE/g, '1');
             console.log('数式セル:', formula);
@@ -336,7 +353,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
           })
         );
       } catch (error) {
-        calculationResults = rawData; // フォールバック
+        calculationResults = rawData as any; // フォールバック
       }
 
       // react-spreadsheet用のデータに変換
@@ -376,18 +393,44 @@ const ChatGPTSpreadsheet: React.FC = () => {
               // その他の関数: グレー系
               className = 'other-formula-cell';
             }
-            // HyperFormulaから計算結果を取得
-            const result = calculationResults[rowIndex]?.[colIndex];
             
-            // 日付関数の場合は日付フォーマットを適用
-            if (result !== null && result !== undefined) {
-              if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(')) {
-                calculatedValue = formatExcelDate(result);
-              } else {
-                calculatedValue = result;
+            // 手動計算が必要な関数かチェック
+            const matchResult = matchFormula(cell.f);
+            if (matchResult && matchResult.function.isSupported === false) {
+              console.log('手動計算実行:', cell.f);
+              try {
+                const result = matchResult.function.calculate(matchResult.matches, {
+                  data: originalDataForManualCalc as any,
+                  row: rowIndex,
+                  col: colIndex
+                });
+                console.log('手動計算結果:', result);
+                
+                // 計算結果をcalculationResultsに反映させる
+                if (!calculationResults[rowIndex]) {
+                  calculationResults[rowIndex] = [];
+                }
+                calculationResults[rowIndex][colIndex] = result as any;
+                
+                calculatedValue = result as any;
+              } catch (error) {
+                console.error('手動計算エラー:', error);
+                calculatedValue = '#ERROR!';
               }
             } else {
-              calculatedValue = '#ERROR!';
+              // HyperFormulaから計算結果を取得
+              const result = calculationResults[rowIndex]?.[colIndex];
+              
+              // 日付関数の場合は日付フォーマットを適用
+              if (result !== null && result !== undefined) {
+                if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(')) {
+                  calculatedValue = formatExcelDate(result);
+                } else {
+                  calculatedValue = result;
+                }
+              } else {
+                calculatedValue = '#ERROR!';
+              }
             }
           } else if (cell.bg) {
             // 背景色がある通常のセル
@@ -535,7 +578,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
           })
         );
       } catch (error) {
-        calculationResults = rawData; // フォールバック
+        calculationResults = rawData as any; // フォールバック
       }
 
       // react-spreadsheet用のデータに変換
