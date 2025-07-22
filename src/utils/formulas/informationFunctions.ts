@@ -1,6 +1,7 @@
 // 情報関数の実装
 
 import type { CustomFormula } from './types';
+import { FormulaError } from './types';
 import { getCellValue } from './utils';
 
 // ISBLANK関数の実装（空白セルか判定）
@@ -141,7 +142,7 @@ export const ISEVEN: CustomFormula = {
       value = parseFloat(valueRef);
     }
     
-    if (isNaN(value)) return '#VALUE!';
+    if (isNaN(value)) return FormulaError.VALUE;
     return Math.floor(value) % 2 === 0;
   }
 };
@@ -163,7 +164,7 @@ export const ISODD: CustomFormula = {
       value = parseFloat(valueRef);
     }
     
-    if (isNaN(value)) return '#VALUE!';
+    if (isNaN(value)) return FormulaError.VALUE;
     return Math.floor(value) % 2 === 1;
   }
 };

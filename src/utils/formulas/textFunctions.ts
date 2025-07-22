@@ -1,6 +1,7 @@
 // テキスト関数の実装
 
 import type { CustomFormula, FormulaContext } from './types';
+import { FormulaError } from './types';
 import { getCellValue, getCellRangeValues } from './utils';
 
 // CONCATENATE関数の実装
@@ -177,7 +178,7 @@ export const PROPER: CustomFormula = {
   calculate: (matches) => {
     const text = matches[1].replace(/"/g, '');
     return text.replace(/\w\S*/g, (txt) => 
-      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+      txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
     );
   }
 };
@@ -191,7 +192,7 @@ export const VALUE: CustomFormula = {
     const text = matches[1].replace(/"/g, '');
     const number = parseFloat(text);
     
-    if (isNaN(number)) return '#VALUE!';
+    if (isNaN(number)) return FormulaError.VALUE;
     return number;
   }
 };
@@ -227,7 +228,7 @@ export const TEXT: CustomFormula = {
     
     if (isNaN(value)) {
       console.error('TEXT: 数値変換失敗', { valueRef, value });
-      return '#VALUE!';
+      return FormulaError.VALUE;
     }
     
     // 簡単な書式対応（完全なExcel書式ではない）
@@ -286,11 +287,11 @@ export const REPT: CustomFormula = {
     
     if (isNaN(times) || times < 0) {
       console.error('REPT: 無効な回数', times);
-      return '#VALUE!';
+      return FormulaError.VALUE;
     }
     if (times > 32767) {
       console.error('REPT: 回数が上限を超過', times);
-      return '#VALUE!';
+      return FormulaError.VALUE;
     }
     
     const result = text.repeat(times);

@@ -1,13 +1,52 @@
 // 統計関数の実装
 
-import type { CustomFormula, CellData } from './types';
+import type { CustomFormula, CellData, FormulaContext } from './types';
+import { FormulaError } from './types';
+import { getCellValue, getCellRangeValues } from './utils';
 
-// 配列から数値のみを抽出するヘルパー関数
+// セル範囲から数値のみを抽出するヘルパー関数（改良版）
+function extractNumbersFromRange(rangeRef: string, context: FormulaContext): number[] {
+  const numbers: number[] = [];
+  
+  if (rangeRef.includes(':')) {
+    // セル範囲の場合
+    const values = getCellRangeValues(rangeRef, context);
+    values.forEach(value => {
+      const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+      if (!isNaN(num) && isFinite(num)) {
+        numbers.push(num);
+      }
+    });
+  } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
+    // 単一セル参照の場合
+    const cellValue = getCellValue(rangeRef, context);
+    const num = typeof cellValue === 'string' ? parseFloat(cellValue) : Number(cellValue);
+    if (!isNaN(num) && isFinite(num)) {
+      numbers.push(num);
+    }
+  } else {
+    // 直接値の場合
+    const num = parseFloat(rangeRef);
+    if (!isNaN(num) && isFinite(num)) {
+      numbers.push(num);
+    }
+  }
+  
+  return numbers;
+}
+
+// 配列から数値のみを抽出するヘルパー関数（下位互換のため保持）
 function extractNumbers(data: CellData[][]): number[] {
   const numbers: number[] = [];
   data.forEach(row => {
     row.forEach(cell => {
-      const value = typeof cell.value === 'string' ? parseFloat(cell.value) : cell.value;
+      if (!cell) return;
+      let value;
+      if (typeof cell === 'object' && 'value' in cell) {
+        value = typeof cell.value === 'string' ? parseFloat(cell.value) : cell.value;
+      } else {
+        value = typeof cell === 'string' ? parseFloat(String(cell)) : Number(cell);
+      }
       if (typeof value === 'number' && !isNaN(value)) {
         numbers.push(value);
       }
@@ -21,9 +60,11 @@ export const MEDIAN: CustomFormula = {
   name: 'MEDIAN',
   pattern: /MEDIAN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (__matches, context) => {
-    const numbers = extractNumbers(context.data);
-    if (numbers.length === 0) return '#NUM!';
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length === 0) return FormulaError.NUM;
     
     const sorted = numbers.sort((a, b) => a - b);
     const middle = Math.floor(sorted.length / 2);
@@ -41,9 +82,11 @@ export const MODE: CustomFormula = {
   name: 'MODE',
   pattern: /MODE\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (__matches, context) => {
-    const numbers = extractNumbers(context.data);
-    if (numbers.length === 0) return '#N/A';
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length === 0) return FormulaError.NA;
     
     const frequency: { [key: number]: number } = {};
     numbers.forEach(num => {
@@ -60,7 +103,7 @@ export const MODE: CustomFormula = {
       }
     }
     
-    if (maxCount < 2) return '#N/A';
+    if (maxCount < 2) return FormulaError.NA;
     return mode;
   }
 };
@@ -70,15 +113,26 @@ export const COUNTA: CustomFormula = {
   name: 'COUNTA',
   pattern: /COUNTA\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (__matches, context) => {
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
     let count = 0;
-    context.data.forEach(row => {
-      row.forEach(cell => {
-        if (cell.value !== null && cell.value !== undefined && cell.value !== '') {
+    
+    if (rangeRef.includes(':')) {
+      // セル範囲の場合
+      const values = getCellRangeValues(rangeRef, context);
+      values.forEach(value => {
+        if (value !== null && value !== undefined && value !== '') {
           count++;
         }
       });
-    });
+    } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
+      // 単一セル参照の場合
+      const cellValue = getCellValue(rangeRef, context);
+      if (cellValue !== null && cellValue !== undefined && cellValue !== '') {
+        count = 1;
+      }
+    }
+    
     return count;
   }
 };
@@ -88,15 +142,26 @@ export const COUNTBLANK: CustomFormula = {
   name: 'COUNTBLANK',
   pattern: /COUNTBLANK\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (__matches, context) => {
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
     let count = 0;
-    context.data.forEach(row => {
-      row.forEach(cell => {
-        if (cell.value === null || cell.value === undefined || cell.value === '') {
+    
+    if (rangeRef.includes(':')) {
+      // セル範囲の場合
+      const values = getCellRangeValues(rangeRef, context);
+      values.forEach(value => {
+        if (value === null || value === undefined || value === '') {
           count++;
         }
       });
-    });
+    } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
+      // 単一セル参照の場合
+      const cellValue = getCellValue(rangeRef, context);
+      if (cellValue === null || cellValue === undefined || cellValue === '') {
+        count = 1;
+      }
+    }
+    
     return count;
   }
 };
@@ -106,9 +171,11 @@ export const STDEV: CustomFormula = {
   name: 'STDEV',
   pattern: /STDEV\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (__matches, context) => {
-    const numbers = extractNumbers(context.data);
-    if (numbers.length < 2) return '#DIV/0!';
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length < 2) return FormulaError.DIV0;
     
     const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
     const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
@@ -123,9 +190,11 @@ export const VAR: CustomFormula = {
   name: 'VAR',
   pattern: /VAR\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (__matches, context) => {
-    const numbers = extractNumbers(context.data);
-    if (numbers.length < 2) return '#DIV/0!';
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length < 2) return FormulaError.DIV0;
     
     const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
     const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
@@ -141,12 +210,22 @@ export const LARGE: CustomFormula = {
   pattern: /LARGE\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
   calculate: (matches, context) => {
-    const k = parseInt(matches[2]);
-    if (isNaN(k) || k < 1) return '#NUM!';
+    const rangeRef = matches[1].trim();
+    const kRef = matches[2].trim();
     
-    const numbers = extractNumbers(context.data);
-    if (numbers.length === 0) return '#NUM!';
-    if (k > numbers.length) return '#NUM!';
+    let k: number;
+    if (kRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(kRef, context);
+      k = parseInt(String(cellValue ?? '1'));
+    } else {
+      k = parseInt(kRef);
+    }
+    
+    if (isNaN(k) || k < 1) return FormulaError.NUM;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NUM;
+    if (k > numbers.length) return FormulaError.NUM;
     
     const sorted = numbers.sort((a, b) => b - a);
     return sorted[k - 1];
@@ -159,12 +238,22 @@ export const SMALL: CustomFormula = {
   pattern: /SMALL\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
   calculate: (matches, context) => {
-    const k = parseInt(matches[2]);
-    if (isNaN(k) || k < 1) return '#NUM!';
+    const rangeRef = matches[1].trim();
+    const kRef = matches[2].trim();
     
-    const numbers = extractNumbers(context.data);
-    if (numbers.length === 0) return '#NUM!';
-    if (k > numbers.length) return '#NUM!';
+    let k: number;
+    if (kRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(kRef, context);
+      k = parseInt(String(cellValue ?? '1'));
+    } else {
+      k = parseInt(kRef);
+    }
+    
+    if (isNaN(k) || k < 1) return FormulaError.NUM;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NUM;
+    if (k > numbers.length) return FormulaError.NUM;
     
     const sorted = numbers.sort((a, b) => a - b);
     return sorted[k - 1];
@@ -177,19 +266,36 @@ export const RANK: CustomFormula = {
   pattern: /RANK\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
   isSupported: false,
   calculate: (matches, context) => {
-    const value = parseFloat(matches[1]);
-    const order = matches[3] ? parseInt(matches[3]) : 0; // 0=降順, 1=昇順
+    const valueRef = matches[1].trim();
+    const rangeRef = matches[2].trim();
+    const orderRef = matches[3] ? matches[3].trim() : '0';
     
-    if (isNaN(value)) return '#VALUE!';
+    let value: number, order: number;
     
-    const numbers = extractNumbers(context.data);
-    if (numbers.length === 0) return '#N/A';
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (orderRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(orderRef, context);
+      order = parseInt(String(cellValue ?? '0'));
+    } else {
+      order = parseInt(orderRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NA;
     
     const sorted = order === 1 
       ? numbers.sort((a, b) => a - b) 
       : numbers.sort((a, b) => b - a);
     
     const rank = sorted.indexOf(value) + 1;
-    return rank === 0 ? '#N/A' : rank;
+    return rank === 0 ? FormulaError.NA : rank;
   }
 };

@@ -1,6 +1,8 @@
 // 数学関数の実装
 
 import type { CustomFormula } from './types';
+import { FormulaError } from './types';
+import { getCellValue } from './utils';
 
 // SUMIF関数の実装
 export const SUMIF: CustomFormula = {
@@ -79,9 +81,19 @@ export const ABS: CustomFormula = {
   name: 'ABS',
   pattern: /ABS\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    // セル参照かチェック
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
     return Math.abs(value);
   }
 };
@@ -91,10 +103,19 @@ export const SQRT: CustomFormula = {
   name: 'SQRT',
   pattern: /SQRT\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
-    if (value < 0) return '#NUM!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    if (value < 0) return FormulaError.NUM;
     return Math.sqrt(value);
   }
 };
@@ -104,10 +125,27 @@ export const POWER: CustomFormula = {
   name: 'POWER',
   pattern: /POWER\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const base = parseFloat(matches[1]);
-    const exponent = parseFloat(matches[2]);
-    if (isNaN(base) || isNaN(exponent)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const baseRef = matches[1].trim();
+    const expRef = matches[2].trim();
+    
+    let base: number, exponent: number;
+    
+    if (baseRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(baseRef, context);
+      base = parseFloat(String(cellValue ?? '0'));
+    } else {
+      base = parseFloat(baseRef);
+    }
+    
+    if (expRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(expRef, context);
+      exponent = parseFloat(String(cellValue ?? '0'));
+    } else {
+      exponent = parseFloat(expRef);
+    }
+    
+    if (isNaN(base) || isNaN(exponent)) return FormulaError.VALUE;
     return Math.pow(base, exponent);
   }
 };
@@ -117,11 +155,28 @@ export const MOD: CustomFormula = {
   name: 'MOD',
   pattern: /MOD\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const dividend = parseFloat(matches[1]);
-    const divisor = parseFloat(matches[2]);
-    if (isNaN(dividend) || isNaN(divisor)) return '#VALUE!';
-    if (divisor === 0) return '#DIV/0!';
+  calculate: (matches, context) => {
+    const dividendRef = matches[1].trim();
+    const divisorRef = matches[2].trim();
+    
+    let dividend: number, divisor: number;
+    
+    if (dividendRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(dividendRef, context);
+      dividend = parseFloat(String(cellValue ?? '0'));
+    } else {
+      dividend = parseFloat(dividendRef);
+    }
+    
+    if (divisorRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(divisorRef, context);
+      divisor = parseFloat(String(cellValue ?? '0'));
+    } else {
+      divisor = parseFloat(divisorRef);
+    }
+    
+    if (isNaN(dividend) || isNaN(divisor)) return FormulaError.VALUE;
+    if (divisor === 0) return FormulaError.DIV0;
     return dividend % divisor;
   }
 };
@@ -131,9 +186,18 @@ export const INT: CustomFormula = {
   name: 'INT',
   pattern: /INT\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
     return Math.floor(value);
   }
 };
@@ -143,11 +207,28 @@ export const TRUNC: CustomFormula = {
   name: 'TRUNC',
   pattern: /TRUNC\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    const digits = matches[2] ? parseInt(matches[2]) : 0;
-    if (isNaN(value)) return '#VALUE!';
-    if (isNaN(digits)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const digitsRef = matches[2] ? matches[2].trim() : '0';
+    
+    let value: number, digits: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (digitsRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(digitsRef, context);
+      digits = parseInt(String(cellValue ?? '0'));
+    } else {
+      digits = parseInt(digitsRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    if (isNaN(digits)) return FormulaError.VALUE;
     
     const multiplier = Math.pow(10, digits);
     return Math.trunc(value * multiplier) / multiplier;
@@ -169,11 +250,28 @@ export const RANDBETWEEN: CustomFormula = {
   name: 'RANDBETWEEN',
   pattern: /RANDBETWEEN\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const min = parseInt(matches[1]);
-    const max = parseInt(matches[2]);
-    if (isNaN(min) || isNaN(max)) return '#VALUE!';
-    if (min > max) return '#NUM!';
+  calculate: (matches, context) => {
+    const minRef = matches[1].trim();
+    const maxRef = matches[2].trim();
+    
+    let min: number, max: number;
+    
+    if (minRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(minRef, context);
+      min = parseInt(String(cellValue ?? '0'));
+    } else {
+      min = parseInt(minRef);
+    }
+    
+    if (maxRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(maxRef, context);
+      max = parseInt(String(cellValue ?? '0'));
+    } else {
+      max = parseInt(maxRef);
+    }
+    
+    if (isNaN(min) || isNaN(max)) return FormulaError.VALUE;
+    if (min > max) return FormulaError.NUM;
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 };
@@ -193,9 +291,18 @@ export const DEGREES: CustomFormula = {
   name: 'DEGREES',
   pattern: /DEGREES\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const radians = parseFloat(matches[1]);
-    if (isNaN(radians)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const radiansRef = matches[1].trim();
+    let radians: number;
+    
+    if (radiansRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(radiansRef, context);
+      radians = parseFloat(String(cellValue ?? '0'));
+    } else {
+      radians = parseFloat(radiansRef);
+    }
+    
+    if (isNaN(radians)) return FormulaError.VALUE;
     return radians * (180 / Math.PI);
   }
 };
@@ -205,9 +312,18 @@ export const RADIANS: CustomFormula = {
   name: 'RADIANS',
   pattern: /RADIANS\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const degrees = parseFloat(matches[1]);
-    if (isNaN(degrees)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const degreesRef = matches[1].trim();
+    let degrees: number;
+    
+    if (degreesRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(degreesRef, context);
+      degrees = parseFloat(String(cellValue ?? '0'));
+    } else {
+      degrees = parseFloat(degreesRef);
+    }
+    
+    if (isNaN(degrees)) return FormulaError.VALUE;
     return degrees * (Math.PI / 180);
   }
 };
@@ -217,9 +333,18 @@ export const SIN: CustomFormula = {
   name: 'SIN',
   pattern: /SIN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const angle = parseFloat(matches[1]);
-    if (isNaN(angle)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const angleRef = matches[1].trim();
+    let angle: number;
+    
+    if (angleRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(angleRef, context);
+      angle = parseFloat(String(cellValue ?? '0'));
+    } else {
+      angle = parseFloat(angleRef);
+    }
+    
+    if (isNaN(angle)) return FormulaError.VALUE;
     return Math.sin(angle);
   }
 };
@@ -229,9 +354,18 @@ export const COS: CustomFormula = {
   name: 'COS',
   pattern: /COS\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const angle = parseFloat(matches[1]);
-    if (isNaN(angle)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const angleRef = matches[1].trim();
+    let angle: number;
+    
+    if (angleRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(angleRef, context);
+      angle = parseFloat(String(cellValue ?? '0'));
+    } else {
+      angle = parseFloat(angleRef);
+    }
+    
+    if (isNaN(angle)) return FormulaError.VALUE;
     return Math.cos(angle);
   }
 };
@@ -241,9 +375,18 @@ export const TAN: CustomFormula = {
   name: 'TAN',
   pattern: /TAN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const angle = parseFloat(matches[1]);
-    if (isNaN(angle)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const angleRef = matches[1].trim();
+    let angle: number;
+    
+    if (angleRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(angleRef, context);
+      angle = parseFloat(String(cellValue ?? '0'));
+    } else {
+      angle = parseFloat(angleRef);
+    }
+    
+    if (isNaN(angle)) return FormulaError.VALUE;
     return Math.tan(angle);
   }
 };
@@ -253,12 +396,28 @@ export const LOG: CustomFormula = {
   name: 'LOG',
   pattern: /LOG\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    const base = matches[2] ? parseFloat(matches[2]) : 10;
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const baseRef = matches[2] ? matches[2].trim() : '10';
     
-    if (isNaN(value) || isNaN(base)) return '#VALUE!';
-    if (value <= 0 || base <= 0 || base === 1) return '#NUM!';
+    let value: number, base: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (baseRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(baseRef, context);
+      base = parseFloat(String(cellValue ?? '10'));
+    } else {
+      base = parseFloat(baseRef);
+    }
+    
+    if (isNaN(value) || isNaN(base)) return FormulaError.VALUE;
+    if (value <= 0 || base <= 0 || base === 1) return FormulaError.NUM;
     
     return Math.log(value) / Math.log(base);
   }
@@ -269,10 +428,19 @@ export const LOG10: CustomFormula = {
   name: 'LOG10',
   pattern: /LOG10\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
-    if (value <= 0) return '#NUM!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    if (value <= 0) return FormulaError.NUM;
     return Math.log10(value);
   }
 };
@@ -282,10 +450,19 @@ export const LN: CustomFormula = {
   name: 'LN',
   pattern: /LN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
-    if (value <= 0) return '#NUM!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    if (value <= 0) return FormulaError.NUM;
     return Math.log(value);
   }
 };
@@ -295,9 +472,18 @@ export const EXP: CustomFormula = {
   name: 'EXP',
   pattern: /EXP\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
     return Math.exp(value);
   }
 };
@@ -307,10 +493,19 @@ export const ASIN: CustomFormula = {
   name: 'ASIN',
   pattern: /ASIN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
-    if (value < -1 || value > 1) return '#NUM!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    if (value < -1 || value > 1) return FormulaError.NUM;
     return Math.asin(value);
   }
 };
@@ -320,10 +515,19 @@ export const ACOS: CustomFormula = {
   name: 'ACOS',
   pattern: /ACOS\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
-    if (value < -1 || value > 1) return '#NUM!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    if (value < -1 || value > 1) return FormulaError.NUM;
     return Math.acos(value);
   }
 };
@@ -333,9 +537,18 @@ export const ATAN: CustomFormula = {
   name: 'ATAN',
   pattern: /ATAN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
     return Math.atan(value);
   }
 };
@@ -345,10 +558,27 @@ export const ATAN2: CustomFormula = {
   name: 'ATAN2',
   pattern: /ATAN2\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const x = parseFloat(matches[1]);
-    const y = parseFloat(matches[2]);
-    if (isNaN(x) || isNaN(y)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const xRef = matches[1].trim();
+    const yRef = matches[2].trim();
+    
+    let x: number, y: number;
+    
+    if (xRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(xRef, context);
+      x = parseFloat(String(cellValue ?? '0'));
+    } else {
+      x = parseFloat(xRef);
+    }
+    
+    if (yRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(yRef, context);
+      y = parseFloat(String(cellValue ?? '0'));
+    } else {
+      y = parseFloat(yRef);
+    }
+    
+    if (isNaN(x) || isNaN(y)) return FormulaError.VALUE;
     return Math.atan2(y, x);
   }
 };
@@ -358,11 +588,27 @@ export const ROUNDUP: CustomFormula = {
   name: 'ROUNDUP',
   pattern: /ROUNDUP\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    const digits = parseInt(matches[2]);
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const digitsRef = matches[2].trim();
     
-    if (isNaN(value) || isNaN(digits)) return '#VALUE!';
+    let value: number, digits: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (digitsRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(digitsRef, context);
+      digits = parseInt(String(cellValue ?? '0'));
+    } else {
+      digits = parseInt(digitsRef);
+    }
+    
+    if (isNaN(value) || isNaN(digits)) return FormulaError.VALUE;
     
     const multiplier = Math.pow(10, digits);
     return Math.ceil(value * multiplier) / multiplier;
@@ -374,11 +620,27 @@ export const ROUNDDOWN: CustomFormula = {
   name: 'ROUNDDOWN',
   pattern: /ROUNDDOWN\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    const digits = parseInt(matches[2]);
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const digitsRef = matches[2].trim();
     
-    if (isNaN(value) || isNaN(digits)) return '#VALUE!';
+    let value: number, digits: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (digitsRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(digitsRef, context);
+      digits = parseInt(String(cellValue ?? '0'));
+    } else {
+      digits = parseInt(digitsRef);
+    }
+    
+    if (isNaN(value) || isNaN(digits)) return FormulaError.VALUE;
     
     const multiplier = Math.pow(10, digits);
     return Math.floor(value * multiplier) / multiplier;
@@ -390,13 +652,29 @@ export const CEILING: CustomFormula = {
   name: 'CEILING',
   pattern: /CEILING\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    const significance = parseFloat(matches[2]);
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const significanceRef = matches[2].trim();
     
-    if (isNaN(value) || isNaN(significance)) return '#VALUE!';
+    let value: number, significance: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (significanceRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(significanceRef, context);
+      significance = parseFloat(String(cellValue ?? '0'));
+    } else {
+      significance = parseFloat(significanceRef);
+    }
+    
+    if (isNaN(value) || isNaN(significance)) return FormulaError.VALUE;
     if (significance === 0) return 0;
-    if ((value > 0 && significance < 0) || (value < 0 && significance > 0)) return '#NUM!';
+    if ((value > 0 && significance < 0) || (value < 0 && significance > 0)) return FormulaError.NUM;
     
     return Math.ceil(value / significance) * significance;
   }
@@ -407,13 +685,29 @@ export const FLOOR: CustomFormula = {
   name: 'FLOOR',
   pattern: /FLOOR\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    const significance = parseFloat(matches[2]);
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const significanceRef = matches[2].trim();
     
-    if (isNaN(value) || isNaN(significance)) return '#VALUE!';
+    let value: number, significance: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (significanceRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(significanceRef, context);
+      significance = parseFloat(String(cellValue ?? '0'));
+    } else {
+      significance = parseFloat(significanceRef);
+    }
+    
+    if (isNaN(value) || isNaN(significance)) return FormulaError.VALUE;
     if (significance === 0) return 0;
-    if ((value > 0 && significance < 0) || (value < 0 && significance > 0)) return '#NUM!';
+    if ((value > 0 && significance < 0) || (value < 0 && significance > 0)) return FormulaError.NUM;
     
     return Math.floor(value / significance) * significance;
   }
@@ -424,9 +718,18 @@ export const SIGN: CustomFormula = {
   name: 'SIGN',
   pattern: /SIGN\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
     return value > 0 ? 1 : value < 0 ? -1 : 0;
   }
 };
@@ -436,11 +739,20 @@ export const FACT: CustomFormula = {
   name: 'FACT',
   pattern: /FACT\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseInt(matches[1]);
-    if (isNaN(value)) return '#VALUE!';
-    if (value < 0) return '#NUM!';
-    if (value > 170) return '#NUM!'; // 階乗が大きすぎる場合
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseInt(String(cellValue ?? '0'));
+    } else {
+      value = parseInt(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    if (value < 0) return FormulaError.NUM;
+    if (value > 170) return FormulaError.NUM; // 階乗が大きすぎる場合
     
     let result = 1;
     for (let i = 2; i <= value; i++) {

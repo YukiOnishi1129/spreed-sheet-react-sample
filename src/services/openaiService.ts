@@ -507,6 +507,22 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 
 これらの例のように、実用的で循環参照のないデータを生成してください。特にVLOOKUP関数では、検索範囲とセル参照を正確に指定してください。
 
+**HLOOKUP関数の特別な要件：**
+- **データ配置**: HLOOKUPは横方向検索なので、データは横方向に配置してください
+- **正しい例**: 
+  - 1行目: 商品名  ノートPC   タブレット  スマートフォン
+  - 2行目: 価格    80000     45000      60000
+  - 3行目: 在庫    10        20         15
+- **使用例**: =HLOOKUP(E1,A1:D3,2,0) - 1行目で商品名を検索し、2行目の価格を返す
+- **重要**: VLOOKUPと違い、検索キーは1行目、返り値は下の行から取得
+
+**IFNA関数の必須使用：**
+- **ユーザーが「IFNA」を含むリクエストをした場合、必ずIFNA関数を使用してください**
+- **使用例**: =IFNA(HLOOKUP(E1,A1:D3,2,0),"商品が見つかりません")
+- **目的**: #N/Aエラーを人にやさしいメッセージに変換
+- **適用**: VLOOKUP、HLOOKUP、INDEX+MATCH等の検索関数と組み合わせる
+- **エラー処理**: 検索が失敗した場合の代替値やメッセージを必ず設定
+
 **重要：複数の関数を使用する場合**
 - function_nameは主要な関数名または組み合わせ名を記載（例："AVERAGE & IF & MAX & MIN"）
 - syntaxは各関数を " + " で区切って記載（例："AVERAGE(数値範囲) + IF(条件, 真の場合, 偽の場合) + MAX(数値範囲) + MIN(数値範囲)"）
@@ -639,14 +655,29 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         // 事前処理：明らかな問題を修正
         console.log('修正前のJSON:', jsonData.substring(0, 300) + '...');
         
-        // REPT関数とTEXT関数の二重引用符を事前に修正（より慎重なアプローチ）
+        // 全関数タイプの二重引用符を事前に修正（包括的アプローチ）
         jsonData = jsonData
+          // REPT関数の修正
           .replace(/("f":\s*"=REPT\()""/g, '$1\\"')
-          .replace(/""(,\s*[^)]+\)")/g, '\\"$1')
           .replace(/(\["=REPT\()""/g, '$1\\"')
-          .replace(/"",(\s*[^)]+\)"])/g, '\\"$1')
-          // TEXT関数の引用符も修正
+          // TEXT関数の修正
           .replace(/("f":\s*"=TEXT\([^,]+,\s*)""/g, '$1\\"')
+          .replace(/(\["=TEXT\([^,]+,\s*)""/g, '$1\\"')
+          // IF関数の修正
+          .replace(/("f":\s*"=IF\([^,]+,\s*)""/g, '$1\\"')
+          .replace(/("f":\s*"=IF\([^,]+,\s*[^,]+,\s*)""/g, '$1\\"')
+          .replace(/(\["=IF\([^,]+,\s*)""/g, '$1\\"')
+          // CONCATENATE関数の修正
+          .replace(/("f":\s*"=CONCATENATE\([^)]*?)""/g, '$1\\"')
+          .replace(/(\["=CONCATENATE\([^)]*?)""/g, '$1\\"')
+          // SUBSTITUTE関数の修正
+          .replace(/("f":\s*"=SUBSTITUTE\([^,]+,\s*)""/g, '$1\\"')
+          .replace(/("f":\s*"=SUBSTITUTE\([^,]+,\s*[^,]+,\s*)""/g, '$1\\"')
+          // FIND、SEARCH関数の修正
+          .replace(/("f":\s*"=(?:FIND|SEARCH)\()""/g, '$1\\"')
+          .replace(/(\["=(?:FIND|SEARCH)\()""/g, '$1\\"')
+          // 一般的な関数引数の修正
+          .replace(/""(,\s*[^)]+\)")/g, '\\"$1')
           .replace(/""(\)")/g, '\\"$1');
         
         // より安全なJSON修正：JSONをパースできるまで修正を試行
@@ -661,14 +692,19 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
             
             // 数式内の引用符を段階的に修正
             if (attempts === 1) {
-              // REPT関数の二重引用符を適切にエスケープ（完全版）
+              // 主要関数の二重引用符を適切にエスケープ（完全版）
               jsonData = jsonData.replace(/"f":\s*"=REPT\(""([^"]+)"",\s*([^)]+)\)"/g, '"f": "=REPT(\\"$1\\", $2)"');
-              // TEXT関数の二重引用符も適切にエスケープ
               jsonData = jsonData.replace(/"f":\s*"=TEXT\(([^,]+),\s*""([^"]+)""\)"/g, '"f": "=TEXT($1, \\"$2\\")"');
+              jsonData = jsonData.replace(/"f":\s*"=IF\(([^,]+),\s*""([^"]+)""/g, '"f": "=IF($1, \\"$2\\"');
+              jsonData = jsonData.replace(/"f":\s*"=CONCATENATE\(([^)]*?)""([^"]*)""/g, '"f": "=CONCATENATE($1\\"$2\\"');
+              jsonData = jsonData.replace(/"f":\s*"=SUBSTITUTE\(([^,]+),\s*""([^"]*)"",\s*""([^"]*)""/g, '"f": "=SUBSTITUTE($1, \\"$2\\", \\"$3\\")"');
             } else if (attempts === 2) {
-              // 例の中の二重引用符も修正
+              // examples配列内の二重引用符も修正
               jsonData = jsonData.replace(/"=REPT\(""([^"]+)"",\s*([^)]+)\)"/g, '"=REPT(\\"$1\\", $2)"');
               jsonData = jsonData.replace(/"=TEXT\(([^,]+),\s*""([^"]+)""\)"/g, '"=TEXT($1, \\"$2\\")"');
+              jsonData = jsonData.replace(/"=IF\(([^,]+),\s*""([^"]+)""/g, '"=IF($1, \\"$2\\"');
+              jsonData = jsonData.replace(/"=CONCATENATE\(([^)]*?)""([^"]*)""/g, '"=CONCATENATE($1\\"$2\\"');
+              jsonData = jsonData.replace(/"=(?:FIND|SEARCH)\(""([^"]*)""/g, '"=FIND(\\"$1\\"');
             } else if (attempts === 3) {
               // より包括的な関数内二重引用符の修正
               jsonData = jsonData.replace(/""([^"]*)""/g, '\\"$1\\"');

@@ -214,13 +214,23 @@ export const YEAR: CustomFormula = {
   name: 'YEAR',
   pattern: /YEAR\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const serialDate = parseFloat(matches[1]);
-    if (isNaN(serialDate)) return FormulaError.VALUE;
+  calculate: (matches, context) => {
+    const dateRef = matches[1].trim();
+    let dateValue;
     
-    // Excelシリアル値から日付に変換
-    const excelEpoch = dayjs('1899-12-30');
-    const date = excelEpoch.add(Math.floor(serialDate), 'day');
+    // セル参照かチェック
+    if (dateRef.match(/^[A-Z]+\d+$/)) {
+      dateValue = getCellValue(dateRef, context);
+    } else {
+      dateValue = dateRef.replace(/"/g, '');
+    }
+    
+    // 日付を解析
+    const date = parseDate(dateValue);
+    if (!date?.isValid()) {
+      console.error('YEAR: 日付解析失敗', { dateRef, dateValue });
+      return FormulaError.VALUE;
+    }
     
     return date.year();
   }
@@ -231,13 +241,23 @@ export const MONTH: CustomFormula = {
   name: 'MONTH',
   pattern: /MONTH\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const serialDate = parseFloat(matches[1]);
-    if (isNaN(serialDate)) return FormulaError.VALUE;
+  calculate: (matches, context) => {
+    const dateRef = matches[1].trim();
+    let dateValue;
     
-    // Excelシリアル値から日付に変換
-    const excelEpoch = dayjs('1899-12-30');
-    const date = excelEpoch.add(Math.floor(serialDate), 'day');
+    // セル参照かチェック
+    if (dateRef.match(/^[A-Z]+\d+$/)) {
+      dateValue = getCellValue(dateRef, context);
+    } else {
+      dateValue = dateRef.replace(/"/g, '');
+    }
+    
+    // 日付を解析
+    const date = parseDate(dateValue);
+    if (!date?.isValid()) {
+      console.error('MONTH: 日付解析失敗', { dateRef, dateValue });
+      return FormulaError.VALUE;
+    }
     
     return date.month() + 1; // dayjsは0ベース、Excelは1ベース
   }
@@ -248,13 +268,23 @@ export const DAY: CustomFormula = {
   name: 'DAY',
   pattern: /DAY\(([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const serialDate = parseFloat(matches[1]);
-    if (isNaN(serialDate)) return FormulaError.VALUE;
+  calculate: (matches, context) => {
+    const dateRef = matches[1].trim();
+    let dateValue;
     
-    // Excelシリアル値から日付に変換
-    const excelEpoch = dayjs('1899-12-30');
-    const date = excelEpoch.add(Math.floor(serialDate), 'day');
+    // セル参照かチェック
+    if (dateRef.match(/^[A-Z]+\d+$/)) {
+      dateValue = getCellValue(dateRef, context);
+    } else {
+      dateValue = dateRef.replace(/"/g, '');
+    }
+    
+    // 日付を解析
+    const date = parseDate(dateValue);
+    if (!date?.isValid()) {
+      console.error('DAY: 日付解析失敗', { dateRef, dateValue });
+      return FormulaError.VALUE;
+    }
     
     return date.date();
   }
