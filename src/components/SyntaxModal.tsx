@@ -78,9 +78,9 @@ const SyntaxModal: React.FC<SyntaxModalProps> = ({
                       {func.syntax}
                     </code>
                     {func.detail && (
-                      <p className="text-pink-800 text-sm leading-relaxed font-mono">
+                      <div className="text-pink-800 text-sm leading-relaxed font-mono whitespace-pre-line">
                         {func.detail}
-                      </p>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -91,9 +91,9 @@ const SyntaxModal: React.FC<SyntaxModalProps> = ({
                   {syntax}
                 </code>
                 {syntaxDetail && (
-                  <p className="text-pink-800 text-sm leading-relaxed font-mono bg-white/70 border border-pink-300 px-4 py-3 rounded-xl mt-2">
+                  <div className="text-pink-800 text-sm leading-relaxed font-mono bg-white/70 border border-pink-300 px-4 py-3 rounded-xl mt-2 whitespace-pre-line">
                     {syntaxDetail}
-                  </p>
+                  </div>
                 )}
               </div>
             )}

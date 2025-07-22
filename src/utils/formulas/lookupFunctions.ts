@@ -7,7 +7,7 @@ import { getCellValue, getCellRangeValues } from './utils';
 // VLOOKUP関数の実装
 export const VLOOKUP: CustomFormula = {
   name: 'VLOOKUP',
-  pattern: /VLOOKUP\(([^,]+),\s*([^,]+),\s*(\d+),\s*(TRUE|FALSE|0|1)\)/i,
+  pattern: /VLOOKUP\(([^,]+),\s*([^,]+),\s*(\d+)(?:,\s*(TRUE|FALSE|0|1))?\)/i,
   isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
@@ -15,7 +15,7 @@ export const VLOOKUP: CustomFormula = {
 // HLOOKUP関数の実装
 export const HLOOKUP: CustomFormula = {
   name: 'HLOOKUP',
-  pattern: /HLOOKUP\(([^,]+),\s*([^,]+),\s*(\d+),\s*(TRUE|FALSE|0|1)\)/i,
+  pattern: /HLOOKUP\(([^,]+),\s*([^,]+),\s*(\d+)(?:,\s*(TRUE|FALSE|0|1))?\)/i,
   isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };

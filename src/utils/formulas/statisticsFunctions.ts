@@ -1,6 +1,6 @@
 // 統計関数の実装
 
-import type { CustomFormula, CellData, FormulaContext } from './types';
+import type { CustomFormula, FormulaContext } from './types';
 import { FormulaError } from './types';
 import { getCellValue, getCellRangeValues } from './utils';
 
@@ -35,25 +35,6 @@ function extractNumbersFromRange(rangeRef: string, context: FormulaContext): num
   return numbers;
 }
 
-// 配列から数値のみを抽出するヘルパー関数（下位互換のため保持）
-function extractNumbers(data: CellData[][]): number[] {
-  const numbers: number[] = [];
-  data.forEach(row => {
-    row.forEach(cell => {
-      if (!cell) return;
-      let value;
-      if (typeof cell === 'object' && 'value' in cell) {
-        value = typeof cell.value === 'string' ? parseFloat(cell.value) : cell.value;
-      } else {
-        value = typeof cell === 'string' ? parseFloat(String(cell)) : Number(cell);
-      }
-      if (typeof value === 'number' && !isNaN(value)) {
-        numbers.push(value);
-      }
-    });
-  });
-  return numbers;
-}
 
 // MEDIAN関数の実装（中央値）
 export const MEDIAN: CustomFormula = {

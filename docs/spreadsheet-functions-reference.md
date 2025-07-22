@@ -692,11 +692,13 @@
 
 このドキュメントには、ExcelとGoogle Sheetsで利用可能な主要な関数をカテゴリ別にまとめました。
 
-### 統計情報
+### 統計情報  
 - 総関数数: 約500+
 - カテゴリ数: 15
-- 実装済み: 5関数（SUM, AVERAGE, COUNT, MAX, MIN, IF）
-- 未実装: 495+関数
+- **実装済み: 101関数**（SUM, AVERAGE, COUNT, MAX, MIN, IF, ABS, SQRT, POWER, MOD, INT, TRUNC, SIN, COS, TAN, LOG, EXP, RANDBETWEEN, DEGREES, RADIANS等）
+- 未実装: 400+関数
+
+**注意**: このマークダウンファイルの実装状況（✅❌）は現在更新されていません。実際の実装状況は /src/utils/formulas/ ディレクトリのコードを参照してください。
 
 ### 次のステップ
 1. 各関数の手動計算ロジックの実装優先順位を決定

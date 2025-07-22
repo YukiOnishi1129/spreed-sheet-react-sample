@@ -4,6 +4,7 @@ import type { ExcelFunctionResponse } from '../types/spreadsheet';
 import { OPENAI_JSON_SCHEMA, ExcelFunctionResponseSchema } from '../types/spreadsheet';
 import { getMockFunction } from './mockData';
 import { enhanceUserPrompt } from './promptEnhancer';
+import { extractFunctionsFromName, generateFunctionDetails } from '../utils/functionDefinitions';
 
 // OpenAI クライアントの初期化
 const openai = new OpenAI({
@@ -516,19 +517,23 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 - **使用例**: =HLOOKUP(E1,A1:D3,2,0) - 1行目で商品名を検索し、2行目の価格を返す
 - **重要**: VLOOKUPと違い、検索キーは1行目、返り値は下の行から取得
 
-**IFNA関数の必須使用：**
+**エラーハンドリング関数の必須使用：**
 - **ユーザーが「IFNA」を含むリクエストをした場合、必ずIFNA関数を使用してください**
-- **使用例**: =IFNA(HLOOKUP(E1,A1:D3,2,0),"商品が見つかりません")
-- **目的**: #N/Aエラーを人にやさしいメッセージに変換
+- **ユーザーが「IFERROR」を含むリクエストをした場合、必ずIFERROR関数を使用してください**
+- **両方含む場合は、IFERROR(IFNA(...))の入れ子構造で使用してください**
+- **IFNA使用例**: =IFNA(HLOOKUP(E1,A1:D3,2,0),"商品が見つかりません")
+- **IFERROR使用例**: =IFERROR(HLOOKUP(E1,A1:D3,2,0),"エラーが発生しました")
+- **組み合わせ例**: =IFERROR(IFNA(HLOOKUP(E1,A1:D3,2,0),"見つかりません"),"エラー")
+- **目的**: #N/Aエラーや他のエラーを人にやさしいメッセージに変換
 - **適用**: VLOOKUP、HLOOKUP、INDEX+MATCH等の検索関数と組み合わせる
-- **エラー処理**: 検索が失敗した場合の代替値やメッセージを必ず設定
 
 **重要：複数の関数を使用する場合**
-- function_nameは主要な関数名または組み合わせ名を記載（例："AVERAGE & IF & MAX & MIN"）
-- syntaxは各関数を " + " で区切って記載（例："AVERAGE(数値範囲) + IF(条件, 真の場合, 偽の場合) + MAX(数値範囲) + MIN(数値範囲)"）
-- syntax_detailも各関数の詳細を " + " で区切って記載
-- 複数の関数を組み合わせた実用的なデータ構造にする
-- 各関数の役割を明確にする
+- function_nameは組み合わせ名を記載（例："HLOOKUP & IFNA & IFERROR"）
+- **syntaxは実際に使用する組み合わせた関数式を記載**（例："=IFERROR(IFNA(HLOOKUP(検索値,範囲,行番号,0),\"見つかりません\"),\"エラー\")"）
+- **syntax_detailは簡単な説明を記載**（詳細な引数説明は自動生成されます）
+- **descriptionは組み合わせた関数全体の動作を説明**
+- 例：「HLOOKUPで横方向検索を行い、#N/Aエラーの場合はIFNAで独自メッセージを表示、その他のエラーはIFERRORで処理する包括的なエラーハンドリング機能」
+
 
 **重要な注意事項：**
 - Structured Outputsにより自動的にJSON形式で出力されます
@@ -752,6 +757,19 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
       };
       
       const functionData = ExcelFunctionResponseSchema.parse(preprocessedData);
+      
+      // 関数名から使用されている関数を抽出し、詳細な説明を自動生成
+      const usedFunctions = extractFunctionsFromName(functionData.function_name ?? '');
+      console.log('使用されている関数:', usedFunctions);
+      
+      if (usedFunctions.length > 0) {
+        const generatedDetails = generateFunctionDetails(usedFunctions);
+        if (generatedDetails) {
+          // 生成された詳細説明でsyntax_detailを置き換え
+          functionData.syntax_detail = generatedDetails;
+          console.log('自動生成された関数詳細:', generatedDetails);
+        }
+      }
       
       console.log('バリデーション済みデータ:', functionData);
       return functionData;
