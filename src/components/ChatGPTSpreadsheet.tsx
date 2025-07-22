@@ -4,6 +4,47 @@ import type { Matrix, CellBase } from 'react-spreadsheet';
 import { HyperFormula } from 'hyperformula';
 import { matchFormula, getFunctionType } from '../utils/formulas';
 import type { CellData, FormulaResult } from '../utils/formulas/types';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { 
+  SpreadsheetFormSchema, 
+  type SpreadsheetForm,
+  type SpreadsheetData,
+  type ExcelFunctionResponse,
+  type ProcessSpreadsheetDataInput,
+  type ApiCellData
+} from '../types/spreadsheet';
+import { fetchExcelFunction } from '../services/openaiService';
+import TemplateSelector from './TemplateSelector';
+import SyntaxModal from './SyntaxModal';
+import type { FunctionTemplate } from '../types/templates';
+
+// 型ガード関数
+const hasFormulaProperty = (cell: ApiCellData | null): cell is ApiCellData & { f: string } => {
+  return cell != null && cell.f != null && typeof cell.f === 'string';
+};
+
+const hasValueProperty = (cell: ApiCellData | null): cell is ApiCellData & { v: string | number | null } => {
+  return cell != null && cell.v !== undefined;
+};
+
+const hasBackgroundProperty = (cell: ApiCellData | null): cell is ApiCellData & { bg: string } => {
+  return cell != null && cell.bg != null && typeof cell.bg === 'string';
+};
+
+const isFormulaCell = (cell: ApiCellData | null): cell is ApiCellData & { f: string } => {
+  return hasFormulaProperty(cell);
+};
+
+// react-spreadsheetで使われるセル（valueプロパティを持つ）の型ガード
+const hasSpreadsheetValue = (cell: unknown): cell is { value: unknown } => {
+  return cell != null && typeof cell === 'object' && 'value' in cell;
+};
+
+// データ数式プロパティを持つセルの型ガード
+const hasDataFormula = (cell: unknown): cell is { 'data-formula': unknown } => {
+  return cell != null && typeof cell === 'object' && 'data-formula' in cell;
+};
 
 // FormulaResultをセルの値に変換するヘルパー関数
 const convertFormulaResult = (result: FormulaResult): string | number | null => {
@@ -13,21 +54,6 @@ const convertFormulaResult = (result: FormulaResult): string | number | null => 
   if (typeof result === 'string' || typeof result === 'number') return result;
   return String(result);
 };
-
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { 
-  SpreadsheetFormSchema, 
-  type SpreadsheetForm,
-  type SpreadsheetData,
-  type ExcelFunctionResponse,
-  type ProcessSpreadsheetDataInput
-} from '../types/spreadsheet';
-import { fetchExcelFunction } from '../services/openaiService';
-import TemplateSelector from './TemplateSelector';
-import SyntaxModal from './SyntaxModal';
-import type { FunctionTemplate } from '../types/templates';
-
 
 // Excelのシリアル値を日付文字列に変換する関数
 const formatExcelDate = (serialDate: number): string => {
@@ -110,11 +136,11 @@ const ChatGPTSpreadsheet: React.FC = () => {
     currentFunction.spreadsheet_data.forEach((row, rowIndex) => {
       if (row) {
         row.forEach((cell, colIndex) => {
-          if (cell && typeof cell === 'object' && 'f' in cell && (cell as { f: string }).f) {
+          if (isFormulaCell(cell)) {
             formulaCells.push({
               row: rowIndex,
               col: colIndex,
-              formula: (cell as { f: string }).f
+              formula: cell.f
             });
           }
         });
@@ -124,7 +150,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
     if (formulaCells.length === 0) return;
     
     // HyperFormulaで計算するためのデータ準備
-    const rawData = data.map((row, rowIndex) => {
+    const rawData: (string | number | null)[][] = data.map((row, rowIndex) => {
       if (!row) return new Array(8).fill('');
       
       return row.map((cell, colIndex) => {
@@ -134,13 +160,20 @@ const ChatGPTSpreadsheet: React.FC = () => {
           return formulaCell.formula;
         }
         // 通常のセルの場合は値を返す
-        return (cell && typeof cell === 'object' && 'value' in cell) ? (cell as { value: unknown }).value || '' : '';
+        if (hasSpreadsheetValue(cell)) {
+          const value = cell.value;
+          if (typeof value === 'string' || typeof value === 'number' || value === null) {
+            return value;
+          }
+          return String(value);
+        }
+        return '';
       });
     });
     
     // HyperFormulaで再計算
     try {
-      const hf = HyperFormula.buildFromArray(rawData as (string | number | null)[][], {
+      const hf = HyperFormula.buildFromArray(rawData, {
         licenseKey: 'gpl-v3',
         useColumnIndex: false,
         useArrayArithmetic: true,
@@ -151,8 +184,8 @@ const ChatGPTSpreadsheet: React.FC = () => {
       });
       
       // 更新されたデータを作成
-      const updatedData = data.map((row, rowIndex) => {
-        if (!row) return row;
+      const updatedData: SpreadsheetData = data.map((row, rowIndex) => {
+        if (!row) return [];
         
         return row.map((cell, colIndex) => {
           // 数式セルの場合は再計算結果を使用
@@ -178,35 +211,51 @@ const ChatGPTSpreadsheet: React.FC = () => {
               }
               
               return {
-                ...(cell && typeof cell === 'object' ? cell : {}),
-                value: displayValue,
+                value: typeof displayValue === 'string' || typeof displayValue === 'number' || displayValue === null ? displayValue : String(displayValue),
                 formula: formulaCell.formula,
-                title: `数式: ${formulaCell.formula}`
+                title: `数式: ${formulaCell.formula}`,
+                className: hasSpreadsheetValue(cell) && typeof cell === 'object' && 'className' in cell ? String(cell.className) : undefined,
+                'data-formula': formulaCell.formula,
+                DataEditor: undefined
               };
             } catch (error) {
               console.warn('HyperFormula計算エラー:', error, formulaCell.formula);
               
               return {
-                ...(cell && typeof cell === 'object' ? cell : {}),
                 value: '#ERROR!',
                 formula: formulaCell.formula,
-                title: `数式: ${formulaCell.formula}`
+                title: `数式: ${formulaCell.formula}`,
+                className: hasSpreadsheetValue(cell) && typeof cell === 'object' && 'className' in cell ? String(cell.className) : undefined,
+                'data-formula': formulaCell.formula,
+                DataEditor: undefined
               };
             }
           }
           
-          return cell;
+          // 通常のセルの場合、適切なCell型オブジェクトを返す
+          if (hasSpreadsheetValue(cell)) {
+            return {
+              value: typeof cell.value === 'string' || typeof cell.value === 'number' || cell.value === null ? cell.value : String(cell.value),
+              className: typeof cell === 'object' && 'className' in cell ? String(cell.className) : undefined,
+              formula: typeof cell === 'object' && 'formula' in cell ? String(cell.formula) : undefined,
+              title: typeof cell === 'object' && 'title' in cell ? String(cell.title) : undefined,
+              'data-formula': hasDataFormula(cell) && cell['data-formula'] != null ? String(cell['data-formula']) : undefined,
+              DataEditor: undefined
+            };
+          }
+          
+          return null;
         });
       });
       
       console.log('手動再計算完了:', updatedData);
-      setValue('spreadsheetData', updatedData as SpreadsheetData);
+      setValue('spreadsheetData', updatedData);
       
     } catch (error) {
       console.error('HyperFormula再計算エラー:', error);
       // エラー時は手動計算のみ実行
-      const updatedData = data.map((row, rowIndex) => {
-        if (!row) return row;
+      const updatedData: SpreadsheetData = data.map((row, rowIndex) => {
+        if (!row) return [];
         
         return row.map((cell, colIndex) => {
           const formulaCell = formulaCells.find(f => f.row === rowIndex && f.col === colIndex);
@@ -222,10 +271,12 @@ const ChatGPTSpreadsheet: React.FC = () => {
                 });
                 
                 return {
-                  ...(cell && typeof cell === 'object' ? cell : {}),
-                  value: result,
+                  value: String(result),
                   formula: formulaCell.formula,
-                  title: `数式: ${formulaCell.formula}`
+                  title: `数式: ${formulaCell.formula}`,
+                  className: hasSpreadsheetValue(cell) && typeof cell === 'object' && 'className' in cell ? String(cell.className) : undefined,
+                  'data-formula': formulaCell.formula,
+                  DataEditor: undefined
                 };
               } catch (calcError) {
                 console.warn('モジュラー関数計算エラー:', calcError, formulaCell.formula);
@@ -233,19 +284,33 @@ const ChatGPTSpreadsheet: React.FC = () => {
             }
             // フォールバック：エラーとして処理
             return {
-              ...(cell && typeof cell === 'object' ? cell : {}),
               value: '#ERROR!',
               formula: formulaCell.formula,
-              title: `数式: ${formulaCell.formula}`
+              title: `数式: ${formulaCell.formula}`,
+              className: hasSpreadsheetValue(cell) && typeof cell === 'object' && 'className' in cell ? String(cell.className) : undefined,
+              'data-formula': formulaCell.formula,
+              DataEditor: undefined
             };
           }
           
-          return cell;
+          // 通常のセルの場合、適切なCell型オブジェクトを返す
+          if (hasSpreadsheetValue(cell)) {
+            return {
+              value: typeof cell.value === 'string' || typeof cell.value === 'number' || cell.value === null ? cell.value : String(cell.value),
+              className: typeof cell === 'object' && 'className' in cell ? String(cell.className) : undefined,
+              formula: typeof cell === 'object' && 'formula' in cell ? String(cell.formula) : undefined,
+              title: typeof cell === 'object' && 'title' in cell ? String(cell.title) : undefined,
+              'data-formula': hasDataFormula(cell) && cell['data-formula'] != null ? String(cell['data-formula']) : undefined,
+              DataEditor: undefined
+            };
+          }
+          
+          return null;
         });
       });
       
       console.log('手動再計算完了:', updatedData);
-      setValue('spreadsheetData', updatedData as SpreadsheetData);
+      setValue('spreadsheetData', updatedData);
     }
   };
 
@@ -267,19 +332,22 @@ const ChatGPTSpreadsheet: React.FC = () => {
       setValue('currentFunction', response);
       
       // 手動計算用の元データを準備
-      const originalDataForManualCalc = response.spreadsheet_data.map(row => 
+      const originalDataForManualCalc: CellData[][] = response.spreadsheet_data.map(row => 
         row.map(cell => {
-          if (!cell) return '';
-          return (cell && typeof cell === 'object' && 'v' in cell) ? (cell as { v: unknown }).v || '' : '';
+          if (!cell) return { value: '' };
+          if (hasValueProperty(cell)) {
+            return { value: cell.v || '' };
+          }
+          return { value: '' };
         })
       );
       
       // HyperFormulaにデータを設定して計算
-      const rawData = response.spreadsheet_data.map(row => 
+      const rawData: (string | number | null)[][] = response.spreadsheet_data.map(row => 
         row.map(cell => {
           if (!cell) return '';
-          if ((cell as { f: string }).f) {
-            let formula = (cell as { f: string }).f;
+          if (hasFormulaProperty(cell)) {
+            let formula = cell.f;
             
             // 手動計算が必要な関数かチェック
             const matchResult = matchFormula(formula);
@@ -295,7 +363,14 @@ const ChatGPTSpreadsheet: React.FC = () => {
             console.log('数式セル:', formula);
             return formula;
           }
-          return (cell && typeof cell === 'object' && 'v' in cell) ? (cell as { v: unknown }).v || '' : '';
+          if (hasValueProperty(cell)) {
+            const value = cell.v;
+            if (typeof value === 'string' || typeof value === 'number' || value === null) {
+              return value;
+            }
+            return String(value);
+          }
+          return '';
         })
       );
       
@@ -305,7 +380,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
       // HyperFormulaでデータを処理
       let calculationResults: unknown[][] = [];
       try {
-        const tempHf = HyperFormula.buildFromArray(rawData as (string | number | null)[][], {
+        const tempHf = HyperFormula.buildFromArray(rawData, {
           licenseKey: 'gpl-v3',
           useColumnIndex: false,
           useArrayArithmetic: true,
@@ -372,7 +447,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
       }
 
       // react-spreadsheet用のデータに変換
-      const convertedData: Matrix<unknown> = response.spreadsheet_data.map((row, rowIndex) => 
+      const convertedData: SpreadsheetData = response.spreadsheet_data.map((row, rowIndex) => 
         row.map((cell, colIndex) => {
           if (!cell) return null;
           
@@ -380,9 +455,9 @@ const ChatGPTSpreadsheet: React.FC = () => {
           let calculatedValue = cell.v;
           
           // 数式セル（関数の結果）の場合
-          if ((cell as { f: string }).f) {
+          if (hasFormulaProperty(cell)) {
             // 関数の種類によって色分け
-            const formula = (cell as { f: string }).f.toUpperCase();
+            const formula = cell.f.toUpperCase();
             
             if (formula.includes('SUM(') || formula.includes('AVERAGE(') || formula.includes('COUNT(') || formula.includes('MAX(') || formula.includes('MIN(') || 
                 formula.includes('SUMIF(') || formula.includes('COUNTIF(') || formula.includes('AVERAGEIF(') ||
@@ -410,12 +485,12 @@ const ChatGPTSpreadsheet: React.FC = () => {
             }
             
             // 手動計算が必要な関数かチェック
-            const matchResult = matchFormula((cell as { f: string }).f);
+            const matchResult = matchFormula(cell.f);
             if (matchResult && matchResult.function.isSupported === false) {
-              console.log('手動計算実行:', (cell as { f: string }).f);
+              console.log('手動計算実行:', cell.f);
               try {
                 const result = matchResult.function.calculate(matchResult.matches, {
-                  data: originalDataForManualCalc as CellData[][],
+                  data: originalDataForManualCalc,
                   row: rowIndex,
                   col: colIndex
                 });
@@ -441,19 +516,19 @@ const ChatGPTSpreadsheet: React.FC = () => {
                 if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(')) {
                   calculatedValue = formatExcelDate(result as number);
                 } else {
-                  calculatedValue = convertFormulaResult(result as FormulaResult);
+                  calculatedValue = String(convertFormulaResult(result as FormulaResult));
                 }
               } else {
                 calculatedValue = '#ERROR!';
               }
             }
-          } else if ((cell as { bg: string }).bg) {
+          } else if (hasBackgroundProperty(cell)) {
             // 背景色がある通常のセル
-            if ((cell as { bg: string }).bg.includes('E3F2FD') || (cell as { bg: string }).bg.includes('E1F5FE')) {
+            if (cell.bg.includes('E3F2FD') || cell.bg.includes('E1F5FE')) {
               className = 'header-cell';
-            } else if ((cell as { bg: string }).bg.includes('F0F4C3') || (cell as { bg: string }).bg.includes('FFECB3')) {
+            } else if (cell.bg.includes('F0F4C3') || cell.bg.includes('FFECB3')) {
               className = 'data-cell';
-            } else if ((cell as { bg: string }).bg.includes('FFF8E1') || (cell as { bg: string }).bg.includes('FFF3E0')) {
+            } else if (cell.bg.includes('FFF8E1') || cell.bg.includes('FFF3E0')) {
               className = 'input-cell';
             }
           }
@@ -464,10 +539,10 @@ const ChatGPTSpreadsheet: React.FC = () => {
           };
           
           // 数式セルの場合、ツールチップと数式プロパティを追加
-          if ((cell as { f: string }).f) {
-            cellData.title = `数式: ${(cell as { f: string }).f}`;
-            cellData.formula = (cell as { f: string }).f;
-            cellData['data-formula'] = (cell as { f: string }).f; // HTML属性として追加
+          if (hasFormulaProperty(cell)) {
+            cellData.title = `数式: ${cell.f}`;
+            cellData.formula = cell.f;
+            cellData['data-formula'] = cell.f; // HTML属性として追加
             // react-spreadsheetでツールチップを表示するための追加設定
             cellData.DataEditor = undefined; // デフォルトエディターを無効化してツールチップを優先
           }
@@ -478,7 +553,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
 
       // Data conversion complete
       
-      setValue('spreadsheetData', convertedData as SpreadsheetData);
+      setValue('spreadsheetData', convertedData);
       // Sheet data set
       
     } catch (error) {
@@ -520,21 +595,24 @@ const ChatGPTSpreadsheet: React.FC = () => {
       const rawData = response.spreadsheet_data.map(row => 
         row?.map(cell => {
           if (!cell) return '';
-          if (cell && typeof cell === 'object' && 'f' in cell && (cell as { f: string }).f) {
+          if (isFormulaCell(cell)) {
             // HyperFormulaとの互換性のためにFALSE/TRUEを0/1に置換
-            let formula = (cell as { f: string }).f;
+            let formula = cell.f;
             formula = formula.replace(/FALSE/g, '0');
             formula = formula.replace(/TRUE/g, '1');
             return formula;
           }
-          return (cell && typeof cell === 'object' && 'v' in cell) ? (cell as { v: unknown }).v || '' : '';
+          if (hasValueProperty(cell)) {
+            return String(cell.v || '');
+          }
+          return '';
         })
       );
       
       // HyperFormulaでデータを処理
       let calculationResults: unknown[][] = [];
       try {
-        const tempHf = HyperFormula.buildFromArray(rawData as (string | number | null)[][], {
+        const tempHf = HyperFormula.buildFromArray(rawData, {
           licenseKey: 'gpl-v3',
           useColumnIndex: false,
           useArrayArithmetic: true,
@@ -598,17 +676,20 @@ const ChatGPTSpreadsheet: React.FC = () => {
       }
 
       // react-spreadsheet用のデータに変換
-      const convertedData: Matrix<unknown> = response.spreadsheet_data.map((row, rowIndex: number) => 
+      const convertedData: SpreadsheetData = response.spreadsheet_data.map((row, rowIndex: number) => 
         row?.map((cell, colIndex: number) => {
           if (!cell) return null;
           
           let className = '';
-          let calculatedValue = (cell && typeof cell === 'object' && 'v' in cell) ? (cell as { v: unknown }).v : '';
+          let calculatedValue = '';
+          if (hasValueProperty(cell)) {
+            calculatedValue = String(cell.v || '');
+          }
           
           // 数式セル（関数の結果）の場合
-          if (cell && typeof cell === 'object' && 'f' in cell && (cell as { f: string }).f) {
+          if (isFormulaCell(cell)) {
             // モジュラー関数を使用して関数タイプを判定
-            const formula = ((cell as { f: string }).f).toUpperCase();
+            const formula = cell.f.toUpperCase();
             const functionMatch = formula.match(/([A-Z]+)\(/);
             
             if (functionMatch) {
@@ -644,20 +725,20 @@ const ChatGPTSpreadsheet: React.FC = () => {
             // 日付関数の場合は日付フォーマットを適用
             if (result !== null && result !== undefined) {
               if (formula.includes('TODAY(') || formula.includes('NOW(') || formula.includes('DATE(')) {
-                calculatedValue = typeof result === 'number' ? formatExcelDate(result) : result;
+                calculatedValue = typeof result === 'number' ? formatExcelDate(result) : String(result);
               } else {
-                calculatedValue = convertFormulaResult(result as FormulaResult);
+                calculatedValue = String(convertFormulaResult(result as FormulaResult));
               }
             } else {
               calculatedValue = '#ERROR!';
             }
-          } else if (cell && typeof cell === 'object' && 'bg' in cell && (cell as { bg: string }).bg) {
+          } else if (hasBackgroundProperty(cell)) {
             // 背景色がある通常のセル
-            if ((cell as { bg: string }).bg.includes('E3F2FD') || (cell as { bg: string }).bg.includes('E1F5FE')) {
+            if (cell.bg.includes('E3F2FD') || cell.bg.includes('E1F5FE')) {
               className = 'header-cell';
-            } else if ((cell as { bg: string }).bg.includes('F0F4C3') || (cell as { bg: string }).bg.includes('FFECB3')) {
+            } else if (cell.bg.includes('F0F4C3') || cell.bg.includes('FFECB3')) {
               className = 'data-cell';
-            } else if ((cell as { bg: string }).bg.includes('FFF8E1') || (cell as { bg: string }).bg.includes('FFF3E0')) {
+            } else if (cell.bg.includes('FFF8E1') || cell.bg.includes('FFF3E0')) {
               className = 'input-cell';
             }
           }
@@ -668,10 +749,10 @@ const ChatGPTSpreadsheet: React.FC = () => {
           };
           
           // 数式セルの場合、ツールチップと数式プロパティを追加
-          if ((cell as { f: string }).f) {
-            cellData.title = `数式: ${(cell as { f: string }).f}`;
-            cellData.formula = (cell as { f: string }).f;
-            cellData['data-formula'] = (cell as { f: string }).f; // HTML属性として追加
+          if (hasFormulaProperty(cell)) {
+            cellData.title = `数式: ${cell.f}`;
+            cellData.formula = cell.f;
+            cellData['data-formula'] = cell.f; // HTML属性として追加
             // react-spreadsheetでツールチップを表示するための追加設定
             cellData.DataEditor = undefined; // デフォルトエディターを無効化してツールチップを優先
           }
@@ -680,7 +761,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
         })
       );
 
-      setValue('spreadsheetData', convertedData as SpreadsheetData);
+      setValue('spreadsheetData', convertedData);
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '不明なエラー';
