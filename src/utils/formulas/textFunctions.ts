@@ -201,22 +201,54 @@ export const TEXT: CustomFormula = {
   name: 'TEXT',
   pattern: /TEXT\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const value = parseFloat(matches[1]);
-    const format = matches[2].replace(/"/g, '');
+  calculate: (matches, context) => {
+    console.log('TEXT関数実行:', { matches });
     
-    if (isNaN(value)) return '#VALUE!';
+    const valueRef = matches[1].trim();
+    const formatRef = matches[2].trim();
     
-    // 簡単な書式対応（完全なExcel書式ではない）
-    if (format.includes('%')) {
-      return (value * 100).toFixed(2) + '%';
-    } else if (format.includes('0.00')) {
-      return value.toFixed(2);
-    } else if (format.includes('0')) {
-      return Math.round(value).toString();
+    // 値の取得
+    let value: number;
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      // セル参照
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
     }
     
-    return value.toString();
+    // フォーマットの取得
+    let format = formatRef;
+    if (format.startsWith('"') && format.endsWith('"')) {
+      format = format.slice(1, -1);
+    }
+    
+    console.log('TEXT計算:', { value, format, valueRef, formatRef });
+    
+    if (isNaN(value)) {
+      console.error('TEXT: 数値変換失敗', { valueRef, value });
+      return '#VALUE!';
+    }
+    
+    // 簡単な書式対応（完全なExcel書式ではない）
+    let result: string;
+    if (format.includes('¥') || format.includes('￥')) {
+      // 通貨形式
+      result = '¥' + value.toLocaleString();
+    } else if (format.includes('%')) {
+      result = (value * 100).toFixed(2) + '%';
+    } else if (format.includes('0.00')) {
+      result = value.toFixed(2);
+    } else if (format.includes('0,000')) {
+      result = value.toLocaleString();
+    } else if (format.includes('0')) {
+      result = Math.round(value).toString();
+    } else {
+      result = value.toString();
+    }
+    
+    console.log('TEXT結果:', { result });
+    return result;
   }
 };
 
@@ -225,13 +257,44 @@ export const REPT: CustomFormula = {
   name: 'REPT',
   pattern: /REPT\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
-  calculate: (matches) => {
-    const text = matches[1].replace(/"/g, '');
-    const times = parseInt(matches[2]);
+  calculate: (matches, context) => {
+    console.log('REPT関数実行:', { matches });
     
-    if (isNaN(times) || times < 0) return '#VALUE!';
-    if (times > 32767) return '#VALUE!';
+    let text = matches[1].trim();
+    const timesRef = matches[2].trim();
     
-    return text.repeat(times);
+    // テキスト部分の処理
+    if (text.startsWith('"') && text.endsWith('"')) {
+      // 引用符で囲まれた文字列
+      text = text.slice(1, -1);
+    } else if (text.match(/^[A-Z]+\d+$/)) {
+      // セル参照
+      text = String(getCellValue(text, context) ?? '');
+    }
+    
+    // 繰り返し回数の処理
+    let times: number;
+    if (timesRef.match(/^[A-Z]+\d+$/)) {
+      // セル参照
+      const cellValue = getCellValue(timesRef, context);
+      times = parseInt(String(cellValue ?? '0'));
+    } else {
+      times = parseInt(timesRef);
+    }
+    
+    console.log('REPT計算:', { text, times, originalText: matches[1], originalTimes: matches[2] });
+    
+    if (isNaN(times) || times < 0) {
+      console.error('REPT: 無効な回数', times);
+      return '#VALUE!';
+    }
+    if (times > 32767) {
+      console.error('REPT: 回数が上限を超過', times);
+      return '#VALUE!';
+    }
+    
+    const result = text.repeat(times);
+    console.log('REPT結果:', result);
+    return result;
   }
 };

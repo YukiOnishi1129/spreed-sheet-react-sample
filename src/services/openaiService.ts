@@ -636,27 +636,73 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         // eslint-disable-next-line no-control-regex
         jsonData = jsonData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
         
+        // 事前処理：明らかな問題を修正
+        console.log('修正前のJSON:', jsonData.substring(0, 300) + '...');
+        
+        // REPT関数とTEXT関数の二重引用符を事前に修正（より慎重なアプローチ）
+        jsonData = jsonData
+          .replace(/("f":\s*"=REPT\()""/g, '$1\\"')
+          .replace(/""(,\s*[^)]+\)")/g, '\\"$1')
+          .replace(/(\["=REPT\()""/g, '$1\\"')
+          .replace(/"",(\s*[^)]+\)"])/g, '\\"$1')
+          // TEXT関数の引用符も修正
+          .replace(/("f":\s*"=TEXT\([^,]+,\s*)""/g, '$1\\"')
+          .replace(/""(\)")/g, '\\"$1');
+        
         // より安全なJSON修正：JSONをパースできるまで修正を試行
         let attempts = 0;
-        while (attempts < 3) {
+        while (attempts < 5) {
           try {
             JSON.parse(jsonData);
             break; // パースに成功したら終了
-          } catch {
+          } catch (error) {
             attempts++;
+            console.log(`JSON修正試行 ${attempts}:`, error);
+            
             // 数式内の引用符を段階的に修正
             if (attempts === 1) {
-              // エスケープされていない引用符を修正
-              jsonData = jsonData.replace(/"f":\s*"=([^"]*)"([^"]*)"([^"]*)"/g, '"f": "=$1"$2"$3"');
+              // REPT関数の二重引用符を適切にエスケープ（完全版）
+              jsonData = jsonData.replace(/"f":\s*"=REPT\(""([^"]+)"",\s*([^)]+)\)"/g, '"f": "=REPT(\\"$1\\", $2)"');
+              // TEXT関数の二重引用符も適切にエスケープ
+              jsonData = jsonData.replace(/"f":\s*"=TEXT\(([^,]+),\s*""([^"]+)""\)"/g, '"f": "=TEXT($1, \\"$2\\")"');
             } else if (attempts === 2) {
-              // より広範囲の引用符を修正
-              jsonData = jsonData.replace(/([^\\])"([^\\])/g, '$1"$2');
+              // 例の中の二重引用符も修正
+              jsonData = jsonData.replace(/"=REPT\(""([^"]+)"",\s*([^)]+)\)"/g, '"=REPT(\\"$1\\", $2)"');
+              jsonData = jsonData.replace(/"=TEXT\(([^,]+),\s*""([^"]+)""\)"/g, '"=TEXT($1, \\"$2\\")"');
+            } else if (attempts === 3) {
+              // より包括的な関数内二重引用符の修正
+              jsonData = jsonData.replace(/""([^"]*)""/g, '\\"$1\\"');
+            } else if (attempts === 4) {
+              // 最後の手段：全ての二重引用符を適切にエスケープ
+              jsonData = jsonData.replace(/([^\\])""/g, '$1\\"');
+              jsonData = jsonData.replace(/^""/g, '\\"');
             }
+            
+            console.log(`修正後のJSON試行 ${attempts}:`, jsonData.substring(0, 200) + '...');
           }
         }
         
         console.log('修正後のJSON:', jsonData);
-        rawData = JSON.parse(jsonData) as Record<string, unknown>;
+        
+        // 最終的なJSONパースを試行
+        try {
+          rawData = JSON.parse(jsonData) as Record<string, unknown>;
+        } catch (finalError) {
+          console.error('最終JSONパースエラー:', finalError);
+          console.error('失敗したJSON:', jsonData);
+          
+          // エラー位置周辺の文字を表示
+          const errorMatch = String(finalError).match(/position (\d+)/);
+          if (errorMatch) {
+            const pos = parseInt(errorMatch[1]);
+            const start = Math.max(0, pos - 50);
+            const end = Math.min(jsonData.length, pos + 50);
+            console.error(`エラー位置周辺 (${start}-${end}):`, jsonData.substring(start, end));
+            console.error('エラー位置:', ' '.repeat(Math.max(0, pos - start)) + '^');
+          }
+          
+          throw new Error(`JSONパースが完全に失敗しました: ${String(finalError)}`);
+        }
       }
       
       // Zodでバリデーション（空文字をデフォルト値で補完）
