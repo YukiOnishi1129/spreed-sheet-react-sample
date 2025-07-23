@@ -248,10 +248,10 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | PROB | 確率の計算 | `=PROB(x範囲, 確率範囲, [下限], [上限])` | ✅ | 🟡 |
 | FISHER | フィッシャー変換 | `=FISHER(x)` | ✅ | 🔴 |
 | FISHERINV | フィッシャー変換の逆関数 | `=FISHERINV(y)` | ✅ | 🔴 |
-| PHI | 標準正規分布の密度関数 | `=PHI(x)` | ❌ | 🔴 |
-| GAUSS | ガウス関数 | `=GAUSS(z)` | ❌ | 🔴 |
-| PERMUT | 順列 | `=PERMUT(総数, 選択数)` | ❌ | 🔴 |
-| PERMUTATIONA | 重複順列 | `=PERMUTATIONA(総数, 選択数)` | ❌ |
+| PHI | 標準正規分布の密度関数 | `=PHI(x)` | ✅ | 🔴 |
+| GAUSS | ガウス関数 | `=GAUSS(z)` | ✅ | 🔴 |
+| PERMUT | 順列 | `=PERMUT(総数, 選択数)` | ✅ | 🔴 |
+| PERMUTATIONA | 重複順列 | `=PERMUTATIONA(総数, 選択数)` | ✅ | 🟡 |
 | COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ✅ | 🔴 |
 
 ## 3. 文字列操作関数 (Text Functions)

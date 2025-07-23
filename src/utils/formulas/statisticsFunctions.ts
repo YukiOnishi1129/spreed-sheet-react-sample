@@ -840,3 +840,19 @@ export const PERCENTRANK_EXC: CustomFormula = {
     return Math.round(rank * Math.pow(10, significance)) / Math.pow(10, significance);
   }
 };
+
+// PHI関数（標準正規分布の密度関数）
+export const PHI: CustomFormula = {
+  name: 'PHI',
+  pattern: /PHI\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// GAUSS関数（ガウス関数）
+export const GAUSS: CustomFormula = {
+  name: 'GAUSS',
+  pattern: /GAUSS\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};

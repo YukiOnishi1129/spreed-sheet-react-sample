@@ -386,45 +386,6 @@ export const COMBIN: CustomFormula = {
   calculate: () => null // HyperFormulaが処理
 };
 
-// PERMUT関数の実装（順列数）
-export const PERMUT: CustomFormula = {
-  name: 'PERMUT',
-  pattern: /PERMUT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const nRef = matches[1].trim();
-    const kRef = matches[2].trim();
-    
-    let n: number, k: number;
-    
-    // n値を取得
-    if (nRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(nRef, context);
-      n = parseInt(String(cellValue ?? '0'));
-    } else {
-      n = parseInt(nRef);
-    }
-    
-    // k値を取得
-    if (kRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(kRef, context);
-      k = parseInt(String(cellValue ?? '0'));
-    } else {
-      k = parseInt(kRef);
-    }
-    
-    if (isNaN(n) || isNaN(k)) return FormulaError.VALUE;
-    if (n < 0 || k < 0) return FormulaError.NUM;
-    if (k > n) return 0;
-    
-    let result = 1;
-    for (let i = 0; i < k; i++) {
-      result *= (n - i);
-    }
-    return result;
-  }
-};
-
 // GCD関数の実装（最大公約数）
 export const GCD: CustomFormula = {
   name: 'GCD',
@@ -564,6 +525,22 @@ export const ROMAN: CustomFormula = {
 export const COMBINA: CustomFormula = {
   name: 'COMBINA',
   pattern: /COMBINA\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// PERMUT関数（順列）
+export const PERMUT: CustomFormula = {
+  name: 'PERMUT',
+  pattern: /PERMUT\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// PERMUTATIONA関数（重複順列）
+export const PERMUTATIONA: CustomFormula = {
+  name: 'PERMUTATIONA',
+  pattern: /PERMUTATIONA\(([^,]+),\s*([^)]+)\)/i,
   isSupported: false,
   calculate: (matches: RegExpMatchArray) => {
     const nStr = matches[1].trim();
@@ -574,7 +551,7 @@ export const COMBINA: CustomFormula = {
     const k = parseFloat(kStr);
     
     // 数値型チェック
-    if (typeof n !== 'number' || typeof k !== 'number') {
+    if (isNaN(n) || isNaN(k)) {
       return FormulaError.VALUE;
     }
     
@@ -593,21 +570,13 @@ export const COMBINA: CustomFormula = {
       return 1;
     }
     
-    // 重複組合せの公式: C(n+k-1, k) = (n+k-1)! / (k! * (n-1)!)
-    // これは C(n+k-1, k) と同じ
-    const numerator = n + k - 1;
-    
-    if (numerator < k) {
+    // n = 0の場合
+    if (n === 0) {
       return 0;
     }
     
-    // 効率的な組合せ計算
-    let result = 1;
-    for (let i = 0; i < Math.min(k, numerator - k); i++) {
-      result = result * (numerator - i) / (i + 1);
-    }
-    
-    return Math.round(result);
+    // 重複順列の公式: n^k
+    return Math.pow(n, k);
   }
 };
 
@@ -659,13 +628,6 @@ export const MULTINOMIAL: CustomFormula = {
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
-// PERMUTATIONA関数（重複順列）
-export const PERMUTATIONA: CustomFormula = {
-  name: 'PERMUTATIONA',
-  pattern: /PERMUTATIONA\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
-  calculate: () => null // HyperFormulaに処理を委譲
-};
 
 // BASE関数（数値を指定した基数に変換）
 export const BASE: CustomFormula = {
