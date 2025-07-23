@@ -297,3 +297,322 @@ export const TRIMMEAN: CustomFormula = {
     return sum / trimmed.length;
   }
 };
+
+// MAXIFS関数（条件付き最大値）
+export const MAXIFS: CustomFormula = {
+  name: 'MAXIFS',
+  pattern: /MAXIFS\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// MINIFS関数（条件付き最小値）
+export const MINIFS: CustomFormula = {
+  name: 'MINIFS',
+  pattern: /MINIFS\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// STDEV.S関数（標本標準偏差）
+export const STDEV_S: CustomFormula = {
+  name: 'STDEV.S',
+  pattern: /STDEV\.S\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// STDEV.P関数（母集団標準偏差）
+export const STDEV_P: CustomFormula = {
+  name: 'STDEV.P',
+  pattern: /STDEV\.P\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// STDEVA関数（文字列含む標本標準偏差）
+export const STDEVA: CustomFormula = {
+  name: 'STDEVA',
+  pattern: /STDEVA\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// STDEVPA関数（文字列含む母集団標準偏差）
+export const STDEVPA: CustomFormula = {
+  name: 'STDEVPA',
+  pattern: /STDEVPA\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// VAR.S関数（標本分散）
+export const VAR_S: CustomFormula = {
+  name: 'VAR.S',
+  pattern: /VAR\.S\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// VAR.P関数（母集団分散）
+export const VAR_P: CustomFormula = {
+  name: 'VAR.P',
+  pattern: /VAR\.P\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// VARA関数（文字列含む標本分散）
+export const VARA: CustomFormula = {
+  name: 'VARA',
+  pattern: /VARA\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// VARPA関数（文字列含む母集団分散）
+export const VARPA: CustomFormula = {
+  name: 'VARPA',
+  pattern: /VARPA\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// AVEDEV関数（平均偏差）
+export const AVEDEV: CustomFormula = {
+  name: 'AVEDEV',
+  pattern: /AVEDEV\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// DEVSQ関数（偏差平方和）
+export const DEVSQ: CustomFormula = {
+  name: 'DEVSQ',
+  pattern: /DEVSQ\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// KURT関数（尖度）
+export const KURT: CustomFormula = {
+  name: 'KURT',
+  pattern: /KURT\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// SKEW関数（歪度）
+export const SKEW: CustomFormula = {
+  name: 'SKEW',
+  pattern: /SKEW\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// SLOPE関数（回帰直線の傾き）
+export const SLOPE: CustomFormula = {
+  name: 'SLOPE',
+  pattern: /SLOPE\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// INTERCEPT関数（回帰直線の切片）
+export const INTERCEPT: CustomFormula = {
+  name: 'INTERCEPT',
+  pattern: /INTERCEPT\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// RSQ関数（決定係数）
+export const RSQ: CustomFormula = {
+  name: 'RSQ',
+  pattern: /RSQ\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// PEARSON関数（ピアソン相関係数）
+export const PEARSON: CustomFormula = {
+  name: 'PEARSON',
+  pattern: /PEARSON\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// STEYX関数（回帰の標準誤差）
+export const STEYX: CustomFormula = {
+  name: 'STEYX',
+  pattern: /STEYX\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// FISHER関数（フィッシャー変換）
+export const FISHER: CustomFormula = {
+  name: 'FISHER',
+  pattern: /FISHER\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// FISHERINV関数（フィッシャー変換の逆関数）
+export const FISHERINV: CustomFormula = {
+  name: 'FISHERINV',
+  pattern: /FISHERINV\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// MODE.SNGL関数（最頻値・単一）
+export const MODE_SNGL: CustomFormula = {
+  name: 'MODE.SNGL',
+  pattern: /MODE\.SNGL\(([^)]+)\)/i,
+  isSupported: false, // 手動実装
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length === 0) return FormulaError.NA;
+    
+    const frequency: { [key: number]: number } = {};
+    numbers.forEach(num => {
+      frequency[num] = (frequency[num] || 0) + 1;
+    });
+    
+    let maxCount = 0;
+    let mode = null;
+    
+    for (const [num, count] of Object.entries(frequency)) {
+      if (count > maxCount && count >= 2) {
+        maxCount = count;
+        mode = parseFloat(num);
+      }
+    }
+    
+    if (maxCount < 2) return FormulaError.NA;
+    return mode;
+  }
+};
+
+// MODE.MULT関数（最頻値・複数）- 簡略化実装
+export const MODE_MULT: CustomFormula = {
+  name: 'MODE.MULT',
+  pattern: /MODE\.MULT\(([^)]+)\)/i,
+  isSupported: false, // 手動実装
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length === 0) return FormulaError.NA;
+    
+    const frequency: { [key: number]: number } = {};
+    numbers.forEach(num => {
+      frequency[num] = (frequency[num] || 0) + 1;
+    });
+    
+    let maxCount = 0;
+    for (const count of Object.values(frequency)) {
+      if (count > maxCount) maxCount = count;
+    }
+    
+    if (maxCount < 2) return FormulaError.NA;
+    
+    const modes = Object.keys(frequency)
+      .filter(key => frequency[parseFloat(key)] === maxCount)
+      .map(key => parseFloat(key))
+      .sort((a, b) => a - b);
+    
+    // 複数値を返すのは複雑なので、最小値を返す
+    return modes[0];
+  }
+};
+
+// RANK.EQ関数（順位・同順位は最小）
+export const RANK_EQ: CustomFormula = {
+  name: 'RANK.EQ',
+  pattern: /RANK\.EQ\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: false, // 手動実装
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const rangeRef = matches[2].trim();
+    const orderRef = matches[3] ? matches[3].trim() : '0';
+    
+    let value: number, order: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (orderRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(orderRef, context);
+      order = parseInt(String(cellValue ?? '0'));
+    } else {
+      order = parseInt(orderRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NA;
+    
+    const sorted = order === 1 
+      ? numbers.sort((a, b) => a - b) 
+      : numbers.sort((a, b) => b - a);
+    
+    const rank = sorted.findIndex(num => num === value) + 1;
+    return rank === 0 ? FormulaError.NA : rank;
+  }
+};
+
+// RANK.AVG関数（順位・同順位は平均）
+export const RANK_AVG: CustomFormula = {
+  name: 'RANK.AVG',
+  pattern: /RANK\.AVG\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: false, // 手動実装
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const rangeRef = matches[2].trim();
+    const orderRef = matches[3] ? matches[3].trim() : '0';
+    
+    let value: number, order: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (orderRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(orderRef, context);
+      order = parseInt(String(cellValue ?? '0'));
+    } else {
+      order = parseInt(orderRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NA;
+    
+    const sorted = order === 1 
+      ? numbers.sort((a, b) => a - b) 
+      : numbers.sort((a, b) => b - a);
+    
+    const indices = sorted.reduce((acc: number[], num, index) => {
+      if (num === value) acc.push(index + 1);
+      return acc;
+    }, []);
+    
+    if (indices.length === 0) return FormulaError.NA;
+    
+    const avgRank = indices.reduce((sum, rank) => sum + rank, 0) / indices.length;
+    return avgRank;
+  }
+};
