@@ -34,25 +34,162 @@ function parseArgumentsToNumbers(args: string, context: FormulaContext): number[
   return values;
 }
 
+// 条件を評価するユーティリティ関数
+function evaluateCondition(value: unknown, condition: string): boolean {
+  // 条件を解析（例: ">5", ">=10", "<>0", "text"など）
+  const stringValue = String(value);
+  const numericValue = Number(value);
+  
+  // 数値比較の正規表現
+  const numericConditionMatch = condition.match(/^(>=|<=|<>|>|<|=)?(.+)$/);
+  if (numericConditionMatch) {
+    const [, operator, operandStr] = numericConditionMatch;
+    const operand = Number(operandStr);
+    
+    if (!isNaN(numericValue) && !isNaN(operand)) {
+      switch (operator) {
+        case '>': return numericValue > operand;
+        case '<': return numericValue < operand;
+        case '>=': return numericValue >= operand;
+        case '<=': return numericValue <= operand;
+        case '<>': return numericValue !== operand;
+        case '=':
+        case undefined: return numericValue === operand;
+        default: return false;
+      }
+    }
+  }
+  
+  // 文字列の完全一致
+  if (condition.startsWith('"') && condition.endsWith('"')) {
+    const conditionText = condition.slice(1, -1);
+    return stringValue === conditionText;
+  }
+  
+  // ワイルドカード対応（*と?）
+  if (condition.includes('*') || condition.includes('?')) {
+    const regex = new RegExp(
+      '^' + condition
+        .replace(/\*/g, '.*')
+        .replace(/\?/g, '.')
+        .replace(/[.+^${}()|[\]\\]/g, '\\$&') + '$',
+      'i'
+    );
+    return regex.test(stringValue);
+  }
+  
+  // デフォルトは文字列の完全一致
+  return stringValue === condition;
+}
+
 // SUMIF関数の実装
 export const SUMIF: CustomFormula = {
   name: 'SUMIF',
-  pattern: /SUMIF\(([^,]+),\s*"([^"]+)",\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /SUMIF\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, range, criteria, sumRange] = matches;
+    
+    try {
+      // 範囲の値を取得
+      const rangeValues = getCellRangeValues(range.trim(), context);
+      
+      // 合計範囲が指定されていない場合は検索範囲と同じ
+      const sumRangeValues = sumRange 
+        ? getCellRangeValues(sumRange.trim(), context)
+        : rangeValues;
+      
+      if (rangeValues.length !== sumRangeValues.length) {
+        return FormulaError.VALUE;
+      }
+      
+      // 条件文字列を処理（引用符を除去）
+      const cleanCriteria = criteria.replace(/^["']|["']$/g, '');
+      
+      let sum = 0;
+      for (let i = 0; i < rangeValues.length; i++) {
+        if (evaluateCondition(rangeValues[i], cleanCriteria)) {
+          const value = Number(sumRangeValues[i]);
+          if (!isNaN(value)) {
+            sum += value;
+          }
+        }
+      }
+      
+      return sum;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // COUNTIF関数の実装
 export const COUNTIF: CustomFormula = {
   name: 'COUNTIF',
-  pattern: /COUNTIF\(([^,]+),\s*"([^"]+)"\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /COUNTIF\(([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, range, criteria] = matches;
+    
+    try {
+      // 範囲の値を取得
+      const rangeValues = getCellRangeValues(range.trim(), context);
+      
+      // 条件文字列を処理（引用符を除去）
+      const cleanCriteria = criteria.replace(/^["']|["']$/g, '');
+      
+      let count = 0;
+      for (const value of rangeValues) {
+        if (evaluateCondition(value, cleanCriteria)) {
+          count++;
+        }
+      }
+      
+      return count;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // AVERAGEIF関数の実装
 export const AVERAGEIF: CustomFormula = {
   name: 'AVERAGEIF',
-  pattern: /AVERAGEIF\(([^,]+),\s*"([^"]+)",\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /AVERAGEIF\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, range, criteria, averageRange] = matches;
+    
+    try {
+      // 範囲の値を取得
+      const rangeValues = getCellRangeValues(range.trim(), context);
+      
+      // 平均範囲が指定されていない場合は検索範囲と同じ
+      const avgRangeValues = averageRange 
+        ? getCellRangeValues(averageRange.trim(), context)
+        : rangeValues;
+      
+      if (rangeValues.length !== avgRangeValues.length) {
+        return FormulaError.VALUE;
+      }
+      
+      // 条件文字列を処理（引用符を除去）
+      const cleanCriteria = criteria.replace(/^["']|["']$/g, '');
+      
+      let sum = 0;
+      let count = 0;
+      for (let i = 0; i < rangeValues.length; i++) {
+        if (evaluateCondition(rangeValues[i], cleanCriteria)) {
+          const value = Number(avgRangeValues[i]);
+          if (!isNaN(value)) {
+            sum += value;
+            count++;
+          }
+        }
+      }
+      
+      return count > 0 ? sum / count : FormulaError.DIV0;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // SUM関数の実装

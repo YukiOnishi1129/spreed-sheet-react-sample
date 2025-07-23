@@ -1,62 +1,113 @@
 // 情報関数の実装
 
-import type { CustomFormula } from './types';
+import type { CustomFormula, FormulaContext } from './types';
+import { FormulaError } from './types';
 import { getCellValue } from './utils';
 
 // ISBLANK関数の実装（空白セルか判定）
 export const ISBLANK: CustomFormula = {
   name: 'ISBLANK',
   pattern: /ISBLANK\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return value === null || value === undefined || value === '';
+  }
 };
 
 // ISERROR関数の実装（エラー値か判定）
 export const ISERROR: CustomFormula = {
   name: 'ISERROR',
   pattern: /ISERROR\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return typeof value === 'string' && value.startsWith('#') && value.endsWith('!');
+  }
 };
 
 // ISNA関数の実装（#N/Aエラーか判定）
 export const ISNA: CustomFormula = {
   name: 'ISNA',
   pattern: /ISNA\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return value === FormulaError.NA;
+  }
 };
 
 // ISTEXT関数の実装（文字列か判定）
 export const ISTEXT: CustomFormula = {
   name: 'ISTEXT',
   pattern: /ISTEXT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return typeof value === 'string' && !(value.startsWith('#') && value.endsWith('!'));
+  }
 };
 
 // ISNUMBER関数の実装（数値か判定）
 export const ISNUMBER: CustomFormula = {
   name: 'ISNUMBER',
   pattern: /ISNUMBER\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return typeof value === 'number' && !isNaN(value);
+  }
 };
 
 // ISLOGICAL関数の実装（論理値か判定）
 export const ISLOGICAL: CustomFormula = {
   name: 'ISLOGICAL',
   pattern: /ISLOGICAL\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return typeof value === 'boolean';
+  }
 };
 
 // ISEVEN関数の実装（偶数か判定）
 export const ISEVEN: CustomFormula = {
   name: 'ISEVEN',
   pattern: /ISEVEN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context) ?? valueRef;
+    const num = Number(value);
+    
+    if (isNaN(num)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.floor(num) % 2 === 0;
+  }
 };
 
 // ISODD関数の実装（奇数か判定）
 export const ISODD: CustomFormula = {
   name: 'ISODD',
   pattern: /ISODD\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context) ?? valueRef;
+    const num = Number(value);
+    
+    if (isNaN(num)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.floor(num) % 2 !== 0;
+  }
 };
 
 // TYPE関数の実装（データ型を返す）

@@ -8,84 +8,420 @@ import { getCellValue, getCellRangeValues } from './utils';
 export const CONCATENATE: CustomFormula = {
   name: 'CONCATENATE',
   pattern: /CONCATENATE\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let result = '';
+    
+    for (const part of parts) {
+      let value: string;
+      if (part.match(/^[A-Z]+\d+$/)) {
+        value = String(getCellValue(part, context) ?? '');
+      } else if (part.startsWith('"') && part.endsWith('"')) {
+        value = part.slice(1, -1);
+      } else {
+        value = String(part);
+      }
+      result += value;
+    }
+    
+    return result;
+  }
 };
 
 // CONCAT関数の実装
 export const CONCAT: CustomFormula = {
   name: 'CONCAT',
   pattern: /CONCAT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let result = '';
+    
+    for (const part of parts) {
+      // 範囲指定（A1:B2のような形式）かチェック
+      if (part.includes(':')) {
+        const rangeValues = getCellRangeValues(part, context);
+        for (const value of rangeValues) {
+          result += String(value ?? '');
+        }
+      } else {
+        let value: string;
+        if (part.match(/^[A-Z]+\d+$/)) {
+          value = String(getCellValue(part, context) ?? '');
+        } else if (part.startsWith('"') && part.endsWith('"')) {
+          value = part.slice(1, -1);
+        } else {
+          value = String(part);
+        }
+        result += value;
+      }
+    }
+    
+    return result;
+  }
 };
 
 // LEFT関数の実装
 export const LEFT: CustomFormula = {
   name: 'LEFT',
-  pattern: /LEFT\(([^,]+),\s*(\d+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /LEFT\(([^,]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef, numCharsRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    let numChars = 1; // デフォルト値
+    if (numCharsRef) {
+      if (numCharsRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(numCharsRef, context);
+        numChars = parseInt(String(cellValue ?? '1'));
+      } else {
+        numChars = parseInt(numCharsRef);
+      }
+    }
+    
+    if (isNaN(numChars) || numChars < 0) {
+      return FormulaError.VALUE;
+    }
+    
+    return text.substring(0, numChars);
+  }
 };
 
 // RIGHT関数の実装
 export const RIGHT: CustomFormula = {
   name: 'RIGHT',
-  pattern: /RIGHT\(([^,]+),\s*(\d+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /RIGHT\(([^,]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef, numCharsRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    let numChars = 1; // デフォルト値
+    if (numCharsRef) {
+      if (numCharsRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(numCharsRef, context);
+        numChars = parseInt(String(cellValue ?? '1'));
+      } else {
+        numChars = parseInt(numCharsRef);
+      }
+    }
+    
+    if (isNaN(numChars) || numChars < 0) {
+      return FormulaError.VALUE;
+    }
+    
+    return text.substring(Math.max(0, text.length - numChars));
+  }
 };
 
 // MID関数の実装
 export const MID: CustomFormula = {
   name: 'MID',
-  pattern: /MID\(([^,]+),\s*(\d+),\s*(\d+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /MID\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef, startNumRef, numCharsRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    let startNum: number;
+    if (startNumRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(startNumRef, context);
+      startNum = parseInt(String(cellValue ?? '1'));
+    } else {
+      startNum = parseInt(startNumRef);
+    }
+    
+    let numChars: number;
+    if (numCharsRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numCharsRef, context);
+      numChars = parseInt(String(cellValue ?? '0'));
+    } else {
+      numChars = parseInt(numCharsRef);
+    }
+    
+    if (isNaN(startNum) || isNaN(numChars) || startNum < 1 || numChars < 0) {
+      return FormulaError.VALUE;
+    }
+    
+    return text.substring(startNum - 1, startNum - 1 + numChars);
+  }
 };
 
 // LEN関数の実装
 export const LEN: CustomFormula = {
   name: 'LEN',
   pattern: /LEN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    return text.length;
+  }
 };
 
 // UPPER関数の実装
 export const UPPER: CustomFormula = {
   name: 'UPPER',
   pattern: /UPPER\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    return text.toUpperCase();
+  }
 };
 
 // LOWER関数の実装
 export const LOWER: CustomFormula = {
   name: 'LOWER',
   pattern: /LOWER\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    return text.toLowerCase();
+  }
 };
 
 // TRIM関数の実装
 export const TRIM: CustomFormula = {
   name: 'TRIM',
   pattern: /TRIM\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    // 先頭と末尾の空白を削除し、複数の連続する空白を単一の空白に変換
+    return text.replace(/\s+/g, ' ').trim();
+  }
 };
 
 // SUBSTITUTE関数の実装
 export const SUBSTITUTE: CustomFormula = {
   name: 'SUBSTITUTE',
-  pattern: /SUBSTITUTE\(([^,]+),\s*"([^"]*)",\s*"([^"]*)"(?:,\s*(\d+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /SUBSTITUTE\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef, oldTextRef, newTextRef, instanceNumRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    let oldText: string;
+    if (oldTextRef.startsWith('"') && oldTextRef.endsWith('"')) {
+      oldText = oldTextRef.slice(1, -1);
+    } else if (oldTextRef.match(/^[A-Z]+\d+$/)) {
+      oldText = String(getCellValue(oldTextRef, context) ?? '');
+    } else {
+      oldText = String(oldTextRef);
+    }
+    
+    let newText: string;
+    if (newTextRef.startsWith('"') && newTextRef.endsWith('"')) {
+      newText = newTextRef.slice(1, -1);
+    } else if (newTextRef.match(/^[A-Z]+\d+$/)) {
+      newText = String(getCellValue(newTextRef, context) ?? '');
+    } else {
+      newText = String(newTextRef);
+    }
+    
+    // インスタンス番号の取得
+    let instanceNum: number | undefined;
+    if (instanceNumRef) {
+      if (instanceNumRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(instanceNumRef, context);
+        instanceNum = parseInt(String(cellValue ?? '1'));
+      } else {
+        instanceNum = parseInt(instanceNumRef);
+      }
+      
+      if (isNaN(instanceNum) || instanceNum < 1) {
+        return FormulaError.VALUE;
+      }
+    }
+    
+    if (instanceNum) {
+      // 特定のインスタンスのみ置換
+      let count = 0;
+      let pos = 0;
+      while ((pos = text.indexOf(oldText, pos)) !== -1) {
+        count++;
+        if (count === instanceNum) {
+          return text.substring(0, pos) + newText + text.substring(pos + oldText.length);
+        }
+        pos += oldText.length;
+      }
+      return text; // 特定のインスタンスが見つからない場合
+    } else {
+      // すべて置換
+      return text.replaceAll(oldText, newText);
+    }
+  }
 };
 
 // FIND関数の実装
 export const FIND: CustomFormula = {
   name: 'FIND',
-  pattern: /FIND\(([^,]+),\s*([^,)]+)(?:,\s*(\d+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /FIND\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, findTextRef, withinTextRef, startNumRef] = matches;
+    
+    let findText: string;
+    if (findTextRef.startsWith('"') && findTextRef.endsWith('"')) {
+      findText = findTextRef.slice(1, -1);
+    } else if (findTextRef.match(/^[A-Z]+\d+$/)) {
+      findText = String(getCellValue(findTextRef, context) ?? '');
+    } else {
+      findText = String(findTextRef);
+    }
+    
+    let withinText: string;
+    if (withinTextRef.match(/^[A-Z]+\d+$/)) {
+      withinText = String(getCellValue(withinTextRef, context) ?? '');
+    } else if (withinTextRef.startsWith('"') && withinTextRef.endsWith('"')) {
+      withinText = withinTextRef.slice(1, -1);
+    } else {
+      withinText = String(withinTextRef);
+    }
+    
+    let startNum = 1; // デフォルト値
+    if (startNumRef) {
+      if (startNumRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(startNumRef, context);
+        startNum = parseInt(String(cellValue ?? '1'));
+      } else {
+        startNum = parseInt(startNumRef);
+      }
+    }
+    
+    if (isNaN(startNum) || startNum < 1) {
+      return FormulaError.VALUE;
+    }
+    
+    const index = withinText.indexOf(findText, startNum - 1);
+    if (index === -1) {
+      return FormulaError.VALUE;
+    }
+    
+    return index + 1; // 1ベースで返す
+  }
 };
 
 // SEARCH関数の実装
 export const SEARCH: CustomFormula = {
   name: 'SEARCH',
-  pattern: /SEARCH\(([^,]+),\s*([^,)]+)(?:,\s*(\d+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /SEARCH\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, findTextRef, withinTextRef, startNumRef] = matches;
+    
+    let findText: string;
+    if (findTextRef.startsWith('"') && findTextRef.endsWith('"')) {
+      findText = findTextRef.slice(1, -1).toLowerCase();
+    } else if (findTextRef.match(/^[A-Z]+\d+$/)) {
+      findText = String(getCellValue(findTextRef, context) ?? '').toLowerCase();
+    } else {
+      findText = String(findTextRef).toLowerCase();
+    }
+    
+    let withinText: string;
+    if (withinTextRef.match(/^[A-Z]+\d+$/)) {
+      withinText = String(getCellValue(withinTextRef, context) ?? '').toLowerCase();
+    } else if (withinTextRef.startsWith('"') && withinTextRef.endsWith('"')) {
+      withinText = withinTextRef.slice(1, -1).toLowerCase();
+    } else {
+      withinText = String(withinTextRef).toLowerCase();
+    }
+    
+    let startNum = 1; // デフォルト値
+    if (startNumRef) {
+      if (startNumRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(startNumRef, context);
+        startNum = parseInt(String(cellValue ?? '1'));
+      } else {
+        startNum = parseInt(startNumRef);
+      }
+    }
+    
+    if (isNaN(startNum) || startNum < 1) {
+      return FormulaError.VALUE;
+    }
+    
+    // ワイルドカード処理（?と*）
+    const pattern = findText
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // エスケープ
+      .replace(/\\\?/g, '.') // ?を.に変換
+      .replace(/\\\*/g, '.*'); // *を.*に変換
+    
+    const regex = new RegExp(pattern);
+    const searchText = withinText.substring(startNum - 1);
+    const match = searchText.match(regex);
+    
+    if (!match?.index) {
+      return FormulaError.VALUE;
+    }
+    
+    return startNum + match.index; // 1ベースで返す
+  }
 };
 
 // TEXTJOIN関数の実装（手動実装が必要）
@@ -160,7 +496,21 @@ export const SPLIT: CustomFormula = {
 export const PROPER: CustomFormula = {
   name: 'PROPER',
   pattern: /PROPER\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    // 各単語の先頭を大文字に、他を小文字に変換
+    return text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+  }
 };
 
 // VALUE関数の実装（文字列を数値に変換） - stringFunctions.tsから移動
@@ -180,14 +530,89 @@ export const VALUE: CustomFormula = {
 export const TEXT: CustomFormula = {
   name: 'TEXT',
   pattern: /TEXT\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef, formatRef] = matches;
+    
+    // 値を取得
+    let value: number | string;
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = (cellValue as number | string) ?? 0;
+    } else {
+      value = parseFloat(valueRef);
+      if (isNaN(value)) {
+        value = valueRef;
+      }
+    }
+    
+    // フォーマットを取得
+    let format: string;
+    if (formatRef.startsWith('"') && formatRef.endsWith('"')) {
+      format = formatRef.slice(1, -1);
+    } else if (formatRef.match(/^[A-Z]+\d+$/)) {
+      format = String(getCellValue(formatRef, context) ?? '');
+    } else {
+      format = String(formatRef);
+    }
+    
+    // 簡単なフォーマット処理
+    if (typeof value === 'number') {
+      if (format.includes('#,##0')) {
+        return value.toLocaleString();
+      } else if (format.includes('0.00')) {
+        return value.toFixed(2);
+      } else if (format.includes('0.0')) {
+        return value.toFixed(1);
+      } else if (format.includes('0')) {
+        return Math.round(value).toString();
+      } else if (format.includes('%')) {
+        return (value * 100).toFixed(0) + '%';
+      }
+    }
+    
+    return String(value);
+  }
 };
 
 // REPT関数の実装（文字列繰り返し） - stringFunctions.tsから移動
 export const REPT: CustomFormula = {
   name: 'REPT',
   pattern: /REPT\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef, numberTimesRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    let numberTimes: number;
+    if (numberTimesRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numberTimesRef, context);
+      numberTimes = parseInt(String(cellValue ?? '0'));
+    } else {
+      numberTimes = parseInt(numberTimesRef);
+    }
+    
+    if (isNaN(numberTimes) || numberTimes < 0) {
+      return FormulaError.VALUE;
+    }
+    
+    if (numberTimes === 0) {
+      return '';
+    }
+    
+    // 最大長を制限してメモリ不足を防ぐ
+    if (text.length * numberTimes > 32767) {
+      return FormulaError.VALUE;
+    }
+    
+    return text.repeat(numberTimes);
+  }
 };
 
 // REPLACE関数の実装（位置指定文字置換）
@@ -246,35 +671,125 @@ export const REPLACE: CustomFormula = {
 export const CHAR: CustomFormula = {
   name: 'CHAR',
   pattern: /CHAR\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    let number: number;
+    if (numberRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numberRef, context);
+      number = parseInt(String(cellValue ?? '0'));
+    } else {
+      number = parseInt(numberRef);
+    }
+    
+    if (isNaN(number) || number < 1 || number > 255) {
+      return FormulaError.VALUE;
+    }
+    
+    return String.fromCharCode(number);
+  }
 };
 
 // CODE関数の実装（文字から文字コードを返す）
 export const CODE: CustomFormula = {
   name: 'CODE',
   pattern: /CODE\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    if (text.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    return text.charCodeAt(0);
+  }
 };
 
 // EXACT関数の実装（文字列が同一か判定）
 export const EXACT: CustomFormula = {
   name: 'EXACT',
   pattern: /EXACT\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, text1Ref, text2Ref] = matches;
+    
+    let text1: string;
+    if (text1Ref.match(/^[A-Z]+\d+$/)) {
+      text1 = String(getCellValue(text1Ref, context) ?? '');
+    } else if (text1Ref.startsWith('"') && text1Ref.endsWith('"')) {
+      text1 = text1Ref.slice(1, -1);
+    } else {
+      text1 = String(text1Ref);
+    }
+    
+    let text2: string;
+    if (text2Ref.match(/^[A-Z]+\d+$/)) {
+      text2 = String(getCellValue(text2Ref, context) ?? '');
+    } else if (text2Ref.startsWith('"') && text2Ref.endsWith('"')) {
+      text2 = text2Ref.slice(1, -1);
+    } else {
+      text2 = String(text2Ref);
+    }
+    
+    return text1 === text2;
+  }
 };
 
 // CLEAN関数の実装（印刷不可文字を削除）
 export const CLEAN: CustomFormula = {
   name: 'CLEAN',
   pattern: /CLEAN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    // 印刷不可文字（文字コード 0-31 および 127）を削除
+    return text.split('').filter(char => {
+      const code = char.charCodeAt(0);
+      return !(code >= 0 && code <= 31) && code !== 127;
+    }).join('');
+  }
 };
 
 // T関数の実装（文字列を返す）
 export const T: CustomFormula = {
   name: 'T',
   pattern: /T\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    let value: unknown;
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      value = getCellValue(valueRef, context);
+    } else if (valueRef.startsWith('"') && valueRef.endsWith('"')) {
+      value = valueRef.slice(1, -1);
+    } else {
+      value = valueRef;
+    }
+    
+    // 文字列の場合はそのまま返し、それ以外は空文字列を返す
+    if (typeof value === 'string') {
+      return value;
+    }
+    
+    return '';
+  }
 };
 
 // FIXED関数の実装（固定小数点表示）
@@ -332,28 +847,156 @@ export const FIXED: CustomFormula = {
 export const NUMBERVALUE: CustomFormula = {
   name: 'NUMBERVALUE',
   pattern: /NUMBERVALUE\(([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef, decimalSeparatorRef, groupSeparatorRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    let decimalSeparator = '.';
+    if (decimalSeparatorRef) {
+      if (decimalSeparatorRef.startsWith('"') && decimalSeparatorRef.endsWith('"')) {
+        decimalSeparator = decimalSeparatorRef.slice(1, -1);
+      } else if (decimalSeparatorRef.match(/^[A-Z]+\d+$/)) {
+        decimalSeparator = String(getCellValue(decimalSeparatorRef, context) ?? '.');
+      } else {
+        decimalSeparator = decimalSeparatorRef;
+      }
+    }
+    
+    let groupSeparator = ',';
+    if (groupSeparatorRef) {
+      if (groupSeparatorRef.startsWith('"') && groupSeparatorRef.endsWith('"')) {
+        groupSeparator = groupSeparatorRef.slice(1, -1);
+      } else if (groupSeparatorRef.match(/^[A-Z]+\d+$/)) {
+        groupSeparator = String(getCellValue(groupSeparatorRef, context) ?? ',');
+      } else {
+        groupSeparator = groupSeparatorRef;
+      }
+    }
+    
+    // グループ区切り文字を削除し、小数点を正規化
+    let normalizedText = text;
+    if (groupSeparator) {
+      normalizedText = normalizedText.replace(new RegExp('\\' + groupSeparator, 'g'), '');
+    }
+    if (decimalSeparator !== '.') {
+      normalizedText = normalizedText.replace(decimalSeparator, '.');
+    }
+    
+    // パーセント記号の処理
+    let isPercentage = false;
+    if (normalizedText.includes('%')) {
+      isPercentage = true;
+      normalizedText = normalizedText.replace('%', '');
+    }
+    
+    const number = parseFloat(normalizedText);
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    return isPercentage ? number / 100 : number;
+  }
 };
 
 // DOLLAR関数の実装（通貨書式に変換）
 export const DOLLAR: CustomFormula = {
   name: 'DOLLAR',
   pattern: /DOLLAR\(([^,]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, decimalsRef] = matches;
+    
+    let number: number;
+    if (numberRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numberRef, context);
+      number = parseFloat(String(cellValue ?? '0'));
+    } else {
+      number = parseFloat(numberRef);
+    }
+    
+    let decimals = 2; // デフォルト値
+    if (decimalsRef) {
+      if (decimalsRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(decimalsRef, context);
+        decimals = parseInt(String(cellValue ?? '2'));
+      } else {
+        decimals = parseInt(decimalsRef);
+      }
+    }
+    
+    if (isNaN(number) || isNaN(decimals)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (decimals < 0) {
+      decimals = 0;
+    }
+    
+    // ドルサインとカンマ区切り付きのフォーマット
+    const formatted = number.toFixed(decimals);
+    const parts = formatted.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    return '$' + parts.join('.');
+  }
 };
 
 // UNICHAR関数の実装（Unicode文字を返す）
 export const UNICHAR: CustomFormula = {
   name: 'UNICHAR',
   pattern: /UNICHAR\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    let number: number;
+    if (numberRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numberRef, context);
+      number = parseInt(String(cellValue ?? '0'));
+    } else {
+      number = parseInt(numberRef);
+    }
+    
+    if (isNaN(number) || number < 1 || number > 1114111) {
+      return FormulaError.VALUE;
+    }
+    
+    try {
+      return String.fromCodePoint(number);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // UNICODE関数の実装（Unicode値を返す）
 export const UNICODE: CustomFormula = {
   name: 'UNICODE',
   pattern: /UNICODE\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = String(textRef);
+    }
+    
+    if (text.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    return text.codePointAt(0) ?? 0;
+  }
 };
 
 // LENB関数の実装（バイト数を返す）

@@ -4,32 +4,142 @@ import type { CustomFormula, FormulaContext, FormulaResult } from './types';
 import { FormulaError } from './types';
 import { getCellValue } from './utils';
 
+// 引数を論理値に変換するユーティリティ関数
+function parseArgumentsToLogical(args: string, context: FormulaContext): boolean[] {
+  const values: boolean[] = [];
+  
+  // 引数をカンマで分割
+  const parts = args.split(',').map(part => part.trim());
+  
+  for (const part of parts) {
+    const cellValue = getCellValue(part, context) ?? part;
+    
+    // 数値の場合：0はfalse、それ以外はtrue
+    if (typeof cellValue === 'number') {
+      values.push(cellValue !== 0);
+    }
+    // 文字列の場合："TRUE"/"FALSE"または"1"/"0"をチェック
+    else if (typeof cellValue === 'string') {
+      const str = cellValue.toLowerCase();
+      if (str === 'true' || str === '1') {
+        values.push(true);
+      } else if (str === 'false' || str === '0') {
+        values.push(false);
+      } else {
+        // 文字列は一般的にtrueとして扱う（空文字列以外）
+        values.push(cellValue !== '');
+      }
+    }
+    // 論理値の場合
+    else if (typeof cellValue === 'boolean') {
+      values.push(cellValue);
+    }
+    // nullまたはundefinedの場合
+    else if (cellValue === null || cellValue === undefined) {
+      values.push(false);
+    }
+    else {
+      values.push(Boolean(cellValue));
+    }
+  }
+  
+  return values;
+}
+
+// 単一の値を論理値に変換
+function toLogical(value: unknown): boolean {
+  if (typeof value === 'number') {
+    return value !== 0;
+  }
+  if (typeof value === 'string') {
+    const str = value.toLowerCase();
+    if (str === 'true' || str === '1') return true;
+    if (str === 'false' || str === '0') return false;
+    return value !== '';
+  }
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (value === null || value === undefined) {
+    return false;
+  }
+  return Boolean(value);
+}
+
 // IF関数の実装
 export const IF: CustomFormula = {
   name: 'IF',
   pattern: /IF\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, conditionRef, trueValueRef, falseValueRef] = matches;
+    
+    const conditionValue = getCellValue(conditionRef, context) ?? conditionRef;
+    const condition = toLogical(conditionValue);
+    
+    if (condition) {
+      const trueValue = getCellValue(trueValueRef, context) ?? trueValueRef;
+      // 文字列の引用符を除去
+      if (typeof trueValue === 'string' && trueValue.startsWith('"') && trueValue.endsWith('"')) {
+        return trueValue.slice(1, -1);
+      }
+      return trueValue as FormulaResult;
+    } else {
+      const falseValue = getCellValue(falseValueRef, context) ?? falseValueRef;
+      // 文字列の引用符を除去
+      if (typeof falseValue === 'string' && falseValue.startsWith('"') && falseValue.endsWith('"')) {
+        return falseValue.slice(1, -1);
+      }
+      return falseValue as FormulaResult;
+    }
+  }
 };
 
 // AND関数の実装
 export const AND: CustomFormula = {
   name: 'AND',
   pattern: /AND\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const logicalValues = parseArgumentsToLogical(args, context);
+    
+    if (logicalValues.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    // すべてがtrueの場合のみtrue
+    return logicalValues.every(value => value === true);
+  }
 };
 
 // OR関数の実装
 export const OR: CustomFormula = {
   name: 'OR',
   pattern: /OR\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const logicalValues = parseArgumentsToLogical(args, context);
+    
+    if (logicalValues.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    // いずれかがtrueの場合にtrue
+    return logicalValues.some(value => value === true);
+  }
 };
 
 // NOT関数の実装
 export const NOT: CustomFormula = {
   name: 'NOT',
   pattern: /NOT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = getCellValue(valueRef, context) ?? valueRef;
+    const logicalValue = toLogical(value);
+    
+    return !logicalValue;
+  }
 };
 
 // IFS関数の実装（手動実装が必要）

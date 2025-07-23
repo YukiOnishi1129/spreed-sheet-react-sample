@@ -14,7 +14,53 @@ let globalDateConfig: DateConfig = {
 };
 
 /**
+ * よく使用されるタイムゾーンの定数
+ */
+export const TIMEZONES = {
+  // 日本
+  JAPAN: 'Asia/Tokyo',
+  
+  // アメリカ
+  US_EASTERN: 'America/New_York',      // ニューヨーク、フロリダ等
+  US_CENTRAL: 'America/Chicago',       // シカゴ、テキサス等
+  US_MOUNTAIN: 'America/Denver',       // デンバー、コロラド等
+  US_PACIFIC: 'America/Los_Angeles',   // ロサンゼルス、シアトル等
+  US_ALASKA: 'America/Anchorage',      // アラスカ
+  US_HAWAII: 'Pacific/Honolulu',       // ハワイ
+  
+  // ヨーロッパ
+  UK: 'Europe/London',
+  FRANCE: 'Europe/Paris', 
+  GERMANY: 'Europe/Berlin',
+  
+  // その他
+  AUSTRALIA_SYDNEY: 'Australia/Sydney',
+  CHINA: 'Asia/Shanghai',
+  KOREA: 'Asia/Seoul',
+  UTC: 'UTC'
+} as const;
+
+/**
  * グローバル日付設定を更新
+ * 
+ * @example
+ * // ニューヨーク時間に設定
+ * setGlobalDateConfig({
+ *   timezone: TIMEZONES.US_EASTERN,
+ *   locale: 'en-US'
+ * });
+ * 
+ * // ロサンゼルス時間に設定
+ * setGlobalDateConfig({
+ *   timezone: TIMEZONES.US_PACIFIC,
+ *   locale: 'en-US'
+ * });
+ * 
+ * // 日本時間に設定
+ * setGlobalDateConfig({
+ *   timezone: TIMEZONES.JAPAN,
+ *   locale: 'ja-JP'
+ * });
  */
 export function setGlobalDateConfig(config: Partial<DateConfig>): void {
   globalDateConfig = { ...globalDateConfig, ...config };
@@ -47,10 +93,11 @@ export function createDateInTimezone(year: number, month: number, day: number, c
     });
     
     const parts = formatter.formatToParts(date);
+    const initialPartsObj: Record<string, string> = {};
     const partsObj: Record<string, string> = parts.reduce((acc, part) => {
       acc[part.type] = part.value;
       return acc;
-    }, {} as Record<string, string>);
+    }, initialPartsObj);
     
     return new Date(
       parseInt(partsObj.year),
@@ -79,10 +126,11 @@ export function formatDate(date: Date, format?: string, config?: DateConfig): st
     // カスタムフォーマット対応
     const formatter = new Intl.DateTimeFormat(cfg.locale, options);
     const parts = formatter.formatToParts(date);
-    const partsObj = parts.reduce((acc, part) => {
+    const initialPartsObj: Record<string, string> = {};
+    const partsObj: Record<string, string> = parts.reduce((acc, part) => {
       acc[part.type] = part.value;
       return acc;
-    }, {} as Record<string, string>);
+    }, initialPartsObj);
     
     return format
       .replace(/YYYY/g, partsObj.year || '')
@@ -229,10 +277,11 @@ export function getDateInTimezone(date: Date, timezone: string): Date {
   });
   
   const parts = formatter.formatToParts(date);
-  const partsObj = parts.reduce((acc, part) => {
+  const initialPartsObj: Record<string, string> = {};
+  const partsObj: Record<string, string> = parts.reduce((acc, part) => {
     acc[part.type] = part.value;
     return acc;
-  }, {} as Record<string, string>);
+  }, initialPartsObj);
   
   return new Date(
     parseInt(partsObj.year),
@@ -449,10 +498,11 @@ export function now(config?: DateConfig): Date {
     });
     
     const parts = formatter.formatToParts(now);
-    const partsObj = parts.reduce((acc, part) => {
+    const initialPartsObj: Record<string, string> = {};
+    const partsObj: Record<string, string> = parts.reduce((acc, part) => {
       acc[part.type] = part.value;
       return acc;
-    }, {} as Record<string, string>);
+    }, initialPartsObj);
     
     return new Date(
       parseInt(partsObj.year),

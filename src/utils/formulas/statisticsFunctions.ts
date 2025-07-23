@@ -40,7 +40,28 @@ function extractNumbersFromRange(rangeRef: string, context: FormulaContext): num
 export const MEDIAN: CustomFormula = {
   name: 'MEDIAN',
   pattern: /MEDIAN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length === 0) {
+      return FormulaError.NUM;
+    }
+    
+    numbers.sort((a, b) => a - b);
+    const mid = Math.floor(numbers.length / 2);
+    
+    if (numbers.length % 2 === 0) {
+      return (numbers[mid - 1] + numbers[mid]) / 2;
+    } else {
+      return numbers[mid];
+    }
+  }
 };
 
 // MODE関数の実装（最頻値）
@@ -77,42 +98,171 @@ export const MODE: CustomFormula = {
 export const COUNTA: CustomFormula = {
   name: 'COUNTA',
   pattern: /COUNTA\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let count = 0;
+    
+    for (const part of parts) {
+      if (part.includes(':')) {
+        // 範囲指定の場合
+        const values = getCellRangeValues(part, context);
+        for (const value of values) {
+          if (value !== null && value !== undefined && value !== '') {
+            count++;
+          }
+        }
+      } else if (part.match(/^[A-Z]+\d+$/)) {
+        // 単一セル参照の場合
+        const cellValue = getCellValue(part, context);
+        if (cellValue !== null && cellValue !== undefined && cellValue !== '') {
+          count++;
+        }
+      } else {
+        // 直接値の場合
+        if (part !== '' && part !== 'null' && part !== 'undefined') {
+          count++;
+        }
+      }
+    }
+    
+    return count;
+  }
 };
 
 // COUNTBLANK関数の実装（空白セルの個数）
 export const COUNTBLANK: CustomFormula = {
   name: 'COUNTBLANK',
   pattern: /COUNTBLANK\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, rangeRef] = matches;
+    
+    if (rangeRef.includes(':')) {
+      // 範囲指定の場合
+      const values = getCellRangeValues(rangeRef, context);
+      let blankCount = 0;
+      
+      for (const value of values) {
+        if (value === null || value === undefined || value === '') {
+          blankCount++;
+        }
+      }
+      
+      return blankCount;
+    } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
+      // 単一セル参照の場合
+      const cellValue = getCellValue(rangeRef, context);
+      return (cellValue === null || cellValue === undefined || cellValue === '') ? 1 : 0;
+    }
+    
+    return 0;
+  }
 };
 
 // STDEV関数の実装（標準偏差・標本）
 export const STDEV: CustomFormula = {
   name: 'STDEV',
   pattern: /STDEV\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length < 2) {
+      return FormulaError.DIV0;
+    }
+    
+    // 標本標準偏差（n-1で割る）
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / (numbers.length - 1);
+    
+    return Math.sqrt(variance);
+  }
 };
 
 // VAR関数の実装（分散・標本）
 export const VAR: CustomFormula = {
   name: 'VAR',
   pattern: /VAR\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length < 2) {
+      return FormulaError.DIV0;
+    }
+    
+    // 標本分散（n-1で割る）
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / (numbers.length - 1);
+    
+    return variance;
+  }
 };
 
 // LARGE関数の実装（k番目に大きい値）
 export const LARGE: CustomFormula = {
   name: 'LARGE',
   pattern: /LARGE\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, rangeRef, kRef] = matches;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    let k: number;
+    if (kRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(kRef, context);
+      k = parseInt(String(cellValue ?? '1'));
+    } else {
+      k = parseInt(kRef);
+    }
+    
+    if (isNaN(k) || k < 1 || k > numbers.length) {
+      return FormulaError.NUM;
+    }
+    
+    // 降順にソート
+    numbers.sort((a, b) => b - a);
+    
+    return numbers[k - 1];
+  }
 };
 
 // SMALL関数の実装（k番目に小さい値）
 export const SMALL: CustomFormula = {
   name: 'SMALL',
   pattern: /SMALL\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, rangeRef, kRef] = matches;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    let k: number;
+    if (kRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(kRef, context);
+      k = parseInt(String(cellValue ?? '1'));
+    } else {
+      k = parseInt(kRef);
+    }
+    
+    if (isNaN(k) || k < 1 || k > numbers.length) {
+      return FormulaError.NUM;
+    }
+    
+    // 昇順にソート
+    numbers.sort((a, b) => a - b);
+    
+    return numbers[k - 1];
+  }
 };
 
 // RANK関数の実装（順位）
@@ -158,16 +308,48 @@ export const RANK: CustomFormula = {
 export const CORREL: CustomFormula = {
   name: 'CORREL',
   pattern: /CORREL\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, array1Ref, array2Ref] = matches;
+    
+    const numbers1 = extractNumbersFromRange(array1Ref, context);
+    const numbers2 = extractNumbersFromRange(array2Ref, context);
+    
+    if (numbers1.length !== numbers2.length || numbers1.length < 2) {
+      return FormulaError.NA;
+    }
+    
+    const n = numbers1.length;
+    const mean1 = numbers1.reduce((sum, num) => sum + num, 0) / n;
+    const mean2 = numbers2.reduce((sum, num) => sum + num, 0) / n;
+    
+    let numerator = 0;
+    let sum1Squared = 0;
+    let sum2Squared = 0;
+    
+    for (let i = 0; i < n; i++) {
+      const diff1 = numbers1[i] - mean1;
+      const diff2 = numbers2[i] - mean2;
+      numerator += diff1 * diff2;
+      sum1Squared += diff1 * diff1;
+      sum2Squared += diff2 * diff2;
+    }
+    
+    const denominator = Math.sqrt(sum1Squared * sum2Squared);
+    
+    if (denominator === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    return numerator / denominator;
+  }
 };
 
 // QUARTILE関数の実装（四分位数）
 export const QUARTILE: CustomFormula = {
   name: 'QUARTILE',
   pattern: /QUARTILE\(([^,]+),\s*([^)]+)\)/i,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const quartRef = matches[2].trim();
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, rangeRef, quartRef] = matches;
     
     let quart: number;
     if (quartRef.match(/^[A-Z]+\d+$/)) {
@@ -177,35 +359,35 @@ export const QUARTILE: CustomFormula = {
       quart = parseInt(quartRef);
     }
     
-    if (isNaN(quart) || quart < 0 || quart > 4) return FormulaError.NUM;
+    if (isNaN(quart) || quart < 0 || quart > 4) {
+      return FormulaError.NUM;
+    }
     
     const numbers = extractNumbersFromRange(rangeRef, context);
-    if (numbers.length === 0) return FormulaError.NUM;
+    if (numbers.length === 0) {
+      return FormulaError.NUM;
+    }
     
-    const sorted = numbers.sort((a, b) => a - b);
-    const n = sorted.length;
+    numbers.sort((a, b) => a - b);
     
     switch (quart) {
-      case 0: 
-        return sorted[0]; // 最小値
-      case 1: {
-        // 第1四分位数
-        const q1Index = (n - 1) * 0.25;
-        return sorted[Math.floor(q1Index)] + (q1Index % 1) * (sorted[Math.ceil(q1Index)] - sorted[Math.floor(q1Index)]);
+      case 0: // 最小値
+        return numbers[0];
+      case 1: // 第一四分位数
+        return numbers[Math.floor((numbers.length - 1) * 0.25)];
+      case 2: { // 中央値
+        const mid = Math.floor(numbers.length / 2);
+        if (numbers.length % 2 === 0) {
+          return (numbers[mid - 1] + numbers[mid]) / 2;
+        } else {
+          return numbers[mid];
+        }
       }
-      case 2: {
-        // 中央値
-        const middle = Math.floor(n / 2);
-        return n % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
-      }
-      case 3: {
-        // 第3四分位数
-        const q3Index = (n - 1) * 0.75;
-        return sorted[Math.floor(q3Index)] + (q3Index % 1) * (sorted[Math.ceil(q3Index)] - sorted[Math.floor(q3Index)]);
-      }
-      case 4: 
-        return sorted[n - 1]; // 最大値
-      default: 
+      case 3: // 第三四分位数
+        return numbers[Math.floor((numbers.length - 1) * 0.75)];
+      case 4: // 最大値
+        return numbers[numbers.length - 1];
+      default:
         return FormulaError.NUM;
     }
   }
