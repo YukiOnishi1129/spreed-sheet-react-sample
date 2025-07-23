@@ -815,3 +815,91 @@ export const SEQUENCE: CustomFormula = {
     return result;
   }
 };
+
+// 双曲線逆正弦（ASINH）
+export const ASINH: CustomFormula = {
+  name: 'ASINH',
+  pattern: /ASINH\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 双曲線逆余弦（ACOSH）
+export const ACOSH: CustomFormula = {
+  name: 'ACOSH',
+  pattern: /ACOSH\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 双曲線逆正接（ATANH）
+export const ATANH: CustomFormula = {
+  name: 'ATANH',
+  pattern: /ATANH\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 余割（CSC）
+export const CSC: CustomFormula = {
+  name: 'CSC',
+  pattern: /CSC\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 正割（SEC）
+export const SEC: CustomFormula = {
+  name: 'SEC',
+  pattern: /SEC\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 余接（COT）
+export const COT: CustomFormula = {
+  name: 'COT',
+  pattern: /COT\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 逆余接（ACOT）
+export const ACOT: CustomFormula = {
+  name: 'ACOT',
+  pattern: /ACOT\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 双曲線余割（CSCH）
+export const CSCH: CustomFormula = {
+  name: 'CSCH',
+  pattern: /CSCH\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 双曲線正割（SECH）
+export const SECH: CustomFormula = {
+  name: 'SECH',
+  pattern: /SECH\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 双曲線余接（COTH）
+export const COTH: CustomFormula = {
+  name: 'COTH',
+  pattern: /COTH\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// 双曲線逆余接（ACOTH）
+export const ACOTH: CustomFormula = {
+  name: 'ACOTH',
+  pattern: /ACOTH\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
