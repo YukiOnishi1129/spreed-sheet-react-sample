@@ -38,11 +38,11 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | CEILING | 基準値の倍数に切り上げ | `=CEILING(数値, 基準値)` | ✅ | 🔴 |
 | FLOOR | 基準値の倍数に切り下げ | `=FLOOR(数値, 基準値)` | ✅ | 🔴 |
 | MOD | 剰余を返す | `=MOD(数値, 除数)` | ✅ | 🔴 |
-| INT | 整数部分を返す | `=INT(数値)` | ✅ | 🔴 |
+| INT | 整数部分を返す | `=INT(数値)` | ✅ | 🟡 |
 | TRUNC | 小数部分を切り捨て | `=TRUNC(数値, [桁数])` | ✅ | 🔴 |
 | SIGN | 数値の符号を返す | `=SIGN(数値)` | ✅ | 🔴 |
-| RAND | 0以上1未満の乱数 | `=RAND()` | ✅ | 🔴 |
-| RANDBETWEEN | 指定範囲の整数乱数 | `=RANDBETWEEN(最小値, 最大値)` | ✅ | 🔴 |
+| RAND | 0以上1未満の乱数 | `=RAND()` | ✅ | 🟡 |
+| RANDBETWEEN | 指定範囲の整数乱数 | `=RANDBETWEEN(最小値, 最大値)` | ✅ | 🟡 |
 | EXP | eのべき乗を計算 | `=EXP(数値)` | ✅ | 🔴 |
 | LN | 自然対数を計算 | `=LN(数値)` | ✅ | 🔴 |
 | LOG | 対数を計算 | `=LOG(数値, [底])` | ✅ | 🔴 |
@@ -54,8 +54,8 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | LCM | 最小公倍数を計算 | `=LCM(数値1, 数値2, ...)` | ✅ | 🔴 |
 | QUOTIENT | 商の整数部分を返す | `=QUOTIENT(被除数, 除数)` | ✅ | 🔴 |
 | MROUND | 倍数に丸める | `=MROUND(数値, 倍数)` | ✅ | 🔴 |
-| SUMSQ | 平方和を計算 | `=SUMSQ(数値1, [数値2], ...)` | ❌ | 🔴 |
-| SUMPRODUCT | 配列の積の和を計算 | `=SUMPRODUCT(配列1, [配列2], ...)` | ❌ | 🔴 |
+| SUMSQ | 平方和を計算 | `=SUMSQ(数値1, [数値2], ...)` | ✅ | 🔴 |
+| SUMPRODUCT | 配列の積の和を計算 | `=SUMPRODUCT(配列1, [配列2], ...)` | ✅ | 🔴 |
 | SUMX2MY2 | x^2-y^2の和を計算 | `=SUMX2MY2(配列x, 配列y)` | ❌ | 🔴 |
 | SUMX2PY2 | x^2+y^2の和を計算 | `=SUMX2PY2(配列x, 配列y)` | ❌ | 🔴 |
 | SUMXMY2 | (x-y)^2の和を計算 | `=SUMXMY2(配列x, 配列y)` | ❌ | 🔴 |
@@ -66,19 +66,19 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | CEILING.PRECISE | 精密な切り上げ | `=CEILING.PRECISE(数値, [基準値])` | ❌ | 🔴 |
 | COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ❌ | 🔴 |
 | DECIMAL | 指定した基数の数値を10進数に変換 | `=DECIMAL(文字列, 基数)` | ❌ | 🔴 |
-| EVEN | 最も近い偶数に切り上げ | `=EVEN(数値)` | ❌ | 🔴 |
-| FACTDOUBLE | 二重階乗を計算 | `=FACTDOUBLE(数値)` | ❌ | 🔴 |
+| EVEN | 最も近い偶数に切り上げ | `=EVEN(数値)` | ✅ | 🔴 |
+| FACTDOUBLE | 二重階乗を計算 | `=FACTDOUBLE(数値)` | ✅ | 🔴 |
 | FLOOR.MATH | 数学的な切り下げ | `=FLOOR.MATH(数値, [基準値], [モード])` | ❌ | 🔴 |
 | FLOOR.PRECISE | 精密な切り下げ | `=FLOOR.PRECISE(数値, [基準値])` | ❌ | 🔴 |
 | ISO.CEILING | ISO標準の切り上げ | `=ISO.CEILING(数値, [基準値])` | ❌ | 🔴 |
 | MULTINOMIAL | 多項係数を計算 | `=MULTINOMIAL(数値1, [数値2], ...)` | ❌ | 🔴 |
-| ODD | 最も近い奇数に切り上げ | `=ODD(数値)` | ❌ | 🔴 |
+| ODD | 最も近い奇数に切り上げ | `=ODD(数値)` | ✅ | 🔴 |
 | PERMUTATIONA | 重複順列を計算 | `=PERMUTATIONA(総数, 選択数)` | ❌ | 🔴 |
 | RANDARRAY | ランダム配列を生成 | `=RANDARRAY([行], [列], [最小値], [最大値], [整数])` | ❌ | 🟡 |  |
-| ROMAN | アラビア数字をローマ数字に変換 | `=ROMAN(数値, [形式])` | ❌ | 🔴 |
+| ROMAN | アラビア数字をローマ数字に変換 | `=ROMAN(数値, [形式])` | ✅ | 🔴 |
 | SEQUENCE | 連続値を生成 | `=SEQUENCE(行, [列], [開始], [ステプ])` | ❌ | 🟡 |  |
 | SERIESSUM | べき級数を計算 | `=SERIESSUM(x, n, m, 係数)` | ❌ | 🔴 |
-| SQRTPI | π倍の平方根を計算 | `=SQRTPI(数値)` | ❌ | 🔴 |
+| SQRTPI | π倍の平方根を計算 | `=SQRTPI(数値)` | ✅ | 🔴 |
 | SUBTOTAL | 小計を計算 | `=SUBTOTAL(関数番号, 参照1, [参照2], ...)` | ❌ | 🔴 |
 
 ### 三角関数
