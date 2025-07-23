@@ -700,3 +700,143 @@ export const PROB: CustomFormula = {
     return FormulaError.VALUE;
   }
 };
+
+// PERCENTRANK関数（パーセント順位）
+export const PERCENTRANK: CustomFormula = {
+  name: 'PERCENTRANK',
+  pattern: /PERCENTRANK\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// PERCENTRANK.INC関数（パーセント順位・境界値含む）
+export const PERCENTRANK_INC: CustomFormula = {
+  name: 'PERCENTRANK.INC',
+  pattern: /PERCENTRANK\.INC\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: false, // 手動実装
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const xRef = matches[2].trim();
+    const significanceRef = matches[3] ? matches[3].trim() : '3';
+    
+    let x: number, significance: number;
+    
+    if (xRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(xRef, context);
+      x = parseFloat(String(cellValue ?? '0'));
+    } else {
+      x = parseFloat(xRef);
+    }
+    
+    if (significanceRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(significanceRef, context);
+      significance = parseInt(String(cellValue ?? '3'));
+    } else {
+      significance = parseInt(significanceRef);
+    }
+    
+    if (isNaN(x)) return FormulaError.VALUE;
+    if (isNaN(significance) || significance < 1) significance = 3;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NA;
+    
+    const sorted = numbers.sort((a, b) => a - b);
+    const n = sorted.length;
+    
+    // xが範囲外の場合
+    if (x < sorted[0] || x > sorted[n - 1]) return FormulaError.NA;
+    
+    // 完全一致の場合
+    const exactIndex = sorted.indexOf(x);
+    if (exactIndex !== -1) {
+      const rank = exactIndex / (n - 1);
+      return Math.round(rank * Math.pow(10, significance)) / Math.pow(10, significance);
+    }
+    
+    // 線形補間
+    let lowerIndex = 0;
+    let upperIndex = n - 1;
+    
+    for (let i = 0; i < n - 1; i++) {
+      if (sorted[i] <= x && x <= sorted[i + 1]) {
+        lowerIndex = i;
+        upperIndex = i + 1;
+        break;
+      }
+    }
+    
+    const lowerRank = lowerIndex / (n - 1);
+    const upperRank = upperIndex / (n - 1);
+    const weight = (x - sorted[lowerIndex]) / (sorted[upperIndex] - sorted[lowerIndex]);
+    const rank = lowerRank + weight * (upperRank - lowerRank);
+    
+    return Math.round(rank * Math.pow(10, significance)) / Math.pow(10, significance);
+  }
+};
+
+// PERCENTRANK.EXC関数（パーセント順位・境界値除く）
+export const PERCENTRANK_EXC: CustomFormula = {
+  name: 'PERCENTRANK.EXC',
+  pattern: /PERCENTRANK\.EXC\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: false, // 手動実装
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const xRef = matches[2].trim();
+    const significanceRef = matches[3] ? matches[3].trim() : '3';
+    
+    let x: number, significance: number;
+    
+    if (xRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(xRef, context);
+      x = parseFloat(String(cellValue ?? '0'));
+    } else {
+      x = parseFloat(xRef);
+    }
+    
+    if (significanceRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(significanceRef, context);
+      significance = parseInt(String(cellValue ?? '3'));
+    } else {
+      significance = parseInt(significanceRef);
+    }
+    
+    if (isNaN(x)) return FormulaError.VALUE;
+    if (isNaN(significance) || significance < 1) significance = 3;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NA;
+    
+    const sorted = numbers.sort((a, b) => a - b);
+    const n = sorted.length;
+    
+    // xが境界値の場合はNA
+    if (x <= sorted[0] || x >= sorted[n - 1]) return FormulaError.NA;
+    
+    // 完全一致の場合
+    const exactIndex = sorted.indexOf(x);
+    if (exactIndex !== -1) {
+      const rank = exactIndex / (n + 1);
+      return Math.round(rank * Math.pow(10, significance)) / Math.pow(10, significance);
+    }
+    
+    // 線形補間
+    let lowerIndex = 0;
+    let upperIndex = n - 1;
+    
+    for (let i = 0; i < n - 1; i++) {
+      if (sorted[i] <= x && x <= sorted[i + 1]) {
+        lowerIndex = i;
+        upperIndex = i + 1;
+        break;
+      }
+    }
+    
+    const lowerRank = (lowerIndex + 1) / (n + 1);
+    const upperRank = (upperIndex + 1) / (n + 1);
+    const weight = (x - sorted[lowerIndex]) / (sorted[upperIndex] - sorted[lowerIndex]);
+    const rank = lowerRank + weight * (upperRank - lowerRank);
+    
+    return Math.round(rank * Math.pow(10, significance)) / Math.pow(10, significance);
+  }
+};

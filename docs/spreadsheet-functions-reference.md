@@ -168,9 +168,9 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | PERCENTILE | パーセンタイル値 | `=PERCENTILE(配列, k)` | ✅ | 🟡 |
 | PERCENTILE.INC | パーセンタイル（境界値含む） | `=PERCENTILE.INC(配列, k)` | ✅ | 🔴 |
 | PERCENTILE.EXC | パーセンタイル（境界値除く） | `=PERCENTILE.EXC(配列, k)` | ✅ | 🔴 |
-| PERCENTRANK | パーセント順位 | `=PERCENTRANK(配列, x, [有効桁数])` | ❌ | 🔴 |
-| PERCENTRANK.INC | パーセント順位（境界値含む） | `=PERCENTRANK.INC(配列, x, [有効桁数])` | ❌ | 🟡 |
-| PERCENTRANK.EXC | パーセント順位（境界値除く） | `=PERCENTRANK.EXC(配列, x, [有効桁数])` | ❌ | 🟡 |
+| PERCENTRANK | パーセント順位 | `=PERCENTRANK(配列, x, [有効桁数])` | ✅ | 🔴 |
+| PERCENTRANK.INC | パーセント順位（境界値含む） | `=PERCENTRANK.INC(配列, x, [有効桁数])` | ✅ | 🟡 |
+| PERCENTRANK.EXC | パーセント順位（境界値除く） | `=PERCENTRANK.EXC(配列, x, [有効桁数])` | ✅ | 🟡 |
 | QUARTILE | 四分位数 | `=QUARTILE(配列, 戻り値)` | ✅ | 🟡 |
 | QUARTILE.INC | 四分位数（境界値含む） | `=QUARTILE.INC(配列, 戻り値)` | ✅ | 🟡 |
 | QUARTILE.EXC |四分位数（境界値除く） | `=QUARTILE.EXC(配列, 戻り値)` | ✅ | 🟡 |
@@ -646,7 +646,7 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | NORMSDIST | 標準正規分布 | NORM.S.DIST | ❌ | 🔴 |
 | NORMSINV | 標準正規分布の逆関数 | NORM.S.INV | ❌ | 🔴 |
 | PERCENTILE | パーセンタイル | PERCENTILE.INC | ✅ | 🟡 |
-| PERCENTRANK | パーセント順位 | PERCENTRANK.INC | ❌ | 🟡 |
+| PERCENTRANK | パーセント順位 | PERCENTRANK.INC | ✅ | 🟡 |
 | POISSON | ポアソン分布 | POISSON.DIST | ❌ | 🔴 |
 | QUARTILE | 四分位数 | QUARTILE.INC | ✅ | 🟡 |
 | RANK | 順位 | RANK.EQ | ✅ | 🟡 |
