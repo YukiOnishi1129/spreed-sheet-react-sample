@@ -299,3 +299,221 @@ export const REPT: CustomFormula = {
     return result;
   }
 };
+
+// REPLACE関数の実装（位置指定文字置換）
+export const REPLACE: CustomFormula = {
+  name: 'REPLACE',
+  pattern: /REPLACE\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    let oldText = matches[1].trim();
+    const startNumRef = matches[2].trim();
+    const numCharsRef = matches[3].trim();
+    let newText = matches[4].trim();
+    
+    // 元の文字列を取得
+    if (oldText.startsWith('"') && oldText.endsWith('"')) {
+      oldText = oldText.slice(1, -1);
+    } else if (oldText.match(/^[A-Z]+\d+$/)) {
+      oldText = String(getCellValue(oldText, context) ?? '');
+    }
+    
+    // 開始位置を取得
+    let startNum: number;
+    if (startNumRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(startNumRef, context);
+      startNum = parseInt(String(cellValue ?? '1'));
+    } else {
+      startNum = parseInt(startNumRef);
+    }
+    
+    // 文字数を取得
+    let numChars: number;
+    if (numCharsRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numCharsRef, context);
+      numChars = parseInt(String(cellValue ?? '0'));
+    } else {
+      numChars = parseInt(numCharsRef);
+    }
+    
+    // 新しい文字列を取得
+    if (newText.startsWith('"') && newText.endsWith('"')) {
+      newText = newText.slice(1, -1);
+    } else if (newText.match(/^[A-Z]+\d+$/)) {
+      newText = String(getCellValue(newText, context) ?? '');
+    }
+    
+    if (isNaN(startNum) || isNaN(numChars)) return FormulaError.VALUE;
+    if (startNum < 1) return FormulaError.VALUE;
+    
+    const before = oldText.substring(0, startNum - 1);
+    const after = oldText.substring(startNum - 1 + numChars);
+    
+    return before + newText + after;
+  }
+};
+
+// CHAR関数の実装（文字コードから文字を返す）
+export const CHAR: CustomFormula = {
+  name: 'CHAR',
+  pattern: /CHAR\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const numberRef = matches[1].trim();
+    let number: number;
+    
+    if (numberRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numberRef, context);
+      number = parseInt(String(cellValue ?? '0'));
+    } else {
+      number = parseInt(numberRef);
+    }
+    
+    if (isNaN(number)) return FormulaError.VALUE;
+    if (number < 1 || number > 255) return FormulaError.VALUE;
+    
+    return String.fromCharCode(number);
+  }
+};
+
+// CODE関数の実装（文字から文字コードを返す）
+export const CODE: CustomFormula = {
+  name: 'CODE',
+  pattern: /CODE\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    let text = matches[1].trim();
+    
+    if (text.startsWith('"') && text.endsWith('"')) {
+      text = text.slice(1, -1);
+    } else if (text.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(text, context) ?? '');
+    }
+    
+    if (text.length === 0) return FormulaError.VALUE;
+    
+    return text.charCodeAt(0);
+  }
+};
+
+// EXACT関数の実装（文字列が同一か判定）
+export const EXACT: CustomFormula = {
+  name: 'EXACT',
+  pattern: /EXACT\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    let text1 = matches[1].trim();
+    let text2 = matches[2].trim();
+    
+    // 最初の文字列を取得
+    if (text1.startsWith('"') && text1.endsWith('"')) {
+      text1 = text1.slice(1, -1);
+    } else if (text1.match(/^[A-Z]+\d+$/)) {
+      text1 = String(getCellValue(text1, context) ?? '');
+    }
+    
+    // 2番目の文字列を取得
+    if (text2.startsWith('"') && text2.endsWith('"')) {
+      text2 = text2.slice(1, -1);
+    } else if (text2.match(/^[A-Z]+\d+$/)) {
+      text2 = String(getCellValue(text2, context) ?? '');
+    }
+    
+    return text1 === text2;
+  }
+};
+
+// CLEAN関数の実装（印刷不可文字を削除）
+export const CLEAN: CustomFormula = {
+  name: 'CLEAN',
+  pattern: /CLEAN\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    let text = matches[1].trim();
+    
+    if (text.startsWith('"') && text.endsWith('"')) {
+      text = text.slice(1, -1);
+    } else if (text.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(text, context) ?? '');
+    }
+    
+    // 印刷不可文字（制御文字）を削除
+    return text.replace(/[\x00-\x1F]/g, '');
+  }
+};
+
+// T関数の実装（文字列を返す）
+export const T: CustomFormula = {
+  name: 'T',
+  pattern: /T\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    let value = matches[1].trim();
+    
+    if (value.startsWith('"') && value.endsWith('"')) {
+      return value.slice(1, -1);
+    } else if (value.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(value, context);
+      return typeof cellValue === 'string' ? cellValue : '';
+    }
+    
+    // 数値の場合は空文字を返す
+    if (!isNaN(parseFloat(value))) {
+      return '';
+    }
+    
+    return String(value);
+  }
+};
+
+// FIXED関数の実装（固定小数点表示）
+export const FIXED: CustomFormula = {
+  name: 'FIXED',
+  pattern: /FIXED\(([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const numberRef = matches[1].trim();
+    const decimalsRef = matches[2]?.trim() || '2';
+    const noCommasRef = matches[3]?.trim() || 'FALSE';
+    
+    let number: number, decimals: number, noCommas: boolean;
+    
+    // 数値を取得
+    if (numberRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numberRef, context);
+      number = parseFloat(String(cellValue ?? '0'));
+    } else {
+      number = parseFloat(numberRef);
+    }
+    
+    // 小数点以下桁数を取得
+    if (decimalsRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(decimalsRef, context);
+      decimals = parseInt(String(cellValue ?? '2'));
+    } else {
+      decimals = parseInt(decimalsRef);
+    }
+    
+    // カンマ区切りなしフラグを取得
+    if (noCommasRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(noCommasRef, context);
+      noCommas = Boolean(cellValue);
+    } else {
+      noCommas = noCommasRef.toUpperCase() === 'TRUE' || noCommasRef === '1';
+    }
+    
+    if (isNaN(number) || isNaN(decimals)) return FormulaError.VALUE;
+    if (decimals < 0) decimals = 0;
+    
+    let result = number.toFixed(decimals);
+    
+    if (!noCommas) {
+      // カンマ区切りを追加
+      const parts = result.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      result = parts.join('.');
+    }
+    
+    return result;
+  }
+};

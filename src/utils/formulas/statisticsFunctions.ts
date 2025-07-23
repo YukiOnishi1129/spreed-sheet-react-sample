@@ -280,3 +280,192 @@ export const RANK: CustomFormula = {
     return rank === 0 ? FormulaError.NA : rank;
   }
 };
+
+// CORREL関数の実装（相関係数）
+export const CORREL: CustomFormula = {
+  name: 'CORREL',
+  pattern: /CORREL\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const range1Ref = matches[1].trim();
+    const range2Ref = matches[2].trim();
+    
+    const numbers1 = extractNumbersFromRange(range1Ref, context);
+    const numbers2 = extractNumbersFromRange(range2Ref, context);
+    
+    if (numbers1.length !== numbers2.length || numbers1.length < 2) return FormulaError.NA;
+    
+    const mean1 = numbers1.reduce((sum, num) => sum + num, 0) / numbers1.length;
+    const mean2 = numbers2.reduce((sum, num) => sum + num, 0) / numbers2.length;
+    
+    let numerator = 0;
+    let denominator1 = 0;
+    let denominator2 = 0;
+    
+    for (let i = 0; i < numbers1.length; i++) {
+      const diff1 = numbers1[i] - mean1;
+      const diff2 = numbers2[i] - mean2;
+      numerator += diff1 * diff2;
+      denominator1 += diff1 * diff1;
+      denominator2 += diff2 * diff2;
+    }
+    
+    const denominator = Math.sqrt(denominator1 * denominator2);
+    if (denominator === 0) return FormulaError.DIV0;
+    
+    return numerator / denominator;
+  }
+};
+
+// QUARTILE関数の実装（四分位数）
+export const QUARTILE: CustomFormula = {
+  name: 'QUARTILE',
+  pattern: /QUARTILE\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const quartRef = matches[2].trim();
+    
+    let quart: number;
+    if (quartRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(quartRef, context);
+      quart = parseInt(String(cellValue ?? '0'));
+    } else {
+      quart = parseInt(quartRef);
+    }
+    
+    if (isNaN(quart) || quart < 0 || quart > 4) return FormulaError.NUM;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NUM;
+    
+    const sorted = numbers.sort((a, b) => a - b);
+    const n = sorted.length;
+    
+    switch (quart) {
+      case 0: return sorted[0]; // 最小値
+      case 1: // 第1四分位数
+        const q1Index = (n - 1) * 0.25;
+        return sorted[Math.floor(q1Index)] + (q1Index % 1) * (sorted[Math.ceil(q1Index)] - sorted[Math.floor(q1Index)]);
+      case 2: // 中央値
+        const middle = Math.floor(n / 2);
+        return n % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+      case 3: // 第3四分位数
+        const q3Index = (n - 1) * 0.75;
+        return sorted[Math.floor(q3Index)] + (q3Index % 1) * (sorted[Math.ceil(q3Index)] - sorted[Math.floor(q3Index)]);
+      case 4: return sorted[n - 1]; // 最大値
+      default: return FormulaError.NUM;
+    }
+  }
+};
+
+// PERCENTILE関数の実装（パーセンタイル値）
+export const PERCENTILE: CustomFormula = {
+  name: 'PERCENTILE',
+  pattern: /PERCENTILE\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const kRef = matches[2].trim();
+    
+    let k: number;
+    if (kRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(kRef, context);
+      k = parseFloat(String(cellValue ?? '0'));
+    } else {
+      k = parseFloat(kRef);
+    }
+    
+    if (isNaN(k) || k < 0 || k > 1) return FormulaError.NUM;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NUM;
+    
+    const sorted = numbers.sort((a, b) => a - b);
+    const n = sorted.length;
+    const index = (n - 1) * k;
+    
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    const weight = index % 1;
+    
+    if (upper >= n) return sorted[n - 1];
+    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+  }
+};
+
+// GEOMEAN関数の実装（幾何平均）
+export const GEOMEAN: CustomFormula = {
+  name: 'GEOMEAN',
+  pattern: /GEOMEAN\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length === 0) return FormulaError.NUM;
+    
+    // すべての値が正でなければならない
+    for (const num of numbers) {
+      if (num <= 0) return FormulaError.NUM;
+    }
+    
+    const product = numbers.reduce((prod, num) => prod * num, 1);
+    return Math.pow(product, 1 / numbers.length);
+  }
+};
+
+// HARMEAN関数の実装（調和平均）
+export const HARMEAN: CustomFormula = {
+  name: 'HARMEAN',
+  pattern: /HARMEAN\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    
+    if (numbers.length === 0) return FormulaError.NUM;
+    
+    // すべての値が正でなければならない
+    for (const num of numbers) {
+      if (num <= 0) return FormulaError.NUM;
+    }
+    
+    const reciprocalSum = numbers.reduce((sum, num) => sum + (1 / num), 0);
+    return numbers.length / reciprocalSum;
+  }
+};
+
+// TRIMMEAN関数の実装（トリム平均）
+export const TRIMMEAN: CustomFormula = {
+  name: 'TRIMMEAN',
+  pattern: /TRIMMEAN\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const rangeRef = matches[1].trim();
+    const percentRef = matches[2].trim();
+    
+    let percent: number;
+    if (percentRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(percentRef, context);
+      percent = parseFloat(String(cellValue ?? '0'));
+    } else {
+      percent = parseFloat(percentRef);
+    }
+    
+    if (isNaN(percent) || percent < 0 || percent >= 1) return FormulaError.NUM;
+    
+    const numbers = extractNumbersFromRange(rangeRef, context);
+    if (numbers.length === 0) return FormulaError.NUM;
+    
+    const sorted = numbers.sort((a, b) => a - b);
+    const trimCount = Math.floor(sorted.length * percent / 2);
+    
+    if (trimCount * 2 >= sorted.length) return FormulaError.NUM;
+    
+    const trimmed = sorted.slice(trimCount, sorted.length - trimCount);
+    const sum = trimmed.reduce((sum, num) => sum + num, 0);
+    
+    return sum / trimmed.length;
+  }
+};

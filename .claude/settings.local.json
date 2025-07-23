@@ -30,7 +30,9 @@
       "Bash(rg:*)",
       "Bash(find:*)",
       "WebFetch(domain:support.microsoft.com)",
-      "WebFetch(domain:support.google.com)"
+      "WebFetch(domain:support.google.com)",
+      "WebFetch(domain:hyperformula.handsontable.com)",
+      "Bash(python3:*)"
     ],
     "deny": []
   }

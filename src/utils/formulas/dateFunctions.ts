@@ -420,3 +420,310 @@ export const TODAY: CustomFormula = {
     return today.diff(excelEpoch, 'day');
   }
 };
+
+// EOMONTH関数の実装（月末日を返す）
+export const EOMONTH: CustomFormula = {
+  name: 'EOMONTH',
+  pattern: /EOMONTH\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// TIME関数の実装（時刻を作成）
+export const TIME: CustomFormula = {
+  name: 'TIME',
+  pattern: /TIME\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// HOUR関数の実装（時を抽出）
+export const HOUR: CustomFormula = {
+  name: 'HOUR',
+  pattern: /HOUR\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const timeRef = matches[1].trim();
+    let timeValue;
+    
+    if (timeRef.match(/^[A-Z]+\d+$/)) {
+      timeValue = getCellValue(timeRef, context);
+    } else if (timeRef.startsWith('"') && timeRef.endsWith('"')) {
+      timeValue = timeRef.slice(1, -1);
+    } else {
+      timeValue = timeRef;
+    }
+    
+    // Excelシリアル値の場合（数値）
+    if (typeof timeValue === 'number' || !isNaN(parseFloat(timeValue))) {
+      const num = typeof timeValue === 'number' ? timeValue : parseFloat(timeValue);
+      const hours = Math.floor((num % 1) * 24);
+      return hours;
+    }
+    
+    // 時刻文字列の場合
+    const timeStr = String(timeValue);
+    const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    if (timeMatch) {
+      return parseInt(timeMatch[1]);
+    }
+    
+    return FormulaError.VALUE;
+  }
+};
+
+// MINUTE関数の実装（分を抽出）
+export const MINUTE: CustomFormula = {
+  name: 'MINUTE',
+  pattern: /MINUTE\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const timeRef = matches[1].trim();
+    let timeValue;
+    
+    if (timeRef.match(/^[A-Z]+\d+$/)) {
+      timeValue = getCellValue(timeRef, context);
+    } else if (timeRef.startsWith('"') && timeRef.endsWith('"')) {
+      timeValue = timeRef.slice(1, -1);
+    } else {
+      timeValue = timeRef;
+    }
+    
+    // Excelシリアル値の場合（数値）
+    if (typeof timeValue === 'number' || !isNaN(parseFloat(timeValue))) {
+      const num = typeof timeValue === 'number' ? timeValue : parseFloat(timeValue);
+      const totalMinutes = Math.floor((num % 1) * 24 * 60);
+      const minutes = totalMinutes % 60;
+      return minutes;
+    }
+    
+    // 時刻文字列の場合
+    const timeStr = String(timeValue);
+    const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    if (timeMatch) {
+      return parseInt(timeMatch[2]);
+    }
+    
+    return FormulaError.VALUE;
+  }
+};
+
+// SECOND関数の実装（秒を抽出）
+export const SECOND: CustomFormula = {
+  name: 'SECOND',
+  pattern: /SECOND\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const timeRef = matches[1].trim();
+    let timeValue;
+    
+    if (timeRef.match(/^[A-Z]+\d+$/)) {
+      timeValue = getCellValue(timeRef, context);
+    } else if (timeRef.startsWith('"') && timeRef.endsWith('"')) {
+      timeValue = timeRef.slice(1, -1);
+    } else {
+      timeValue = timeRef;
+    }
+    
+    // Excelシリアル値の場合（数値）
+    if (typeof timeValue === 'number' || !isNaN(parseFloat(timeValue))) {
+      const num = typeof timeValue === 'number' ? timeValue : parseFloat(timeValue);
+      const totalSeconds = Math.floor((num % 1) * 24 * 60 * 60);
+      const seconds = totalSeconds % 60;
+      return seconds;
+    }
+    
+    // 時刻文字列の場合
+    const timeStr = String(timeValue);
+    const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    if (timeMatch) {
+      return parseInt(timeMatch[3] || '0');
+    }
+    
+    return FormulaError.VALUE;
+  }
+};
+
+// WEEKNUM関数の実装（週番号を返す）
+export const WEEKNUM: CustomFormula = {
+  name: 'WEEKNUM',
+  pattern: /WEEKNUM\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const dateRef = matches[1].trim();
+    const returnTypeRef = matches[2]?.trim() || '1';
+    
+    let dateValue;
+    if (dateRef.match(/^[A-Z]+\d+$/)) {
+      dateValue = getCellValue(dateRef, context);
+    } else if (dateRef.startsWith('"') && dateRef.endsWith('"')) {
+      dateValue = dateRef.slice(1, -1);
+    } else {
+      dateValue = dateRef;
+    }
+    
+    let returnType: number;
+    if (returnTypeRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(returnTypeRef, context);
+      returnType = parseInt(String(cellValue ?? '1'));
+    } else {
+      returnType = parseInt(returnTypeRef);
+    }
+    
+    const date = parseDate(dateValue);
+    if (!date?.isValid()) return FormulaError.VALUE;
+    
+    // 年の最初の日
+    const yearStart = date.startOf('year');
+    
+    // 週の開始日を設定（1=日曜日、2=月曜日）
+    const startOfWeek = returnType === 2 ? 1 : 0; // 0=日曜日、1=月曜日
+    
+    // 年の最初の週の開始日
+    const firstWeekStart = yearStart.day(startOfWeek);
+    
+    // 日付が年始より前の場合は前年の最終週
+    if (date.isBefore(firstWeekStart)) {
+      return 1;
+    }
+    
+    // 週番号を計算
+    const weekNum = Math.floor(date.diff(firstWeekStart, 'day') / 7) + 1;
+    return weekNum;
+  }
+};
+
+// DAYS360関数の実装（360日基準の日数）
+export const DAYS360: CustomFormula = {
+  name: 'DAYS360',
+  pattern: /DAYS360\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const startDateRef = matches[1].trim();
+    const endDateRef = matches[2].trim();
+    const methodRef = matches[3]?.trim() || 'FALSE';
+    
+    let startDateValue, endDateValue;
+    
+    // 開始日を取得
+    if (startDateRef.match(/^[A-Z]+\d+$/)) {
+      startDateValue = getCellValue(startDateRef, context);
+    } else if (startDateRef.startsWith('"') && startDateRef.endsWith('"')) {
+      startDateValue = startDateRef.slice(1, -1);
+    } else {
+      startDateValue = startDateRef;
+    }
+    
+    // 終了日を取得
+    if (endDateRef.match(/^[A-Z]+\d+$/)) {
+      endDateValue = getCellValue(endDateRef, context);
+    } else if (endDateRef.startsWith('"') && endDateRef.endsWith('"')) {
+      endDateValue = endDateRef.slice(1, -1);
+    } else {
+      endDateValue = endDateRef;
+    }
+    
+    // メソッドを取得（US=FALSE, European=TRUE）
+    let method: boolean;
+    if (methodRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(methodRef, context);
+      method = Boolean(cellValue);
+    } else {
+      method = methodRef.toUpperCase() === 'TRUE';
+    }
+    
+    const startDate = parseDate(startDateValue);
+    const endDate = parseDate(endDateValue);
+    
+    if (!startDate?.isValid() || !endDate?.isValid()) {
+      return FormulaError.VALUE;
+    }
+    
+    let startY = startDate.year();
+    let startM = startDate.month() + 1; // dayjsは0ベース
+    let startD = startDate.date();
+    
+    let endY = endDate.year();
+    let endM = endDate.month() + 1;
+    let endD = endDate.date();
+    
+    // 360日基準での日数計算
+    if (method) {
+      // European method
+      if (startD === 31) startD = 30;
+      if (endD === 31) endD = 30;
+    } else {
+      // US method
+      if (startD === 31) startD = 30;
+      if (endD === 31 && startD >= 30) endD = 30;
+    }
+    
+    return (endY - startY) * 360 + (endM - startM) * 30 + (endD - startD);
+  }
+};
+
+// YEARFRAC関数の実装（年の割合を計算）
+export const YEARFRAC: CustomFormula = {
+  name: 'YEARFRAC',
+  pattern: /YEARFRAC\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const startDateRef = matches[1].trim();
+    const endDateRef = matches[2].trim();
+    const basisRef = matches[3]?.trim() || '0';
+    
+    let startDateValue, endDateValue;
+    
+    // 開始日を取得
+    if (startDateRef.match(/^[A-Z]+\d+$/)) {
+      startDateValue = getCellValue(startDateRef, context);
+    } else if (startDateRef.startsWith('"') && startDateRef.endsWith('"')) {
+      startDateValue = startDateRef.slice(1, -1);
+    } else {
+      startDateValue = startDateRef;
+    }
+    
+    // 終了日を取得
+    if (endDateRef.match(/^[A-Z]+\d+$/)) {
+      endDateValue = getCellValue(endDateRef, context);
+    } else if (endDateRef.startsWith('"') && endDateRef.endsWith('"')) {
+      endDateValue = endDateRef.slice(1, -1);
+    } else {
+      endDateValue = endDateRef;
+    }
+    
+    // 基準を取得
+    let basis: number;
+    if (basisRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(basisRef, context);
+      basis = parseInt(String(cellValue ?? '0'));
+    } else {
+      basis = parseInt(basisRef);
+    }
+    
+    const startDate = parseDate(startDateValue);
+    const endDate = parseDate(endDateValue);
+    
+    if (!startDate?.isValid() || !endDate?.isValid()) {
+      return FormulaError.VALUE;
+    }
+    
+    const daysDiff = endDate.diff(startDate, 'day');
+    
+    switch (basis) {
+      case 0: // 30/360 US
+        return daysDiff / 360;
+      case 1: // Actual/actual
+        const years = endDate.diff(startDate, 'year', true);
+        return years;
+      case 2: // Actual/360
+        return daysDiff / 360;
+      case 3: // Actual/365
+        return daysDiff / 365;
+      case 4: // 30/360 European
+        return daysDiff / 360;
+      default:
+        return FormulaError.NUM;
+    }
+  }
+};

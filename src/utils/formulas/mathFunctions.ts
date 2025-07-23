@@ -427,22 +427,8 @@ export const LOG: CustomFormula = {
 export const LOG10: CustomFormula = {
   name: 'LOG10',
   pattern: /LOG10\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    if (value <= 0) return FormulaError.NUM;
-    return Math.log10(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // LN関数の実装（自然対数）
@@ -759,5 +745,305 @@ export const FACT: CustomFormula = {
       result *= i;
     }
     return result;
+  }
+};
+
+// SUMIFS関数の実装（複数条件での合計）
+export const SUMIFS: CustomFormula = {
+  name: 'SUMIFS',
+  pattern: /SUMIFS\(([^,]+),\s*([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// COUNTIFS関数の実装（複数条件でのカウント）
+export const COUNTIFS: CustomFormula = {
+  name: 'COUNTIFS',
+  pattern: /COUNTIFS\(([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// AVERAGEIFS関数の実装（複数条件での平均）
+export const AVERAGEIFS: CustomFormula = {
+  name: 'AVERAGEIFS',
+  pattern: /AVERAGEIFS\(([^,]+),\s*([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// PRODUCT関数の実装（積を計算）
+export const PRODUCT: CustomFormula = {
+  name: 'PRODUCT',
+  pattern: /PRODUCT\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// MROUND関数の実装（倍数に丸める）
+export const MROUND: CustomFormula = {
+  name: 'MROUND',
+  pattern: /MROUND\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// COMBIN関数の実装（組み合わせ数）
+export const COMBIN: CustomFormula = {
+  name: 'COMBIN',
+  pattern: /COMBIN\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const nRef = matches[1].trim();
+    const kRef = matches[2].trim();
+    
+    let n: number, k: number;
+    
+    // n値を取得
+    if (nRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(nRef, context);
+      n = parseInt(String(cellValue ?? '0'));
+    } else {
+      n = parseInt(nRef);
+    }
+    
+    // k値を取得
+    if (kRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(kRef, context);
+      k = parseInt(String(cellValue ?? '0'));
+    } else {
+      k = parseInt(kRef);
+    }
+    
+    if (isNaN(n) || isNaN(k)) return FormulaError.VALUE;
+    if (n < 0 || k < 0) return FormulaError.NUM;
+    if (k > n) return 0;
+    if (k === 0 || k === n) return 1;
+    
+    // 効率的な組み合わせ計算
+    k = Math.min(k, n - k);
+    let result = 1;
+    for (let i = 0; i < k; i++) {
+      result = result * (n - i) / (i + 1);
+    }
+    return Math.round(result);
+  }
+};
+
+// PERMUT関数の実装（順列数）
+export const PERMUT: CustomFormula = {
+  name: 'PERMUT',
+  pattern: /PERMUT\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const nRef = matches[1].trim();
+    const kRef = matches[2].trim();
+    
+    let n: number, k: number;
+    
+    // n値を取得
+    if (nRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(nRef, context);
+      n = parseInt(String(cellValue ?? '0'));
+    } else {
+      n = parseInt(nRef);
+    }
+    
+    // k値を取得
+    if (kRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(kRef, context);
+      k = parseInt(String(cellValue ?? '0'));
+    } else {
+      k = parseInt(kRef);
+    }
+    
+    if (isNaN(n) || isNaN(k)) return FormulaError.VALUE;
+    if (n < 0 || k < 0) return FormulaError.NUM;
+    if (k > n) return 0;
+    
+    let result = 1;
+    for (let i = 0; i < k; i++) {
+      result *= (n - i);
+    }
+    return result;
+  }
+};
+
+// GCD関数の実装（最大公約数）
+export const GCD: CustomFormula = {
+  name: 'GCD',
+  pattern: /GCD\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const args = matches[1].split(',').map(arg => arg.trim());
+    const numbers: number[] = [];
+    
+    for (const arg of args) {
+      let num: number;
+      if (arg.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(arg, context);
+        num = parseInt(String(cellValue ?? '0'));
+      } else {
+        num = parseInt(arg);
+      }
+      
+      if (isNaN(num)) return FormulaError.VALUE;
+      if (num < 0) return FormulaError.NUM;
+      numbers.push(num);
+    }
+    
+    if (numbers.length === 0) return FormulaError.VALUE;
+    
+    // ユークリッドの互除法
+    const gcd = (a: number, b: number): number => {
+      return b === 0 ? a : gcd(b, a % b);
+    };
+    
+    let result = numbers[0];
+    for (let i = 1; i < numbers.length; i++) {
+      result = gcd(result, numbers[i]);
+    }
+    return result;
+  }
+};
+
+// LCM関数の実装（最小公倍数）
+export const LCM: CustomFormula = {
+  name: 'LCM',
+  pattern: /LCM\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const args = matches[1].split(',').map(arg => arg.trim());
+    const numbers: number[] = [];
+    
+    for (const arg of args) {
+      let num: number;
+      if (arg.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(arg, context);
+        num = parseInt(String(cellValue ?? '0'));
+      } else {
+        num = parseInt(arg);
+      }
+      
+      if (isNaN(num)) return FormulaError.VALUE;
+      if (num <= 0) return FormulaError.NUM;
+      numbers.push(num);
+    }
+    
+    if (numbers.length === 0) return FormulaError.VALUE;
+    
+    // ユークリッドの互除法でGCDを計算
+    const gcd = (a: number, b: number): number => {
+      return b === 0 ? a : gcd(b, a % b);
+    };
+    
+    // LCM = (a * b) / GCD(a, b)
+    const lcm = (a: number, b: number): number => {
+      return (a * b) / gcd(a, b);
+    };
+    
+    let result = numbers[0];
+    for (let i = 1; i < numbers.length; i++) {
+      result = lcm(result, numbers[i]);
+    }
+    return result;
+  }
+};
+
+// QUOTIENT関数の実装（商の整数部分）
+export const QUOTIENT: CustomFormula = {
+  name: 'QUOTIENT',
+  pattern: /QUOTIENT\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const numeratorRef = matches[1].trim();
+    const denominatorRef = matches[2].trim();
+    
+    let numerator: number, denominator: number;
+    
+    // 分子を取得
+    if (numeratorRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(numeratorRef, context);
+      numerator = parseFloat(String(cellValue ?? '0'));
+    } else {
+      numerator = parseFloat(numeratorRef);
+    }
+    
+    // 分母を取得
+    if (denominatorRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(denominatorRef, context);
+      denominator = parseFloat(String(cellValue ?? '0'));
+    } else {
+      denominator = parseFloat(denominatorRef);
+    }
+    
+    if (isNaN(numerator) || isNaN(denominator)) return FormulaError.VALUE;
+    if (denominator === 0) return FormulaError.DIV0;
+    
+    return Math.trunc(numerator / denominator);
+  }
+};
+
+// 双曲線関数の実装
+// SINH関数（双曲線正弦）
+export const SINH: CustomFormula = {
+  name: 'SINH',
+  pattern: /SINH\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    return Math.sinh(value);
+  }
+};
+
+// COSH関数（双曲線余弦）
+export const COSH: CustomFormula = {
+  name: 'COSH',
+  pattern: /COSH\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    return Math.cosh(value);
+  }
+};
+
+// TANH関数（双曲線正接）
+export const TANH: CustomFormula = {
+  name: 'TANH',
+  pattern: /TANH\(([^)]+)\)/i,
+  isSupported: false,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    let value: number;
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(valueRef, context);
+      value = parseFloat(String(cellValue ?? '0'));
+    } else {
+      value = parseFloat(valueRef);
+    }
+    
+    if (isNaN(value)) return FormulaError.VALUE;
+    return Math.tanh(value);
   }
 };

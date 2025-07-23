@@ -3,25 +3,28 @@
 import type { CustomFormula } from './types';
 
 // 各カテゴリから関数をインポート
-import { DATEDIF, NETWORKDAYS, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE } from './dateFunctions';
+import { DATEDIF, NETWORKDAYS, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC } from './dateFunctions';
 import { 
   SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND,
   ABS, SQRT, POWER, MOD, INT, TRUNC, RAND, RANDBETWEEN, PI, DEGREES, RADIANS,
   SIN, COS, TAN, LOG, LOG10, LN, EXP, ASIN, ACOS, ATAN, ATAN2, ROUNDUP, ROUNDDOWN,
-  CEILING, FLOOR, SIGN, FACT
+  CEILING, FLOOR, SIGN, FACT, SUMIFS, COUNTIFS, AVERAGEIFS, PRODUCT, MROUND,
+  COMBIN, PERMUT, GCD, LCM, QUOTIENT, SINH, COSH, TANH
 } from './mathFunctions';
 import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP } from './lookupFunctions';
 import { IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA } from './logicFunctions';
 import { 
   CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT,
-  PROPER, VALUE, TEXT, REPT
+  PROPER, VALUE, TEXT, REPT, REPLACE, CHAR, CODE, EXACT, CLEAN, T, FIXED
 } from './textFunctions';
 import { 
-  MEDIAN, MODE, COUNTA, COUNTBLANK, STDEV, VAR, LARGE, SMALL, RANK
+  MEDIAN, MODE, COUNTA, COUNTBLANK, STDEV, VAR, LARGE, SMALL, RANK,
+  CORREL, QUARTILE, PERCENTILE, GEOMEAN, HARMEAN, TRIMMEAN
 } from './statisticsFunctions';
 import {
   ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N
 } from './informationFunctions';
+import { PMT, PV, FV, NPV, IRR, PPMT, IPMT } from './financialFunctions';
 
 // すべての関数を配列にまとめる
 export const ALL_FUNCTIONS = [
@@ -37,6 +40,14 @@ export const ALL_FUNCTIONS = [
   WEEKDAY,
   DAYS,
   EDATE,
+  EOMONTH,
+  TIME,
+  HOUR,
+  MINUTE,
+  SECOND,
+  WEEKNUM,
+  DAYS360,
+  YEARFRAC,
   
   // 数学関数
   SUMIF,
@@ -76,6 +87,19 @@ export const ALL_FUNCTIONS = [
   FLOOR,
   SIGN,
   FACT,
+  SUMIFS,
+  COUNTIFS,
+  AVERAGEIFS,
+  PRODUCT,
+  MROUND,
+  COMBIN,
+  PERMUT,
+  GCD,
+  LCM,
+  QUOTIENT,
+  SINH,
+  COSH,
+  TANH,
   
   // 統計関数
   MEDIAN,
@@ -87,6 +111,12 @@ export const ALL_FUNCTIONS = [
   LARGE,
   SMALL,
   RANK,
+  CORREL,
+  QUARTILE,
+  PERCENTILE,
+  GEOMEAN,
+  HARMEAN,
+  TRIMMEAN,
   
   // 検索関数
   VLOOKUP,
@@ -127,6 +157,13 @@ export const ALL_FUNCTIONS = [
   VALUE,
   TEXT,
   REPT,
+  REPLACE,
+  CHAR,
+  CODE,
+  EXACT,
+  CLEAN,
+  T,
+  FIXED,
   
   // 情報関数
   ISBLANK,
@@ -138,18 +175,28 @@ export const ALL_FUNCTIONS = [
   ISEVEN,
   ISODD,
   TYPE,
-  N
+  N,
+  
+  // 財務関数
+  PMT,
+  PV,
+  FV,
+  NPV,
+  IRR,
+  PPMT,
+  IPMT
 ] as CustomFormula[];
 
 // カテゴリ別の関数分類
 export const FUNCTION_CATEGORIES = {
-  date: [DATEDIF, NETWORKDAYS, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE] as CustomFormula[],
-  math: [SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND, ABS, SQRT, POWER, MOD, INT, TRUNC, RAND, RANDBETWEEN, PI, DEGREES, RADIANS, SIN, COS, TAN, LOG, LOG10, LN, EXP, ASIN, ACOS, ATAN, ATAN2, ROUNDUP, ROUNDDOWN, CEILING, FLOOR, SIGN, FACT] as CustomFormula[],
-  statistics: [MEDIAN, MODE, COUNTA, COUNTBLANK, STDEV, VAR, LARGE, SMALL, RANK] as CustomFormula[],
+  date: [DATEDIF, NETWORKDAYS, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC] as CustomFormula[],
+  math: [SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND, ABS, SQRT, POWER, MOD, INT, TRUNC, RAND, RANDBETWEEN, PI, DEGREES, RADIANS, SIN, COS, TAN, LOG, LOG10, LN, EXP, ASIN, ACOS, ATAN, ATAN2, ROUNDUP, ROUNDDOWN, CEILING, FLOOR, SIGN, FACT, SUMIFS, COUNTIFS, AVERAGEIFS, PRODUCT, MROUND, COMBIN, PERMUT, GCD, LCM, QUOTIENT, SINH, COSH, TANH] as CustomFormula[],
+  statistics: [MEDIAN, MODE, COUNTA, COUNTBLANK, STDEV, VAR, LARGE, SMALL, RANK, CORREL, QUARTILE, PERCENTILE, GEOMEAN, HARMEAN, TRIMMEAN] as CustomFormula[],
   lookup: [VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP] as CustomFormula[],
   logic: [IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA] as CustomFormula[],
-  text: [CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT, PROPER, VALUE, TEXT, REPT] as CustomFormula[],
-  information: [ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N] as CustomFormula[]
+  text: [CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT, PROPER, VALUE, TEXT, REPT, REPLACE, CHAR, CODE, EXACT, CLEAN, T, FIXED] as CustomFormula[],
+  information: [ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N] as CustomFormula[],
+  financial: [PMT, PV, FV, NPV, IRR, PPMT, IPMT] as CustomFormula[]
 };
 
 // HyperFormulaでサポートされていない関数（手動計算が必要）
@@ -185,6 +232,7 @@ export const getFunctionType = (functionName: string): string => {
   if (FUNCTION_CATEGORIES.logic.some(f => f.name === name)) return 'logic';
   if (FUNCTION_CATEGORIES.text.some(f => f.name === name)) return 'text';
   if (FUNCTION_CATEGORIES.information.some(f => f.name === name)) return 'information';
+  if (FUNCTION_CATEGORIES.financial.some(f => f.name === name)) return 'financial';
   
   return 'other';
 };
@@ -199,3 +247,4 @@ export * from './logicFunctions';
 export * from './textFunctions';
 export * from './statisticsFunctions';
 export * from './informationFunctions';
+export * from './financialFunctions';
