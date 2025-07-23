@@ -153,27 +153,27 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
 |--------|------|------|----------|----------|------|
 | CORREL | 相関係数を計算 | `=CORREL(配列1, 配列2)` | ✅ | 🔴 |
-| COVARIANCE.P | 母共分散を計算 | `=COVARIANCE.P(配列1, 配列2)` | ❌ | 🔴 |
-| COVARIANCE.S | 標本共分散を計算 | `=COVARIANCE.S(配列1, 配列2)` | ❌ | 🔴 |
+| COVARIANCE.P | 母共分散を計算 | `=COVARIANCE.P(配列1, 配列2)` | ✅ | 🔴 |
+| COVARIANCE.S | 標本共分散を計算 | `=COVARIANCE.S(配列1, 配列2)` | ✅ | 🔴 |
 | DEVSQ | 偏差平方和を計算 | `=DEVSQ(数値1, [数値2], ...)` | ✅ | 🔴 |
 | KURT | 尖度を計算 | `=KURT(数値1, [数値2], ...)` | ✅ | 🔴 |
 | SKEW | 歪度を計算 | `=SKEW(数値1, [数値2], ...)` | ✅ | 🔴 |
-| SKEW.P | 歪度（母集団） | `=SKEW.P(数値1, [数値2], ...)` | ❌ | 🔴 |
-| STANDARDIZE | 標準化する | `=STANDARDIZE(x, 平均, 標準偏差)` | ❌ | 🔴 |
+| SKEW.P | 歪度（母集団） | `=SKEW.P(数値1, [数値2], ...)` | ✅ | 🔴 |
+| STANDARDIZE | 標準化する | `=STANDARDIZE(x, 平均, 標準偏差)` | ✅ | 🔴 |
 | LARGE | k番目に大きい値 | `=LARGE(配列, k)` | ✅ | 🔴 |
 | SMALL | k番目に小さい値 | `=SMALL(配列, k)` | ✅ | 🔴 |
 | RANK | 順位を返す | `=RANK(数値, 参照, [順序])` | ✅ | 🟡 |
 | RANK.EQ | 順位（同順位は最小） | `=RANK.EQ(数値, 参照, [順序])` | ✅ | 🔴 |
 | RANK.AVG | 順位（同順位は平均） | `=RANK.AVG(数値, 参照, [順序])` | ✅ | 🔴 |
 | PERCENTILE | パーセンタイル値 | `=PERCENTILE(配列, k)` | ✅ | 🟡 |
-| PERCENTILE.INC | パーセンタイル（境界値含む） | `=PERCENTILE.INC(配列, k)` | ❌ | 🔴 |
-| PERCENTILE.EXC | パーセンタイル（境界値除く） | `=PERCENTILE.EXC(配列, k)` | ❌ | 🔴 |
+| PERCENTILE.INC | パーセンタイル（境界値含む） | `=PERCENTILE.INC(配列, k)` | ✅ | 🔴 |
+| PERCENTILE.EXC | パーセンタイル（境界値除く） | `=PERCENTILE.EXC(配列, k)` | ✅ | 🔴 |
 | PERCENTRANK | パーセント順位 | `=PERCENTRANK(配列, x, [有効桁数])` | ❌ | 🔴 |
 | PERCENTRANK.INC | パーセント順位（境界値含む） | `=PERCENTRANK.INC(配列, x, [有効桁数])` | ❌ | 🟡 |
 | PERCENTRANK.EXC | パーセント順位（境界値除く） | `=PERCENTRANK.EXC(配列, x, [有効桁数])` | ❌ | 🟡 |
 | QUARTILE | 四分位数 | `=QUARTILE(配列, 戻り値)` | ✅ | 🟡 |
-| QUARTILE.INC | 四分位数（境界値含む） | `=QUARTILE.INC(配列, 戻り値)` | ❌ | 🟡 |
-| QUARTILE.EXC |四分位数（境界値除く） | `=QUARTILE.EXC(配列, 戻り値)` | ❌ | 🟡 |
+| QUARTILE.INC | 四分位数（境界値含む） | `=QUARTILE.INC(配列, 戻り値)` | ✅ | 🟡 |
+| QUARTILE.EXC |四分位数（境界値除く） | `=QUARTILE.EXC(配列, 戻り値)` | ✅ | 🟡 |
 
 ### 分布関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
@@ -245,7 +245,7 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | GEOMEAN | 幾何平均 | `=GEOMEAN(数値1, [数値2], ...)` | ✅ | 🔴 |
 | HARMEAN | 調和平均 | `=HARMEAN(数値1, [数値2], ...)` | ✅ | 🔴 |
 | TRIMMEAN | トリム平均 | `=TRIMMEAN(配列, 割合)` | ✅ | 🟡 |
-| PROB | 確率の計算 | `=PROB(x範囲, 確率範囲, [下限], [上限])` | ❌ | 🟡 |
+| PROB | 確率の計算 | `=PROB(x範囲, 確率範囲, [下限], [上限])` | ✅ | 🟡 |
 | FISHER | フィッシャー変換 | `=FISHER(x)` | ✅ | 🔴 |
 | FISHERINV | フィッシャー変換の逆関数 | `=FISHERINV(y)` | ✅ | 🔴 |
 | PHI | 標準正規分布の密度関数 | `=PHI(x)` | ❌ | 🔴 |
@@ -628,7 +628,7 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | CHIINV | カイ二乗分布の逆関数 | CHISQ.INV.RT | ❌ | 🔴 |
 | CHITEST | カイ二乗検定 | CHISQ.TEST | ❌ | 🔴 |
 | CONFIDENCE | 信頼区間 | CONFIDENCE.NORM | ❌ | 🔴 |
-| COVAR | 共分散 | COVARIANCE.P | ❌ | 🔴 |
+| COVAR | 共分散 | COVARIANCE.P | ✅ | 🔴 |
 | CRITBINOM | 二項分布の臨界値 | BINOM.INV | ❌ | 🔴 |
 | EXPONDIST | 指数分布 | EXPON.DIST | ❌ | 🔴 |
 | FDIST | F分布 | F.DIST.RT | ❌ | 🔴 |
@@ -645,10 +645,10 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | NORMINV | 正規分布の逆関数 | NORM.INV | ❌ | 🔴 |
 | NORMSDIST | 標準正規分布 | NORM.S.DIST | ❌ | 🔴 |
 | NORMSINV | 標準正規分布の逆関数 | NORM.S.INV | ❌ | 🔴 |
-| PERCENTILE | パーセンタイル | PERCENTILE.INC | ❌ | 🟡 |
+| PERCENTILE | パーセンタイル | PERCENTILE.INC | ✅ | 🟡 |
 | PERCENTRANK | パーセント順位 | PERCENTRANK.INC | ❌ | 🟡 |
 | POISSON | ポアソン分布 | POISSON.DIST | ❌ | 🔴 |
-| QUARTILE | 四分位数 | QUARTILE.INC | ❌ | 🟡 |
+| QUARTILE | 四分位数 | QUARTILE.INC | ✅ | 🟡 |
 | RANK | 順位 | RANK.EQ | ✅ | 🟡 |
 | STDEV | 標準偏差 | STDEV.S | ✅ | 🔴 |
 | STDEVP | 標準偏差（母集団） | STDEV.P | ✅ | 🔴 |

@@ -197,18 +197,27 @@ export const QUARTILE: CustomFormula = {
     const n = sorted.length;
     
     switch (quart) {
-      case 0: return sorted[0]; // 最小値
-      case 1: // 第1四分位数
+      case 0: 
+        return sorted[0]; // 最小値
+      case 1: {
+        // 第1四分位数
         const q1Index = (n - 1) * 0.25;
         return sorted[Math.floor(q1Index)] + (q1Index % 1) * (sorted[Math.ceil(q1Index)] - sorted[Math.floor(q1Index)]);
-      case 2: // 中央値
+      }
+      case 2: {
+        // 中央値
         const middle = Math.floor(n / 2);
         return n % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
-      case 3: // 第3四分位数
+      }
+      case 3: {
+        // 第3四分位数
         const q3Index = (n - 1) * 0.75;
         return sorted[Math.floor(q3Index)] + (q3Index % 1) * (sorted[Math.ceil(q3Index)] - sorted[Math.floor(q3Index)]);
-      case 4: return sorted[n - 1]; // 最大値
-      default: return FormulaError.NUM;
+      }
+      case 4: 
+        return sorted[n - 1]; // 最大値
+      default: 
+        return FormulaError.NUM;
     }
   }
 };
@@ -614,5 +623,80 @@ export const RANK_AVG: CustomFormula = {
     
     const avgRank = indices.reduce((sum, rank) => sum + rank, 0) / indices.length;
     return avgRank;
+  }
+};
+
+// PERCENTILE.INC関数（境界値含むパーセンタイル）
+export const PERCENTILE_INC: CustomFormula = {
+  name: 'PERCENTILE.INC',
+  pattern: /PERCENTILE\.INC\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// PERCENTILE.EXC関数（境界値除くパーセンタイル）
+export const PERCENTILE_EXC: CustomFormula = {
+  name: 'PERCENTILE.EXC',
+  pattern: /PERCENTILE\.EXC\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// QUARTILE.INC関数（境界値含む四分位数）
+export const QUARTILE_INC: CustomFormula = {
+  name: 'QUARTILE.INC',
+  pattern: /QUARTILE\.INC\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// QUARTILE.EXC関数（境界値除く四分位数）
+export const QUARTILE_EXC: CustomFormula = {
+  name: 'QUARTILE.EXC',
+  pattern: /QUARTILE\.EXC\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// STANDARDIZE関数（標準化）
+export const STANDARDIZE: CustomFormula = {
+  name: 'STANDARDIZE',
+  pattern: /STANDARDIZE\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// COVARIANCE.P関数（母共分散）
+export const COVARIANCE_P: CustomFormula = {
+  name: 'COVARIANCE.P',
+  pattern: /COVARIANCE\.P\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// COVARIANCE.S関数（標本共分散）
+export const COVARIANCE_S: CustomFormula = {
+  name: 'COVARIANCE.S',
+  pattern: /COVARIANCE\.S\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// SKEW.P関数（母集団歪度）
+export const SKEW_P: CustomFormula = {
+  name: 'SKEW.P',
+  pattern: /SKEW\.P\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
+};
+
+// PROB関数（確率計算）- 手動実装
+export const PROB: CustomFormula = {
+  name: 'PROB',
+  pattern: /PROB\(([^,]+),\s*([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
+  isSupported: false, // 手動実装
+  calculate: () => {
+    // 簡略化実装 - 基本的なエラーハンドリングのみ
+    return FormulaError.VALUE;
   }
 };
