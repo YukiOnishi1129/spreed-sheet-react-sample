@@ -178,60 +178,60 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 ### 分布関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
 |--------|------|------|----------|----------|------|
-| NORM.DIST | 正規分布 | `=NORM.DIST(x, 平均, 標準偏差, 累積)` | ❌ | 🔴 |
-| NORM.INV | 正規分布の逆関数 | `=NORM.INV(確率, 平均, 標準偏差)` | ❌ | 🔴 |
-| NORM.S.DIST | 標準正規分布 | `=NORM.S.DIST(z, 累積)` | ❌ | 🔴 |
-| NORM.S.INV | 標準正規分布の逆関数 | `=NORM.S.INV(確率)` | ❌ | 🔴 |
-| LOGNORM.DIST | 対数正規分布 | `=LOGNORM.DIST(x, 平均, 標準偏差, 累積)` | ❌ | 🔴 |
-| LOGNORM.INV | 対数正規分布の逆関数 | `=LOGNORM.INV(確率, 平均, 標準偏差)` | ❌ | 🔴 |
-| T.DIST | t分布（左側） | `=T.DIST(x, 自由度, 累積)` | ❌ | 🔴 |
-| T.DIST.2T | t分布（両側） | `=T.DIST.2T(x, 自由度)` | ❌ | 🔴 |
-| T.DIST.RT | t分布（右側） | `=T.DIST.RT(x, 自由度)` | ❌ | 🔴 |
-| T.INV | t分布の逆関数（左側） | `=T.INV(確率, 自由度)` | ❌ | 🔴 |
-| T.INV.2T | t分布の逆関数（両側） | `=T.INV.2T(確率, 自由度)` | ❌ | 🔴 |
-| CHISQ.DIST | カイ二乗分布 | `=CHISQ.DIST(x, 自由度, 累積)` | ❌ | 🔴 |
-| CHISQ.DIST.RT | カイ二乗分布（右側） | `=CHISQ.DIST.RT(x, 自由度)` | ❌ | 🔴 |
-| CHISQ.INV | カイ二乗分布の逆関数 | `=CHISQ.INV(確率, 自由度)` | ❌ | 🔴 |
-| CHISQ.INV.RT | カイ二乗分布の逆関数（右側） | `=CHISQ.INV.RT(確率, 自由度)` | ❌ | 🔴 |
-| F.DIST | F分布 | `=F.DIST(x, 自由度1, 自由度2, 累積)` | ❌ | 🔴 |
-| F.DIST.RT | F分布（右側） | `=F.DIST.RT(x, 自由度1, 自由度2)` | ❌ | 🔴 |
-| F.INV | F分布の逆関数 | `=F.INV(確率, 自由度1, 自由度2)` | ❌ | 🔴 |
-| F.INV.RT | F分布の逆関数（右側） | `=F.INV.RT(確率, 自由度1, 自由度2)` | ❌ | 🔴 |
-| BETA.DIST | ベータ分布 | `=BETA.DIST(x, α, β, 累積, [A], [B])` | ❌ | 🔴 |
-| BETA.INV | ベータ分布の逆関数 | `=BETA.INV(確率, α, β, [A], [B])` | ❌ | 🔴 |
-| GAMMA.DIST | ガンマ分布 | `=GAMMA.DIST(x, α, β, 累積)` | ❌ | 🔴 |
-| GAMMA.INV | ガンマ分布の逆関数 | `=GAMMA.INV(確率, α, β)` | ❌ | 🔴 |
-| EXPON.DIST | 指数分布 | `=EXPON.DIST(x, λ, 累積)` | ❌ | 🔴 |
-| WEIBULL.DIST | ワイブル分布 | `=WEIBULL.DIST(x, α, β, 累積)` | ❌ | 🔴 |
-| BINOM.DIST | 二項分布 | `=BINOM.DIST(成功数, 試行回数, 成功率, 累積)` | ❌ | 🔴 |
-| BINOM.INV | 二項分布の逆関数 | `=BINOM.INV(試行回数, 成功率, α)` | ❌ | 🔴 |
-| NEGBINOM.DIST | 負の二項分布 | `=NEGBINOM.DIST(失敗数, 成功数, 成功率, 累積)` | ❌ | 🔴 |
-| POISSON.DIST | ポアソン分布 | `=POISSON.DIST(x, 平均, 累積)` | ❌ | 🔴 |
-| HYPGEOM.DIST | 超幾何分布 | `=HYPGEOM.DIST(標本成功数, 標本数, 母集団成功数, 母集団数, 累積)` | ❌ | 🔴 |
+| NORM.DIST | 正規分布 | `=NORM.DIST(x, 平均, 標準偏差, 累積)` | ✅ | 🔴 |
+| NORM.INV | 正規分布の逆関数 | `=NORM.INV(確率, 平均, 標準偏差)` | ✅ | 🔴 |
+| NORM.S.DIST | 標準正規分布 | `=NORM.S.DIST(z, 累積)` | ✅ | 🔴 |
+| NORM.S.INV | 標準正規分布の逆関数 | `=NORM.S.INV(確率)` | ✅ | 🔴 |
+| LOGNORM.DIST | 対数正規分布 | `=LOGNORM.DIST(x, 平均, 標準偏差, 累積)` | ✅ | 🔴 |
+| LOGNORM.INV | 対数正規分布の逆関数 | `=LOGNORM.INV(確率, 平均, 標準偏差)` | ✅ | 🔴 |
+| T.DIST | t分布（左側） | `=T.DIST(x, 自由度, 累積)` | ✅ | 🔴 |
+| T.DIST.2T | t分布（両側） | `=T.DIST.2T(x, 自由度)` | ✅ | 🔴 |
+| T.DIST.RT | t分布（右側） | `=T.DIST.RT(x, 自由度)` | ✅ | 🔴 |
+| T.INV | t分布の逆関数（左側） | `=T.INV(確率, 自由度)` | ✅ | 🔴 |
+| T.INV.2T | t分布の逆関数（両側） | `=T.INV.2T(確率, 自由度)` | ✅ | 🔴 |
+| CHISQ.DIST | カイ二乗分布 | `=CHISQ.DIST(x, 自由度, 累積)` | ✅ | 🔴 |
+| CHISQ.DIST.RT | カイ二乗分布（右側） | `=CHISQ.DIST.RT(x, 自由度)` | ✅ | 🔴 |
+| CHISQ.INV | カイ二乗分布の逆関数 | `=CHISQ.INV(確率, 自由度)` | ✅ | 🔴 |
+| CHISQ.INV.RT | カイ二乗分布の逆関数（右側） | `=CHISQ.INV.RT(確率, 自由度)` | ✅ | 🔴 |
+| F.DIST | F分布 | `=F.DIST(x, 自由度1, 自由度2, 累積)` | ✅ | 🔴 |
+| F.DIST.RT | F分布（右側） | `=F.DIST.RT(x, 自由度1, 自由度2)` | ✅ | 🔴 |
+| F.INV | F分布の逆関数 | `=F.INV(確率, 自由度1, 自由度2)` | ✅ | 🔴 |
+| F.INV.RT | F分布の逆関数（右側） | `=F.INV.RT(確率, 自由度1, 自由度2)` | ✅ | 🔴 |
+| BETA.DIST | ベータ分布 | `=BETA.DIST(x, α, β, 累積, [A], [B])` | ✅ | 🔴 |
+| BETA.INV | ベータ分布の逆関数 | `=BETA.INV(確率, α, β, [A], [B])` | ✅ | 🔴 |
+| GAMMA.DIST | ガンマ分布 | `=GAMMA.DIST(x, α, β, 累積)` | ✅ | 🔴 |
+| GAMMA.INV | ガンマ分布の逆関数 | `=GAMMA.INV(確率, α, β)` | ✅ | 🔴 |
+| EXPON.DIST | 指数分布 | `=EXPON.DIST(x, λ, 累積)` | ✅ | 🔴 |
+| WEIBULL.DIST | ワイブル分布 | `=WEIBULL.DIST(x, α, β, 累積)` | ✅ | 🔴 |
+| BINOM.DIST | 二項分布 | `=BINOM.DIST(成功数, 試行回数, 成功率, 累積)` | ✅ | 🔴 |
+| BINOM.INV | 二項分布の逆関数 | `=BINOM.INV(試行回数, 成功率, α)` | ✅ | 🔴 |
+| NEGBINOM.DIST | 負の二項分布 | `=NEGBINOM.DIST(失敗数, 成功数, 成功率, 累積)` | ✅ | 🔴 |
+| POISSON.DIST | ポアソン分布 | `=POISSON.DIST(x, 平均, 累積)` | ✅ | 🔴 |
+| HYPGEOM.DIST | 超幾何分布 | `=HYPGEOM.DIST(標本成功数, 標本数, 母集団成功数, 母集団数, 累積)` | ✅ | 🔴 |
 
 ### 検定・推定関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
 |--------|------|------|----------|----------|------|
-| CONFIDENCE.NORM | 信頼区間（正規分布） | `=CONFIDENCE.NORM(α, 標準偏差, 標本数)` | ❌ | 🔴 |
-| CONFIDENCE.T | 信頼区間（t分布） | `=CONFIDENCE.T(α, 標準偏差, 標本数)` | ❌ | 🔴 |
-| Z.TEST | z検定 | `=Z.TEST(配列, x, [σ])` | ❌ | 🔴 |
-| T.TEST | t検定 | `=T.TEST(配列1, 配列2, 尾部, 検定の種類)` | ❌ | 🔴 |
-| F.TEST | F検定 | `=F.TEST(配列1, 配列2)` | ❌ | 🔴 |
-| CHISQ.TEST | カイ二乗検定 | `=CHISQ.TEST(実測値範囲, 期待値範囲)` | ❌ | 🔴 |
+| CONFIDENCE.NORM | 信頼区間（正規分布） | `=CONFIDENCE.NORM(α, 標準偏差, 標本数)` | ✅ | 🔴 |
+| CONFIDENCE.T | 信頼区間（t分布） | `=CONFIDENCE.T(α, 標準偏差, 標本数)` | ✅ | 🔴 |
+| Z.TEST | z検定 | `=Z.TEST(配列, x, [σ])` | ✅ | 🔴 |
+| T.TEST | t検定 | `=T.TEST(配列1, 配列2, 尾部, 検定の種類)` | ✅ | 🔴 |
+| F.TEST | F検定 | `=F.TEST(配列1, 配列2)` | ✅ | 🔴 |
+| CHISQ.TEST | カイ二乗検定 | `=CHISQ.TEST(実測値範囲, 期待値範囲)` | ✅ | 🔴 |
 
 ### 予測・回帰関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
 |--------|------|------|----------|----------|------|
-| FORECAST | 予測値を計算 | `=FORECAST(x, 既知のy, 既知のx)` | ❌ | 🔴 |
-| FORECAST.LINEAR | 線形予測 | `=FORECAST.LINEAR(x, 既知のy, 既知のx)` | ❌ | 🔴 |
-| FORECAST.ETS | 指数平滑法による予測 | `=FORECAST.ETS(目標日付, 値, タイムライン, [季節性], [データ補完], [集計])` | ❌ | 🔴 |
-| FORECAST.ETS.CONFINT | ETS予測の信頼区間 | `=FORECAST.ETS.CONFINT(目標日付, 値, タイムライン, [信頼度], [季節性], [データ補完], [集計])` | ❌ | 🔴 |
-| FORECAST.ETS.SEASONALITY | ETS季節性の長さ | `=FORECAST.ETS.SEASONALITY(値, タイムライン, [データ補完], [集計])` | ❌ | 🔴 |
-| FORECAST.ETS.STAT | ETS統計値 | `=FORECAST.ETS.STAT(値, タイムライン, 統計タイプ, [季節性], [データ補完], [集計])` | ❌ | 🔴 |
-| TREND | 線形トレンド値 | `=TREND(既知のy, [既知のx], [新しいx], [定数])` | ❌ | 🔴 |
-| GROWTH | 指数成長値 | `=GROWTH(既知のy, [既知のx], [新しいx], [定数])` | ❌ | 🔴 |
-| LINEST | 線形回帰統計値 | `=LINEST(既知のy, [既知のx], [定数], [補正])` | ❌ | 🔴 |
-| LOGEST | 指数回帰統計値 | `=LOGEST(既知のy, [既知のx], [定数], [補正])` | ❌ | 🔴 |
+| FORECAST | 予測値を計算 | `=FORECAST(x, 既知のy, 既知のx)` | ✅ | 🔴 |
+| FORECAST.LINEAR | 線形予測 | `=FORECAST.LINEAR(x, 既知のy, 既知のx)` | ✅ | 🔴 |
+| FORECAST.ETS | 指数平滑法による予測 | `=FORECAST.ETS(目標日付, 値, タイムライン, [季節性], [データ補完], [集計])` | ✅ | 🔴 |
+| FORECAST.ETS.CONFINT | ETS予測の信頼区間 | `=FORECAST.ETS.CONFINT(目標日付, 値, タイムライン, [信頼度], [季節性], [データ補完], [集計])` | ✅ | 🔴 |
+| FORECAST.ETS.SEASONALITY | ETS季節性の長さ | `=FORECAST.ETS.SEASONALITY(値, タイムライン, [データ補完], [集計])` | ✅ | 🔴 |
+| FORECAST.ETS.STAT | ETS統計値 | `=FORECAST.ETS.STAT(値, タイムライン, 統計タイプ, [季節性], [データ補完], [集計])` | ✅ | 🔴 |
+| TREND | 線形トレンド値 | `=TREND(既知のy, [既知のx], [新しいx], [定数])` | ✅ | 🔴 |
+| GROWTH | 指数成長値 | `=GROWTH(既知のy, [既知のx], [新しいx], [定数])` | ✅ | 🔴 |
+| LINEST | 線形回帰統計値 | `=LINEST(既知のy, [既知のx], [定数], [補正])` | ✅ | 🔴 |
+| LOGEST | 指数回帰統計値 | `=LOGEST(既知のy, [既知のx], [定数], [補正])` | ✅ | 🔴 |
 | SLOPE | 回帰直線の傾き | `=SLOPE(既知のy, 既知のx)` | ✅ | 🔴 |
 | INTERCEPT | 回帰直線の切片 | `=INTERCEPT(既知のy, 既知のx)` | ✅ | 🔴 |
 | RSQ | 決定係数 | `=RSQ(既知のy, 既知のx)` | ✅ | 🔴 |
