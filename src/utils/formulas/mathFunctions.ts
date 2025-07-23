@@ -528,42 +528,8 @@ export const MROUND: CustomFormula = {
 export const COMBIN: CustomFormula = {
   name: 'COMBIN',
   pattern: /COMBIN\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const nRef = matches[1].trim();
-    const kRef = matches[2].trim();
-    
-    let n: number, k: number;
-    
-    // n値を取得
-    if (nRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(nRef, context);
-      n = parseInt(String(cellValue ?? '0'));
-    } else {
-      n = parseInt(nRef);
-    }
-    
-    // k値を取得
-    if (kRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(kRef, context);
-      k = parseInt(String(cellValue ?? '0'));
-    } else {
-      k = parseInt(kRef);
-    }
-    
-    if (isNaN(n) || isNaN(k)) return FormulaError.VALUE;
-    if (n < 0 || k < 0) return FormulaError.NUM;
-    if (k > n) return 0;
-    if (k === 0 || k === n) return 1;
-    
-    // 効率的な組み合わせ計算
-    k = Math.min(k, n - k);
-    let result = 1;
-    for (let i = 0; i < k; i++) {
-      result = result * (n - i) / (i + 1);
-    }
-    return Math.round(result);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // PERMUT関数の実装（順列数）
@@ -609,38 +575,8 @@ export const PERMUT: CustomFormula = {
 export const GCD: CustomFormula = {
   name: 'GCD',
   pattern: /GCD\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const args = matches[1].split(',').map(arg => arg.trim());
-    const numbers: number[] = [];
-    
-    for (const arg of args) {
-      let num: number;
-      if (arg.match(/^[A-Z]+\d+$/)) {
-        const cellValue = getCellValue(arg, context);
-        num = parseInt(String(cellValue ?? '0'));
-      } else {
-        num = parseInt(arg);
-      }
-      
-      if (isNaN(num)) return FormulaError.VALUE;
-      if (num < 0) return FormulaError.NUM;
-      numbers.push(num);
-    }
-    
-    if (numbers.length === 0) return FormulaError.VALUE;
-    
-    // ユークリッドの互除法
-    const gcd = (a: number, b: number): number => {
-      return b === 0 ? a : gcd(b, a % b);
-    };
-    
-    let result = numbers[0];
-    for (let i = 1; i < numbers.length; i++) {
-      result = gcd(result, numbers[i]);
-    }
-    return result;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // LCM関数の実装（最小公倍数）
@@ -725,61 +661,22 @@ export const QUOTIENT: CustomFormula = {
 export const SINH: CustomFormula = {
   name: 'SINH',
   pattern: /SINH\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.sinh(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // COSH関数（双曲線余弦）
 export const COSH: CustomFormula = {
   name: 'COSH',
   pattern: /COSH\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.cosh(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // TANH関数（双曲線正接）
 export const TANH: CustomFormula = {
   name: 'TANH',
   pattern: /TANH\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.tanh(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };

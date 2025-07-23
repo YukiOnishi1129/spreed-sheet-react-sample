@@ -281,70 +281,24 @@ export const CODE: CustomFormula = {
 export const EXACT: CustomFormula = {
   name: 'EXACT',
   pattern: /EXACT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    let text1 = matches[1].trim();
-    let text2 = matches[2].trim();
-    
-    // 最初の文字列を取得
-    if (text1.startsWith('"') && text1.endsWith('"')) {
-      text1 = text1.slice(1, -1);
-    } else if (text1.match(/^[A-Z]+\d+$/)) {
-      text1 = String(getCellValue(text1, context) ?? '');
-    }
-    
-    // 2番目の文字列を取得
-    if (text2.startsWith('"') && text2.endsWith('"')) {
-      text2 = text2.slice(1, -1);
-    } else if (text2.match(/^[A-Z]+\d+$/)) {
-      text2 = String(getCellValue(text2, context) ?? '');
-    }
-    
-    return text1 === text2;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // CLEAN関数の実装（印刷不可文字を削除）
 export const CLEAN: CustomFormula = {
   name: 'CLEAN',
   pattern: /CLEAN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    let text = matches[1].trim();
-    
-    if (text.startsWith('"') && text.endsWith('"')) {
-      text = text.slice(1, -1);
-    } else if (text.match(/^[A-Z]+\d+$/)) {
-      text = String(getCellValue(text, context) ?? '');
-    }
-    
-    // 印刷不可文字（制御文字）を削除
-    return text.replace(/[\x00-\x1F]/g, '');
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // T関数の実装（文字列を返す）
 export const T: CustomFormula = {
   name: 'T',
   pattern: /T\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    let value = matches[1].trim();
-    
-    if (value.startsWith('"') && value.endsWith('"')) {
-      return value.slice(1, -1);
-    } else if (value.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(value, context);
-      return typeof cellValue === 'string' ? cellValue : '';
-    }
-    
-    // 数値の場合は空文字を返す
-    if (!isNaN(parseFloat(value))) {
-      return '';
-    }
-    
-    return String(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // FIXED関数の実装（固定小数点表示）

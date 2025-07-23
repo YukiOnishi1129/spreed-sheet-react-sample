@@ -79,58 +79,16 @@ export const MODE: CustomFormula = {
 export const COUNTA: CustomFormula = {
   name: 'COUNTA',
   pattern: /COUNTA\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    let count = 0;
-    
-    if (rangeRef.includes(':')) {
-      // セル範囲の場合
-      const values = getCellRangeValues(rangeRef, context);
-      values.forEach(value => {
-        if (value !== null && value !== undefined && value !== '') {
-          count++;
-        }
-      });
-    } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
-      // 単一セル参照の場合
-      const cellValue = getCellValue(rangeRef, context);
-      if (cellValue !== null && cellValue !== undefined && cellValue !== '') {
-        count = 1;
-      }
-    }
-    
-    return count;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // COUNTBLANK関数の実装（空白セルの個数）
 export const COUNTBLANK: CustomFormula = {
   name: 'COUNTBLANK',
   pattern: /COUNTBLANK\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    let count = 0;
-    
-    if (rangeRef.includes(':')) {
-      // セル範囲の場合
-      const values = getCellRangeValues(rangeRef, context);
-      values.forEach(value => {
-        if (value === null || value === undefined || value === '') {
-          count++;
-        }
-      });
-    } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
-      // 単一セル参照の場合
-      const cellValue = getCellValue(rangeRef, context);
-      if (cellValue === null || cellValue === undefined || cellValue === '') {
-        count = 1;
-      }
-    }
-    
-    return count;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // STDEV関数の実装（標準偏差・標本）

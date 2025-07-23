@@ -32,7 +32,8 @@
       "WebFetch(domain:support.microsoft.com)",
       "WebFetch(domain:support.google.com)",
       "WebFetch(domain:hyperformula.handsontable.com)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }

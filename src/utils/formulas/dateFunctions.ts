@@ -189,136 +189,40 @@ export const NOW: CustomFormula = {
 export const DATE: CustomFormula = {
   name: 'DATE',
   pattern: /DATE\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches) => {
-    const year = parseInt(matches[1]);
-    const month = parseInt(matches[2]);
-    const day = parseInt(matches[3]);
-    
-    if (isNaN(year) || isNaN(month) || isNaN(day)) return FormulaError.VALUE;
-    if (year < 1900 || year > 9999) return FormulaError.NUM;
-    if (month < 1 || month > 12) return FormulaError.NUM;
-    if (day < 1 || day > 31) return FormulaError.NUM;
-    
-    const date = dayjs(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
-    if (!date.isValid()) return FormulaError.NUM;
-    
-    // Excelシリアル値に変換
-    const excelEpoch = dayjs('1899-12-30');
-    return date.diff(excelEpoch, 'day');
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // YEAR関数の実装（年を抽出）
 export const YEAR: CustomFormula = {
   name: 'YEAR',
   pattern: /YEAR\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const dateRef = matches[1].trim();
-    let dateValue;
-    
-    // セル参照かチェック
-    if (dateRef.match(/^[A-Z]+\d+$/)) {
-      dateValue = getCellValue(dateRef, context);
-    } else {
-      dateValue = dateRef.replace(/"/g, '');
-    }
-    
-    // 日付を解析
-    const date = parseDate(dateValue);
-    if (!date?.isValid()) {
-      console.error('YEAR: 日付解析失敗', { dateRef, dateValue });
-      return FormulaError.VALUE;
-    }
-    
-    return date.year();
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // MONTH関数の実装（月を抽出）
 export const MONTH: CustomFormula = {
   name: 'MONTH',
   pattern: /MONTH\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const dateRef = matches[1].trim();
-    let dateValue;
-    
-    // セル参照かチェック
-    if (dateRef.match(/^[A-Z]+\d+$/)) {
-      dateValue = getCellValue(dateRef, context);
-    } else {
-      dateValue = dateRef.replace(/"/g, '');
-    }
-    
-    // 日付を解析
-    const date = parseDate(dateValue);
-    if (!date?.isValid()) {
-      console.error('MONTH: 日付解析失敗', { dateRef, dateValue });
-      return FormulaError.VALUE;
-    }
-    
-    return date.month() + 1; // dayjsは0ベース、Excelは1ベース
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // DAY関数の実装（日を抽出）
 export const DAY: CustomFormula = {
   name: 'DAY',
   pattern: /DAY\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const dateRef = matches[1].trim();
-    let dateValue;
-    
-    // セル参照かチェック
-    if (dateRef.match(/^[A-Z]+\d+$/)) {
-      dateValue = getCellValue(dateRef, context);
-    } else {
-      dateValue = dateRef.replace(/"/g, '');
-    }
-    
-    // 日付を解析
-    const date = parseDate(dateValue);
-    if (!date?.isValid()) {
-      console.error('DAY: 日付解析失敗', { dateRef, dateValue });
-      return FormulaError.VALUE;
-    }
-    
-    return date.date();
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // WEEKDAY関数の実装（曜日を数値で返す）
 export const WEEKDAY: CustomFormula = {
   name: 'WEEKDAY',
   pattern: /WEEKDAY\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
-  calculate: (matches) => {
-    const serialDate = parseFloat(matches[1]);
-    const returnType = matches[2] ? parseInt(matches[2]) : 1;
-    
-    if (isNaN(serialDate)) return FormulaError.VALUE;
-    if (isNaN(returnType) || returnType < 1 || returnType > 3) return FormulaError.NUM;
-    
-    // Excelシリアル値から日付に変換
-    const excelEpoch = dayjs('1899-12-30');
-    const date = excelEpoch.add(Math.floor(serialDate), 'day');
-    
-    const dayOfWeek = date.day(); // 0=日曜日, 1=月曜日, ...
-    
-    switch (returnType) {
-      case 1: // 1=日曜日, 2=月曜日, ..., 7=土曜日
-        return dayOfWeek + 1;
-      case 2: // 1=月曜日, 2=火曜日, ..., 7=日曜日
-        return dayOfWeek === 0 ? 7 : dayOfWeek;
-      case 3: // 0=月曜日, 1=火曜日, ..., 6=日曜日
-        return dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-      default:
-        return FormulaError.NUM;
-    }
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // DAYS関数の実装（日数差）
