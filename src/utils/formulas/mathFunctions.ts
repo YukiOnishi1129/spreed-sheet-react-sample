@@ -80,74 +80,24 @@ export const ROUND: CustomFormula = {
 export const ABS: CustomFormula = {
   name: 'ABS',
   pattern: /ABS\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    // セル参照かチェック
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.abs(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // SQRT関数の実装（平方根）
 export const SQRT: CustomFormula = {
   name: 'SQRT',
   pattern: /SQRT\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    if (value < 0) return FormulaError.NUM;
-    return Math.sqrt(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // POWER関数の実装（べき乗）
 export const POWER: CustomFormula = {
   name: 'POWER',
   pattern: /POWER\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const baseRef = matches[1].trim();
-    const expRef = matches[2].trim();
-    
-    let base: number, exponent: number;
-    
-    if (baseRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(baseRef, context);
-      base = parseFloat(String(cellValue ?? '0'));
-    } else {
-      base = parseFloat(baseRef);
-    }
-    
-    if (expRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(expRef, context);
-      exponent = parseFloat(String(cellValue ?? '0'));
-    } else {
-      exponent = parseFloat(expRef);
-    }
-    
-    if (isNaN(base) || isNaN(exponent)) return FormulaError.VALUE;
-    return Math.pow(base, exponent);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // MOD関数の実装（剰余）
@@ -280,147 +230,56 @@ export const RANDBETWEEN: CustomFormula = {
 export const PI: CustomFormula = {
   name: 'PI',
   pattern: /PI\(\)/i,
-  isSupported: false,
-  calculate: () => {
-    return Math.PI;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // DEGREES関数の実装（ラジアンを度に変換）
 export const DEGREES: CustomFormula = {
   name: 'DEGREES',
   pattern: /DEGREES\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const radiansRef = matches[1].trim();
-    let radians: number;
-    
-    if (radiansRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(radiansRef, context);
-      radians = parseFloat(String(cellValue ?? '0'));
-    } else {
-      radians = parseFloat(radiansRef);
-    }
-    
-    if (isNaN(radians)) return FormulaError.VALUE;
-    return radians * (180 / Math.PI);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // RADIANS関数の実装（度をラジアンに変換）
 export const RADIANS: CustomFormula = {
   name: 'RADIANS',
   pattern: /RADIANS\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const degreesRef = matches[1].trim();
-    let degrees: number;
-    
-    if (degreesRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(degreesRef, context);
-      degrees = parseFloat(String(cellValue ?? '0'));
-    } else {
-      degrees = parseFloat(degreesRef);
-    }
-    
-    if (isNaN(degrees)) return FormulaError.VALUE;
-    return degrees * (Math.PI / 180);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // SIN関数の実装（正弦）
 export const SIN: CustomFormula = {
   name: 'SIN',
   pattern: /SIN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const angleRef = matches[1].trim();
-    let angle: number;
-    
-    if (angleRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(angleRef, context);
-      angle = parseFloat(String(cellValue ?? '0'));
-    } else {
-      angle = parseFloat(angleRef);
-    }
-    
-    if (isNaN(angle)) return FormulaError.VALUE;
-    return Math.sin(angle);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // COS関数の実装（余弦）
 export const COS: CustomFormula = {
   name: 'COS',
   pattern: /COS\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const angleRef = matches[1].trim();
-    let angle: number;
-    
-    if (angleRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(angleRef, context);
-      angle = parseFloat(String(cellValue ?? '0'));
-    } else {
-      angle = parseFloat(angleRef);
-    }
-    
-    if (isNaN(angle)) return FormulaError.VALUE;
-    return Math.cos(angle);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // TAN関数の実装（正接）
 export const TAN: CustomFormula = {
   name: 'TAN',
   pattern: /TAN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const angleRef = matches[1].trim();
-    let angle: number;
-    
-    if (angleRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(angleRef, context);
-      angle = parseFloat(String(cellValue ?? '0'));
-    } else {
-      angle = parseFloat(angleRef);
-    }
-    
-    if (isNaN(angle)) return FormulaError.VALUE;
-    return Math.tan(angle);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // LOG関数の実装（対数）
 export const LOG: CustomFormula = {
   name: 'LOG',
   pattern: /LOG\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    const baseRef = matches[2] ? matches[2].trim() : '10';
-    
-    let value: number, base: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (baseRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(baseRef, context);
-      base = parseFloat(String(cellValue ?? '10'));
-    } else {
-      base = parseFloat(baseRef);
-    }
-    
-    if (isNaN(value) || isNaN(base)) return FormulaError.VALUE;
-    if (value <= 0 || base <= 0 || base === 1) return FormulaError.NUM;
-    
-    return Math.log(value) / Math.log(base);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // LOG10関数の実装（常用対数）
@@ -435,138 +294,48 @@ export const LOG10: CustomFormula = {
 export const LN: CustomFormula = {
   name: 'LN',
   pattern: /LN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    if (value <= 0) return FormulaError.NUM;
-    return Math.log(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // EXP関数の実装（指数関数）
 export const EXP: CustomFormula = {
   name: 'EXP',
   pattern: /EXP\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.exp(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ASIN関数の実装（逆正弦）
 export const ASIN: CustomFormula = {
   name: 'ASIN',
   pattern: /ASIN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    if (value < -1 || value > 1) return FormulaError.NUM;
-    return Math.asin(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ACOS関数の実装（逆余弦）
 export const ACOS: CustomFormula = {
   name: 'ACOS',
   pattern: /ACOS\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    if (value < -1 || value > 1) return FormulaError.NUM;
-    return Math.acos(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ATAN関数の実装（逆正接）
 export const ATAN: CustomFormula = {
   name: 'ATAN',
   pattern: /ATAN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.atan(value);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ATAN2関数の実装（x,y座標から角度）
 export const ATAN2: CustomFormula = {
   name: 'ATAN2',
   pattern: /ATAN2\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const xRef = matches[1].trim();
-    const yRef = matches[2].trim();
-    
-    let x: number, y: number;
-    
-    if (xRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(xRef, context);
-      x = parseFloat(String(cellValue ?? '0'));
-    } else {
-      x = parseFloat(xRef);
-    }
-    
-    if (yRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(yRef, context);
-      y = parseFloat(String(cellValue ?? '0'));
-    } else {
-      y = parseFloat(yRef);
-    }
-    
-    if (isNaN(x) || isNaN(y)) return FormulaError.VALUE;
-    return Math.atan2(y, x);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ROUNDUP関数の実装（切り上げ）
@@ -703,49 +472,16 @@ export const FLOOR: CustomFormula = {
 export const SIGN: CustomFormula = {
   name: 'SIGN',
   pattern: /SIGN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return value > 0 ? 1 : value < 0 ? -1 : 0;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // FACT関数の実装（階乗）
 export const FACT: CustomFormula = {
   name: 'FACT',
   pattern: /FACT\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = parseInt(String(cellValue ?? '0'));
-    } else {
-      value = parseInt(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    if (value < 0) return FormulaError.NUM;
-    if (value > 170) return FormulaError.NUM; // 階乗が大きすぎる場合
-    
-    let result = 1;
-    for (let i = 2; i <= value; i++) {
-      result *= i;
-    }
-    return result;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // SUMIFS関数の実装（複数条件での合計）

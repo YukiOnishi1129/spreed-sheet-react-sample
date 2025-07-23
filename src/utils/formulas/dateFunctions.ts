@@ -441,156 +441,32 @@ export const TIME: CustomFormula = {
 export const HOUR: CustomFormula = {
   name: 'HOUR',
   pattern: /HOUR\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const timeRef = matches[1].trim();
-    let timeValue;
-    
-    if (timeRef.match(/^[A-Z]+\d+$/)) {
-      timeValue = getCellValue(timeRef, context);
-    } else if (timeRef.startsWith('"') && timeRef.endsWith('"')) {
-      timeValue = timeRef.slice(1, -1);
-    } else {
-      timeValue = timeRef;
-    }
-    
-    // Excelシリアル値の場合（数値）
-    if (typeof timeValue === 'number' || !isNaN(parseFloat(timeValue))) {
-      const num = typeof timeValue === 'number' ? timeValue : parseFloat(timeValue);
-      const hours = Math.floor((num % 1) * 24);
-      return hours;
-    }
-    
-    // 時刻文字列の場合
-    const timeStr = String(timeValue);
-    const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-    if (timeMatch) {
-      return parseInt(timeMatch[1]);
-    }
-    
-    return FormulaError.VALUE;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // MINUTE関数の実装（分を抽出）
 export const MINUTE: CustomFormula = {
   name: 'MINUTE',
   pattern: /MINUTE\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const timeRef = matches[1].trim();
-    let timeValue;
-    
-    if (timeRef.match(/^[A-Z]+\d+$/)) {
-      timeValue = getCellValue(timeRef, context);
-    } else if (timeRef.startsWith('"') && timeRef.endsWith('"')) {
-      timeValue = timeRef.slice(1, -1);
-    } else {
-      timeValue = timeRef;
-    }
-    
-    // Excelシリアル値の場合（数値）
-    if (typeof timeValue === 'number' || !isNaN(parseFloat(timeValue))) {
-      const num = typeof timeValue === 'number' ? timeValue : parseFloat(timeValue);
-      const totalMinutes = Math.floor((num % 1) * 24 * 60);
-      const minutes = totalMinutes % 60;
-      return minutes;
-    }
-    
-    // 時刻文字列の場合
-    const timeStr = String(timeValue);
-    const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-    if (timeMatch) {
-      return parseInt(timeMatch[2]);
-    }
-    
-    return FormulaError.VALUE;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // SECOND関数の実装（秒を抽出）
 export const SECOND: CustomFormula = {
   name: 'SECOND',
   pattern: /SECOND\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const timeRef = matches[1].trim();
-    let timeValue;
-    
-    if (timeRef.match(/^[A-Z]+\d+$/)) {
-      timeValue = getCellValue(timeRef, context);
-    } else if (timeRef.startsWith('"') && timeRef.endsWith('"')) {
-      timeValue = timeRef.slice(1, -1);
-    } else {
-      timeValue = timeRef;
-    }
-    
-    // Excelシリアル値の場合（数値）
-    if (typeof timeValue === 'number' || !isNaN(parseFloat(timeValue))) {
-      const num = typeof timeValue === 'number' ? timeValue : parseFloat(timeValue);
-      const totalSeconds = Math.floor((num % 1) * 24 * 60 * 60);
-      const seconds = totalSeconds % 60;
-      return seconds;
-    }
-    
-    // 時刻文字列の場合
-    const timeStr = String(timeValue);
-    const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-    if (timeMatch) {
-      return parseInt(timeMatch[3] || '0');
-    }
-    
-    return FormulaError.VALUE;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // WEEKNUM関数の実装（週番号を返す）
 export const WEEKNUM: CustomFormula = {
   name: 'WEEKNUM',
   pattern: /WEEKNUM\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const dateRef = matches[1].trim();
-    const returnTypeRef = matches[2]?.trim() || '1';
-    
-    let dateValue;
-    if (dateRef.match(/^[A-Z]+\d+$/)) {
-      dateValue = getCellValue(dateRef, context);
-    } else if (dateRef.startsWith('"') && dateRef.endsWith('"')) {
-      dateValue = dateRef.slice(1, -1);
-    } else {
-      dateValue = dateRef;
-    }
-    
-    let returnType: number;
-    if (returnTypeRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(returnTypeRef, context);
-      returnType = parseInt(String(cellValue ?? '1'));
-    } else {
-      returnType = parseInt(returnTypeRef);
-    }
-    
-    const date = parseDate(dateValue);
-    if (!date?.isValid()) return FormulaError.VALUE;
-    
-    // 年の最初の日
-    const yearStart = date.startOf('year');
-    
-    // 週の開始日を設定（1=日曜日、2=月曜日）
-    const startOfWeek = returnType === 2 ? 1 : 0; // 0=日曜日、1=月曜日
-    
-    // 年の最初の週の開始日
-    const firstWeekStart = yearStart.day(startOfWeek);
-    
-    // 日付が年始より前の場合は前年の最終週
-    if (date.isBefore(firstWeekStart)) {
-      return 1;
-    }
-    
-    // 週番号を計算
-    const weekNum = Math.floor(date.diff(firstWeekStart, 'day') / 7) + 1;
-    return weekNum;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // DAYS360関数の実装（360日基準の日数）

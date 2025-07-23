@@ -1,172 +1,70 @@
 // 情報関数の実装
 
 import type { CustomFormula } from './types';
-import { FormulaError } from './types';
 import { getCellValue } from './utils';
 
 // ISBLANK関数の実装（空白セルか判定）
 export const ISBLANK: CustomFormula = {
   name: 'ISBLANK',
   pattern: /ISBLANK\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const cellRef = matches[1].trim();
-    
-    // セル参照の場合
-    if (cellRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(cellRef, context);
-      return cellValue === null || cellValue === undefined || cellValue === '';
-    }
-    
-    // 直接値の場合
-    const value = cellRef.replace(/"/g, '');
-    return value === '';
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ISERROR関数の実装（エラー値か判定）
 export const ISERROR: CustomFormula = {
   name: 'ISERROR',
   pattern: /ISERROR\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      return typeof cellValue === 'string' && cellValue.startsWith('#') && cellValue.endsWith('!');
-    }
-    
-    // 直接値の場合
-    return valueRef.startsWith('#') && valueRef.endsWith('!');
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ISNA関数の実装（#N/Aエラーか判定）
 export const ISNA: CustomFormula = {
   name: 'ISNA',
   pattern: /ISNA\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      return cellValue === '#N/A' || cellValue === '#N/A!';
-    }
-    
-    // 直接値の場合
-    return valueRef === '#N/A' || valueRef === '#N/A!';
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ISTEXT関数の実装（文字列か判定）
 export const ISTEXT: CustomFormula = {
   name: 'ISTEXT',
   pattern: /ISTEXT\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      return typeof cellValue === 'string' && isNaN(parseFloat(cellValue));
-    }
-    
-    // 直接値の場合
-    if (valueRef.startsWith('"') && valueRef.endsWith('"')) {
-      return true; // 明示的に文字列
-    }
-    
-    // 数値でない文字列
-    return isNaN(parseFloat(valueRef));
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ISNUMBER関数の実装（数値か判定）
 export const ISNUMBER: CustomFormula = {
   name: 'ISNUMBER',
   pattern: /ISNUMBER\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      return typeof cellValue === 'number' || (typeof cellValue === 'string' && !isNaN(parseFloat(cellValue)));
-    }
-    
-    // 直接値の場合
-    return !isNaN(parseFloat(valueRef));
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ISLOGICAL関数の実装（論理値か判定）
 export const ISLOGICAL: CustomFormula = {
   name: 'ISLOGICAL',
   pattern: /ISLOGICAL\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      return typeof cellValue === 'boolean';
-    }
-    
-    // 直接値の場合
-    const value = valueRef.replace(/"/g, '').toUpperCase();
-    return value === 'TRUE' || value === 'FALSE';
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ISEVEN関数の実装（偶数か判定）
 export const ISEVEN: CustomFormula = {
   name: 'ISEVEN',
   pattern: /ISEVEN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = typeof cellValue === 'number' ? cellValue : parseFloat(String(cellValue));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.floor(value) % 2 === 0;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // ISODD関数の実装（奇数か判定）
 export const ISODD: CustomFormula = {
   name: 'ISODD',
   pattern: /ISODD\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const valueRef = matches[1].trim();
-    let value: number;
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(valueRef, context);
-      value = typeof cellValue === 'number' ? cellValue : parseFloat(String(cellValue));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    if (isNaN(value)) return FormulaError.VALUE;
-    return Math.floor(value) % 2 === 1;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // TYPE関数の実装（データ型を返す）

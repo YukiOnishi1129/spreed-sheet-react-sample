@@ -40,22 +40,8 @@ function extractNumbersFromRange(rangeRef: string, context: FormulaContext): num
 export const MEDIAN: CustomFormula = {
   name: 'MEDIAN',
   pattern: /MEDIAN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const numbers = extractNumbersFromRange(rangeRef, context);
-    
-    if (numbers.length === 0) return FormulaError.NUM;
-    
-    const sorted = numbers.sort((a, b) => a - b);
-    const middle = Math.floor(sorted.length / 2);
-    
-    if (sorted.length % 2 === 0) {
-      return (sorted[middle - 1] + sorted[middle]) / 2;
-    } else {
-      return sorted[middle];
-    }
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // MODE関数の実装（最頻値）
@@ -151,94 +137,32 @@ export const COUNTBLANK: CustomFormula = {
 export const STDEV: CustomFormula = {
   name: 'STDEV',
   pattern: /STDEV\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const numbers = extractNumbersFromRange(rangeRef, context);
-    
-    if (numbers.length < 2) return FormulaError.DIV0;
-    
-    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
-    const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
-    const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / (numbers.length - 1);
-    
-    return Math.sqrt(variance);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // VAR関数の実装（分散・標本）
 export const VAR: CustomFormula = {
   name: 'VAR',
   pattern: /VAR\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const numbers = extractNumbersFromRange(rangeRef, context);
-    
-    if (numbers.length < 2) return FormulaError.DIV0;
-    
-    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
-    const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
-    const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / (numbers.length - 1);
-    
-    return variance;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // LARGE関数の実装（k番目に大きい値）
 export const LARGE: CustomFormula = {
   name: 'LARGE',
   pattern: /LARGE\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const kRef = matches[2].trim();
-    
-    let k: number;
-    if (kRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(kRef, context);
-      k = parseInt(String(cellValue ?? '1'));
-    } else {
-      k = parseInt(kRef);
-    }
-    
-    if (isNaN(k) || k < 1) return FormulaError.NUM;
-    
-    const numbers = extractNumbersFromRange(rangeRef, context);
-    if (numbers.length === 0) return FormulaError.NUM;
-    if (k > numbers.length) return FormulaError.NUM;
-    
-    const sorted = numbers.sort((a, b) => b - a);
-    return sorted[k - 1];
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // SMALL関数の実装（k番目に小さい値）
 export const SMALL: CustomFormula = {
   name: 'SMALL',
   pattern: /SMALL\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const kRef = matches[2].trim();
-    
-    let k: number;
-    if (kRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(kRef, context);
-      k = parseInt(String(cellValue ?? '1'));
-    } else {
-      k = parseInt(kRef);
-    }
-    
-    if (isNaN(k) || k < 1) return FormulaError.NUM;
-    
-    const numbers = extractNumbersFromRange(rangeRef, context);
-    if (numbers.length === 0) return FormulaError.NUM;
-    if (k > numbers.length) return FormulaError.NUM;
-    
-    const sorted = numbers.sort((a, b) => a - b);
-    return sorted[k - 1];
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // RANK関数の実装（順位）
@@ -285,36 +209,8 @@ export const RANK: CustomFormula = {
 export const CORREL: CustomFormula = {
   name: 'CORREL',
   pattern: /CORREL\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const range1Ref = matches[1].trim();
-    const range2Ref = matches[2].trim();
-    
-    const numbers1 = extractNumbersFromRange(range1Ref, context);
-    const numbers2 = extractNumbersFromRange(range2Ref, context);
-    
-    if (numbers1.length !== numbers2.length || numbers1.length < 2) return FormulaError.NA;
-    
-    const mean1 = numbers1.reduce((sum, num) => sum + num, 0) / numbers1.length;
-    const mean2 = numbers2.reduce((sum, num) => sum + num, 0) / numbers2.length;
-    
-    let numerator = 0;
-    let denominator1 = 0;
-    let denominator2 = 0;
-    
-    for (let i = 0; i < numbers1.length; i++) {
-      const diff1 = numbers1[i] - mean1;
-      const diff2 = numbers2[i] - mean2;
-      numerator += diff1 * diff2;
-      denominator1 += diff1 * diff1;
-      denominator2 += diff2 * diff2;
-    }
-    
-    const denominator = Math.sqrt(denominator1 * denominator2);
-    if (denominator === 0) return FormulaError.DIV0;
-    
-    return numerator / denominator;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // QUARTILE関数の実装（四分位数）
@@ -398,42 +294,16 @@ export const PERCENTILE: CustomFormula = {
 export const GEOMEAN: CustomFormula = {
   name: 'GEOMEAN',
   pattern: /GEOMEAN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const numbers = extractNumbersFromRange(rangeRef, context);
-    
-    if (numbers.length === 0) return FormulaError.NUM;
-    
-    // すべての値が正でなければならない
-    for (const num of numbers) {
-      if (num <= 0) return FormulaError.NUM;
-    }
-    
-    const product = numbers.reduce((prod, num) => prod * num, 1);
-    return Math.pow(product, 1 / numbers.length);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // HARMEAN関数の実装（調和平均）
 export const HARMEAN: CustomFormula = {
   name: 'HARMEAN',
   pattern: /HARMEAN\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const rangeRef = matches[1].trim();
-    const numbers = extractNumbersFromRange(rangeRef, context);
-    
-    if (numbers.length === 0) return FormulaError.NUM;
-    
-    // すべての値が正でなければならない
-    for (const num of numbers) {
-      if (num <= 0) return FormulaError.NUM;
-    }
-    
-    const reciprocalSum = numbers.reduce((sum, num) => sum + (1 / num), 0);
-    return numbers.length / reciprocalSum;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // TRIMMEAN関数の実装（トリム平均）

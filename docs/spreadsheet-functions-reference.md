@@ -40,14 +40,14 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | MOD | 剰余を返す | `=MOD(数値, 除数)` | ✅ | 🔴 |
 | INT | 整数部分を返す | `=INT(数値)` | ✅ | 🔴 |
 | TRUNC | 小数部分を切り捨て | `=TRUNC(数値, [桁数])` | ✅ | 🔴 |
-| SIGN | 数値の符号を返す | `=SIGN(数値)` | ✅ | 🟡 |
+| SIGN | 数値の符号を返す | `=SIGN(数値)` | ✅ | 🔴 |
 | RAND | 0以上1未満の乱数 | `=RAND()` | ✅ | 🟡 |
 | RANDBETWEEN | 指定範囲の整数乱数 | `=RANDBETWEEN(最小値, 最大値)` | ✅ | 🟡 |
-| EXP | eのべき乗を計算 | `=EXP(数値)` | ✅ | 🟡 |
-| LN | 自然対数を計算 | `=LN(数値)` | ✅ | 🟡 |
-| LOG | 対数を計算 | `=LOG(数値, [底])` | ✅ | 🟡 |
+| EXP | eのべき乗を計算 | `=EXP(数値)` | ✅ | 🔴 |
+| LN | 自然対数を計算 | `=LN(数値)` | ✅ | 🔴 |
+| LOG | 対数を計算 | `=LOG(数値, [底])` | ✅ | 🔴 |
 | LOG10 | 常用対数を計算 | `=LOG10(数値)` | ✅ | 🔴 |
-| FACT | 階乗を計算 | `=FACT(数値)` | ✅ | 🟡 |
+| FACT | 階乗を計算 | `=FACT(数値)` | ✅ | 🔴 |
 | COMBIN | 組み合わせ数を計算 | `=COMBIN(総数, 選択数)` | ✅ | 🟡 |
 | PERMUT | 順列数を計算 | `=PERMUT(総数, 選択数)` | ✅ | 🟡 |
 | GCD | 最大公約数を計算 | `=GCD(数値1, 数値2, ...)` | ✅ | 🟡 |
@@ -63,22 +63,22 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 ### 三角関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート |
 |--------|------|------|----------|----------|
-| SIN | 正弦を計算 | `=SIN(角度)` | ✅ | 🟡 |
-| COS | 余弦を計算 | `=COS(角度)` | ✅ | 🟡 |
-| TAN | 正接を計算 | `=TAN(角度)` | ✅ | 🟡 |
-| ASIN | 逆正弦を計算 | `=ASIN(数値)` | ✅ | 🟡 |
-| ACOS | 逆余弦を計算 | `=ACOS(数値)` | ✅ | 🟡 |
-| ATAN | 逆正接を計算 | `=ATAN(数値)` | ✅ | 🟡 |
-| ATAN2 | x,y座標から角度を計算 | `=ATAN2(x座標, y座標)` | ✅ | 🟡 |
+| SIN | 正弦を計算 | `=SIN(角度)` | ✅ | 🔴 |
+| COS | 余弦を計算 | `=COS(角度)` | ✅ | 🔴 |
+| TAN | 正接を計算 | `=TAN(角度)` | ✅ | 🔴 |
+| ASIN | 逆正弦を計算 | `=ASIN(数値)` | ✅ | 🔴 |
+| ACOS | 逆余弦を計算 | `=ACOS(数値)` | ✅ | 🔴 |
+| ATAN | 逆正接を計算 | `=ATAN(数値)` | ✅ | 🔴 |
+| ATAN2 | x,y座標から角度を計算 | `=ATAN2(x座標, y座標)` | ✅ | 🔴 |
 | SINH | 双曲線正弦を計算 | `=SINH(数値)` | ✅ | 🟡 |
 | COSH | 双曲線余弦を計算 | `=COSH(数値)` | ✅ | 🟡 |
 | TANH | 双曲線正接を計算 | `=TANH(数値)` | ✅ | 🟡 |
 | ASINH | 双曲線逆正弦を計算 | `=ASINH(数値)` | ❌ |  |
 | ACOSH | 双曲線逆余弦を計算 | `=ACOSH(数値)` | ❌ |  |
 | ATANH | 双曲線逆正接を計算 | `=ATANH(数値)` | ❌ |  |
-| DEGREES | ラジアンを度に変換 | `=DEGREES(角度)` | ✅ | 🟡 |
-| RADIANS | 度をラジアンに変換 | `=RADIANS(角度)` | ✅ | 🟡 |
-| PI | 円周率を返す | `=PI()` | ✅ | 🟡 |
+| DEGREES | ラジアンを度に変換 | `=DEGREES(角度)` | ✅ | 🔴 |
+| RADIANS | 度をラジアンに変換 | `=RADIANS(角度)` | ✅ | 🔴 |
+| PI | 円周率を返す | `=PI()` | ✅ | 🔴 |
 | CSC | 余割を計算 | `=CSC(角度)` | ❌ |  |
 | SEC | 正割を計算 | `=SEC(角度)` | ❌ |  |
 | COT | 余接を計算 | `=COT(角度)` | ❌ |  |
@@ -113,16 +113,16 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | MIN | 最小値を返す | `=MIN(数値1, [数値2], ...)` | ✅ | 🔴 |
 | MAXIFS | 条件付き最大値 | `=MAXIFS(最大範囲, 条件範囲1, 条件1, ...)` | ❌ | 🔴 |
 | MINIFS | 条件付き最小値 | `=MINIFS(最小範囲, 条件範囲1, 条件1, ...)` | ❌ | 🔴 |
-| MEDIAN | 中央値を計算 | `=MEDIAN(数値1, [数値2], ...)` | ✅ | 🟡 |
+| MEDIAN | 中央値を計算 | `=MEDIAN(数値1, [数値2], ...)` | ✅ | 🔴 |
 | MODE | 最頻値を計算 | `=MODE(数値1, [数値2], ...)` | ✅ | 🟡 |
 | MODE.SNGL | 最頻値（単一） | `=MODE.SNGL(数値1, [数値2], ...)` | ❌ | 🔴 |
 | MODE.MULT | 最頻値（複数） | `=MODE.MULT(数値1, [数値2], ...)` | ❌ | 🔴 |
-| STDEV | 標準偏差（標本） | `=STDEV(数値1, [数値2], ...)` | ✅ | 🟡 |
+| STDEV | 標準偏差（標本） | `=STDEV(数値1, [数値2], ...)` | ✅ | 🔴 |
 | STDEV.S | 標準偏差（標本） | `=STDEV.S(数値1, [数値2], ...)` | ❌ | 🔴 |
 | STDEV.P | 標準偏差（母集団） | `=STDEV.P(数値1, [数値2], ...)` | ❌ | 🔴 |
 | STDEVA | 標準偏差（文字列含む） | `=STDEVA(値1, [値2], ...)` | ❌ | 🔴 |
 | STDEVPA | 標準偏差（母集団、文字列含む） | `=STDEVPA(値1, [値2], ...)` | ❌ | 🔴 |
-| VAR | 分散（標本） | `=VAR(数値1, [数値2], ...)` | ✅ | 🟡 |
+| VAR | 分散（標本） | `=VAR(数値1, [数値2], ...)` | ✅ | 🔴 |
 | VAR.S | 分散（標本） | `=VAR.S(数値1, [数値2], ...)` | ❌ | 🔴 |
 | VAR.P | 分散（母集団） | `=VAR.P(数値1, [数値2], ...)` | ❌ | 🔴 |
 | VARA | 分散（文字列含む） | `=VARA(値1, [値2], ...)` | ❌ | 🔴 |
@@ -131,7 +131,7 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 ### 高度な統計関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート |
 |--------|------|------|----------|----------|
-| CORREL | 相関係数を計算 | `=CORREL(配列1, 配列2)` | ✅ | 🟡 |
+| CORREL | 相関係数を計算 | `=CORREL(配列1, 配列2)` | ✅ | 🔴 |
 | COVARIANCE.P | 母共分散を計算 | `=COVARIANCE.P(配列1, 配列2)` | ❌ |
 | COVARIANCE.S | 標本共分散を計算 | `=COVARIANCE.S(配列1, 配列2)` | ❌ |
 | DEVSQ | 偏差平方和を計算 | `=DEVSQ(数値1, [数値2], ...)` | ❌ |
@@ -139,8 +139,8 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | SKEW | 歪度を計算 | `=SKEW(数値1, [数値2], ...)` | ❌ |
 | SKEW.P | 歪度（母集団） | `=SKEW.P(数値1, [数値2], ...)` | ❌ |
 | STANDARDIZE | 標準化する | `=STANDARDIZE(x, 平均, 標準偏差)` | ❌ |
-| LARGE | k番目に大きい値 | `=LARGE(配列, k)` | ✅ |
-| SMALL | k番目に小さい値 | `=SMALL(配列, k)` | ✅ |
+| LARGE | k番目に大きい値 | `=LARGE(配列, k)` | ✅ | 🔴 |
+| SMALL | k番目に小さい値 | `=SMALL(配列, k)` | ✅ | 🔴 |
 | RANK | 順位を返す | `=RANK(数値, 参照, [順序])` | ✅ |
 | RANK.EQ | 順位（同順位は最小） | `=RANK.EQ(数値, 参照, [順序])` | ❌ |
 | RANK.AVG | 順位（同順位は平均） | `=RANK.AVG(数値, 参照, [順序])` | ❌ |
@@ -221,8 +221,8 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | 関数名 | 説明 | 構文 | 実装状況 | サポート |
 |--------|------|------|----------|----------|
 | AVEDEV | 平均偏差 | `=AVEDEV(数値1, [数値2], ...)` | ❌ |
-| GEOMEAN | 幾何平均 | `=GEOMEAN(数値1, [数値2], ...)` | ✅ | 🟡 |
-| HARMEAN | 調和平均 | `=HARMEAN(数値1, [数値2], ...)` | ✅ | 🟡 |
+| GEOMEAN | 幾何平均 | `=GEOMEAN(数値1, [数値2], ...)` | ✅ | 🔴 |
+| HARMEAN | 調和平均 | `=HARMEAN(数値1, [数値2], ...)` | ✅ | 🔴 |
 | TRIMMEAN | トリム平均 | `=TRIMMEAN(配列, 割合)` | ✅ | 🟡 |
 | PROB | 確率の計算 | `=PROB(x範囲, 確率範囲, [下限], [上限])` | ❌ |
 | FISHER | フィッシャー変換 | `=FISHER(x)` | ❌ |
@@ -254,18 +254,18 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | SUBSTITUTE | 文字を置換（文字指定） | `=SUBSTITUTE(文字列, 検索文字列, 置換文字列, [置換対象])` | ✅ | 🔴 |
 | UPPER | 大文字に変換 | `=UPPER(文字列)` | ✅ | 🔴 |
 | LOWER | 小文字に変換 | `=LOWER(文字列)` | ✅ | 🔴 |
-| PROPER | 先頭を大文字に変換 | `=PROPER(文字列)` | ✅ | 🟡 |
+| PROPER | 先頭を大文字に変換 | `=PROPER(文字列)` | ✅ | 🔴 |
 | TRIM | 余分なスペースを削除 | `=TRIM(文字列)` | ✅ | 🔴 |
 | CLEAN | 印刷不可文字を削除 | `=CLEAN(文字列)` | ✅ | 🟡 |
-| TEXT | 数値を書式付き文字列に変換 | `=TEXT(値, 表示形式)` | ✅ | 🟡 |
+| TEXT | 数値を書式付き文字列に変換 | `=TEXT(値, 表示形式)` | ✅ | 🔴 |
 | VALUE | 文字列を数値に変換 | `=VALUE(文字列)` | ✅ | 🟡 |
 | NUMBERVALUE | 文字列を数値に変換（地域設定対応） | `=NUMBERVALUE(文字列, [小数点], [桁区切り])` | ❌ |  |
 | DOLLAR | 通貨書式に変換 | `=DOLLAR(数値, [桁数])` | ❌ |  |
 | FIXED | 固定小数点表示 | `=FIXED(数値, [桁数], [桁区切りなし])` | ✅ | 🟡 |
-| REPT | 文字列を繰り返す | `=REPT(文字列, 繰り返し回数)` | ✅ | 🟡 |
-| CHAR | 文字コードから文字を返す | `=CHAR(数値)` | ✅ | 🟡 |
+| REPT | 文字列を繰り返す | `=REPT(文字列, 繰り返し回数)` | ✅ | 🔴 |
+| CHAR | 文字コードから文字を返す | `=CHAR(数値)` | ✅ | 🔴 |
 | UNICHAR | Unicode文字を返す | `=UNICHAR(数値)` | ❌ |
-| CODE | 文字から文字コードを返す | `=CODE(文字列)` | ✅ | 🟡 |
+| CODE | 文字から文字コードを返す | `=CODE(文字列)` | ✅ | 🔴 |
 | UNICODE | Unicode値を返す | `=UNICODE(文字列)` | ❌ |
 | EXACT | 文字列が同一か判定 | `=EXACT(文字列1, 文字列2)` | ✅ | 🟡 |
 | T | 文字列を返す | `=T(値)` | ✅ | 🟡 |
@@ -294,11 +294,11 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | YEAR | 年を抽出 | `=YEAR(日付)` | ✅ | 🟡 |
 | MONTH | 月を抽出 | `=MONTH(日付)` | ✅ | 🟡 |
 | DAY | 日を抽出 | `=DAY(日付)` | ✅ | 🟡 |
-| HOUR | 時を抽出 | `=HOUR(時刻)` | ✅ | 🟡 |
-| MINUTE | 分を抽出 | `=MINUTE(時刻)` | ✅ | 🟡 |
-| SECOND | 秒を抽出 | `=SECOND(時刻)` | ✅ | 🟡 |
+| HOUR | 時を抽出 | `=HOUR(時刻)` | ✅ | 🔴 |
+| MINUTE | 分を抽出 | `=MINUTE(時刻)` | ✅ | 🔴 |
+| SECOND | 秒を抽出 | `=SECOND(時刻)` | ✅ | 🔴 |
 | WEEKDAY | 曜日を数値で返す | `=WEEKDAY(日付, [種類])` | ✅ | 🟡 |
-| WEEKNUM | 週番号を返す | `=WEEKNUM(日付, [週の基準])` | ✅ | 🟡 |
+| WEEKNUM | 週番号を返す | `=WEEKNUM(日付, [週の基準])` | ✅ | 🔴 |
 | ISOWEEKNUM | ISO週番号を返す | `=ISOWEEKNUM(日付)` | ❌ |  |
 
 ### 日付計算関数
@@ -388,18 +388,18 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 
 | 関数名 | 説明 | 構文 | 実装状況 | サポート |
 |--------|------|------|----------|----------|
-| ISBLANK | 空白セルか判定 | `=ISBLANK(値)` | ✅ | 🟡 |
-| ISERROR | エラー値か判定 | `=ISERROR(値)` | ✅ | 🟡 |
+| ISBLANK | 空白セルか判定 | `=ISBLANK(値)` | ✅ | 🔴 |
+| ISERROR | エラー値か判定 | `=ISERROR(値)` | ✅ | 🔴 |
 | ISERR | エラー値か判定（#N/A以外） | `=ISERR(値)` | ❌ |  |
-| ISNA | #N/Aエラーか判定 | `=ISNA(値)` | ✅ | 🟡 |
-| ISTEXT | 文字列か判定 | `=ISTEXT(値)` | ✅ | 🟡 |
+| ISNA | #N/Aエラーか判定 | `=ISNA(値)` | ✅ | 🔴 |
+| ISTEXT | 文字列か判定 | `=ISTEXT(値)` | ✅ | 🔴 |
 | ISNONTEXT | 文字列以外か判定 | `=ISNONTEXT(値)` | ❌ |  |
-| ISNUMBER | 数値か判定 | `=ISNUMBER(値)` | ✅ | 🟡 |
-| ISLOGICAL | 論理値か判定 | `=ISLOGICAL(値)` | ✅ | 🟡 |
+| ISNUMBER | 数値か判定 | `=ISNUMBER(値)` | ✅ | 🔴 |
+| ISLOGICAL | 論理値か判定 | `=ISLOGICAL(値)` | ✅ | 🔴 |
 | ISREF | 参照か判定 | `=ISREF(値)` | ❌ |  |
 | ISFORMULA | 数式か判定 | `=ISFORMULA(参照)` | ❌ |  |
-| ISEVEN | 偶数か判定 | `=ISEVEN(数値)` | ✅ | 🟡 |
-| ISODD | 奇数か判定 | `=ISODD(数値)` | ✅ | 🟡 |
+| ISEVEN | 偶数か判定 | `=ISEVEN(数値)` | ✅ | 🔴 |
+| ISODD | 奇数か判定 | `=ISODD(数値)` | ✅ | 🔴 |
 | INFO | システム情報を返す | `=INFO(検査の種類)` | ❌ |  |
 | TYPE | データ型を返す | `=TYPE(値)` | ✅ | 🟡 |
 | N | 数値に変換 | `=N(値)` | ✅ | 🟡 |
@@ -715,8 +715,8 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 現在実装済みの関数数: **142関数** ✅
 
 ### 実装別内訳
-- **🔴 HyperFormulaでサポート**: 50関数 (35%) - 自動処理による高性能計算
-- **🟡 手動実装**: 91関数 (64%) - カスタム計算ロジック
+- **🔴 HyperFormulaでサポート**: 76関数 (54%) - 自動処理による高性能計算
+- **🟡 手動実装**: 65関数 (46%) - カスタム計算ロジック
 - **🔵 Google Sheets専用**: 1関数 (1%) - SPLIT関数
 - **🟠 Excel専用**: 0関数
 

@@ -174,13 +174,8 @@ export const SPLIT: CustomFormula = {
 export const PROPER: CustomFormula = {
   name: 'PROPER',
   pattern: /PROPER\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches) => {
-    const text = matches[1].replace(/"/g, '');
-    return text.replace(/\w\S*/g, (txt) => 
-      txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
-    );
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // VALUE関数の実装（文字列を数値に変換） - stringFunctions.tsから移動
@@ -201,103 +196,16 @@ export const VALUE: CustomFormula = {
 export const TEXT: CustomFormula = {
   name: 'TEXT',
   pattern: /TEXT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    console.log('TEXT関数実行:', { matches });
-    
-    const valueRef = matches[1].trim();
-    const formatRef = matches[2].trim();
-    
-    // 値の取得
-    let value: number;
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      // セル参照
-      const cellValue = getCellValue(valueRef, context);
-      value = parseFloat(String(cellValue ?? '0'));
-    } else {
-      value = parseFloat(valueRef);
-    }
-    
-    // フォーマットの取得
-    let format = formatRef;
-    if (format.startsWith('"') && format.endsWith('"')) {
-      format = format.slice(1, -1);
-    }
-    
-    console.log('TEXT計算:', { value, format, valueRef, formatRef });
-    
-    if (isNaN(value)) {
-      console.error('TEXT: 数値変換失敗', { valueRef, value });
-      return FormulaError.VALUE;
-    }
-    
-    // 簡単な書式対応（完全なExcel書式ではない）
-    let result: string;
-    if (format.includes('¥') || format.includes('￥')) {
-      // 通貨形式
-      result = '¥' + value.toLocaleString();
-    } else if (format.includes('%')) {
-      result = (value * 100).toFixed(2) + '%';
-    } else if (format.includes('0.00')) {
-      result = value.toFixed(2);
-    } else if (format.includes('0,000')) {
-      result = value.toLocaleString();
-    } else if (format.includes('0')) {
-      result = Math.round(value).toString();
-    } else {
-      result = value.toString();
-    }
-    
-    console.log('TEXT結果:', { result });
-    return result;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // REPT関数の実装（文字列繰り返し） - stringFunctions.tsから移動
 export const REPT: CustomFormula = {
   name: 'REPT',
   pattern: /REPT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    console.log('REPT関数実行:', { matches });
-    
-    let text = matches[1].trim();
-    const timesRef = matches[2].trim();
-    
-    // テキスト部分の処理
-    if (text.startsWith('"') && text.endsWith('"')) {
-      // 引用符で囲まれた文字列
-      text = text.slice(1, -1);
-    } else if (text.match(/^[A-Z]+\d+$/)) {
-      // セル参照
-      text = String(getCellValue(text, context) ?? '');
-    }
-    
-    // 繰り返し回数の処理
-    let times: number;
-    if (timesRef.match(/^[A-Z]+\d+$/)) {
-      // セル参照
-      const cellValue = getCellValue(timesRef, context);
-      times = parseInt(String(cellValue ?? '0'));
-    } else {
-      times = parseInt(timesRef);
-    }
-    
-    console.log('REPT計算:', { text, times, originalText: matches[1], originalTimes: matches[2] });
-    
-    if (isNaN(times) || times < 0) {
-      console.error('REPT: 無効な回数', times);
-      return FormulaError.VALUE;
-    }
-    if (times > 32767) {
-      console.error('REPT: 回数が上限を超過', times);
-      return FormulaError.VALUE;
-    }
-    
-    const result = text.repeat(times);
-    console.log('REPT結果:', result);
-    return result;
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // REPLACE関数の実装（位置指定文字置換）
@@ -357,43 +265,16 @@ export const REPLACE: CustomFormula = {
 export const CHAR: CustomFormula = {
   name: 'CHAR',
   pattern: /CHAR\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const numberRef = matches[1].trim();
-    let number: number;
-    
-    if (numberRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(numberRef, context);
-      number = parseInt(String(cellValue ?? '0'));
-    } else {
-      number = parseInt(numberRef);
-    }
-    
-    if (isNaN(number)) return FormulaError.VALUE;
-    if (number < 1 || number > 255) return FormulaError.VALUE;
-    
-    return String.fromCharCode(number);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // CODE関数の実装（文字から文字コードを返す）
 export const CODE: CustomFormula = {
   name: 'CODE',
   pattern: /CODE\(([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    let text = matches[1].trim();
-    
-    if (text.startsWith('"') && text.endsWith('"')) {
-      text = text.slice(1, -1);
-    } else if (text.match(/^[A-Z]+\d+$/)) {
-      text = String(getCellValue(text, context) ?? '');
-    }
-    
-    if (text.length === 0) return FormulaError.VALUE;
-    
-    return text.charCodeAt(0);
-  }
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaが処理
 };
 
 // EXACT関数の実装（文字列が同一か判定）
