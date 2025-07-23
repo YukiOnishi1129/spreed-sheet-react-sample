@@ -79,7 +79,7 @@ export function formatDate(date: Date, format?: string, config?: DateConfig): st
     // カスタムフォーマット対応
     const formatter = new Intl.DateTimeFormat(cfg.locale, options);
     const parts = formatter.formatToParts(date);
-    const partsObj: Record<string, string> = parts.reduce((acc, part) => {
+    const partsObj = parts.reduce((acc, part) => {
       acc[part.type] = part.value;
       return acc;
     }, {} as Record<string, string>);
@@ -100,7 +100,9 @@ export function getWeekday(date: Date, startOfWeek: number = 1, config?: DateCon
   // startOfWeek: 1=月曜日, 0=日曜日
   const cfg = { ...globalDateConfig, ...config };
   
-  let dayOfWeek = date.getDay(); // 0=日曜日, 1=月曜日, ..., 6=土曜日
+  // タイムゾーンを考慮した日付取得
+  const localDate = cfg.timezone ? getDateInTimezone(date, cfg.timezone) : date;
+  let dayOfWeek = localDate.getDay(); // 0=日曜日, 1=月曜日, ..., 6=土曜日
   
   if (startOfWeek === 1) {
     // 月曜日を1とする場合
@@ -111,6 +113,135 @@ export function getWeekday(date: Date, startOfWeek: number = 1, config?: DateCon
   }
   
   return dayOfWeek;
+}
+
+/**
+ * 週番号を計算（WEEKNUM関数用）
+ */
+export function getWeekNumber(date: Date, returnType: number = 1): number {
+  const year = date.getFullYear();
+  const jan1 = new Date(year, 0, 1);
+  
+  let weekStart: number;
+  switch (returnType) {
+    case 1: // 日曜日始まり、1月1日を含む週が第1週
+    case 17: // 日曜日始まり、1月1日を含む週が第1週（日曜日=1〜土曜日=7）
+      weekStart = 0; // 日曜日
+      break;
+    case 2: // 月曜日始まり、1月1日を含む週が第1週
+    case 21: // 月曜日始まり、1月1日を含む週が第1週（月曜日=1〜日曜日=7）
+      weekStart = 1; // 月曜日
+      break;
+    default:
+      weekStart = 0;
+      break;
+  }
+  
+  // 1月1日の曜日
+  const jan1DayOfWeek = jan1.getDay();
+  
+  // 第1週の開始日を計算
+  const firstWeekStart = new Date(jan1);
+  const daysToFirstWeek = (weekStart - jan1DayOfWeek + 7) % 7;
+  if (daysToFirstWeek > 0) {
+    firstWeekStart.setDate(jan1.getDate() - daysToFirstWeek);
+  }
+  
+  // 日付と第1週開始日の差から週番号を計算
+  const diffTime = date.getTime() - firstWeekStart.getTime();
+  const diffDays = Math.floor(diffTime / (24 * 60 * 60 * 1000));
+  
+  return Math.floor(diffDays / 7) + 1;
+}
+
+/**
+ * ISO週番号を計算（ISOWEEKNUM関数用）
+ */
+export function getISOWeekNumber(date: Date): number {
+  const year = date.getFullYear();
+  const jan4 = new Date(year, 0, 4); // 1月4日
+  
+  // 1月4日の曜日を取得（月曜日=1, 日曜日=7）
+  const jan4DayOfWeek = jan4.getDay() === 0 ? 7 : jan4.getDay();
+  
+  // ISO週の第1週の月曜日を計算
+  const firstMondayOfYear = new Date(jan4);
+  firstMondayOfYear.setDate(jan4.getDate() - jan4DayOfWeek + 1);
+  
+  // 指定日と第1週月曜日の差から週番号を計算
+  const diffTime = date.getTime() - firstMondayOfYear.getTime();
+  const diffDays = Math.floor(diffTime / (24 * 60 * 60 * 1000));
+  
+  const weekNumber = Math.floor(diffDays / 7) + 1;
+  
+  // 前年の最終週または来年の第1週の場合の調整
+  if (weekNumber < 1) {
+    // 前年の週番号を計算
+    return getISOWeekNumber(new Date(year - 1, 11, 31));
+  } else if (weekNumber > 52) {
+    // 来年の第1週かチェック
+    const dec31 = new Date(year, 11, 31);
+    const dec31DayOfWeek = dec31.getDay() === 0 ? 7 : dec31.getDay();
+    if (dec31DayOfWeek < 4) {
+      return 1; // 来年の第1週
+    }
+  }
+  
+  return weekNumber;
+}
+
+/**
+ * 時刻文字列を時間値に変換
+ */
+export function parseTimeString(timeStr: string): number | null {
+  const timePattern = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/;
+  const match = timeStr.match(timePattern);
+  
+  if (!match) {
+    return null;
+  }
+  
+  const hours = parseInt(match[1]);
+  const minutes = parseInt(match[2]);
+  const seconds = match[3] ? parseInt(match[3]) : 0;
+  
+  if (hours > 23 || minutes > 59 || seconds > 59) {
+    return null;
+  }
+  
+  // 時刻を日の割合で返す
+  return (hours * 3600 + minutes * 60 + seconds) / 86400;
+}
+
+/**
+ * 指定されたタイムゾーンでの日付を取得
+ */
+export function getDateInTimezone(date: Date, timezone: string): Date {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  
+  const parts = formatter.formatToParts(date);
+  const partsObj = parts.reduce((acc, part) => {
+    acc[part.type] = part.value;
+    return acc;
+  }, {} as Record<string, string>);
+  
+  return new Date(
+    parseInt(partsObj.year),
+    parseInt(partsObj.month) - 1,
+    parseInt(partsObj.day),
+    parseInt(partsObj.hour),
+    parseInt(partsObj.minute),
+    parseInt(partsObj.second)
+  );
 }
 
 /**
@@ -318,7 +449,7 @@ export function now(config?: DateConfig): Date {
     });
     
     const parts = formatter.formatToParts(now);
-    const partsObj: Record<string, string> = parts.reduce((acc, part) => {
+    const partsObj = parts.reduce((acc, part) => {
       acc[part.type] = part.value;
       return acc;
     }, {} as Record<string, string>);

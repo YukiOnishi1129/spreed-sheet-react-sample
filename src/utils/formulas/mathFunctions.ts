@@ -1,8 +1,38 @@
 // 数学関数の実装
 
-import type { CustomFormula } from './types';
+import type { CustomFormula, FormulaContext } from './types';
 import { FormulaError } from './types';
-import { getCellValue } from './utils';
+import { getCellValue, getCellRangeValues } from './utils';
+
+// 引数を数値の配列に変換するユーティリティ関数
+function parseArgumentsToNumbers(args: string, context: FormulaContext): number[] {
+  const values: number[] = [];
+  
+  // 引数をカンマで分割
+  const parts = args.split(',').map(part => part.trim());
+  
+  for (const part of parts) {
+    // 範囲指定（A1:B2のような形式）かチェック
+    if (part.includes(':')) {
+      const rangeValues = getCellRangeValues(part, context);
+      for (const value of rangeValues) {
+        const num = Number(value);
+        if (!isNaN(num)) {
+          values.push(num);
+        }
+      }
+    } else {
+      // 単一のセルまたは値
+      const cellValue = getCellValue(part, context) ?? part;
+      const num = Number(cellValue);
+      if (!isNaN(num)) {
+        values.push(num);
+      }
+    }
+  }
+  
+  return values;
+}
 
 // SUMIF関数の実装
 export const SUMIF: CustomFormula = {
@@ -29,70 +59,172 @@ export const AVERAGEIF: CustomFormula = {
 export const SUM: CustomFormula = {
   name: 'SUM',
   pattern: /SUM\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return 0;
+    }
+    
+    return numbers.reduce((sum, num) => sum + num, 0);
+  }
 };
 
 // AVERAGE関数の実装
 export const AVERAGE: CustomFormula = {
   name: 'AVERAGE',
   pattern: /AVERAGE\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    const sum = numbers.reduce((total, num) => total + num, 0);
+    return sum / numbers.length;
+  }
 };
 
 // COUNT関数の実装
 export const COUNT: CustomFormula = {
   name: 'COUNT',
   pattern: /COUNT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    return numbers.length;
+  }
 };
 
 // MAX関数の実装
 export const MAX: CustomFormula = {
   name: 'MAX',
   pattern: /MAX\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.max(...numbers);
+  }
 };
 
 // MIN関数の実装
 export const MIN: CustomFormula = {
   name: 'MIN',
   pattern: /MIN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.min(...numbers);
+  }
 };
 
 // ROUND関数の実装
 export const ROUND: CustomFormula = {
   name: 'ROUND',
-  pattern: /ROUND\(([^,]+),\s*(\d+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /ROUND\(([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, digitsRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const digits = Number(getCellValue(digitsRef, context) ?? digitsRef);
+    
+    if (isNaN(number) || isNaN(digits)) {
+      return FormulaError.VALUE;
+    }
+    
+    const factor = Math.pow(10, digits);
+    return Math.round(number * factor) / factor;
+  }
 };
 
 // ABS関数の実装（絶対値）
 export const ABS: CustomFormula = {
   name: 'ABS',
   pattern: /ABS\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.abs(number);
+  }
 };
 
 // SQRT関数の実装（平方根）
 export const SQRT: CustomFormula = {
   name: 'SQRT',
   pattern: /SQRT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number) || number < 0) {
+      return FormulaError.NUM;
+    }
+    
+    return Math .sqrt(number);
+  }
 };
 
 // POWER関数の実装（べき乗）
 export const POWER: CustomFormula = {
   name: 'POWER',
   pattern: /POWER\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, baseRef, exponentRef] = matches;
+    
+    const base = Number(getCellValue(baseRef, context) ?? baseRef);
+    const exponent = Number(getCellValue(exponentRef, context) ?? exponentRef);
+    
+    if (isNaN(base) || isNaN(exponent)) {
+      return FormulaError.VALUE;
+    }
+    
+    const result = Math.pow(base, exponent);
+    
+    if (!isFinite(result)) {
+      return FormulaError.NUM;
+    }
+    
+    return result;
+  }
 };
 
 // MOD関数の実装（剰余）
 export const MOD: CustomFormula = {
   name: 'MOD',
   pattern: /MOD\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, divisorRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const divisor = Number(getCellValue(divisorRef, context) ?? divisorRef);
+    
+    if (isNaN(number) || isNaN(divisor) || divisor === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    return number % divisor;
+  }
 };
 
 // INT関数の実装（整数部分）
@@ -119,7 +251,19 @@ export const INT: CustomFormula = {
 export const TRUNC: CustomFormula = {
   name: 'TRUNC',
   pattern: /TRUNC\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, digitsRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const digits = digitsRef ? Number(getCellValue(digitsRef, context) ?? digitsRef) : 0;
+    
+    if (isNaN(number) || isNaN(digits)) {
+      return FormulaError.VALUE;
+    }
+    
+    const factor = Math.pow(10, digits);
+    return Math.trunc(number * factor) / factor;
+  }
 };
 
 // RAND関数の実装（0以上1未満の乱数）
@@ -165,98 +309,249 @@ export const RANDBETWEEN: CustomFormula = {
 export const PI: CustomFormula = {
   name: 'PI',
   pattern: /PI\(\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: () => {
+    return Math.PI;
+  }
 };
 
 // DEGREES関数の実装（ラジアンを度に変換）
 export const DEGREES: CustomFormula = {
   name: 'DEGREES',
   pattern: /DEGREES\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    // ラジアンを度に変換
+    return angle * (180 / Math.PI);
+  }
 };
 
 // RADIANS関数の実装（度をラジアンに変換）
 export const RADIANS: CustomFormula = {
   name: 'RADIANS',
   pattern: /RADIANS\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    // 度をラジアンに変換
+    return angle * (Math.PI / 180);
+  }
 };
 
 // SIN関数の実装（正弦）
 export const SIN: CustomFormula = {
   name: 'SIN',
   pattern: /SIN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.sin(angle);
+  }
 };
 
 // COS関数の実装（余弦）
 export const COS: CustomFormula = {
   name: 'COS',
   pattern: /COS\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.cos(angle);
+  }
 };
 
 // TAN関数の実装（正接）
 export const TAN: CustomFormula = {
   name: 'TAN',
   pattern: /TAN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.tan(angle);
+  }
 };
 
 // LOG関数の実装（対数）
 export const LOG: CustomFormula = {
   name: 'LOG',
   pattern: /LOG\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, baseRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const base = baseRef ? Number(getCellValue(baseRef, context) ?? baseRef) : 10;
+    
+    if (isNaN(number) || isNaN(base) || number <= 0 || base <= 0 || base === 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.log(number) / Math.log(base);
+  }
 };
 
 // LOG10関数の実装（常用対数）
 export const LOG10: CustomFormula = {
   name: 'LOG10',
   pattern: /LOG10\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number) || number <= 0) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.log10(number);
+  }
 };
 
 // LN関数の実装（自然対数）
 export const LN: CustomFormula = {
   name: 'LN',
   pattern: /LN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number) || number <= 0) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.log(number);
+  }
 };
 
 // EXP関数の実装（指数関数）
 export const EXP: CustomFormula = {
   name: 'EXP',
   pattern: /EXP\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    const result = Math.exp(number);
+    
+    if (!isFinite(result)) {
+      return FormulaError.NUM;
+    }
+    
+    return result;
+  }
 };
 
 // ASIN関数の実装（逆正弦）
 export const ASIN: CustomFormula = {
   name: 'ASIN',
   pattern: /ASIN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value) || value < -1 || value > 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.asin(value);
+  }
 };
 
 // ACOS関数の実装（逆余弦）
 export const ACOS: CustomFormula = {
   name: 'ACOS',
   pattern: /ACOS\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value) || value < -1 || value > 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.acos(value);
+  }
 };
 
 // ATAN関数の実装（逆正接）
 export const ATAN: CustomFormula = {
   name: 'ATAN',
   pattern: /ATAN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.atan(value);
+  }
 };
 
 // ATAN2関数の実装（x,y座標から角度）
 export const ATAN2: CustomFormula = {
   name: 'ATAN2',
   pattern: /ATAN2\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, xRef, yRef] = matches;
+    
+    const x = Number(getCellValue(xRef, context) ?? xRef);
+    const y = Number(getCellValue(yRef, context) ?? yRef);
+    
+    if (isNaN(x) || isNaN(y)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (x === 0 && y === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    return Math.atan2(x, y);
+  }
 };
 
 // ROUNDUP関数の実装（切り上げ）
@@ -291,14 +586,43 @@ export const FLOOR: CustomFormula = {
 export const SIGN: CustomFormula = {
   name: 'SIGN',
   pattern: /SIGN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.sign(number);
+  }
 };
 
 // FACT関数の実装（階乗）
 export const FACT: CustomFormula = {
   name: 'FACT',
   pattern: /FACT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number) || number < 0 || !Number.isInteger(number)) {
+      return FormulaError.NUM;
+    }
+    
+    if (number > 170) {
+      return FormulaError.NUM; // オーバーフロー防止
+    }
+    
+    let result = 1;
+    for (let i = 2; i <= number; i++) {
+      result *= i;
+    }
+    
+    return result;
+  }
 };
 
 // SUMIFS関数の実装（複数条件での合計）
@@ -369,21 +693,51 @@ export const QUOTIENT: CustomFormula = {
 export const SINH: CustomFormula = {
   name: 'SINH',
   pattern: /SINH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.sinh(value);
+  }
 };
 
 // COSH関数（双曲線余弦）
 export const COSH: CustomFormula = {
   name: 'COSH',
   pattern: /COSH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.cosh(value);
+  }
 };
 
 // TANH関数（双曲線正接）
 export const TANH: CustomFormula = {
   name: 'TANH',
   pattern: /TANH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.tanh(value);
+  }
 };
 
 // HyperFormulaでサポートされている未実装関数を追加
@@ -706,21 +1060,51 @@ export const SEQUENCE: CustomFormula = {
 export const ASINH: CustomFormula = {
   name: 'ASINH',
   pattern: /ASINH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.asinh(value);
+  }
 };
 
 // 双曲線逆余弦（ACOSH）
 export const ACOSH: CustomFormula = {
   name: 'ACOSH',
   pattern: /ACOSH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value) || value < 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.acosh(value);
+  }
 };
 
 // 双曲線逆正接（ATANH）
 export const ATANH: CustomFormula = {
   name: 'ATANH',
   pattern: /ATANH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value) || value <= -1 || value >= 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.atanh(value);
+  }
 };
 
 // 余割（CSC）
