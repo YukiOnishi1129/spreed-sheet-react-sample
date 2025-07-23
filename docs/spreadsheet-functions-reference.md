@@ -112,10 +112,10 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 ### 行列関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
 |--------|------|------|----------|----------|------|
-| MDETERM | 行列式を計算 | `=MDETERM(配列)` | ❌ | 🔴 |
-| MINVERSE | 逆行列を計算 | `=MINVERSE(配列)` | ❌ | 🔴 |
-| MMULT | 行列の積を計算 | `=MMULT(配列1, 配列2)` | ❌ | 🔴 |
-| MUNIT | 単位行列を作成 | `=MUNIT(サイズ)` | ❌ | 🔴 |
+| MDETERM | 行列式を計算 | `=MDETERM(配列)` | ✅ | 🔴 |
+| MINVERSE | 逆行列を計算 | `=MINVERSE(配列)` | ✅ | 🔴 |
+| MMULT | 行列の積を計算 | `=MMULT(配列1, 配列2)` | ✅ | 🔴 |
+| MUNIT | 単位行列を作成 | `=MUNIT(サイズ)` | ✅ | 🔴 |
 
 ## 2. 統計関数 (Statistical Functions)
 

@@ -29,6 +29,7 @@ import {
   ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N
 } from './informationFunctions';
 import { PMT, PV, FV, NPV, IRR, PPMT, IPMT } from './financialFunctions';
+import { MDETERM, MINVERSE, MMULT, MUNIT } from './matrixFunctions';
 
 // すべての関数を配列にまとめる
 export const ALL_FUNCTIONS = [
@@ -225,7 +226,13 @@ export const ALL_FUNCTIONS = [
   NPV,
   IRR,
   PPMT,
-  IPMT
+  IPMT,
+  
+  // 行列関数
+  MDETERM,
+  MINVERSE,
+  MMULT,
+  MUNIT
 ] as CustomFormula[];
 
 // カテゴリ別の関数分類
@@ -237,7 +244,8 @@ export const FUNCTION_CATEGORIES = {
   logic: [IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA] as CustomFormula[],
   text: [CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT, PROPER, VALUE, TEXT, REPT, REPLACE, CHAR, CODE, EXACT, CLEAN, T, FIXED] as CustomFormula[],
   information: [ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N] as CustomFormula[],
-  financial: [PMT, PV, FV, NPV, IRR, PPMT, IPMT] as CustomFormula[]
+  financial: [PMT, PV, FV, NPV, IRR, PPMT, IPMT] as CustomFormula[],
+  matrix: [MDETERM, MINVERSE, MMULT, MUNIT] as CustomFormula[]
 };
 
 // HyperFormulaでサポートされていない関数（手動計算が必要）
@@ -274,6 +282,7 @@ export const getFunctionType = (functionName: string): string => {
   if (FUNCTION_CATEGORIES.text.some(f => f.name === name)) return 'text';
   if (FUNCTION_CATEGORIES.information.some(f => f.name === name)) return 'information';
   if (FUNCTION_CATEGORIES.financial.some(f => f.name === name)) return 'financial';
+  if (FUNCTION_CATEGORIES.matrix.some(f => f.name === name)) return 'matrix';
   
   return 'other';
 };
@@ -289,3 +298,4 @@ export * from './textFunctions';
 export * from './statisticsFunctions';
 export * from './informationFunctions';
 export * from './financialFunctions';
+export * from './matrixFunctions';
