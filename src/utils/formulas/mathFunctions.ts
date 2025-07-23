@@ -512,8 +512,44 @@ export const ODD: CustomFormula = {
 export const ARABIC: CustomFormula = {
   name: 'ARABIC',
   pattern: /ARABIC\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
-  calculate: () => null // HyperFormulaに処理を委譲
+  isSupported: false,
+  calculate: (matches: RegExpMatchArray) => {
+    const romanStr = matches[1].trim().replace(/["']/g, '').toUpperCase();
+    
+    // ローマ数字の基本文字と対応する値
+    const romanMap: { [key: string]: number } = {
+      'I': 1, 'V': 5, 'X': 10, 'L': 50,
+      'C': 100, 'D': 500, 'M': 1000
+    };
+    
+    // 無効なローマ数字文字をチェック
+    if (!/^[IVXLCDM]+$/.test(romanStr)) {
+      return FormulaError.VALUE;
+    }
+    
+    let result = 0;
+    let prev = 0;
+    
+    // 右から左へ処理
+    for (let i = romanStr.length - 1; i >= 0; i--) {
+      const current = romanMap[romanStr[i]];
+      
+      if (current === undefined) {
+        return FormulaError.VALUE;
+      }
+      
+      // 前の文字より小さい場合は減算、そうでなければ加算
+      if (current < prev) {
+        result -= current;
+      } else {
+        result += current;
+      }
+      
+      prev = current;
+    }
+    
+    return result;
+  }
 };
 
 // ROMAN関数（アラビア数字をローマ数字に変換）
@@ -528,8 +564,51 @@ export const ROMAN: CustomFormula = {
 export const COMBINA: CustomFormula = {
   name: 'COMBINA',
   pattern: /COMBINA\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
-  calculate: () => null // HyperFormulaに処理を委譲
+  isSupported: false,
+  calculate: (matches: RegExpMatchArray) => {
+    const nStr = matches[1].trim();
+    const kStr = matches[2].trim();
+    
+    // 数値の取得
+    const n = parseFloat(nStr);
+    const k = parseFloat(kStr);
+    
+    // 数値型チェック
+    if (typeof n !== 'number' || typeof k !== 'number') {
+      return FormulaError.VALUE;
+    }
+    
+    // 整数チェック
+    if (!Number.isInteger(n) || !Number.isInteger(k)) {
+      return FormulaError.NUM;
+    }
+    
+    // 負数チェック
+    if (n < 0 || k < 0) {
+      return FormulaError.NUM;
+    }
+    
+    // k = 0の場合
+    if (k === 0) {
+      return 1;
+    }
+    
+    // 重複組合せの公式: C(n+k-1, k) = (n+k-1)! / (k! * (n-1)!)
+    // これは C(n+k-1, k) と同じ
+    const numerator = n + k - 1;
+    
+    if (numerator < k) {
+      return 0;
+    }
+    
+    // 効率的な組合せ計算
+    let result = 1;
+    for (let i = 0; i < Math.min(k, numerator - k); i++) {
+      result = result * (numerator - i) / (i + 1);
+    }
+    
+    return Math.round(result);
+  }
 };
 
 // FACTDOUBLE関数（二重階乗）
@@ -546,4 +625,193 @@ export const SQRTPI: CustomFormula = {
   pattern: /SQRTPI\(([^)]+)\)/i,
   isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// SUMX2MY2関数（x^2-y^2の和）
+export const SUMX2MY2: CustomFormula = {
+  name: 'SUMX2MY2',
+  pattern: /SUMX2MY2\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// SUMX2PY2関数（x^2+y^2の和）
+export const SUMX2PY2: CustomFormula = {
+  name: 'SUMX2PY2',
+  pattern: /SUMX2PY2\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// SUMXMY2関数（(x-y)^2の和）
+export const SUMXMY2: CustomFormula = {
+  name: 'SUMXMY2',
+  pattern: /SUMXMY2\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// MULTINOMIAL関数（多項係数）
+export const MULTINOMIAL: CustomFormula = {
+  name: 'MULTINOMIAL',
+  pattern: /MULTINOMIAL\(([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// PERMUTATIONA関数（重複順列）
+export const PERMUTATIONA: CustomFormula = {
+  name: 'PERMUTATIONA',
+  pattern: /PERMUTATIONA\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// BASE関数（数値を指定した基数に変換）
+export const BASE: CustomFormula = {
+  name: 'BASE',
+  pattern: /BASE\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// DECIMAL関数（指定した基数の数値を10進数に変換）
+export const DECIMAL: CustomFormula = {
+  name: 'DECIMAL',
+  pattern: /DECIMAL\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// SUBTOTAL関数（小計）
+export const SUBTOTAL: CustomFormula = {
+  name: 'SUBTOTAL',
+  pattern: /SUBTOTAL\(([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// AGGREGATE関数（集計関数、エラー値を除外）
+export const AGGREGATE: CustomFormula = {
+  name: 'AGGREGATE',
+  pattern: /AGGREGATE\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// CEILING.MATH関数（数学的な切り上げ）
+export const CEILING_MATH: CustomFormula = {
+  name: 'CEILING.MATH',
+  pattern: /CEILING\.MATH\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// CEILING.PRECISE関数（精密な切り上げ）
+export const CEILING_PRECISE: CustomFormula = {
+  name: 'CEILING.PRECISE',
+  pattern: /CEILING\.PRECISE\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// FLOOR.MATH関数（数学的な切り下げ）
+export const FLOOR_MATH: CustomFormula = {
+  name: 'FLOOR.MATH',
+  pattern: /FLOOR\.MATH\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// FLOOR.PRECISE関数（精密な切り下げ）
+export const FLOOR_PRECISE: CustomFormula = {
+  name: 'FLOOR.PRECISE',
+  pattern: /FLOOR\.PRECISE\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// ISO.CEILING関数（ISO標準の切り上げ）
+export const ISO_CEILING: CustomFormula = {
+  name: 'ISO.CEILING',
+  pattern: /ISO\.CEILING\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// SERIESSUM関数（べき級数を計算）
+export const SERIESSUM: CustomFormula = {
+  name: 'SERIESSUM',
+  pattern: /SERIESSUM\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  isSupported: true, // HyperFormulaでサポート
+  calculate: () => null // HyperFormulaに処理を委譲
+};
+
+// RANDARRAY関数（ランダム配列を生成）
+export const RANDARRAY: CustomFormula = {
+  name: 'RANDARRAY',
+  pattern: /RANDARRAY\((?:([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  isSupported: false, // HyperFormulaでサポートされていない（手動実装）
+  calculate: (matches) => {
+    const rows = matches[1] ? parseInt(matches[1]) : 1;
+    const cols = matches[2] ? parseInt(matches[2]) : 1;
+    const min = matches[3] ? parseFloat(matches[3]) : 0;
+    const max = matches[4] ? parseFloat(matches[4]) : 1;
+    const wholeNumber = matches[5] ? matches[5].toLowerCase() === 'true' : false;
+    
+    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) return FormulaError.VALUE;
+    if (isNaN(min) || isNaN(max) || min >= max) return FormulaError.VALUE;
+    
+    const result: number[][] = [];
+    for (let i = 0; i < rows; i++) {
+      const row: number[] = [];
+      for (let j = 0; j < cols; j++) {
+        const randomValue = Math.random() * (max - min) + min;
+        row.push(wholeNumber ? Math.floor(randomValue) : randomValue);
+      }
+      result.push(row);
+    }
+    
+    // 1x1の場合は単一の値を返す
+    if (rows === 1 && cols === 1) {
+      return result[0][0];
+    }
+    
+    return result;
+  }
+};
+
+// SEQUENCE関数（連続値を生成）
+export const SEQUENCE: CustomFormula = {
+  name: 'SEQUENCE',
+  pattern: /SEQUENCE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  isSupported: false, // HyperFormulaでサポートされていない（手動実装）
+  calculate: (matches) => {
+    const rows = parseInt(matches[1]);
+    const cols = matches[2] ? parseInt(matches[2]) : 1;
+    const start = matches[3] ? parseFloat(matches[3]) : 1;
+    const step = matches[4] ? parseFloat(matches[4]) : 1;
+    
+    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) return FormulaError.VALUE;
+    if (isNaN(start) || isNaN(step)) return FormulaError.VALUE;
+    
+    const result: number[][] = [];
+    let currentValue = start;
+    
+    for (let i = 0; i < rows; i++) {
+      const row: number[] = [];
+      for (let j = 0; j < cols; j++) {
+        row.push(currentValue);
+        currentValue += step;
+      }
+      result.push(row);
+    }
+    
+    // 1x1の場合は単一の値を返す
+    if (rows === 1 && cols === 1) {
+      return result[0][0];
+    }
+    
+    return result;
+  }
 };

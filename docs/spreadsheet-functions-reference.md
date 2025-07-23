@@ -56,30 +56,30 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | MROUND | 倍数に丸める | `=MROUND(数値, 倍数)` | ✅ | 🔴 |
 | SUMSQ | 平方和を計算 | `=SUMSQ(数値1, [数値2], ...)` | ✅ | 🔴 |
 | SUMPRODUCT | 配列の積の和を計算 | `=SUMPRODUCT(配列1, [配列2], ...)` | ✅ | 🔴 |
-| SUMX2MY2 | x^2-y^2の和を計算 | `=SUMX2MY2(配列x, 配列y)` | ❌ | 🔴 |
-| SUMX2PY2 | x^2+y^2の和を計算 | `=SUMX2PY2(配列x, 配列y)` | ❌ | 🔴 |
-| SUMXMY2 | (x-y)^2の和を計算 | `=SUMXMY2(配列x, 配列y)` | ❌ | 🔴 |
-| AGGREGATE | 集計関数（エラー値を除外） | `=AGGREGATE(関数番号, オプション, 配列, [k])` | ❌ | 🔴 |
-| ARABIC | ローマ数字をアラビア数字に変換 | `=ARABIC(文字列)` | ❌ | 🔴 |
-| BASE | 数値を指定した基数に変換 | `=BASE(数値, 基数, [最小長])` | ❌ | 🔴 |
-| CEILING.MATH | 数学的な切り上げ | `=CEILING.MATH(数値, [基準値], [モード])` | ❌ | 🔴 |
-| CEILING.PRECISE | 精密な切り上げ | `=CEILING.PRECISE(数値, [基準値])` | ❌ | 🔴 |
-| COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ❌ | 🔴 |
-| DECIMAL | 指定した基数の数値を10進数に変換 | `=DECIMAL(文字列, 基数)` | ❌ | 🔴 |
+| SUMX2MY2 | x^2-y^2の和を計算 | `=SUMX2MY2(配列x, 配列y)` | ✅ | 🔴 |
+| SUMX2PY2 | x^2+y^2の和を計算 | `=SUMX2PY2(配列x, 配列y)` | ✅ | 🔴 |
+| SUMXMY2 | (x-y)^2の和を計算 | `=SUMXMY2(配列x, 配列y)` | ✅ | 🔴 |
+| AGGREGATE | 集計関数（エラー値を除外） | `=AGGREGATE(関数番号, オプション, 配列, [k])` | ✅ | 🔴 |
+| ARABIC | ローマ数字をアラビア数字に変換 | `=ARABIC(文字列)` | ✅ | 🔴 |
+| BASE | 数値を指定した基数に変換 | `=BASE(数値, 基数, [最小長])` | ✅ | 🔴 |
+| CEILING.MATH | 数学的な切り上げ | `=CEILING.MATH(数値, [基準値], [モード])` | ✅ | 🔴 |
+| CEILING.PRECISE | 精密な切り上げ | `=CEILING.PRECISE(数値, [基準値])` | ✅ | 🔴 |
+| COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ✅ | 🔴 |
+| DECIMAL | 指定した基数の数値を10進数に変換 | `=DECIMAL(文字列, 基数)` | ✅ | 🔴 |
 | EVEN | 最も近い偶数に切り上げ | `=EVEN(数値)` | ✅ | 🔴 |
 | FACTDOUBLE | 二重階乗を計算 | `=FACTDOUBLE(数値)` | ✅ | 🔴 |
-| FLOOR.MATH | 数学的な切り下げ | `=FLOOR.MATH(数値, [基準値], [モード])` | ❌ | 🔴 |
-| FLOOR.PRECISE | 精密な切り下げ | `=FLOOR.PRECISE(数値, [基準値])` | ❌ | 🔴 |
-| ISO.CEILING | ISO標準の切り上げ | `=ISO.CEILING(数値, [基準値])` | ❌ | 🔴 |
-| MULTINOMIAL | 多項係数を計算 | `=MULTINOMIAL(数値1, [数値2], ...)` | ❌ | 🔴 |
+| FLOOR.MATH | 数学的な切り下げ | `=FLOOR.MATH(数値, [基準値], [モード])` | ✅ | 🔴 |
+| FLOOR.PRECISE | 精密な切り下げ | `=FLOOR.PRECISE(数値, [基準値])` | ✅ | 🔴 |
+| ISO.CEILING | ISO標準の切り上げ | `=ISO.CEILING(数値, [基準値])` | ✅ | 🔴 |
+| MULTINOMIAL | 多項係数を計算 | `=MULTINOMIAL(数値1, [数値2], ...)` | ✅ | 🔴 |
 | ODD | 最も近い奇数に切り上げ | `=ODD(数値)` | ✅ | 🔴 |
-| PERMUTATIONA | 重複順列を計算 | `=PERMUTATIONA(総数, 選択数)` | ❌ | 🔴 |
-| RANDARRAY | ランダム配列を生成 | `=RANDARRAY([行], [列], [最小値], [最大値], [整数])` | ❌ | 🟡 |  |
+| PERMUTATIONA | 重複順列を計算 | `=PERMUTATIONA(総数, 選択数)` | ✅ | 🔴 |
+| RANDARRAY | ランダム配列を生成 | `=RANDARRAY([行], [列], [最小値], [最大値], [整数])` | ✅ | 🟡 |  |
 | ROMAN | アラビア数字をローマ数字に変換 | `=ROMAN(数値, [形式])` | ✅ | 🔴 |
-| SEQUENCE | 連続値を生成 | `=SEQUENCE(行, [列], [開始], [ステプ])` | ❌ | 🟡 |  |
-| SERIESSUM | べき級数を計算 | `=SERIESSUM(x, n, m, 係数)` | ❌ | 🔴 |
+| SEQUENCE | 連続値を生成 | `=SEQUENCE(行, [列], [開始], [ステップ])` | ✅ | 🟡 |  |
+| SERIESSUM | べき級数を計算 | `=SERIESSUM(x, n, m, 係数)` | ✅ | 🔴 |
 | SQRTPI | π倍の平方根を計算 | `=SQRTPI(数値)` | ✅ | 🔴 |
-| SUBTOTAL | 小計を計算 | `=SUBTOTAL(関数番号, 参照1, [参照2], ...)` | ❌ | 🔴 |
+| SUBTOTAL | 小計を計算 | `=SUBTOTAL(関数番号, 参照1, [参照2], ...)` | ✅ | 🔴 |
 
 ### 三角関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
@@ -252,7 +252,7 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | GAUSS | ガウス関数 | `=GAUSS(z)` | ❌ | 🔴 |
 | PERMUT | 順列 | `=PERMUT(総数, 選択数)` | ❌ | 🔴 |
 | PERMUTATIONA | 重複順列 | `=PERMUTATIONA(総数, 選択数)` | ❌ |
-| COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ❌ | 🔴 |
+| COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ✅ | 🔴 |
 
 ## 3. 文字列操作関数 (Text Functions)
 
@@ -298,7 +298,7 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | DBCS | 半角を全角に変換 | `=DBCS(文字列)` | ❌ | 🟡 |
 | PHONETIC | ふりがなを抽出 | `=PHONETIC(参照)` | ❌ | 🟡 |
 | BAHTTEXT | 数値をタイ語文字列に変換 | `=BAHTTEXT(数値)` | ❌ | 🟡 |
-| ARABIC | ローマ数字をアラビア数字に変換 | `=ARABIC(文字列)` | ❌ | 🔴 |
+| ARABIC | ローマ数字をアラビア数字に変換 | `=ARABIC(文字列)` | ✅ | 🔴 |
 | ROMAN | アラビア数字をローマ数字に変換 | `=ROMAN(数値, [書式])` | ❌ | 🔴 |
 
 ## 4. 日付・時刻関数 (Date & Time Functions)
