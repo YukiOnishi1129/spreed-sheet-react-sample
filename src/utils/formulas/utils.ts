@@ -2,11 +2,7 @@
 
 import type { FormulaContext } from './types';
 import { FormulaError } from './types';
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-
-// dayjsプラグインを有効化
-dayjs.extend(customParseFormat);
+import { parseDate as parseDateNew } from './dateUtils';
 
 // セル参照（A1形式）から座標を取得
 export const parseCellReference = (cellRef: string): { col: number; row: number } | null => {
@@ -49,7 +45,6 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
   }
   
   const cellData = context.data[row][col];
-  console.log(`getCellValue ${cellRef}: row=${row}, col=${col}, cellData=`, cellData);
   
   // 配列データの場合、セルは直接値として格納されている
   // 文字列、数値、null、undefinedの場合はそのまま返す
@@ -87,77 +82,14 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
   return values;
 };
 
-// 日付文字列をdayjsオブジェクトに変換
-export const parseDate = (dateValue: unknown): dayjs.Dayjs | null => {
-  console.log('parseDate: 入力値', { dateValue, type: typeof dateValue });
-  
-  if (!dateValue) {
-    console.log('parseDate: 空の値のためnullを返す');
-    return null;
-  }
-  
-  // すでにdayjsオブジェクトの場合
-  if (dayjs.isDayjs(dateValue)) {
-    console.log('parseDate: すでにdayjsオブジェクト');
-    return dateValue;
-  }
-  
-  // Dateオブジェクトの場合
-  if (dateValue instanceof Date) {
-    console.log('parseDate: Dateオブジェクト');
-    return dayjs(dateValue);
-  }
-  
-  // 文字列の場合
-  if (typeof dateValue === 'string') {
-    console.log('parseDate: 文字列として解析開始', dateValue);
-    // 対応する日付フォーマット
-    const formats = [
-      'YYYY-MM-DD',
-      'YYYY/MM/DD',
-      'MM/DD/YYYY',
-      'DD/MM/YYYY',
-      'YYYY-M-D',
-      'YYYY/M/D',
-      'M/D/YYYY',
-      'D/M/YYYY'
-    ];
-    
-    for (const format of formats) {
-      const parsed = dayjs(dateValue, format, true); // strict mode
-      console.log(`parseDate: フォーマット ${format} でテスト`, { parsed: parsed.format(), isValid: parsed.isValid() });
-      if (parsed.isValid()) {
-        console.log(`parseDate: ${format} で解析成功`, parsed.format());
-        return parsed;
-      }
-    }
-    
-    // フォーマット指定なしで試す
-    const parsed = dayjs(dateValue);
-    console.log('parseDate: フォーマット指定なしでテスト', { parsed: parsed.format(), isValid: parsed.isValid() });
-    if (parsed.isValid()) {
-      console.log('parseDate: フォーマット指定なしで解析成功', parsed.format());
-      return parsed;
-    }
-  }
-  
-  // 数値の場合（Excelシリアル値）
-  if (typeof dateValue === 'number') {
-    console.log('parseDate: 数値（Excelシリアル値）として解析', dateValue);
-    // Excel epoch: 1900/1/1 (実際は1899/12/30)
-    const excelEpoch = dayjs('1899-12-30');
-    const result = excelEpoch.add(dateValue, 'day');
-    console.log('parseDate: Excelシリアル値解析結果', result.format());
-    return result;
-  }
-  
-  console.log('parseDate: すべての解析に失敗、nullを返す');
-  return null;
+// 日付文字列をDateオブジェクトに変換（互換性のため）
+export const parseDate = (dateValue: unknown): Date | null => {
+  return parseDateNew(dateValue);
 };
 
-// dayjsオブジェクトをDateオブジェクトに変換（互換性のため）
-export const toDate = (dayjsObj: dayjs.Dayjs | null): Date | null => {
-  return dayjsObj ? dayjsObj.toDate() : null;
+// Dateオブジェクトをそのまま返す（互換性のため）
+export const toDate = (dateObj: Date | null): Date | null => {
+  return dateObj;
 };
 
 // 値を数値に変換

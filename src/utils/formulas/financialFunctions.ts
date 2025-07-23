@@ -8,7 +8,6 @@ import { getCellValue, getCellRangeValues } from './utils';
 export const PMT: CustomFormula = {
   name: 'PMT',
   pattern: /PMT\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -16,7 +15,6 @@ export const PMT: CustomFormula = {
 export const PV: CustomFormula = {
   name: 'PV',
   pattern: /PV\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -24,7 +22,6 @@ export const PV: CustomFormula = {
 export const FV: CustomFormula = {
   name: 'FV',
   pattern: /FV\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -32,7 +29,6 @@ export const FV: CustomFormula = {
 export const NPV: CustomFormula = {
   name: 'NPV',
   pattern: /NPV\(([^,]+),\s*(.+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -40,7 +36,6 @@ export const NPV: CustomFormula = {
 export const IRR: CustomFormula = {
   name: 'IRR',
   pattern: /IRR\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false, // HyperFormulaでサポートされていない
   calculate: (matches, context) => {
     const valuesRef = matches[1].trim();
     const guessRef = matches[2]?.trim();
@@ -135,7 +130,6 @@ export const IRR: CustomFormula = {
 export const PPMT: CustomFormula = {
   name: 'PPMT',
   pattern: /PPMT\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -143,6 +137,5 @@ export const PPMT: CustomFormula = {
 export const IPMT: CustomFormula = {
   name: 'IPMT',
   pattern: /IPMT\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };

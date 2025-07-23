@@ -8,7 +8,6 @@ import { getCellValue } from './utils';
 export const SUMIF: CustomFormula = {
   name: 'SUMIF',
   pattern: /SUMIF\(([^,]+),\s*"([^"]+)",\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -16,7 +15,6 @@ export const SUMIF: CustomFormula = {
 export const COUNTIF: CustomFormula = {
   name: 'COUNTIF',
   pattern: /COUNTIF\(([^,]+),\s*"([^"]+)"\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -24,7 +22,6 @@ export const COUNTIF: CustomFormula = {
 export const AVERAGEIF: CustomFormula = {
   name: 'AVERAGEIF',
   pattern: /AVERAGEIF\(([^,]+),\s*"([^"]+)",\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -32,7 +29,6 @@ export const AVERAGEIF: CustomFormula = {
 export const SUM: CustomFormula = {
   name: 'SUM',
   pattern: /SUM\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -40,7 +36,6 @@ export const SUM: CustomFormula = {
 export const AVERAGE: CustomFormula = {
   name: 'AVERAGE',
   pattern: /AVERAGE\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -48,7 +43,6 @@ export const AVERAGE: CustomFormula = {
 export const COUNT: CustomFormula = {
   name: 'COUNT',
   pattern: /COUNT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -56,7 +50,6 @@ export const COUNT: CustomFormula = {
 export const MAX: CustomFormula = {
   name: 'MAX',
   pattern: /MAX\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -64,7 +57,6 @@ export const MAX: CustomFormula = {
 export const MIN: CustomFormula = {
   name: 'MIN',
   pattern: /MIN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -72,7 +64,6 @@ export const MIN: CustomFormula = {
 export const ROUND: CustomFormula = {
   name: 'ROUND',
   pattern: /ROUND\(([^,]+),\s*(\d+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -80,7 +71,6 @@ export const ROUND: CustomFormula = {
 export const ABS: CustomFormula = {
   name: 'ABS',
   pattern: /ABS\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -88,7 +78,6 @@ export const ABS: CustomFormula = {
 export const SQRT: CustomFormula = {
   name: 'SQRT',
   pattern: /SQRT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -96,7 +85,6 @@ export const SQRT: CustomFormula = {
 export const POWER: CustomFormula = {
   name: 'POWER',
   pattern: /POWER\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -104,7 +92,6 @@ export const POWER: CustomFormula = {
 export const MOD: CustomFormula = {
   name: 'MOD',
   pattern: /MOD\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -112,7 +99,6 @@ export const MOD: CustomFormula = {
 export const INT: CustomFormula = {
   name: 'INT',
   pattern: /INT\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     const valueRef = matches[1].trim();
     let value: number;
@@ -133,7 +119,6 @@ export const INT: CustomFormula = {
 export const TRUNC: CustomFormula = {
   name: 'TRUNC',
   pattern: /TRUNC\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -141,7 +126,6 @@ export const TRUNC: CustomFormula = {
 export const RAND: CustomFormula = {
   name: 'RAND',
   pattern: /RAND\(\)/i,
-  isSupported: false,
   calculate: () => {
     return Math.random();
   }
@@ -151,7 +135,6 @@ export const RAND: CustomFormula = {
 export const RANDBETWEEN: CustomFormula = {
   name: 'RANDBETWEEN',
   pattern: /RANDBETWEEN\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     const minRef = matches[1].trim();
     const maxRef = matches[2].trim();
@@ -182,7 +165,6 @@ export const RANDBETWEEN: CustomFormula = {
 export const PI: CustomFormula = {
   name: 'PI',
   pattern: /PI\(\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -190,7 +172,6 @@ export const PI: CustomFormula = {
 export const DEGREES: CustomFormula = {
   name: 'DEGREES',
   pattern: /DEGREES\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -198,7 +179,6 @@ export const DEGREES: CustomFormula = {
 export const RADIANS: CustomFormula = {
   name: 'RADIANS',
   pattern: /RADIANS\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -206,7 +186,6 @@ export const RADIANS: CustomFormula = {
 export const SIN: CustomFormula = {
   name: 'SIN',
   pattern: /SIN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -214,7 +193,6 @@ export const SIN: CustomFormula = {
 export const COS: CustomFormula = {
   name: 'COS',
   pattern: /COS\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -222,7 +200,6 @@ export const COS: CustomFormula = {
 export const TAN: CustomFormula = {
   name: 'TAN',
   pattern: /TAN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -230,7 +207,6 @@ export const TAN: CustomFormula = {
 export const LOG: CustomFormula = {
   name: 'LOG',
   pattern: /LOG\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -238,7 +214,6 @@ export const LOG: CustomFormula = {
 export const LOG10: CustomFormula = {
   name: 'LOG10',
   pattern: /LOG10\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -246,7 +221,6 @@ export const LOG10: CustomFormula = {
 export const LN: CustomFormula = {
   name: 'LN',
   pattern: /LN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -254,7 +228,6 @@ export const LN: CustomFormula = {
 export const EXP: CustomFormula = {
   name: 'EXP',
   pattern: /EXP\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -262,7 +235,6 @@ export const EXP: CustomFormula = {
 export const ASIN: CustomFormula = {
   name: 'ASIN',
   pattern: /ASIN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -270,7 +242,6 @@ export const ASIN: CustomFormula = {
 export const ACOS: CustomFormula = {
   name: 'ACOS',
   pattern: /ACOS\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -278,7 +249,6 @@ export const ACOS: CustomFormula = {
 export const ATAN: CustomFormula = {
   name: 'ATAN',
   pattern: /ATAN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -286,7 +256,6 @@ export const ATAN: CustomFormula = {
 export const ATAN2: CustomFormula = {
   name: 'ATAN2',
   pattern: /ATAN2\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -294,7 +263,6 @@ export const ATAN2: CustomFormula = {
 export const ROUNDUP: CustomFormula = {
   name: 'ROUNDUP',
   pattern: /ROUNDUP\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -302,7 +270,6 @@ export const ROUNDUP: CustomFormula = {
 export const ROUNDDOWN: CustomFormula = {
   name: 'ROUNDDOWN',
   pattern: /ROUNDDOWN\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -310,7 +277,6 @@ export const ROUNDDOWN: CustomFormula = {
 export const CEILING: CustomFormula = {
   name: 'CEILING',
   pattern: /CEILING\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -318,7 +284,6 @@ export const CEILING: CustomFormula = {
 export const FLOOR: CustomFormula = {
   name: 'FLOOR',
   pattern: /FLOOR\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -326,7 +291,6 @@ export const FLOOR: CustomFormula = {
 export const SIGN: CustomFormula = {
   name: 'SIGN',
   pattern: /SIGN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -334,7 +298,6 @@ export const SIGN: CustomFormula = {
 export const FACT: CustomFormula = {
   name: 'FACT',
   pattern: /FACT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -342,7 +305,6 @@ export const FACT: CustomFormula = {
 export const SUMIFS: CustomFormula = {
   name: 'SUMIFS',
   pattern: /SUMIFS\(([^,]+),\s*([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -350,7 +312,6 @@ export const SUMIFS: CustomFormula = {
 export const COUNTIFS: CustomFormula = {
   name: 'COUNTIFS',
   pattern: /COUNTIFS\(([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -358,7 +319,6 @@ export const COUNTIFS: CustomFormula = {
 export const AVERAGEIFS: CustomFormula = {
   name: 'AVERAGEIFS',
   pattern: /AVERAGEIFS\(([^,]+),\s*([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -366,7 +326,6 @@ export const AVERAGEIFS: CustomFormula = {
 export const PRODUCT: CustomFormula = {
   name: 'PRODUCT',
   pattern: /PRODUCT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -374,7 +333,6 @@ export const PRODUCT: CustomFormula = {
 export const MROUND: CustomFormula = {
   name: 'MROUND',
   pattern: /MROUND\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -382,7 +340,6 @@ export const MROUND: CustomFormula = {
 export const COMBIN: CustomFormula = {
   name: 'COMBIN',
   pattern: /COMBIN\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -390,7 +347,6 @@ export const COMBIN: CustomFormula = {
 export const GCD: CustomFormula = {
   name: 'GCD',
   pattern: /GCD\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -398,7 +354,6 @@ export const GCD: CustomFormula = {
 export const LCM: CustomFormula = {
   name: 'LCM',
   pattern: /LCM\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -406,7 +361,6 @@ export const LCM: CustomFormula = {
 export const QUOTIENT: CustomFormula = {
   name: 'QUOTIENT',
   pattern: /QUOTIENT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -415,7 +369,6 @@ export const QUOTIENT: CustomFormula = {
 export const SINH: CustomFormula = {
   name: 'SINH',
   pattern: /SINH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -423,7 +376,6 @@ export const SINH: CustomFormula = {
 export const COSH: CustomFormula = {
   name: 'COSH',
   pattern: /COSH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -431,7 +383,6 @@ export const COSH: CustomFormula = {
 export const TANH: CustomFormula = {
   name: 'TANH',
   pattern: /TANH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -441,7 +392,6 @@ export const TANH: CustomFormula = {
 export const SUMSQ: CustomFormula = {
   name: 'SUMSQ',
   pattern: /SUMSQ\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -449,7 +399,6 @@ export const SUMSQ: CustomFormula = {
 export const SUMPRODUCT: CustomFormula = {
   name: 'SUMPRODUCT',
   pattern: /SUMPRODUCT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -457,7 +406,6 @@ export const SUMPRODUCT: CustomFormula = {
 export const EVEN: CustomFormula = {
   name: 'EVEN',
   pattern: /EVEN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -465,7 +413,6 @@ export const EVEN: CustomFormula = {
 export const ODD: CustomFormula = {
   name: 'ODD',
   pattern: /ODD\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -473,7 +420,6 @@ export const ODD: CustomFormula = {
 export const ARABIC: CustomFormula = {
   name: 'ARABIC',
   pattern: /ARABIC\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches: RegExpMatchArray) => {
     const romanStr = matches[1].trim().replace(/["']/g, '').toUpperCase();
     
@@ -517,7 +463,6 @@ export const ARABIC: CustomFormula = {
 export const ROMAN: CustomFormula = {
   name: 'ROMAN',
   pattern: /ROMAN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -525,7 +470,6 @@ export const ROMAN: CustomFormula = {
 export const COMBINA: CustomFormula = {
   name: 'COMBINA',
   pattern: /COMBINA\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -533,7 +477,6 @@ export const COMBINA: CustomFormula = {
 export const PERMUT: CustomFormula = {
   name: 'PERMUT',
   pattern: /PERMUT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -541,7 +484,6 @@ export const PERMUT: CustomFormula = {
 export const PERMUTATIONA: CustomFormula = {
   name: 'PERMUTATIONA',
   pattern: /PERMUTATIONA\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches: RegExpMatchArray) => {
     const nStr = matches[1].trim();
     const kStr = matches[2].trim();
@@ -584,7 +526,6 @@ export const PERMUTATIONA: CustomFormula = {
 export const FACTDOUBLE: CustomFormula = {
   name: 'FACTDOUBLE',
   pattern: /FACTDOUBLE\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -592,7 +533,6 @@ export const FACTDOUBLE: CustomFormula = {
 export const SQRTPI: CustomFormula = {
   name: 'SQRTPI',
   pattern: /SQRTPI\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -600,7 +540,6 @@ export const SQRTPI: CustomFormula = {
 export const SUMX2MY2: CustomFormula = {
   name: 'SUMX2MY2',
   pattern: /SUMX2MY2\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -608,7 +547,6 @@ export const SUMX2MY2: CustomFormula = {
 export const SUMX2PY2: CustomFormula = {
   name: 'SUMX2PY2',
   pattern: /SUMX2PY2\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -616,7 +554,6 @@ export const SUMX2PY2: CustomFormula = {
 export const SUMXMY2: CustomFormula = {
   name: 'SUMXMY2',
   pattern: /SUMXMY2\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -624,7 +561,6 @@ export const SUMXMY2: CustomFormula = {
 export const MULTINOMIAL: CustomFormula = {
   name: 'MULTINOMIAL',
   pattern: /MULTINOMIAL\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -633,7 +569,6 @@ export const MULTINOMIAL: CustomFormula = {
 export const BASE: CustomFormula = {
   name: 'BASE',
   pattern: /BASE\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -641,7 +576,6 @@ export const BASE: CustomFormula = {
 export const DECIMAL: CustomFormula = {
   name: 'DECIMAL',
   pattern: /DECIMAL\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -649,7 +583,6 @@ export const DECIMAL: CustomFormula = {
 export const SUBTOTAL: CustomFormula = {
   name: 'SUBTOTAL',
   pattern: /SUBTOTAL\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -657,7 +590,6 @@ export const SUBTOTAL: CustomFormula = {
 export const AGGREGATE: CustomFormula = {
   name: 'AGGREGATE',
   pattern: /AGGREGATE\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -665,7 +597,6 @@ export const AGGREGATE: CustomFormula = {
 export const CEILING_MATH: CustomFormula = {
   name: 'CEILING.MATH',
   pattern: /CEILING\.MATH\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -673,7 +604,6 @@ export const CEILING_MATH: CustomFormula = {
 export const CEILING_PRECISE: CustomFormula = {
   name: 'CEILING.PRECISE',
   pattern: /CEILING\.PRECISE\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -681,7 +611,6 @@ export const CEILING_PRECISE: CustomFormula = {
 export const FLOOR_MATH: CustomFormula = {
   name: 'FLOOR.MATH',
   pattern: /FLOOR\.MATH\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -689,7 +618,6 @@ export const FLOOR_MATH: CustomFormula = {
 export const FLOOR_PRECISE: CustomFormula = {
   name: 'FLOOR.PRECISE',
   pattern: /FLOOR\.PRECISE\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -697,7 +625,6 @@ export const FLOOR_PRECISE: CustomFormula = {
 export const ISO_CEILING: CustomFormula = {
   name: 'ISO.CEILING',
   pattern: /ISO\.CEILING\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -705,7 +632,6 @@ export const ISO_CEILING: CustomFormula = {
 export const SERIESSUM: CustomFormula = {
   name: 'SERIESSUM',
   pattern: /SERIESSUM\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaに処理を委譲
 };
 
@@ -713,7 +639,6 @@ export const SERIESSUM: CustomFormula = {
 export const RANDARRAY: CustomFormula = {
   name: 'RANDARRAY',
   pattern: /RANDARRAY\((?:([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: false, // HyperFormulaでサポートされていない（手動実装）
   calculate: (matches) => {
     const rows = matches[1] ? parseInt(matches[1]) : 1;
     const cols = matches[2] ? parseInt(matches[2]) : 1;
@@ -747,7 +672,6 @@ export const RANDARRAY: CustomFormula = {
 export const SEQUENCE: CustomFormula = {
   name: 'SEQUENCE',
   pattern: /SEQUENCE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: false, // HyperFormulaでサポートされていない（手動実装）
   calculate: (matches) => {
     const rows = parseInt(matches[1]);
     const cols = matches[2] ? parseInt(matches[2]) : 1;
@@ -782,7 +706,6 @@ export const SEQUENCE: CustomFormula = {
 export const ASINH: CustomFormula = {
   name: 'ASINH',
   pattern: /ASINH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -790,7 +713,6 @@ export const ASINH: CustomFormula = {
 export const ACOSH: CustomFormula = {
   name: 'ACOSH',
   pattern: /ACOSH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -798,7 +720,6 @@ export const ACOSH: CustomFormula = {
 export const ATANH: CustomFormula = {
   name: 'ATANH',
   pattern: /ATANH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -806,7 +727,6 @@ export const ATANH: CustomFormula = {
 export const CSC: CustomFormula = {
   name: 'CSC',
   pattern: /CSC\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -814,7 +734,6 @@ export const CSC: CustomFormula = {
 export const SEC: CustomFormula = {
   name: 'SEC',
   pattern: /SEC\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -822,7 +741,6 @@ export const SEC: CustomFormula = {
 export const COT: CustomFormula = {
   name: 'COT',
   pattern: /COT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -830,7 +748,6 @@ export const COT: CustomFormula = {
 export const ACOT: CustomFormula = {
   name: 'ACOT',
   pattern: /ACOT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -838,7 +755,6 @@ export const ACOT: CustomFormula = {
 export const CSCH: CustomFormula = {
   name: 'CSCH',
   pattern: /CSCH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -846,7 +762,6 @@ export const CSCH: CustomFormula = {
 export const SECH: CustomFormula = {
   name: 'SECH',
   pattern: /SECH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -854,7 +769,6 @@ export const SECH: CustomFormula = {
 export const COTH: CustomFormula = {
   name: 'COTH',
   pattern: /COTH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -862,6 +776,5 @@ export const COTH: CustomFormula = {
 export const ACOTH: CustomFormula = {
   name: 'ACOTH',
   pattern: /ACOTH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };

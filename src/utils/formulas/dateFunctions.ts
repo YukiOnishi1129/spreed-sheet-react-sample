@@ -2,120 +2,94 @@
 
 import type { CustomFormula, FormulaContext } from './types';
 import { FormulaError } from './types';
-import { getCellValue, parseDate } from './utils';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import { getCellValue } from './utils';
+import { 
+  parseDate as parseDateNew, 
+  diffDays, 
+  diffMonths, 
+  diffYears, 
+  diffMonthsYM, 
+  diffDaysYD, 
+  diffDaysMD,
+  now,
+  today,
+  dateToExcelSerial,
+  isValidDate
+} from './dateUtils';
 
-// dayjsプラグインを有効化
-dayjs.extend(isSameOrBefore);
-dayjs.extend(isSameOrAfter);
-
-// DATEDIF関数の実装
+// DATEDIF関数の実装（Date版）
 export const DATEDIF: CustomFormula = {
   name: 'DATEDIF',
   pattern: /DATEDIF\(([^,]+),\s*([^,]+),\s*"([^"]+)"\)/i,
-  isSupported: false,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, startRef, endRef, unit] = matches;
-    
-    console.log('DATEDIF: 計算開始', { startRef, endRef, unit });
-    console.log('DATEDIF: コンテキスト', { 
-      dataLength: context.data.length, 
-      firstRowLength: context.data[0]?.length,
-      currentRow: context.row,
-      currentCol: context.col
-    });
     
     // セル参照か直接値かを判定
     let startValue, endValue;
     
     // 開始日の取得
     if (startRef.startsWith('"') && startRef.endsWith('"')) {
-      // 直接文字列の場合
       startValue = startRef.slice(1, -1);
-      console.log('DATEDIF: 開始日（直接文字列）', startValue);
     } else if (startRef.match(/^[A-Z]+\d+$/)) {
-      // セル参照の場合
       startValue = getCellValue(startRef, context);
-      console.log('DATEDIF: 開始日（セル参照）', { cellRef: startRef, value: startValue });
     } else {
       startValue = startRef;
-      console.log('DATEDIF: 開始日（その他）', startValue);
     }
     
     // 終了日の取得
     if (endRef.startsWith('"') && endRef.endsWith('"')) {
-      // 直接文字列の場合
       endValue = endRef.slice(1, -1);
-      console.log('DATEDIF: 終了日（直接文字列）', endValue);
     } else if (endRef.match(/^[A-Z]+\d+$/)) {
-      // セル参照の場合
       endValue = getCellValue(endRef, context);
-      console.log('DATEDIF: 終了日（セル参照）', { cellRef: endRef, value: endValue });
     } else {
       endValue = endRef;
-      console.log('DATEDIF: 終了日（その他）', endValue);
     }
     
-    console.log('DATEDIF: 日付解析前の値', { startValue, endValue, startType: typeof startValue, endType: typeof endValue });
-    
-    const startDate = parseDate(startValue);
-    const endDate = parseDate(endValue);
-    
-    console.log('DATEDIF: 日付解析結果', { 
-      startDate: startDate ? startDate.format() : 'null', 
-      endDate: endDate ? endDate.format() : 'null' 
-    });
+    // Date版のparseDate関数を使用
+    const startDate = parseDateNew(startValue);
+    const endDate = parseDateNew(endValue);
     
     if (!startDate || !endDate) {
-      console.error('DATEDIF: 日付解析失敗', { startValue, endValue, startDate, endDate });
       return FormulaError.VALUE;
     }
     
-    if (startDate.isAfter(endDate)) {
-      console.error('DATEDIF: 開始日が終了日より後', { startDate: startDate.format(), endDate: endDate.format() });
+    if (startDate.getTime() > endDate.getTime()) {
       return FormulaError.NUM;
     }
     
     switch (unit.toUpperCase()) {
-      case 'D':
+      case 'D': {
         // 日数の差
-        return endDate.diff(startDate, 'day');
-      case 'M':
+        const days = diffDays(startDate, endDate);
+        return days;
+      }
+      case 'M': {
         // 月数の差
-        return endDate.diff(startDate, 'month');
-      case 'Y':
+        const months = diffMonths(startDate, endDate);
+        return months;
+      }
+      case 'Y': {
         // 年数の差
-        return endDate.diff(startDate, 'year');
+        const years = diffYears(startDate, endDate);
+        return years;
+      }
       case 'YM': {
         // 年を無視した月数の差
-        const monthDiff = endDate.month() - startDate.month();
-        return monthDiff < 0 ? monthDiff + 12 : monthDiff;
+        const result = diffMonthsYM(startDate, endDate);
+        return result;
       }
       case 'YD': {
         // 年を無視した日数の差
-        const sameYearEnd = endDate.year(startDate.year());
-        let dayDiff = sameYearEnd.diff(startDate, 'day');
-        if (dayDiff < 0) {
-          const nextYearEnd = endDate.year(startDate.year() + 1);
-          dayDiff = nextYearEnd.diff(startDate, 'day');
-        }
-        return dayDiff;
+        const result = diffDaysYD(startDate, endDate);
+        return result;
       }
       case 'MD': {
         // 月を無視した日数の差
-        const dayOfMonthDiff = endDate.date() - startDate.date();
-        if (dayOfMonthDiff < 0) {
-          const prevMonthDays = endDate.subtract(1, 'month').daysInMonth();
-          return prevMonthDays - startDate.date() + endDate.date();
-        }
-        return dayOfMonthDiff;
+        const result = diffDaysMD(startDate, endDate);
+        return result;
       }
-      default: {
-        console.error('DATEDIF: 無効な単位', unit);
+      default:
         return FormulaError.VALUE;
-      }
     }
   }
 };
@@ -124,64 +98,16 @@ export const DATEDIF: CustomFormula = {
 export const NETWORKDAYS: CustomFormula = {
   name: 'NETWORKDAYS',
   pattern: /NETWORKDAYS\(([^,)]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, startRef, endRef] = matches;
-    
-    // セル参照か直接値かを判定
-    let startValue, endValue;
-    
-    // 開始日の取得
-    if (startRef.match(/^[A-Z]+\d+$/)) {
-      startValue = getCellValue(startRef, context);
-    } else {
-      startValue = startRef.replace(/^"|"$/g, '');
-    }
-    
-    // 終了日の取得
-    if (endRef.match(/^[A-Z]+\d+$/)) {
-      endValue = getCellValue(endRef, context);
-    } else {
-      endValue = endRef.replace(/^"|"$/g, '');
-    }
-    
-    const startDate = parseDate(startValue);
-    const endDate = parseDate(endValue);
-    
-    if (!startDate || !endDate) {
-      console.warn('NETWORKDAYS: 日付解析失敗', { startValue, endValue });
-      return FormulaError.VALUE;
-    }
-    
-    let workdays = 0;
-    const isForward = startDate.isSameOrBefore(endDate);
-    let currentDate = startDate.clone();
-    
-    while (isForward ? currentDate.isSameOrBefore(endDate) : currentDate.isSameOrAfter(endDate)) {
-      const dayOfWeek = currentDate.day();
-      // 月曜日(1)から金曜日(5)までが平日
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        workdays++;
-      }
-      currentDate = currentDate.add(isForward ? 1 : -1, 'day');
-    }
-    
-    return isForward ? workdays : -workdays;
-  }
+  calculate: () => null // HyperFormulaが処理
 };
 
 // NOW関数の実装（現在の日時）
 export const NOW: CustomFormula = {
   name: 'NOW',
   pattern: /NOW\(\)/i,
-  isSupported: false,
   calculate: () => {
-    // Excelシリアル値を返す
-    const now = dayjs();
-    const excelEpoch = dayjs('1899-12-30');
-    const days = now.diff(excelEpoch, 'day');
-    const timeOfDay = (now.hour() * 3600 + now.minute() * 60 + now.second()) / 86400;
-    return days + timeOfDay;
+    const currentDate = now();
+    return dateToExcelSerial(currentDate) + (currentDate.getHours() * 3600 + currentDate.getMinutes() * 60 + currentDate.getSeconds()) / 86400;
   }
 };
 
@@ -189,39 +115,84 @@ export const NOW: CustomFormula = {
 export const DATE: CustomFormula = {
   name: 'DATE',
   pattern: /DATE\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, yearRef, monthRef, dayRef] = matches;
+    
+    const year = Number(getCellValue(yearRef, context) ?? yearRef);
+    const month = Number(getCellValue(monthRef, context) ?? monthRef);
+    const day = Number(getCellValue(dayRef, context) ?? dayRef);
+    
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+      return FormulaError.VALUE;
+    }
+    
+    const date = new Date(year, month - 1, day); // 月は0ベース
+    if (!isValidDate(date)) {
+      return FormulaError.VALUE;
+    }
+    
+    return dateToExcelSerial(date);
+  }
 };
 
 // YEAR関数の実装（年を抽出）
 export const YEAR: CustomFormula = {
   name: 'YEAR',
   pattern: /YEAR\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, dateRef] = matches;
+    
+    const dateValue = getCellValue(dateRef, context) ?? dateRef;
+    const date = parseDateNew(dateValue);
+    
+    if (!date) {
+      return FormulaError.VALUE;
+    }
+    
+    return date.getFullYear();
+  }
 };
 
 // MONTH関数の実装（月を抽出）
 export const MONTH: CustomFormula = {
   name: 'MONTH',
   pattern: /MONTH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, dateRef] = matches;
+    
+    const dateValue = getCellValue(dateRef, context) ?? dateRef;
+    const date = parseDateNew(dateValue);
+    
+    if (!date) {
+      return FormulaError.VALUE;
+    }
+    
+    return date.getMonth() + 1; // 月は1ベース
+  }
 };
 
 // DAY関数の実装（日を抽出）
 export const DAY: CustomFormula = {
   name: 'DAY',
   pattern: /DAY\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, dateRef] = matches;
+    
+    const dateValue = getCellValue(dateRef, context) ?? dateRef;
+    const date = parseDateNew(dateValue);
+    
+    if (!date) {
+      return FormulaError.VALUE;
+    }
+    
+    return date.getDate();
+  }
 };
 
 // WEEKDAY関数の実装（曜日を数値で返す）
 export const WEEKDAY: CustomFormula = {
   name: 'WEEKDAY',
   pattern: /WEEKDAY\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -229,99 +200,23 @@ export const WEEKDAY: CustomFormula = {
 export const DAYS: CustomFormula = {
   name: 'DAYS',
   pattern: /DAYS\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches) => {
-    const endDate = parseFloat(matches[1]);
-    const startDate = parseFloat(matches[2]);
-    
-    if (isNaN(endDate) || isNaN(startDate)) return FormulaError.VALUE;
-    
-    return Math.floor(endDate - startDate);
-  }
+  calculate: () => null // HyperFormulaが処理
 };
 
 // EDATE関数の実装（月数後の日付）
 export const EDATE: CustomFormula = {
   name: 'EDATE',
   pattern: /EDATE\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, dateRef, monthsRef] = matches;
-    const months = parseInt(monthsRef.trim());
-    
-    console.log('EDATE: 計算開始', { dateRef: dateRef.trim(), monthsRef: monthsRef.trim(), months });
-    
-    if (isNaN(months)) {
-      console.error('EDATE: 月数が無効', { monthsRef, months });
-      return FormulaError.VALUE;
-    }
-    
-    let startDate;
-    const cleanDateRef = dateRef.trim();
-    
-    // セル参照かチェック
-    if (cleanDateRef.match(/^[A-Z]+\d+$/)) {
-      console.log('EDATE: セル参照を検出', cleanDateRef);
-      const dateValue = getCellValue(cleanDateRef, context);
-      console.log('EDATE: セル値取得', { cellRef: cleanDateRef, value: dateValue, type: typeof dateValue });
-      startDate = parseDate(dateValue);
-    } else {
-      // 直接値の場合（文字列の日付や数値）
-      const unquotedRef = cleanDateRef.replace(/^["']|["']$/g, ''); // 引用符を除去
-      console.log('EDATE: 直接値を処理', { original: cleanDateRef, unquoted: unquotedRef });
-      
-      const numericDate = parseFloat(unquotedRef);
-      
-      if (!isNaN(numericDate)) {
-        // Excelシリアル値の場合
-        console.log('EDATE: Excelシリアル値として処理', numericDate);
-        const excelEpoch = dayjs('1899-12-30');
-        startDate = excelEpoch.add(Math.floor(numericDate), 'day');
-      } else {
-        // 文字列日付の場合
-        console.log('EDATE: 文字列日付として処理', unquotedRef);
-        startDate = parseDate(unquotedRef);
-      }
-    }
-    
-    console.log('EDATE: 日付解析結果', { 
-      startDate: startDate ? startDate.format() : 'null', 
-      isValid: startDate?.isValid() 
-    });
-    
-    if (!startDate?.isValid()) {
-      console.error('EDATE: 日付解析失敗', { 
-        dateRef: cleanDateRef, 
-        startDate, 
-        context: { dataLength: context.data.length, row: context.row, col: context.col }
-      });
-      return FormulaError.VALUE;
-    }
-    
-    const newDate = startDate.add(months, 'month');
-    const result = newDate.format('YYYY-MM-DD');
-    
-    console.log('EDATE: 計算完了', { 
-      originalDate: startDate.format(), 
-      months, 
-      newDate: newDate.format(), 
-      result 
-    });
-    
-    return result;
-  }
+  calculate: () => null // HyperFormulaが処理
 };
 
-// TODAY関数の実装（HyperFormulaでサポートされているが、日付フォーマットのため）
+// TODAY関数の実装（今日の日付を返す）
 export const TODAY: CustomFormula = {
   name: 'TODAY',
   pattern: /TODAY\(\)/i,
-  isSupported: true,
   calculate: () => {
-    // Excelシリアル値を返す（HyperFormulaと同じ）
-    const today = dayjs();
-    const excelEpoch = dayjs('1899-12-30');
-    return today.diff(excelEpoch, 'day');
+    const todayDate = today();
+    return dateToExcelSerial(todayDate);
   }
 };
 
@@ -329,7 +224,6 @@ export const TODAY: CustomFormula = {
 export const EOMONTH: CustomFormula = {
   name: 'EOMONTH',
   pattern: /EOMONTH\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -337,7 +231,6 @@ export const EOMONTH: CustomFormula = {
 export const TIME: CustomFormula = {
   name: 'TIME',
   pattern: /TIME\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -345,7 +238,6 @@ export const TIME: CustomFormula = {
 export const HOUR: CustomFormula = {
   name: 'HOUR',
   pattern: /HOUR\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -353,7 +245,6 @@ export const HOUR: CustomFormula = {
 export const MINUTE: CustomFormula = {
   name: 'MINUTE',
   pattern: /MINUTE\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -361,7 +252,6 @@ export const MINUTE: CustomFormula = {
 export const SECOND: CustomFormula = {
   name: 'SECOND',
   pattern: /SECOND\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -369,7 +259,6 @@ export const SECOND: CustomFormula = {
 export const WEEKNUM: CustomFormula = {
   name: 'WEEKNUM',
   pattern: /WEEKNUM\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -377,133 +266,54 @@ export const WEEKNUM: CustomFormula = {
 export const DAYS360: CustomFormula = {
   name: 'DAYS360',
   pattern: /DAYS360\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const startDateRef = matches[1].trim();
-    const endDateRef = matches[2].trim();
-    const methodRef = matches[3]?.trim() || 'FALSE';
-    
-    let startDateValue, endDateValue;
-    
-    // 開始日を取得
-    if (startDateRef.match(/^[A-Z]+\d+$/)) {
-      startDateValue = getCellValue(startDateRef, context);
-    } else if (startDateRef.startsWith('"') && startDateRef.endsWith('"')) {
-      startDateValue = startDateRef.slice(1, -1);
-    } else {
-      startDateValue = startDateRef;
-    }
-    
-    // 終了日を取得
-    if (endDateRef.match(/^[A-Z]+\d+$/)) {
-      endDateValue = getCellValue(endDateRef, context);
-    } else if (endDateRef.startsWith('"') && endDateRef.endsWith('"')) {
-      endDateValue = endDateRef.slice(1, -1);
-    } else {
-      endDateValue = endDateRef;
-    }
-    
-    // メソッドを取得（US=FALSE, European=TRUE）
-    let method: boolean;
-    if (methodRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(methodRef, context);
-      method = Boolean(cellValue);
-    } else {
-      method = methodRef.toUpperCase() === 'TRUE';
-    }
-    
-    const startDate = parseDate(startDateValue);
-    const endDate = parseDate(endDateValue);
-    
-    if (!startDate?.isValid() || !endDate?.isValid()) {
-      return FormulaError.VALUE;
-    }
-    
-    let startY = startDate.year();
-    let startM = startDate.month() + 1; // dayjsは0ベース
-    let startD = startDate.date();
-    
-    let endY = endDate.year();
-    let endM = endDate.month() + 1;
-    let endD = endDate.date();
-    
-    // 360日基準での日数計算
-    if (method) {
-      // European method
-      if (startD === 31) startD = 30;
-      if (endD === 31) endD = 30;
-    } else {
-      // US method
-      if (startD === 31) startD = 30;
-      if (endD === 31 && startD >= 30) endD = 30;
-    }
-    
-    return (endY - startY) * 360 + (endM - startM) * 30 + (endD - startD);
-  }
+  calculate: () => null // HyperFormulaが処理
 };
 
 // YEARFRAC関数の実装（年の割合を計算）
 export const YEARFRAC: CustomFormula = {
   name: 'YEARFRAC',
   pattern: /YEARFRAC\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
-  calculate: (matches, context) => {
-    const startDateRef = matches[1].trim();
-    const endDateRef = matches[2].trim();
-    const basisRef = matches[3]?.trim() || '0';
-    
-    let startDateValue, endDateValue;
-    
-    // 開始日を取得
-    if (startDateRef.match(/^[A-Z]+\d+$/)) {
-      startDateValue = getCellValue(startDateRef, context);
-    } else if (startDateRef.startsWith('"') && startDateRef.endsWith('"')) {
-      startDateValue = startDateRef.slice(1, -1);
-    } else {
-      startDateValue = startDateRef;
-    }
-    
-    // 終了日を取得
-    if (endDateRef.match(/^[A-Z]+\d+$/)) {
-      endDateValue = getCellValue(endDateRef, context);
-    } else if (endDateRef.startsWith('"') && endDateRef.endsWith('"')) {
-      endDateValue = endDateRef.slice(1, -1);
-    } else {
-      endDateValue = endDateRef;
-    }
-    
-    // 基準を取得
-    let basis: number;
-    if (basisRef.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(basisRef, context);
-      basis = parseInt(String(cellValue ?? '0'));
-    } else {
-      basis = parseInt(basisRef);
-    }
-    
-    const startDate = parseDate(startDateValue);
-    const endDate = parseDate(endDateValue);
-    
-    if (!startDate?.isValid() || !endDate?.isValid()) {
-      return FormulaError.VALUE;
-    }
-    
-    const daysDiff = endDate.diff(startDate, 'day');
-    
-    switch (basis) {
-      case 0: // 30/360 US
-        return daysDiff / 360;
-      case 1: // Actual/actual
-        const years = endDate.diff(startDate, 'year', true);
-        return years;
-      case 2: // Actual/360
-        return daysDiff / 360;
-      case 3: // Actual/365
-        return daysDiff / 365;
-      case 4: // 30/360 European
-        return daysDiff / 360;
-      default:
-        return FormulaError.NUM;
-    }
-  }
+  calculate: () => null // HyperFormulaが処理
+};
+
+// DATEVALUE関数の実装（日付文字列を日付値に変換）
+export const DATEVALUE: CustomFormula = {
+  name: 'DATEVALUE',
+  pattern: /DATEVALUE\(([^)]+)\)/i,
+  calculate: () => null // HyperFormulaが処理
+};
+
+// TIMEVALUE関数の実装（時刻文字列を時刻値に変換）
+export const TIMEVALUE: CustomFormula = {
+  name: 'TIMEVALUE',
+  pattern: /TIMEVALUE\(([^)]+)\)/i,
+  calculate: () => null // HyperFormulaが処理
+};
+
+// ISOWEEKNUM関数の実装（ISO週番号を返す）
+export const ISOWEEKNUM: CustomFormula = {
+  name: 'ISOWEEKNUM',
+  pattern: /ISOWEEKNUM\(([^)]+)\)/i,
+  calculate: () => null // HyperFormulaが処理
+};
+
+// NETWORKDAYS.INTL関数の実装（稼働日数・国際版）
+export const NETWORKDAYS_INTL: CustomFormula = {
+  name: 'NETWORKDAYS.INTL',
+  pattern: /NETWORKDAYS\.INTL\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: () => null // HyperFormulaが処理
+};
+
+// WORKDAY関数の実装（稼働日を計算）
+export const WORKDAY: CustomFormula = {
+  name: 'WORKDAY',
+  pattern: /WORKDAY\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: () => null // HyperFormulaが処理
+};
+
+// WORKDAY.INTL関数の実装（稼働日・国際版）
+export const WORKDAY_INTL: CustomFormula = {
+  name: 'WORKDAY.INTL',
+  pattern: /WORKDAY\.INTL\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: () => null // HyperFormulaが処理
 };

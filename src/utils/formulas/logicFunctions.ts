@@ -8,7 +8,6 @@ import { getCellValue } from './utils';
 export const IF: CustomFormula = {
   name: 'IF',
   pattern: /IF\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -16,7 +15,6 @@ export const IF: CustomFormula = {
 export const AND: CustomFormula = {
   name: 'AND',
   pattern: /AND\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -24,7 +22,6 @@ export const AND: CustomFormula = {
 export const OR: CustomFormula = {
   name: 'OR',
   pattern: /OR\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -32,7 +29,6 @@ export const OR: CustomFormula = {
 export const NOT: CustomFormula = {
   name: 'NOT',
   pattern: /NOT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -40,7 +36,6 @@ export const NOT: CustomFormula = {
 export const IFS: CustomFormula = {
   name: 'IFS',
   pattern: /IFS\(([^)]+)\)/i,
-  isSupported: false, // HyperFormulaでサポートされていない可能性
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const argsString = matches[1];
     
@@ -155,7 +150,6 @@ export const IFS: CustomFormula = {
 export const XOR: CustomFormula = {
   name: 'XOR',
   pattern: /XOR\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const args = matches[1].split(',').map(arg => arg.trim());
     let trueCount = 0;
@@ -194,7 +188,6 @@ export const XOR: CustomFormula = {
 export const TRUE: CustomFormula = {
   name: 'TRUE',
   pattern: /TRUE\(\)/i,
-  isSupported: false,
   calculate: (): FormulaResult => {
     return true;
   }
@@ -204,7 +197,6 @@ export const TRUE: CustomFormula = {
 export const FALSE: CustomFormula = {
   name: 'FALSE',
   pattern: /FALSE\(\)/i,
-  isSupported: false,
   calculate: (): FormulaResult => {
     return false;
   }
@@ -214,7 +206,6 @@ export const FALSE: CustomFormula = {
 export const IFERROR: CustomFormula = {
   name: 'IFERROR',
   pattern: /IFERROR\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const valueArg = matches[1].trim();
     const errorValue = matches[2].replace(/"/g, '').trim();
@@ -248,7 +239,6 @@ export const IFERROR: CustomFormula = {
 export const IFNA: CustomFormula = {
   name: 'IFNA',
   pattern: /IFNA\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const valueArg = matches[1].trim();
     const naValue = matches[2].replace(/"/g, '').trim();

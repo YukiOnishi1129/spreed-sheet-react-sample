@@ -6,7 +6,6 @@ import type { CustomFormula } from './types';
 export const MDETERM: CustomFormula = {
   name: 'MDETERM',
   pattern: /MDETERM\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -14,7 +13,6 @@ export const MDETERM: CustomFormula = {
 export const MINVERSE: CustomFormula = {
   name: 'MINVERSE',
   pattern: /MINVERSE\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -22,7 +20,6 @@ export const MINVERSE: CustomFormula = {
 export const MMULT: CustomFormula = {
   name: 'MMULT',
   pattern: /MMULT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -30,6 +27,5 @@ export const MMULT: CustomFormula = {
 export const MUNIT: CustomFormula = {
   name: 'MUNIT',
   pattern: /MUNIT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };

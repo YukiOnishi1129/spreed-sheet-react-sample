@@ -7,7 +7,6 @@ import { getCellValue } from './utils';
 export const ISBLANK: CustomFormula = {
   name: 'ISBLANK',
   pattern: /ISBLANK\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -15,7 +14,6 @@ export const ISBLANK: CustomFormula = {
 export const ISERROR: CustomFormula = {
   name: 'ISERROR',
   pattern: /ISERROR\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -23,7 +21,6 @@ export const ISERROR: CustomFormula = {
 export const ISNA: CustomFormula = {
   name: 'ISNA',
   pattern: /ISNA\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -31,7 +28,6 @@ export const ISNA: CustomFormula = {
 export const ISTEXT: CustomFormula = {
   name: 'ISTEXT',
   pattern: /ISTEXT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -39,7 +35,6 @@ export const ISTEXT: CustomFormula = {
 export const ISNUMBER: CustomFormula = {
   name: 'ISNUMBER',
   pattern: /ISNUMBER\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -47,7 +42,6 @@ export const ISNUMBER: CustomFormula = {
 export const ISLOGICAL: CustomFormula = {
   name: 'ISLOGICAL',
   pattern: /ISLOGICAL\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -55,7 +49,6 @@ export const ISLOGICAL: CustomFormula = {
 export const ISEVEN: CustomFormula = {
   name: 'ISEVEN',
   pattern: /ISEVEN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -63,7 +56,6 @@ export const ISEVEN: CustomFormula = {
 export const ISODD: CustomFormula = {
   name: 'ISODD',
   pattern: /ISODD\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -71,7 +63,6 @@ export const ISODD: CustomFormula = {
 export const TYPE: CustomFormula = {
   name: 'TYPE',
   pattern: /TYPE\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     const valueRef = matches[1].trim();
     let value: unknown;
@@ -108,7 +99,6 @@ export const TYPE: CustomFormula = {
 export const N: CustomFormula = {
   name: 'N',
   pattern: /N\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     const valueRef = matches[1].trim();
     let value: unknown;

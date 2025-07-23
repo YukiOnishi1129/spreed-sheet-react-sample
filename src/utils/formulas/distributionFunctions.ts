@@ -8,7 +8,6 @@ import type { CustomFormula } from './types';
 export const NORM_DIST: CustomFormula = {
   name: 'NORM.DIST',
   pattern: /NORM\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -16,7 +15,6 @@ export const NORM_DIST: CustomFormula = {
 export const NORM_INV: CustomFormula = {
   name: 'NORM.INV',
   pattern: /NORM\.INV\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -24,7 +22,6 @@ export const NORM_INV: CustomFormula = {
 export const NORM_S_DIST: CustomFormula = {
   name: 'NORM.S.DIST',
   pattern: /NORM\.S\.DIST\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -32,7 +29,6 @@ export const NORM_S_DIST: CustomFormula = {
 export const NORM_S_INV: CustomFormula = {
   name: 'NORM.S.INV',
   pattern: /NORM\.S\.INV\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -40,7 +36,6 @@ export const NORM_S_INV: CustomFormula = {
 export const LOGNORM_DIST: CustomFormula = {
   name: 'LOGNORM.DIST',
   pattern: /LOGNORM\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -48,7 +43,6 @@ export const LOGNORM_DIST: CustomFormula = {
 export const LOGNORM_INV: CustomFormula = {
   name: 'LOGNORM.INV',
   pattern: /LOGNORM\.INV\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -56,7 +50,6 @@ export const LOGNORM_INV: CustomFormula = {
 export const T_DIST: CustomFormula = {
   name: 'T.DIST',
   pattern: /T\.DIST\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -64,7 +57,6 @@ export const T_DIST: CustomFormula = {
 export const T_DIST_2T: CustomFormula = {
   name: 'T.DIST.2T',
   pattern: /T\.DIST\.2T\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -72,7 +64,6 @@ export const T_DIST_2T: CustomFormula = {
 export const T_DIST_RT: CustomFormula = {
   name: 'T.DIST.RT',
   pattern: /T\.DIST\.RT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -80,7 +71,6 @@ export const T_DIST_RT: CustomFormula = {
 export const T_INV: CustomFormula = {
   name: 'T.INV',
   pattern: /T\.INV\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -88,7 +78,6 @@ export const T_INV: CustomFormula = {
 export const T_INV_2T: CustomFormula = {
   name: 'T.INV.2T',
   pattern: /T\.INV\.2T\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -96,7 +85,6 @@ export const T_INV_2T: CustomFormula = {
 export const CHISQ_DIST: CustomFormula = {
   name: 'CHISQ.DIST',
   pattern: /CHISQ\.DIST\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -104,7 +92,6 @@ export const CHISQ_DIST: CustomFormula = {
 export const CHISQ_DIST_RT: CustomFormula = {
   name: 'CHISQ.DIST.RT',
   pattern: /CHISQ\.DIST\.RT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -112,7 +99,6 @@ export const CHISQ_DIST_RT: CustomFormula = {
 export const CHISQ_INV: CustomFormula = {
   name: 'CHISQ.INV',
   pattern: /CHISQ\.INV\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -120,7 +106,6 @@ export const CHISQ_INV: CustomFormula = {
 export const CHISQ_INV_RT: CustomFormula = {
   name: 'CHISQ.INV.RT',
   pattern: /CHISQ\.INV\.RT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -128,7 +113,6 @@ export const CHISQ_INV_RT: CustomFormula = {
 export const F_DIST: CustomFormula = {
   name: 'F.DIST',
   pattern: /F\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -136,7 +120,6 @@ export const F_DIST: CustomFormula = {
 export const F_DIST_RT: CustomFormula = {
   name: 'F.DIST.RT',
   pattern: /F\.DIST\.RT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -144,7 +127,6 @@ export const F_DIST_RT: CustomFormula = {
 export const F_INV: CustomFormula = {
   name: 'F.INV',
   pattern: /F\.INV\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -152,7 +134,6 @@ export const F_INV: CustomFormula = {
 export const F_INV_RT: CustomFormula = {
   name: 'F.INV.RT',
   pattern: /F\.INV\.RT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -160,7 +141,6 @@ export const F_INV_RT: CustomFormula = {
 export const BETA_DIST: CustomFormula = {
   name: 'BETA.DIST',
   pattern: /BETA\.DIST\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -168,7 +148,6 @@ export const BETA_DIST: CustomFormula = {
 export const BETA_INV: CustomFormula = {
   name: 'BETA.INV',
   pattern: /BETA\.INV\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -176,7 +155,6 @@ export const BETA_INV: CustomFormula = {
 export const GAMMA_DIST: CustomFormula = {
   name: 'GAMMA.DIST',
   pattern: /GAMMA\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -184,7 +162,6 @@ export const GAMMA_DIST: CustomFormula = {
 export const GAMMA_INV: CustomFormula = {
   name: 'GAMMA.INV',
   pattern: /GAMMA\.INV\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -192,7 +169,6 @@ export const GAMMA_INV: CustomFormula = {
 export const EXPON_DIST: CustomFormula = {
   name: 'EXPON.DIST',
   pattern: /EXPON\.DIST\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -200,7 +176,6 @@ export const EXPON_DIST: CustomFormula = {
 export const WEIBULL_DIST: CustomFormula = {
   name: 'WEIBULL.DIST',
   pattern: /WEIBULL\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -208,7 +183,6 @@ export const WEIBULL_DIST: CustomFormula = {
 export const BINOM_DIST: CustomFormula = {
   name: 'BINOM.DIST',
   pattern: /BINOM\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -216,7 +190,6 @@ export const BINOM_DIST: CustomFormula = {
 export const BINOM_INV: CustomFormula = {
   name: 'BINOM.INV',
   pattern: /BINOM\.INV\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -224,7 +197,6 @@ export const BINOM_INV: CustomFormula = {
 export const NEGBINOM_DIST: CustomFormula = {
   name: 'NEGBINOM.DIST',
   pattern: /NEGBINOM\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -232,7 +204,6 @@ export const NEGBINOM_DIST: CustomFormula = {
 export const POISSON_DIST: CustomFormula = {
   name: 'POISSON.DIST',
   pattern: /POISSON\.DIST\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -240,7 +211,6 @@ export const POISSON_DIST: CustomFormula = {
 export const HYPGEOM_DIST: CustomFormula = {
   name: 'HYPGEOM.DIST',
   pattern: /HYPGEOM\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -250,7 +220,6 @@ export const HYPGEOM_DIST: CustomFormula = {
 export const CONFIDENCE_NORM: CustomFormula = {
   name: 'CONFIDENCE.NORM',
   pattern: /CONFIDENCE\.NORM\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -258,7 +227,6 @@ export const CONFIDENCE_NORM: CustomFormula = {
 export const CONFIDENCE_T: CustomFormula = {
   name: 'CONFIDENCE.T',
   pattern: /CONFIDENCE\.T\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -266,7 +234,6 @@ export const CONFIDENCE_T: CustomFormula = {
 export const Z_TEST: CustomFormula = {
   name: 'Z.TEST',
   pattern: /Z\.TEST\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -274,7 +241,6 @@ export const Z_TEST: CustomFormula = {
 export const T_TEST: CustomFormula = {
   name: 'T.TEST',
   pattern: /T\.TEST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -282,7 +248,6 @@ export const T_TEST: CustomFormula = {
 export const F_TEST: CustomFormula = {
   name: 'F.TEST',
   pattern: /F\.TEST\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -290,7 +255,6 @@ export const F_TEST: CustomFormula = {
 export const CHISQ_TEST: CustomFormula = {
   name: 'CHISQ.TEST',
   pattern: /CHISQ\.TEST\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -300,7 +264,6 @@ export const CHISQ_TEST: CustomFormula = {
 export const FORECAST: CustomFormula = {
   name: 'FORECAST',
   pattern: /FORECAST\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -308,7 +271,6 @@ export const FORECAST: CustomFormula = {
 export const FORECAST_LINEAR: CustomFormula = {
   name: 'FORECAST.LINEAR',
   pattern: /FORECAST\.LINEAR\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -316,7 +278,6 @@ export const FORECAST_LINEAR: CustomFormula = {
 export const FORECAST_ETS: CustomFormula = {
   name: 'FORECAST.ETS',
   pattern: /FORECAST\.ETS\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -324,7 +285,6 @@ export const FORECAST_ETS: CustomFormula = {
 export const FORECAST_ETS_CONFINT: CustomFormula = {
   name: 'FORECAST.ETS.CONFINT',
   pattern: /FORECAST\.ETS\.CONFINT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -332,7 +292,6 @@ export const FORECAST_ETS_CONFINT: CustomFormula = {
 export const FORECAST_ETS_SEASONALITY: CustomFormula = {
   name: 'FORECAST.ETS.SEASONALITY',
   pattern: /FORECAST\.ETS\.SEASONALITY\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -340,7 +299,6 @@ export const FORECAST_ETS_SEASONALITY: CustomFormula = {
 export const FORECAST_ETS_STAT: CustomFormula = {
   name: 'FORECAST.ETS.STAT',
   pattern: /FORECAST\.ETS\.STAT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -348,7 +306,6 @@ export const FORECAST_ETS_STAT: CustomFormula = {
 export const TREND: CustomFormula = {
   name: 'TREND',
   pattern: /TREND\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -356,7 +313,6 @@ export const TREND: CustomFormula = {
 export const GROWTH: CustomFormula = {
   name: 'GROWTH',
   pattern: /GROWTH\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -364,7 +320,6 @@ export const GROWTH: CustomFormula = {
 export const LINEST: CustomFormula = {
   name: 'LINEST',
   pattern: /LINEST\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -372,6 +327,5 @@ export const LINEST: CustomFormula = {
 export const LOGEST: CustomFormula = {
   name: 'LOGEST',
   pattern: /LOGEST\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };

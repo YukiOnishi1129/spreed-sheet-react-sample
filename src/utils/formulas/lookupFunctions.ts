@@ -8,7 +8,6 @@ import { getCellValue, getCellRangeValues } from './utils';
 export const VLOOKUP: CustomFormula = {
   name: 'VLOOKUP',
   pattern: /VLOOKUP\(([^,]+),\s*([^,]+),\s*(\d+)(?:,\s*(TRUE|FALSE|0|1))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -16,7 +15,6 @@ export const VLOOKUP: CustomFormula = {
 export const HLOOKUP: CustomFormula = {
   name: 'HLOOKUP',
   pattern: /HLOOKUP\(([^,]+),\s*([^,]+),\s*(\d+)(?:,\s*(TRUE|FALSE|0|1))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -24,7 +22,6 @@ export const HLOOKUP: CustomFormula = {
 export const INDEX: CustomFormula = {
   name: 'INDEX',
   pattern: /INDEX\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -32,7 +29,6 @@ export const INDEX: CustomFormula = {
 export const MATCH: CustomFormula = {
   name: 'MATCH',
   pattern: /MATCH\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -40,7 +36,6 @@ export const MATCH: CustomFormula = {
 export const LOOKUP: CustomFormula = {
   name: 'LOOKUP',
   pattern: /LOOKUP\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -48,7 +43,6 @@ export const LOOKUP: CustomFormula = {
 export const XLOOKUP: CustomFormula = {
   name: 'XLOOKUP',
   pattern: /XLOOKUP\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: false, // HyperFormulaでサポートされていない
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, lookupValue, lookupArray, returnArray, ifNotFound] = matches;
     

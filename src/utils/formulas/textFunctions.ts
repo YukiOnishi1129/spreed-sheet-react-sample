@@ -8,7 +8,6 @@ import { getCellValue, getCellRangeValues } from './utils';
 export const CONCATENATE: CustomFormula = {
   name: 'CONCATENATE',
   pattern: /CONCATENATE\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -16,7 +15,6 @@ export const CONCATENATE: CustomFormula = {
 export const CONCAT: CustomFormula = {
   name: 'CONCAT',
   pattern: /CONCAT\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -24,7 +22,6 @@ export const CONCAT: CustomFormula = {
 export const LEFT: CustomFormula = {
   name: 'LEFT',
   pattern: /LEFT\(([^,]+),\s*(\d+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -32,7 +29,6 @@ export const LEFT: CustomFormula = {
 export const RIGHT: CustomFormula = {
   name: 'RIGHT',
   pattern: /RIGHT\(([^,]+),\s*(\d+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -40,7 +36,6 @@ export const RIGHT: CustomFormula = {
 export const MID: CustomFormula = {
   name: 'MID',
   pattern: /MID\(([^,]+),\s*(\d+),\s*(\d+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -48,7 +43,6 @@ export const MID: CustomFormula = {
 export const LEN: CustomFormula = {
   name: 'LEN',
   pattern: /LEN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -56,7 +50,6 @@ export const LEN: CustomFormula = {
 export const UPPER: CustomFormula = {
   name: 'UPPER',
   pattern: /UPPER\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -64,7 +57,6 @@ export const UPPER: CustomFormula = {
 export const LOWER: CustomFormula = {
   name: 'LOWER',
   pattern: /LOWER\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -72,7 +64,6 @@ export const LOWER: CustomFormula = {
 export const TRIM: CustomFormula = {
   name: 'TRIM',
   pattern: /TRIM\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -80,7 +71,6 @@ export const TRIM: CustomFormula = {
 export const SUBSTITUTE: CustomFormula = {
   name: 'SUBSTITUTE',
   pattern: /SUBSTITUTE\(([^,]+),\s*"([^"]*)",\s*"([^"]*)"(?:,\s*(\d+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -88,7 +78,6 @@ export const SUBSTITUTE: CustomFormula = {
 export const FIND: CustomFormula = {
   name: 'FIND',
   pattern: /FIND\(([^,]+),\s*([^,)]+)(?:,\s*(\d+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -96,7 +85,6 @@ export const FIND: CustomFormula = {
 export const SEARCH: CustomFormula = {
   name: 'SEARCH',
   pattern: /SEARCH\(([^,]+),\s*([^,)]+)(?:,\s*(\d+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -104,7 +92,6 @@ export const SEARCH: CustomFormula = {
 export const TEXTJOIN: CustomFormula = {
   name: 'TEXTJOIN',
   pattern: /TEXTJOIN\("([^"]*)",\s*(TRUE|FALSE),\s*([^)]+)\)/i,
-  isSupported: false, // HyperFormulaでサポートされていない可能性
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, delimiter, ignoreEmpty, rangeOrValues] = matches;
     const shouldIgnoreEmpty = ignoreEmpty.toUpperCase() === 'TRUE';
@@ -146,7 +133,6 @@ export const TEXTJOIN: CustomFormula = {
 export const SPLIT: CustomFormula = {
   name: 'SPLIT',
   pattern: /SPLIT\(([^,]+),\s*"([^"]*)"(?:,\s*(TRUE|FALSE))?(?:,\s*(TRUE|FALSE))?\)/i,
-  isSupported: false, // Excel標準ではない（Google Sheets特有）
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, textRef, delimiter, , removeEmptyText] = matches;
     
@@ -174,7 +160,6 @@ export const SPLIT: CustomFormula = {
 export const PROPER: CustomFormula = {
   name: 'PROPER',
   pattern: /PROPER\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -182,7 +167,6 @@ export const PROPER: CustomFormula = {
 export const VALUE: CustomFormula = {
   name: 'VALUE',
   pattern: /VALUE\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches) => {
     const text = matches[1].replace(/"/g, '');
     const number = parseFloat(text);
@@ -196,7 +180,6 @@ export const VALUE: CustomFormula = {
 export const TEXT: CustomFormula = {
   name: 'TEXT',
   pattern: /TEXT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -204,7 +187,6 @@ export const TEXT: CustomFormula = {
 export const REPT: CustomFormula = {
   name: 'REPT',
   pattern: /REPT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -212,7 +194,6 @@ export const REPT: CustomFormula = {
 export const REPLACE: CustomFormula = {
   name: 'REPLACE',
   pattern: /REPLACE\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let oldText = matches[1].trim();
     const startNumRef = matches[2].trim();
@@ -265,7 +246,6 @@ export const REPLACE: CustomFormula = {
 export const CHAR: CustomFormula = {
   name: 'CHAR',
   pattern: /CHAR\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -273,7 +253,6 @@ export const CHAR: CustomFormula = {
 export const CODE: CustomFormula = {
   name: 'CODE',
   pattern: /CODE\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -281,7 +260,6 @@ export const CODE: CustomFormula = {
 export const EXACT: CustomFormula = {
   name: 'EXACT',
   pattern: /EXACT\(([^,]+),\s*([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -289,7 +267,6 @@ export const EXACT: CustomFormula = {
 export const CLEAN: CustomFormula = {
   name: 'CLEAN',
   pattern: /CLEAN\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -297,7 +274,6 @@ export const CLEAN: CustomFormula = {
 export const T: CustomFormula = {
   name: 'T',
   pattern: /T\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -305,7 +281,6 @@ export const T: CustomFormula = {
 export const FIXED: CustomFormula = {
   name: 'FIXED',
   pattern: /FIXED\(([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     const numberRef = matches[1].trim();
     const decimalsRef = matches[2]?.trim() || '2';
@@ -357,7 +332,6 @@ export const FIXED: CustomFormula = {
 export const NUMBERVALUE: CustomFormula = {
   name: 'NUMBERVALUE',
   pattern: /NUMBERVALUE\(([^,]+)(?:,\s*([^,]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -365,7 +339,6 @@ export const NUMBERVALUE: CustomFormula = {
 export const DOLLAR: CustomFormula = {
   name: 'DOLLAR',
   pattern: /DOLLAR\(([^,]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -373,7 +346,6 @@ export const DOLLAR: CustomFormula = {
 export const UNICHAR: CustomFormula = {
   name: 'UNICHAR',
   pattern: /UNICHAR\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -381,7 +353,6 @@ export const UNICHAR: CustomFormula = {
 export const UNICODE: CustomFormula = {
   name: 'UNICODE',
   pattern: /UNICODE\(([^)]+)\)/i,
-  isSupported: true, // HyperFormulaでサポート
   calculate: () => null // HyperFormulaが処理
 };
 
@@ -389,7 +360,6 @@ export const UNICODE: CustomFormula = {
 export const LENB: CustomFormula = {
   name: 'LENB',
   pattern: /LENB\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let text = matches[1].trim();
     
@@ -410,7 +380,6 @@ export const LENB: CustomFormula = {
 export const FINDB: CustomFormula = {
   name: 'FINDB',
   pattern: /FINDB\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let findText = matches[1].trim();
     let withinText = matches[2].trim();
@@ -467,7 +436,6 @@ export const FINDB: CustomFormula = {
 export const SEARCHB: CustomFormula = {
   name: 'SEARCHB',
   pattern: /SEARCHB\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let findText = matches[1].trim();
     let withinText = matches[2].trim();
@@ -525,7 +493,6 @@ export const SEARCHB: CustomFormula = {
 export const REPLACEB: CustomFormula = {
   name: 'REPLACEB',
   pattern: /REPLACEB\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let oldText = matches[1].trim();
     const startNumRef = matches[2].trim();
@@ -599,7 +566,6 @@ export const REPLACEB: CustomFormula = {
 export const TEXTBEFORE: CustomFormula = {
   name: 'TEXTBEFORE',
   pattern: /TEXTBEFORE\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let text = matches[1].trim();
     let delimiter = matches[2].trim();
@@ -678,7 +644,6 @@ export const TEXTBEFORE: CustomFormula = {
 export const TEXTAFTER: CustomFormula = {
   name: 'TEXTAFTER',
   pattern: /TEXTAFTER\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let text = matches[1].trim();
     let delimiter = matches[2].trim();
@@ -757,7 +722,6 @@ export const TEXTAFTER: CustomFormula = {
 export const TEXTSPLIT: CustomFormula = {
   name: 'TEXTSPLIT',
   pattern: /TEXTSPLIT\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let text = matches[1].trim();
     let colDelimiter = matches[2].trim();
@@ -796,7 +760,6 @@ export const TEXTSPLIT: CustomFormula = {
 export const ASC: CustomFormula = {
   name: 'ASC',
   pattern: /ASC\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let text = matches[1].trim();
     
@@ -855,7 +818,6 @@ export const ASC: CustomFormula = {
 export const JIS: CustomFormula = {
   name: 'JIS',
   pattern: /JIS\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     let text = matches[1].trim();
     
@@ -931,7 +893,6 @@ export const JIS: CustomFormula = {
 export const DBCS: CustomFormula = {
   name: 'DBCS',
   pattern: /DBCS\(([^)]+)\)/i,
-  isSupported: false,
   calculate: JIS.calculate // JIS関数と同じ実装
 };
 
@@ -939,7 +900,6 @@ export const DBCS: CustomFormula = {
 export const PHONETIC: CustomFormula = {
   name: 'PHONETIC',
   pattern: /PHONETIC\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     const reference = matches[1].trim();
     
@@ -963,7 +923,6 @@ export const PHONETIC: CustomFormula = {
 export const BAHTTEXT: CustomFormula = {
   name: 'BAHTTEXT',
   pattern: /BAHTTEXT\(([^)]+)\)/i,
-  isSupported: false,
   calculate: (matches, context) => {
     const numberRef = matches[1].trim();
     

@@ -19,7 +19,6 @@ export interface CustomFormula {
   name: string;
   pattern: RegExp;
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => FormulaResult;
-  isSupported?: boolean; // HyperFormulaでサポートされているか
 }
 
 // エラー定義

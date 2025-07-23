@@ -310,8 +310,8 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | NOW | 現在の日時を返す | `=NOW()` | ✅ | 🔴 |
 | DATE | 日付を作成 | `=DATE(年, 月, 日)` | ✅ | 🔴 |
 | TIME | 時刻を作成 | `=TIME(時, 分, 秒)` | ✅ | 🔴 |
-| DATEVALUE | 日付文字列を日付値に変換 | `=DATEVALUE(日付文字列)` | ❌ | 🔴 |
-| TIMEVALUE | 時刻文字列を時刻値に変換 | `=TIMEVALUE(時刻文字列)` | ❌ | 🔴 |
+| DATEVALUE | 日付文字列を日付値に変換 | `=DATEVALUE(日付文字列)` | ✅ | 🔴 |
+| TIMEVALUE | 時刻文字列を時刻値に変換 | `=TIMEVALUE(時刻文字列)` | ✅ | 🔴 |
 | YEAR | 年を抽出 | `=YEAR(日付)` | ✅ | 🔴 |
 | MONTH | 月を抽出 | `=MONTH(日付)` | ✅ | 🔴 |
 | DAY | 日を抽出 | `=DAY(日付)` | ✅ | 🔴 |
@@ -320,7 +320,7 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | SECOND | 秒を抽出 | `=SECOND(時刻)` | ✅ | 🔴 |
 | WEEKDAY | 曜日を数値で返す | `=WEEKDAY(日付, [種類])` | ✅ | 🔴 |
 | WEEKNUM | 週番号を返す | `=WEEKNUM(日付, [週の基準])` | ✅ | 🔴 |
-| ISOWEEKNUM | ISO週番号を返す | `=ISOWEEKNUM(日付)` | ❌ | 🔴 |
+| ISOWEEKNUM | ISO週番号を返す | `=ISOWEEKNUM(日付)` | ✅ | 🔴 |
 
 ### 日付計算関数
 | 関数名 | 説明 | 構文 | 実装状況 | サポート | 専用 |
@@ -331,9 +331,9 @@ https://hyperformula.handsontable.com/guide/built-in-functions.html
 | EDATE | 月数後の日付 | `=EDATE(開始日, 月数)` | ✅ | 🔴 |
 | EOMONTH | 月末日を返す | `=EOMONTH(開始日, 月数)` | ✅ | 🔴 |
 | NETWORKDAYS | 稼働日数を計算 | `=NETWORKDAYS(開始日, 終了日, [祝日])` | ✅ | 🔴 |
-| NETWORKDAYS.INTL | 稼働日数（国際版） | `=NETWORKDAYS.INTL(開始日, 終了日, [週末], [祝日])` | ❌ | 🔴 |
-| WORKDAY | 稼働日を計算 | `=WORKDAY(開始日, 日数, [祝日])` | ❌ | 🔴 |
-| WORKDAY.INTL | 稼働日（国際版） | `=WORKDAY.INTL(開始日, 日数, [週末], [祝日])` | ❌ | 🔴 |
+| NETWORKDAYS.INTL | 稼働日数（国際版） | `=NETWORKDAYS.INTL(開始日, 終了日, [週末], [祝日])` | ✅ | 🔴 |
+| WORKDAY | 稼働日を計算 | `=WORKDAY(開始日, 日数, [祝日])` | ✅ | 🔴 |
+| WORKDAY.INTL | 稼働日（国際版） | `=WORKDAY.INTL(開始日, 日数, [週末], [祝日])` | ✅ | 🔴 |
 | YEARFRAC | 年の割合を計算 | `=YEARFRAC(開始日, 終了日, [基準])` | ✅ | 🔴 |
 
 ## 5. 論理関数 (Logical Functions)
