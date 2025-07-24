@@ -3,6 +3,7 @@ import Spreadsheet, { type Matrix, type CellBase } from 'react-spreadsheet';
 import { testCategories, type TestCategory } from '../data/testData';
 import { Link } from 'react-router-dom';
 import { recalculateFormulas } from './utils/customFormulaCalculations';
+import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
 
 interface TestResult {
   row: number;
@@ -21,7 +22,7 @@ function TestSpreadsheet() {
   // カテゴリ選択時にデータを初期化
   useEffect(() => {
     initializeSpreadsheet();
-  }, [selectedCategory]);
+  }, [selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initializeSpreadsheet = () => {
     const initialData: Matrix<CellBase> = selectedCategory.data.map((row, rowIndex) => 
@@ -32,14 +33,16 @@ function TestSpreadsheet() {
         );
         
         if (formula) {
-          return {
+          const cell = {
             value: '',
             formula: formula.formula,
             'data-formula': formula.formula
-          } as CellBase & { 'data-formula': string };
+          };
+          return cell;
         }
         
-        return { value: cellValue ?? '' } as CellBase;
+        const cell = { value: cellValue ?? '' };
+        return cell;
       })
     );
     
@@ -50,21 +53,26 @@ function TestSpreadsheet() {
 
   const runTests = () => {
     // カスタム関数システムで再計算
-    const mockFunction = {
+    const mockFunction: ExcelFunctionResponse = {
       spreadsheet_data: spreadsheetData.map(row => 
         row.map(cell => {
-          if (typeof cell === 'object' && cell !== null) {
-            return cell;
+          if (typeof cell === 'object' && cell !== null && 'value' in cell) {
+            const cellWithFormula = cell as { value?: string | number | null; formula?: string };
+            return {
+              v: cellWithFormula.value ?? null,
+              f: cellWithFormula.formula
+            };
           }
-          return { value: cell };
+          return { v: String(cell) };
         })
-      )
+      ),
+      function_name: 'TEST'
     };
     
     recalculateFormulas(
       spreadsheetData,
-      mockFunction as any,
-      (name: string, value: any) => {
+      mockFunction,
+      (name: string, value: SpreadsheetData) => {
         if (name === 'spreadsheetData') {
           // 計算結果を取得してテスト
           const results: TestResult[] = [];
@@ -84,7 +92,7 @@ function TestSpreadsheet() {
           
           setTestResults(results);
           setShowResults(true);
-          setSpreadsheetData(value);
+          setSpreadsheetData(value as Matrix<CellBase>);
         }
       }
     );
