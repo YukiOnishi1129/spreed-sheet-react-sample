@@ -1,8 +1,8 @@
 // 数学関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
-import { FormulaError } from './types';
-import { getCellValue, getCellRangeValues } from './utils';
+import type { CustomFormula, FormulaContext } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 
 // 引数を数値の配列に変換するユーティリティ関数

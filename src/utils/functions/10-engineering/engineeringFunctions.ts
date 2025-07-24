@@ -1,8 +1,8 @@
 // エンジニアリング関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
-import { FormulaError } from './types';
-import { getCellValue } from './utils';
+import type { CustomFormula, FormulaContext } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue } from '../shared/utils';
 
 // BIN2DEC関数の実装（2進数→10進数）
 export const BIN2DEC: CustomFormula = {

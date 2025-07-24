@@ -1,8 +1,8 @@
 // 情報関数の実装
 
-import type { CustomFormula, FormulaResult } from './types';
-import { FormulaError } from './types';
-import { getCellValue } from './utils';
+import type { CustomFormula, FormulaResult } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue } from '../shared/utils';
 
 // ISBLANK関数の実装（空白セルか判定）
 export const ISBLANK: CustomFormula = {

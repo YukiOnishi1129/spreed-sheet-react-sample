@@ -1,8 +1,8 @@
 // 三角関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
-import { FormulaError } from './types';
-import { getCellValue } from './utils';
+import type { CustomFormula, FormulaContext } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue } from '../shared/utils';
 
 // SIN関数（正弦）
 export const SIN: CustomFormula = {

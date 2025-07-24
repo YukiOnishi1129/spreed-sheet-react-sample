@@ -1,8 +1,8 @@
 // 高度な統計関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
-import { FormulaError } from './types';
-import { getCellValue, getCellRangeValues } from './utils';
+import type { CustomFormula, FormulaContext } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // セル範囲から数値のみを抽出するヘルパー関数
 function extractNumbersFromRange(rangeRef: string, context: FormulaContext): number[] {

@@ -1,8 +1,8 @@
 // 論理関数の実装
 
-import type { CustomFormula, FormulaContext, FormulaResult } from './types';
-import { FormulaError } from './types';
-import { getCellValue } from './utils';
+import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue } from '../shared/utils';
 
 // 引数を論理値に変換するユーティリティ関数
 function parseArgumentsToLogical(args: string, context: FormulaContext): boolean[] {

@@ -1,8 +1,8 @@
 // データベース関数の実装
 
-import type { CustomFormula, FormulaContext, FormulaResult } from './types';
-import { FormulaError } from './types';
-import { getCellValue } from './utils';
+import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue } from '../shared/utils';
 
 // データベース範囲を2次元配列として取得するヘルパー関数
 function getDatabaseArray(databaseRef: string, context: FormulaContext): unknown[][] {

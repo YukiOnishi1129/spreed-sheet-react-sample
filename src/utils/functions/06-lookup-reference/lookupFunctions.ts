@@ -1,8 +1,8 @@
 // 検索関数の実装
 
-import type { CustomFormula, FormulaContext, FormulaResult } from './types';
-import { FormulaError } from './types';
-import { getCellValue, getCellRangeValues } from './utils';
+import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // VLOOKUP関数の実装
 export const VLOOKUP: CustomFormula = {

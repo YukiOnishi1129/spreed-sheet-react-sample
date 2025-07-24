@@ -1,5 +1,5 @@
 import type { Matrix } from 'react-spreadsheet';
-import type { CellData, FormulaResult } from '../../utils/formulas/types';
+import type { CellData, FormulaResult } from "../../utils/functions";
 import type { SpreadsheetData } from '../../types/spreadsheet';
 import { hasSpreadsheetValue } from './typeGuards';
 

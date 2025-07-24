@@ -1,7 +1,7 @@
 import type { Matrix } from 'react-spreadsheet';
 import { HyperFormula } from 'hyperformula';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../../types/spreadsheet';
-import { matchFormula } from '../../utils/formulas';
+import { matchFormula } from "../../utils/functions";
 import { 
   hasSpreadsheetValue, 
   hasDataFormula, 

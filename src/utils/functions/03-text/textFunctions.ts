@@ -1,8 +1,8 @@
 // テキスト関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
-import { FormulaError } from './types';
-import { getCellValue, getCellRangeValues } from './utils';
+import type { CustomFormula, FormulaContext } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // CONCATENATE関数の実装
 export const CONCATENATE: CustomFormula = {

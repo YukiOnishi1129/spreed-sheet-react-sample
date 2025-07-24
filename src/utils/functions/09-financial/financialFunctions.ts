@@ -1,8 +1,8 @@
 // 財務関数の実装
 
-import type { CustomFormula } from './types';
-import { FormulaError } from './types';
-import { getCellValue, getCellRangeValues } from './utils';
+import type { CustomFormula } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // PMT関数の実装（定期支払額）
 export const PMT: CustomFormula = {

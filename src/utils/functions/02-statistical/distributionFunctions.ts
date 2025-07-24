@@ -1,8 +1,8 @@
 // 分布関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
-import { FormulaError } from './types';
-import { getCellValue } from './utils';
+import type { CustomFormula, FormulaContext } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue } from '../shared/utils';
 
 // 数学定数とヘルパー関数
 const SQRT_2PI = Math.sqrt(2 * Math.PI);

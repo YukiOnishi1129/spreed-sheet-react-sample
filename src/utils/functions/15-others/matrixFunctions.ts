@@ -1,8 +1,8 @@
 // 行列関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
-import { FormulaError } from './types';
-import { getCellValue, getCellRangeValues } from './utils';
+import type { CustomFormula, FormulaContext } from '../shared/types';
+import { FormulaError } from '../shared/types';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // 2次元配列として行列を解析するヘルパー関数
 function parseMatrix(rangeRef: string, context: FormulaContext): number[][] {

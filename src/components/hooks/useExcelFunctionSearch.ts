@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { HyperFormula } from 'hyperformula';
-import { matchFormula } from '../../utils/formulas';
-import type { CellData } from '../../utils/formulas/types';
+import { matchFormula } from "../../utils/functions";
+import type { CellData } from "../../utils/functions";
 import type { SpreadsheetData, ExcelFunctionResponse } from '../../types/spreadsheet';
 import { fetchExcelFunction } from '../../services/openaiService';
 import {
