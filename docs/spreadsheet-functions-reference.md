@@ -136,39 +136,39 @@ https://support.google.com/docs/table/25273?hl=ja
 | STDEV | 標準偏差（標本） | `=STDEV(数値1, [数値2], ...)` | ✅ |
 | STDEV.S | 標準偏差（標本） | `=STDEV.S(数値1, [数値2], ...)` | ✅ |
 | STDEV.P | 標準偏差（母集団） | `=STDEV.P(数値1, [数値2], ...)` | ✅ |
-| STDEVA | 標準偏差（文字列含む） | `=STDEVA(値1, [値2], ...)` | ❌ |
-| STDEVPA | 標準偏差（母集団、文字列含む） | `=STDEVPA(値1, [値2], ...)` | ❌ |
+| STDEVA | 標準偏差（文字列含む） | `=STDEVA(値1, [値2], ...)` | ✅ |
+| STDEVPA | 標準偏差（母集団、文字列含む） | `=STDEVPA(値1, [値2], ...)` | ✅ |
 | VAR | 分散（標本） | `=VAR(数値1, [数値2], ...)` | ✅ |
 | VAR.S | 分散（標本） | `=VAR.S(数値1, [数値2], ...)` | ✅ |
 | VAR.P | 分散（母集団） | `=VAR.P(数値1, [数値2], ...)` | ✅ |
-| VARA | 分散（文字列含む） | `=VARA(値1, [値2], ...)` | ❌ |
-| VARPA | 分散（母集団、文字列含む） | `=VARPA(値1, [値2], ...)` | ❌ |
+| VARA | 分散（文字列含む） | `=VARA(値1, [値2], ...)` | ✅ |
+| VARPA | 分散（母集団、文字列含む） | `=VARPA(値1, [値2], ...)` | ✅ |
 
 ### 高度な統計関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
 | CORREL | 相関係数を計算 | `=CORREL(配列1, 配列2)` | ✅ |
-| COVARIANCE.P | 母共分散を計算 | `=COVARIANCE.P(配列1, 配列2)` | ❌ |
-| COVARIANCE.S | 標本共分散を計算 | `=COVARIANCE.S(配列1, 配列2)` | ❌ |
-| DEVSQ | 偏差平方和を計算 | `=DEVSQ(数値1, [数値2], ...)` | ❌ |
-| KURT | 尖度を計算 | `=KURT(数値1, [数値2], ...)` | ❌ |
-| SKEW | 歪度を計算 | `=SKEW(数値1, [数値2], ...)` | ❌ |
-| SKEW.P | 歪度（母集団） | `=SKEW.P(数値1, [数値2], ...)` | ❌ |
-| STANDARDIZE | 標準化する | `=STANDARDIZE(x, 平均, 標準偏差)` | ❌ |
+| COVARIANCE.P | 母共分散を計算 | `=COVARIANCE.P(配列1, 配列2)` | ✅ |
+| COVARIANCE.S | 標本共分散を計算 | `=COVARIANCE.S(配列1, 配列2)` | ✅ |
+| DEVSQ | 偏差平方和を計算 | `=DEVSQ(数値1, [数値2], ...)` | ✅ |
+| KURT | 尖度を計算 | `=KURT(数値1, [数値2], ...)` | ✅ |
+| SKEW | 歪度を計算 | `=SKEW(数値1, [数値2], ...)` | ✅ |
+| SKEW.P | 歪度（母集団） | `=SKEW.P(数値1, [数値2], ...)` | ✅ |
+| STANDARDIZE | 標準化する | `=STANDARDIZE(x, 平均, 標準偏差)` | ✅ |
 | LARGE | k番目に大きい値 | `=LARGE(配列, k)` | ✅ |
 | SMALL | k番目に小さい値 | `=SMALL(配列, k)` | ✅ |
 | RANK | 順位を返す | `=RANK(数値, 参照, [順序])` | ✅ |
 | RANK.EQ | 順位（同順位は最小） | `=RANK.EQ(数値, 参照, [順序])` | ✅ |
 | RANK.AVG | 順位（同順位は平均） | `=RANK.AVG(数値, 参照, [順序])` | ✅ |
 | PERCENTILE | パーセンタイル値 | `=PERCENTILE(配列, k)` | ✅ |
-| PERCENTILE.INC | パーセンタイル（境界値含む） | `=PERCENTILE.INC(配列, k)` | ❌ |
-| PERCENTILE.EXC | パーセンタイル（境界値除く） | `=PERCENTILE.EXC(配列, k)` | ❌ |
-| PERCENTRANK | パーセント順位 | `=PERCENTRANK(配列, x, [有効桁数])` | ❌ |
+| PERCENTILE.INC | パーセンタイル（境界値含む） | `=PERCENTILE.INC(配列, k)` | ✅ |
+| PERCENTILE.EXC | パーセンタイル（境界値除く） | `=PERCENTILE.EXC(配列, k)` | ✅ |
+| PERCENTRANK | パーセント順位 | `=PERCENTRANK(配列, x, [有効桁数])` | ✅ |
 | PERCENTRANK.INC | パーセント順位（境界値含む） | `=PERCENTRANK.INC(配列, x, [有効桁数])` | ✅ |
 | PERCENTRANK.EXC | パーセント順位（境界値除く） | `=PERCENTRANK.EXC(配列, x, [有効桁数])` | ✅ |
 | QUARTILE | 四分位数 | `=QUARTILE(配列, 戻り値)` | ✅ |
-| QUARTILE.INC | 四分位数（境界値含む） | `=QUARTILE.INC(配列, 戻り値)` | ❌ |
-| QUARTILE.EXC |四分位数（境界値除く） | `=QUARTILE.EXC(配列, 戻り値)` | ❌ |
+| QUARTILE.INC | 四分位数（境界値含む） | `=QUARTILE.INC(配列, 戻り値)` | ✅ |
+| QUARTILE.EXC |四分位数（境界値除く） | `=QUARTILE.EXC(配列, 戻り値)` | ✅ |
 
 ### 分布関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -230,15 +230,15 @@ https://support.google.com/docs/table/25273?hl=ja
 | SLOPE | 回帰直線の傾き | `=SLOPE(既知のy, 既知のx)` | ❌ |
 | INTERCEPT | 回帰直線の切片 | `=INTERCEPT(既知のy, 既知のx)` | ❌ |
 | RSQ | 決定係数 | `=RSQ(既知のy, 既知のx)` | ❌ |
-| PEARSON | ピアソン相関係数 | `=PEARSON(配列1, 配列2)` | ❌ |
+| PEARSON | ピアソン相関係数 | `=PEARSON(配列1, 配列2)` | ✅ | ❌ |
 | STEYX | 回帰の標準誤差 | `=STEYX(既知のy, 既知のx)` | ❌ |
 
 ### その他の統計関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| AVEDEV | 平均偏差 | `=AVEDEV(数値1, [数値2], ...)` | ❌ |
-| GEOMEAN | 幾何平均 | `=GEOMEAN(数値1, [数値2], ...)` | ❌ |
-| HARMEAN | 調和平均 | `=HARMEAN(数値1, [数値2], ...)` | ❌ |
+| AVEDEV | 平均偏差 | `=AVEDEV(数値1, [数値2], ...)` | ✅ |
+| GEOMEAN | 幾何平均 | `=GEOMEAN(数値1, [数値2], ...)` | ✅ |
+| HARMEAN | 調和平均 | `=HARMEAN(数値1, [数値2], ...)` | ✅ |
 | TRIMMEAN | トリム平均 | `=TRIMMEAN(配列, 割合)` | ✅ |
 | PROB | 確率の計算 | `=PROB(x範囲, 確率範囲, [下限], [上限])` | ❌ |
 | FISHER | フィッシャー変換 | `=FISHER(x)` | ❌ |
