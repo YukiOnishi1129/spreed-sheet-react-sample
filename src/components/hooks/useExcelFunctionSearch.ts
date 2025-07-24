@@ -35,14 +35,21 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
       setValue('currentFunction', response);
       
       // カスタム関数システム用のデータ準備
-      const cellData: CellData[][] = response.spreadsheet_data.map(row => 
-        row.map(cell => {
+      const cellData: CellData[][] = response.spreadsheet_data.map((row, rowIndex) => 
+        row.map((cell, colIndex) => {
           if (!cell) return { value: '' };
+          
+          // デバッグ: セルの内容を確認
+          if (cell.f) {
+            console.log(`セル[${rowIndex}][${colIndex}]の内容:`, cell);
+          }
+          
+          if (hasFormulaProperty(cell)) {
+            console.log('数式セル検出:', cell.f);
+            return { value: '', formula: cell.f };
+          }
           if (hasValueProperty(cell)) {
             return { value: cell.v ?? '' };
-          }
-          if (hasFormulaProperty(cell)) {
-            return { value: '', formula: cell.f };
           }
           return { value: '' };
         })
@@ -52,6 +59,8 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
       
       // カスタム関数システムで数式を計算
       const calculatedData = await calculateCustomFormulas(cellData);
+      
+      console.log('計算後のデータ:', calculatedData);
       
       setLoadingMessage('結果を整形しています');
       
@@ -110,6 +119,14 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
       );
       
       console.log('最終データ:', processedData);
+      // デバッグ: 数式が含まれているか確認
+      processedData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          if (cell && cell.formula) {
+            console.log(`数式発見 [${rowIndex}][${colIndex}]:`, cell.formula);
+          }
+        });
+      });
       setValue('spreadsheetData', processedData);
       
     } catch (error) {

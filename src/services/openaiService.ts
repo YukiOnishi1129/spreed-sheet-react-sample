@@ -53,6 +53,11 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 7. 空セルはnullにしてください
 8. 各行は必ず8つの要素を持つ配列にしてください
 
+**極めて重要：数式フィールドの必須化**
+- ユーザーがリクエストした関数（例：NPER、PMT、VLOOKUP等）を使用する計算結果のセルには、必ず"f"フィールドに数式を含めてください
+- 例：NPERを計算する場合、結果セルは必ず {"v": null, "f": "=NPER(A2,B2,C2,D2)", "bg": "#FFE0B2", "fc": "#D84315"} の形式にしてください
+- 数式がないセルは単なる静的な値として扱われ、関数のデモンストレーションになりません
+
 **売上管理表の正しいレイアウト例：**
 - 1行目：ヘッダー行（営業担当者名、売上金額、評価）※3列構成
 - 2-6行目：各営業担当者のデータ行（A列=名前、B列=売上、C列=IF関数での評価）
@@ -281,6 +286,61 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
   "syntax": "AVERAGE(数値範囲) + IF(条件, 真の場合, 偽の場合) + MAX(数値範囲) + MIN(数値範囲)",
   "syntax_detail": "AVERAGE(range) - 数値範囲の平均値を計算 + IF(logical_test, value_if_true, value_if_false) - 条件に基づく判定 + MAX(range) - 数値範囲の最大値を取得 + MIN(range) - 数値範囲の最小値を取得",
   "category": "統計・論理関数"
+}
+
+**NPER関数の完全な例（重要）：**
+{
+  "function_name": "NPER",
+  "description": "定期的な支払いと一定の利率に基づいて、ローンの支払い回数を計算します",
+  "syntax": "NPER(利率, 定期支払額, 現在価値, [将来価値], [支払期日])",
+  "syntax_detail": "NPER(rate, pmt, pv, [fv], [type]) - rate:期間あたりの利率, pmt:各期の支払額（通常は負の値）, pv:現在価値（ローン額）, fv:将来価値（省略時は0）, type:支払期日（0=期末、1=期首）",
+  "category": "財務関数",
+  "spreadsheet_data": [
+    [
+      {"v": "利率", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "定期支払額", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "現在価値", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "将来価値", "ct": {"t": "s"}, "bg": "#E3F2FD"},
+      {"v": "期間", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      null, null, null
+    ],
+    [
+      {"v": 0.05, "ct": {"t": "n"}},
+      {"v": -200, "ct": {"t": "n"}},
+      {"v": 1000, "ct": {"t": "n"}},
+      {"v": 0, "ct": {"t": "n"}},
+      {"v": null, "f": "=NPER(A2,B2,C2,D2)", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": 0.04, "ct": {"t": "n"}},
+      {"v": -150, "ct": {"t": "n"}},
+      {"v": 500, "ct": {"t": "n"}},
+      {"v": 0, "ct": {"t": "n"}},
+      {"v": null, "f": "=NPER(A3,B3,C3,D3)", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": 0.03, "ct": {"t": "n"}},
+      {"v": -100, "ct": {"t": "n"}},
+      {"v": 300, "ct": {"t": "n"}},
+      {"v": 0, "ct": {"t": "n"}},
+      {"v": null, "f": "=NPER(A4,B4,C4,D4)", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [
+      {"v": 0.06, "ct": {"t": "n"}},
+      {"v": -250, "ct": {"t": "n"}},
+      {"v": 1200, "ct": {"t": "n"}},
+      {"v": 0, "ct": {"t": "n"}},
+      {"v": null, "f": "=NPER(A5,B5,C5,D5)", "bg": "#FFE0B2", "fc": "#D84315"},
+      null, null, null
+    ],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null]
+  ],
+  "examples": ["=NPER(0.05,-200,1000)", "=NPER(0.05/12,-200,10000,0,0)"]
 }
 
 **TODAY関数と年齢計算の完全な例：**
