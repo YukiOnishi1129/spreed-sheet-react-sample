@@ -847,8 +847,85 @@ export const FACT: CustomFormula = {
 // SUMIFS関数の実装（複数条件での合計）
 export const SUMIFS: CustomFormula = {
   name: 'SUMIFS',
-  pattern: /SUMIFS\(([^,]+),\s*([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /SUMIFS\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, argsStr] = matches;
+    
+    try {
+      // 引数を解析
+      const args: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      let depth = 0;
+      
+      for (let i = 0; i < argsStr.length; i++) {
+        const char = argsStr[i];
+        
+        if (char === '"') {
+          inQuotes = !inQuotes;
+          current += char;
+        } else if (!inQuotes && char === '(') {
+          depth++;
+          current += char;
+        } else if (!inQuotes && char === ')') {
+          depth--;
+          current += char;
+        } else if (!inQuotes && depth === 0 && char === ',') {
+          args.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      if (current) {
+        args.push(current.trim());
+      }
+      
+      if (args.length < 3 || args.length % 2 === 0) {
+        return FormulaError.VALUE;
+      }
+      
+      // 最初の引数は合計範囲
+      const sumRangeValues = getCellRangeValues(args[0], context);
+      
+      // 条件範囲と条件のペアを処理
+      const conditionPairs: Array<{values: unknown[], criteria: string}> = [];
+      for (let i = 1; i < args.length; i += 2) {
+        const rangeValues = getCellRangeValues(args[i], context);
+        const criteria = args[i + 1].replace(/^["']|["']$/g, '');
+        
+        if (rangeValues.length !== sumRangeValues.length) {
+          return FormulaError.VALUE;
+        }
+        
+        conditionPairs.push({ values: rangeValues, criteria });
+      }
+      
+      // すべての条件を満たす行の合計を計算
+      let sum = 0;
+      for (let i = 0; i < sumRangeValues.length; i++) {
+        let allConditionsMet = true;
+        
+        for (const pair of conditionPairs) {
+          if (!evaluateCondition(pair.values[i], pair.criteria)) {
+            allConditionsMet = false;
+            break;
+          }
+        }
+        
+        if (allConditionsMet) {
+          const value = Number(sumRangeValues[i]);
+          if (!isNaN(value)) {
+            sum += value;
+          }
+        }
+      }
+      
+      return sum;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // COUNTIFS関数の実装（複数条件でのカウント）
@@ -885,7 +962,27 @@ export const PRODUCT: CustomFormula = {
 export const MROUND: CustomFormula = {
   name: 'MROUND',
   pattern: /MROUND\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, multipleRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const multiple = Number(getCellValue(multipleRef, context) ?? multipleRef);
+    
+    if (isNaN(number) || isNaN(multiple)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (multiple === 0) {
+      return 0;
+    }
+    
+    // 符号が異なる場合はエラー
+    if ((number > 0 && multiple < 0) || (number < 0 && multiple > 0)) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.round(number / multiple) * multiple;
+  }
 };
 
 // COMBIN関数の実装（組み合わせ数）
@@ -1009,7 +1106,22 @@ export const LCM: CustomFormula = {
 export const QUOTIENT: CustomFormula = {
   name: 'QUOTIENT',
   pattern: /QUOTIENT\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numeratorRef, denominatorRef] = matches;
+    
+    const numerator = Number(getCellValue(numeratorRef, context) ?? numeratorRef);
+    const denominator = Number(getCellValue(denominatorRef, context) ?? denominatorRef);
+    
+    if (isNaN(numerator) || isNaN(denominator)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (denominator === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    return Math.trunc(numerator / denominator);
+  }
 };
 
 // 双曲線関数の実装
@@ -1070,28 +1182,118 @@ export const TANH: CustomFormula = {
 export const SUMSQ: CustomFormula = {
   name: 'SUMSQ',
   pattern: /SUMSQ\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return 0;
+    }
+    
+    return numbers.reduce((sum, num) => sum + num * num, 0);
+  }
 };
 
 // SUMPRODUCT関数（配列の積の和）
 export const SUMPRODUCT: CustomFormula = {
   name: 'SUMPRODUCT',
   pattern: /SUMPRODUCT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, argsStr] = matches;
+    
+    try {
+      // 引数を解析（範囲を分割）
+      const ranges = argsStr.split(',').map(r => r.trim());
+      
+      if (ranges.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
+      // 各範囲の値を取得
+      const rangeValues = ranges.map(range => getCellRangeValues(range, context));
+      
+      // すべての範囲が同じ長さか確認
+      const length = rangeValues[0].length;
+      if (!rangeValues.every(values => values.length === length)) {
+        return FormulaError.VALUE;
+      }
+      
+      // 各位置で積を計算し、合計する
+      let sum = 0;
+      for (let i = 0; i < length; i++) {
+        let product = 1;
+        for (const values of rangeValues) {
+          const num = Number(values[i]);
+          if (!isNaN(num)) {
+            product *= num;
+          } else {
+            product = 0;
+            break;
+          }
+        }
+        sum += product;
+      }
+      
+      return sum;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // EVEN関数（最も近い偶数に切り上げ）
 export const EVEN: CustomFormula = {
   name: 'EVEN',
   pattern: /EVEN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (number === 0) {
+      return 0;
+    }
+    
+    if (number > 0) {
+      return Math.ceil(number / 2) * 2;
+    } else {
+      return Math.floor(number / 2) * 2;
+    }
+  }
 };
 
 // ODD関数（最も近い奇数に切り上げ）
 export const ODD: CustomFormula = {
   name: 'ODD',
   pattern: /ODD\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (number === 0) {
+      return 1;
+    }
+    
+    const sign = Math.sign(number);
+    const absNumber = Math.abs(number);
+    const result = Math.ceil(absNumber);
+    
+    // 偶数の場合は1を足す
+    if (result % 2 === 0) {
+      return sign * (result + 1);
+    } else {
+      return sign * result;
+    }
+  }
 };
 
 // ARABIC関数（ローマ数字をアラビア数字に変換）
@@ -1141,7 +1343,47 @@ export const ARABIC: CustomFormula = {
 export const ROMAN: CustomFormula = {
   name: 'ROMAN',
   pattern: /ROMAN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Math.floor(Number(getCellValue(numberRef, context) ?? numberRef));
+    
+    if (isNaN(number) || number < 0 || number > 3999) {
+      return FormulaError.VALUE;
+    }
+    
+    if (number === 0) {
+      return '';
+    }
+    
+    const romanNumerals = [
+      { value: 1000, numeral: 'M' },
+      { value: 900, numeral: 'CM' },
+      { value: 500, numeral: 'D' },
+      { value: 400, numeral: 'CD' },
+      { value: 100, numeral: 'C' },
+      { value: 90, numeral: 'XC' },
+      { value: 50, numeral: 'L' },
+      { value: 40, numeral: 'XL' },
+      { value: 10, numeral: 'X' },
+      { value: 9, numeral: 'IX' },
+      { value: 5, numeral: 'V' },
+      { value: 4, numeral: 'IV' },
+      { value: 1, numeral: 'I' }
+    ];
+    
+    let result = '';
+    let remaining = number;
+    
+    for (const { value, numeral } of romanNumerals) {
+      while (remaining >= value) {
+        result += numeral;
+        remaining -= value;
+      }
+    }
+    
+    return result;
+  }
 };
 
 // COMBINA関数（重複組合せ）
@@ -1246,21 +1488,97 @@ export const SQRTPI: CustomFormula = {
 export const SUMX2MY2: CustomFormula = {
   name: 'SUMX2MY2',
   pattern: /SUMX2MY2\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, xRange, yRange] = matches;
+    
+    try {
+      const xValues = getCellRangeValues(xRange.trim(), context);
+      const yValues = getCellRangeValues(yRange.trim(), context);
+      
+      if (xValues.length !== yValues.length) {
+        return FormulaError.NA;
+      }
+      
+      let sum = 0;
+      for (let i = 0; i < xValues.length; i++) {
+        const x = Number(xValues[i]);
+        const y = Number(yValues[i]);
+        
+        if (!isNaN(x) && !isNaN(y)) {
+          sum += (x * x - y * y);
+        }
+      }
+      
+      return sum;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // SUMX2PY2関数（x^2+y^2の和）
 export const SUMX2PY2: CustomFormula = {
   name: 'SUMX2PY2',
   pattern: /SUMX2PY2\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, xRange, yRange] = matches;
+    
+    try {
+      const xValues = getCellRangeValues(xRange.trim(), context);
+      const yValues = getCellRangeValues(yRange.trim(), context);
+      
+      if (xValues.length !== yValues.length) {
+        return FormulaError.NA;
+      }
+      
+      let sum = 0;
+      for (let i = 0; i < xValues.length; i++) {
+        const x = Number(xValues[i]);
+        const y = Number(yValues[i]);
+        
+        if (!isNaN(x) && !isNaN(y)) {
+          sum += (x * x + y * y);
+        }
+      }
+      
+      return sum;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // SUMXMY2関数（(x-y)^2の和）
 export const SUMXMY2: CustomFormula = {
   name: 'SUMXMY2',
   pattern: /SUMXMY2\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, xRange, yRange] = matches;
+    
+    try {
+      const xValues = getCellRangeValues(xRange.trim(), context);
+      const yValues = getCellRangeValues(yRange.trim(), context);
+      
+      if (xValues.length !== yValues.length) {
+        return FormulaError.NA;
+      }
+      
+      let sum = 0;
+      for (let i = 0; i < xValues.length; i++) {
+        const x = Number(xValues[i]);
+        const y = Number(yValues[i]);
+        
+        if (!isNaN(x) && !isNaN(y)) {
+          const diff = x - y;
+          sum += diff * diff;
+        }
+      }
+      
+      return sum;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
 };
 
 // MULTINOMIAL関数（多項係数）
@@ -1275,14 +1593,80 @@ export const MULTINOMIAL: CustomFormula = {
 export const BASE: CustomFormula = {
   name: 'BASE',
   pattern: /BASE\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, radixRef, minLengthRef] = matches;
+    
+    const number = Math.floor(Number(getCellValue(numberRef, context) ?? numberRef));
+    const radix = Number(getCellValue(radixRef, context) ?? radixRef);
+    const minLength = minLengthRef ? Number(getCellValue(minLengthRef, context) ?? minLengthRef) : 0;
+    
+    if (isNaN(number) || isNaN(radix) || isNaN(minLength)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (number < 0 || number > 2 ** 53 - 1) {
+      return FormulaError.NUM;
+    }
+    
+    if (radix < 2 || radix > 36 || !Number.isInteger(radix)) {
+      return FormulaError.NUM;
+    }
+    
+    if (minLength < 0 || minLength > 255) {
+      return FormulaError.NUM;
+    }
+    
+    let result = number.toString(radix).toUpperCase();
+    
+    // 最小長に満たない場合は0でパディング
+    if (result.length < minLength) {
+      result = '0'.repeat(minLength - result.length) + result;
+    }
+    
+    return result;
+  }
 };
 
 // DECIMAL関数（指定した基数の数値を10進数に変換）
 export const DECIMAL: CustomFormula = {
   name: 'DECIMAL',
   pattern: /DECIMAL\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef, radixRef] = matches;
+    
+    const text = String(getCellValue(textRef, context) ?? textRef).trim();
+    const radix = Number(getCellValue(radixRef, context) ?? radixRef);
+    
+    if (isNaN(radix)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (radix < 2 || radix > 36 || !Number.isInteger(radix)) {
+      return FormulaError.NUM;
+    }
+    
+    if (text.length === 0 || text.length > 255) {
+      return FormulaError.VALUE;
+    }
+    
+    // 基数に応じて有効な文字をチェック
+    const validChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, radix);
+    const upperText = text.toUpperCase();
+    
+    for (const char of upperText) {
+      if (!validChars.includes(char)) {
+        return FormulaError.NUM;
+      }
+    }
+    
+    const result = parseInt(upperText, radix);
+    
+    if (isNaN(result) || !isFinite(result)) {
+      return FormulaError.NUM;
+    }
+    
+    return result;
+  }
 };
 
 // SUBTOTAL関数（小計）
