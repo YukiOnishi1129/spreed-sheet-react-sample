@@ -402,8 +402,12 @@ const ChatGPTSpreadsheet: React.FC = () => {
                 <span>💰 財務関数</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-4 h-4 bg-orange-200 border border-orange-400 rounded"></div>
-                <span>📊 数学・統計関数</span>
+                <div className="w-4 h-4 bg-orange-100 border border-orange-500 rounded"></div>
+                <span>📊 数学・三角関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-red-50 border border-red-600 rounded"></div>
+                <span>📈 統計関数</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-4 h-4 bg-blue-100 border border-blue-400 rounded"></div>
@@ -422,8 +426,32 @@ const ChatGPTSpreadsheet: React.FC = () => {
                 <span>📝 文字列関数</span>
               </div>
               <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-teal-50 border border-teal-600 rounded"></div>
+                <span>ℹ️ 情報関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-amber-50 border border-amber-700 rounded"></div>
+                <span>🗄️ データベース関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-emerald-100 border border-emerald-600 rounded"></div>
+                <span>⚙️ エンジニアリング関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-indigo-100 border border-indigo-500 rounded"></div>
+                <span>📊 キューブ関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-cyan-50 border border-cyan-600 rounded"></div>
+                <span>🌐 Web関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-lime-50 border border-lime-600 rounded"></div>
+                <span>📋 Google Sheets関数</span>
+              </div>
+              <div className="flex items-center gap-1">
                 <div className="w-4 h-4 bg-gray-100 border border-gray-400 rounded"></div>
-                <span>🔧 その他/未対応</span>
+                <span>🔧 その他</span>
               </div>
             </div>
           </div>

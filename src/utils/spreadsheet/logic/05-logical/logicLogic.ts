@@ -69,28 +69,122 @@ function toLogical(value: unknown): boolean {
 // IF関数の実装
 export const IF: CustomFormula = {
   name: 'IF',
-  pattern: /IF\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /IF\s*\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, conditionRef, trueValueRef, falseValueRef] = matches;
+    const fullArgs = matches[1];
     
-    const conditionValue = getCellValue(conditionRef, context) ?? conditionRef;
-    const condition = toLogical(conditionValue);
+    // 引数を適切に分割する（引用符内のカンマを無視）
+    const args: string[] = [];
+    let currentArg = '';
+    let inQuotes = false;
+    let quoteChar = '';
+    let parenDepth = 0;
     
-    if (condition) {
-      const trueValue = getCellValue(trueValueRef, context) ?? trueValueRef;
-      // 文字列の引用符を除去
-      if (typeof trueValue === 'string' && trueValue.startsWith('"') && trueValue.endsWith('"')) {
-        return trueValue.slice(1, -1);
+    for (let i = 0; i < fullArgs.length; i++) {
+      const char = fullArgs[i];
+      const prevChar = i > 0 ? fullArgs[i - 1] : '';
+      
+      // エスケープされた引用符を処理
+      if (char === '"' && prevChar !== '\\') {
+        if (!inQuotes) {
+          inQuotes = true;
+          quoteChar = '"';
+        } else if (quoteChar === '"') {
+          inQuotes = false;
+        }
       }
-      return trueValue as FormulaResult;
-    } else {
-      const falseValue = getCellValue(falseValueRef, context) ?? falseValueRef;
-      // 文字列の引用符を除去
-      if (typeof falseValue === 'string' && falseValue.startsWith('"') && falseValue.endsWith('"')) {
-        return falseValue.slice(1, -1);
+      
+      // 括弧の深さを追跡
+      if (!inQuotes) {
+        if (char === '(') parenDepth++;
+        else if (char === ')') parenDepth--;
       }
-      return falseValue as FormulaResult;
+      
+      // カンマで引数を分割（引用符内や括弧内でない場合）
+      if (char === ',' && !inQuotes && parenDepth === 0) {
+        args.push(currentArg.trim());
+        currentArg = '';
+      } else {
+        currentArg += char;
+      }
     }
+    
+    // 最後の引数を追加
+    if (currentArg.trim()) {
+      args.push(currentArg.trim());
+    }
+    
+    // IF関数は3つの引数が必要
+    if (args.length !== 3) {
+      return FormulaError.VALUE;
+    }
+    
+    const [conditionStr, trueValueStr, falseValueStr] = args;
+    
+    // 条件を評価（比較演算子を含む場合の処理）
+    let condition: boolean;
+    
+    // 比較演算子のパターン
+    const comparisonMatch = conditionStr.match(/^(.+?)(>=|<=|<>|!=|>|<|=)(.+)$/);
+    
+    if (comparisonMatch) {
+      const [, leftExpr, operator, rightExpr] = comparisonMatch;
+      
+      // 左辺と右辺の値を取得
+      const leftValue = getCellValue(leftExpr.trim(), context) ?? leftExpr.trim();
+      const rightValue = getCellValue(rightExpr.trim(), context) ?? rightExpr.trim();
+      
+      // 数値に変換を試みる
+      const leftNum = typeof leftValue === 'number' ? leftValue : parseFloat(String(leftValue));
+      const rightNum = typeof rightValue === 'number' ? rightValue : parseFloat(String(rightValue));
+      
+      // 比較演算を実行
+      switch (operator) {
+        case '>=':
+          condition = !isNaN(leftNum) && !isNaN(rightNum) ? leftNum >= rightNum : String(leftValue) >= String(rightValue);
+          break;
+        case '<=':
+          condition = !isNaN(leftNum) && !isNaN(rightNum) ? leftNum <= rightNum : String(leftValue) <= String(rightValue);
+          break;
+        case '>':
+          condition = !isNaN(leftNum) && !isNaN(rightNum) ? leftNum > rightNum : String(leftValue) > String(rightValue);
+          break;
+        case '<':
+          condition = !isNaN(leftNum) && !isNaN(rightNum) ? leftNum < rightNum : String(leftValue) < String(rightValue);
+          break;
+        case '<>':
+        case '!=':
+          condition = !isNaN(leftNum) && !isNaN(rightNum) ? leftNum !== rightNum : leftValue !== rightValue;
+          break;
+        case '=':
+          condition = !isNaN(leftNum) && !isNaN(rightNum) ? leftNum === rightNum : leftValue === rightValue;
+          break;
+        default:
+          condition = false;
+      }
+    } else {
+      // 比較演算子がない場合は、値を論理値として評価
+      const conditionValue = getCellValue(conditionStr, context) ?? conditionStr;
+      condition = toLogical(conditionValue);
+    }
+    
+    // 結果の値を取得
+    const resultStr = condition ? trueValueStr : falseValueStr;
+    const resultValue = getCellValue(resultStr, context) ?? resultStr;
+    
+    // 文字列の引用符を除去（通常の引用符とエスケープされた引用符の両方を処理）
+    if (typeof resultValue === 'string') {
+      // エスケープされた引用符 \" を処理
+      if (resultValue.startsWith('\\"') && resultValue.endsWith('\\"')) {
+        return resultValue.slice(2, -2);
+      }
+      // 通常の引用符を処理
+      else if (resultValue.startsWith('"') && resultValue.endsWith('"')) {
+        return resultValue.slice(1, -1);
+      }
+    }
+    
+    return resultValue as FormulaResult;
   }
 };
 

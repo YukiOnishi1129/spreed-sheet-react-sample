@@ -46,6 +46,64 @@ export const MATH_FUNCTIONS: Record<string, FunctionDefinition> = {
     colorScheme: COLOR_SCHEMES.math
   },
 
+  COUNTIF: {
+    name: 'COUNTIF',
+    syntax: 'COUNTIF(range, criteria)',
+    params: [
+      { name: 'range', desc: '条件を評価する範囲' },
+      { name: 'criteria', desc: '条件（">10"、"=商品A"など）' }
+    ],
+    description: '条件に一致するセルの個数を数えます',
+    category: 'math',
+    examples: ['=COUNTIF(A1:A10,">100")', '=COUNTIF(B1:B10,"商品A")'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  COUNTIFS: {
+    name: 'COUNTIFS',
+    syntax: 'COUNTIFS(criteria_range1, criteria1, [criteria_range2, criteria2], ...)',
+    params: [
+      { name: 'criteria_range1', desc: '1つ目の条件範囲' },
+      { name: 'criteria1', desc: '1つ目の条件' },
+      { name: 'criteria_range2', desc: '2つ目の条件範囲', optional: true },
+      { name: 'criteria2', desc: '2つ目の条件', optional: true }
+    ],
+    description: '複数条件に一致するセルの個数を数えます',
+    category: 'math',
+    examples: ['=COUNTIFS(A1:A10,">100",B1:B10,"商品A")'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  AVERAGEIF: {
+    name: 'AVERAGEIF',
+    syntax: 'AVERAGEIF(range, criteria, [average_range])',
+    params: [
+      { name: 'range', desc: '条件を評価する範囲' },
+      { name: 'criteria', desc: '条件（">10"、"=商品A"など）' },
+      { name: 'average_range', desc: '平均する範囲（省略時はrangeを使用）', optional: true }
+    ],
+    description: '条件に一致するセルの平均を計算します',
+    category: 'math',
+    examples: ['=AVERAGEIF(A1:A10,">100")', '=AVERAGEIF(B1:B10,"商品A",C1:C10)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  AVERAGEIFS: {
+    name: 'AVERAGEIFS',
+    syntax: 'AVERAGEIFS(average_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)',
+    params: [
+      { name: 'average_range', desc: '平均する範囲' },
+      { name: 'criteria_range1', desc: '1つ目の条件範囲' },
+      { name: 'criteria1', desc: '1つ目の条件' },
+      { name: 'criteria_range2', desc: '2つ目の条件範囲', optional: true },
+      { name: 'criteria2', desc: '2つ目の条件', optional: true }
+    ],
+    description: '複数条件に一致するセルの平均を計算します',
+    category: 'math',
+    examples: ['=AVERAGEIFS(C1:C10,A1:A10,">100",B1:B10,"商品A")'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
   PRODUCT: {
     name: 'PRODUCT',
     syntax: 'PRODUCT(number1, [number2], ...)',

@@ -109,7 +109,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 **極めて重要：数式フィールドの必須化**
 - ユーザーがリクエストした関数を使用する計算結果のセルには、必ず"f"フィールドに数式を含めてください
 - 例：NPER（財務関数）の場合 → {"v": null, "f": "=NPER(A2,B2,C2,D2)", "bg": "#FFFDE7", "fc": "#F57F17"}
-- 例：DATEDIF（日付関数）の場合 → {"v": null, "f": "=DATEDIF(B2,C2,\"D\")", "bg": "#F3E5F5", "fc": "#7B1FA2"}
+- 例：DATEDIF（日付関数）の場合 → {"v": null, "f": "=DATEDIF(B2,C2,\\\"D\\\")", "bg": "#F3E5F5", "fc": "#7B1FA2"}
 - 数式がないセルは単なる静的な値として扱われ、関数のデモンストレーションになりません
 
 **売上管理表の正しいレイアウト例：**
@@ -1022,6 +1022,8 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         
         // 全関数タイプの二重引用符を事前に修正（包括的アプローチ）
         jsonData = jsonData
+          // DATEDIF関数の修正（既にエスケープされている場合をスキップ）
+          .replace(/("f":\s*"=DATEDIF\([^,]+,\s*[^,]+,\s*)\\?"([^"]+)\\?"\)"/g, '"f": "=DATEDIF($1\\"$2\\")"')
           // REPT関数の修正
           .replace(/("f":\s*"=REPT\()""/g, '$1\\"')
           .replace(/(\["=REPT\()""/g, '$1\\"')
