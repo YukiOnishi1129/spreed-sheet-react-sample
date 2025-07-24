@@ -398,7 +398,7 @@ const ChatGPTSpreadsheet: React.FC = () => {
                 <span>ヘッダー</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-4 h-4 bg-orange-100 border border-orange-600 rounded"></div>
+                <div className="w-4 h-4 bg-yellow-50 border border-yellow-600 rounded"></div>
                 <span>💰 財務関数</span>
               </div>
               <div className="flex items-center gap-1">

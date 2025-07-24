@@ -97,12 +97,6 @@ export const DATEDIF: CustomFormula = {
   }
 };
 
-// NETWORKDAYS関数の実装
-export const NETWORKDAYS: CustomFormula = {
-  name: 'NETWORKDAYS',
-  pattern: /NETWORKDAYS\(([^,)]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
 // NOW関数の実装（現在の日時）
 export const NOW: CustomFormula = {
@@ -595,23 +589,5 @@ export const ISOWEEKNUM: CustomFormula = {
   }
 };
 
-// NETWORKDAYS.INTL関数の実装（稼働日数・国際版）
-export const NETWORKDAYS_INTL: CustomFormula = {
-  name: 'NETWORKDAYS.INTL',
-  pattern: /NETWORKDAYS\.INTL\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
-// WORKDAY関数の実装（稼働日を計算）
-export const WORKDAY: CustomFormula = {
-  name: 'WORKDAY',
-  pattern: /WORKDAY\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
-// WORKDAY.INTL関数の実装（稼働日・国際版）
-export const WORKDAY_INTL: CustomFormula = {
-  name: 'WORKDAY.INTL',
-  pattern: /WORKDAY\.INTL\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
-};

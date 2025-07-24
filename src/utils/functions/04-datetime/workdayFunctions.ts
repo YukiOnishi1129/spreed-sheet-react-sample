@@ -83,8 +83,19 @@ function parseHolidays(holidaysRef: string, context: FormulaContext): Date[] {
       
       for (let row = startRow; row <= endRow; row++) {
         for (let col = startColIndex; col <= endColIndex; col++) {
-          if (context.data[row]?.[col]) {
-            const date = normalizeDate(context.data[row][col].value);
+          if (context.data[row]?.[col] !== undefined) {
+            const cellData = context.data[row][col];
+            // セルデータから値を取得
+            let value;
+            if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null) {
+              value = cellData;
+            } else if (cellData && typeof cellData === 'object') {
+              value = cellData.value ?? cellData.v ?? cellData._ ?? cellData;
+            } else {
+              value = cellData;
+            }
+            
+            const date = normalizeDate(value);
             if (date) {
               holidays.push(date);
             }
@@ -95,9 +106,12 @@ function parseHolidays(holidaysRef: string, context: FormulaContext): Date[] {
   } else {
     // 単一セルの場合
     const value = getCellValue(holidaysRef, context);
-    const date = normalizeDate(value);
-    if (date) {
-      holidays.push(date);
+    // セル参照エラーの場合はスキップ
+    if (value !== FormulaError.REF && value !== null && value !== undefined) {
+      const date = normalizeDate(value);
+      if (date) {
+        holidays.push(date);
+      }
     }
   }
   
@@ -119,16 +133,24 @@ export const NETWORKDAYS: CustomFormula = {
     
     try {
       // 開始日を取得
-      const startValue = getCellValue(startDateRef.trim(), context) ?? startDateRef.trim();
-      const startDate = normalizeDate(startValue);
+      const startValue = getCellValue(startDateRef.trim(), context);
+      // セル参照エラーの場合は、直接値として解釈を試みる
+      const startDateInput = (startValue === FormulaError.REF || startValue === null || startValue === undefined) 
+        ? startDateRef.trim() 
+        : startValue;
+      const startDate = normalizeDate(startDateInput);
       
       if (!startDate) {
         return FormulaError.VALUE;
       }
       
       // 終了日を取得
-      const endValue = getCellValue(endDateRef.trim(), context) ?? endDateRef.trim();
-      const endDate = normalizeDate(endValue);
+      const endValue = getCellValue(endDateRef.trim(), context);
+      // セル参照エラーの場合は、直接値として解釈を試みる
+      const endDateInput = (endValue === FormulaError.REF || endValue === null || endValue === undefined)
+        ? endDateRef.trim()
+        : endValue;
+      const endDate = normalizeDate(endDateInput);
       
       if (!endDate) {
         return FormulaError.VALUE;
@@ -169,16 +191,24 @@ export const NETWORKDAYS_INTL: CustomFormula = {
     
     try {
       // 開始日を取得
-      const startValue = getCellValue(startDateRef.trim(), context) ?? startDateRef.trim();
-      const startDate = normalizeDate(startValue);
+      const startValue = getCellValue(startDateRef.trim(), context);
+      // セル参照エラーの場合は、直接値として解釈を試みる
+      const startDateInput = (startValue === FormulaError.REF || startValue === null || startValue === undefined) 
+        ? startDateRef.trim() 
+        : startValue;
+      const startDate = normalizeDate(startDateInput);
       
       if (!startDate) {
         return FormulaError.VALUE;
       }
       
       // 終了日を取得
-      const endValue = getCellValue(endDateRef.trim(), context) ?? endDateRef.trim();
-      const endDate = normalizeDate(endValue);
+      const endValue = getCellValue(endDateRef.trim(), context);
+      // セル参照エラーの場合は、直接値として解釈を試みる
+      const endDateInput = (endValue === FormulaError.REF || endValue === null || endValue === undefined)
+        ? endDateRef.trim()
+        : endValue;
+      const endDate = normalizeDate(endDateInput);
       
       if (!endDate) {
         return FormulaError.VALUE;
@@ -187,8 +217,11 @@ export const NETWORKDAYS_INTL: CustomFormula = {
       // 週末の定義を取得（デフォルトは1=土日）
       let weekendDays = '1';
       if (weekendRef) {
-        const weekendValue = getCellValue(weekendRef.trim(), context) ?? weekendRef.trim();
-        weekendDays = String(weekendValue).replace(/['"]/g, '');
+        const weekendValue = getCellValue(weekendRef.trim(), context);
+        const weekendInput = (weekendValue === FormulaError.REF || weekendValue === null || weekendValue === undefined)
+          ? weekendRef.trim()
+          : weekendValue;
+        weekendDays = String(weekendInput).replace(/['"]/g, '');
       }
       
       // 祝日リストを取得
@@ -226,16 +259,23 @@ export const WORKDAY: CustomFormula = {
     
     try {
       // 開始日を取得
-      const startValue = getCellValue(startDateRef.trim(), context) ?? startDateRef.trim();
-      const startDate = normalizeDate(startValue);
+      const startValue = getCellValue(startDateRef.trim(), context);
+      // セル参照エラーの場合は、直接値として解釈を試みる
+      const startDateInput = (startValue === FormulaError.REF || startValue === null || startValue === undefined) 
+        ? startDateRef.trim() 
+        : startValue;
+      const startDate = normalizeDate(startDateInput);
       
       if (!startDate) {
         return FormulaError.VALUE;
       }
       
       // 日数を取得
-      const daysValue = getCellValue(daysRef.trim(), context) ?? daysRef.trim();
-      const days = parseInt(String(daysValue));
+      const daysValue = getCellValue(daysRef.trim(), context);
+      const daysInput = (daysValue === FormulaError.REF || daysValue === null || daysValue === undefined)
+        ? daysRef.trim()
+        : daysValue;
+      const days = parseInt(String(daysInput));
       
       if (isNaN(days)) {
         return FormulaError.VALUE;
@@ -278,16 +318,23 @@ export const WORKDAY_INTL: CustomFormula = {
     
     try {
       // 開始日を取得
-      const startValue = getCellValue(startDateRef.trim(), context) ?? startDateRef.trim();
-      const startDate = normalizeDate(startValue);
+      const startValue = getCellValue(startDateRef.trim(), context);
+      // セル参照エラーの場合は、直接値として解釈を試みる
+      const startDateInput = (startValue === FormulaError.REF || startValue === null || startValue === undefined) 
+        ? startDateRef.trim() 
+        : startValue;
+      const startDate = normalizeDate(startDateInput);
       
       if (!startDate) {
         return FormulaError.VALUE;
       }
       
       // 日数を取得
-      const daysValue = getCellValue(daysRef.trim(), context) ?? daysRef.trim();
-      const days = parseInt(String(daysValue));
+      const daysValue = getCellValue(daysRef.trim(), context);
+      const daysInput = (daysValue === FormulaError.REF || daysValue === null || daysValue === undefined)
+        ? daysRef.trim()
+        : daysValue;
+      const days = parseInt(String(daysInput));
       
       if (isNaN(days)) {
         return FormulaError.VALUE;
@@ -296,8 +343,11 @@ export const WORKDAY_INTL: CustomFormula = {
       // 週末の定義を取得（デフォルトは1=土日）
       let weekendDays = '1';
       if (weekendRef) {
-        const weekendValue = getCellValue(weekendRef.trim(), context) ?? weekendRef.trim();
-        weekendDays = String(weekendValue).replace(/['"]/g, '');
+        const weekendValue = getCellValue(weekendRef.trim(), context);
+        const weekendInput = (weekendValue === FormulaError.REF || weekendValue === null || weekendValue === undefined)
+          ? weekendRef.trim()
+          : weekendValue;
+        weekendDays = String(weekendInput).replace(/['"]/g, '');
       }
       
       // 祝日リストを取得

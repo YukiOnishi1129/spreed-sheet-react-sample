@@ -3,7 +3,8 @@
 import type { CustomFormula } from './shared/types';
 
 // 各カテゴリから関数をインポート
-import { DATEDIF, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC, DATEVALUE, TIMEVALUE, ISOWEEKNUM, NETWORKDAYS, NETWORKDAYS_INTL, WORKDAY, WORKDAY_INTL } from './04-datetime/dateFunctions';
+import { DATEDIF, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC, DATEVALUE, TIMEVALUE, ISOWEEKNUM } from './04-datetime/dateFunctions';
+import { NETWORKDAYS, NETWORKDAYS_INTL, WORKDAY, WORKDAY_INTL } from './04-datetime/workdayFunctions';
 
 import { 
   SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND,
@@ -370,6 +371,7 @@ export * from './02-statistical/otherStatisticalFunctions';
 export * from './02-statistical/modeRankFunctions';
 export * from './03-text/textFunctions';
 export * from './04-datetime/dateFunctions';
+export * from './04-datetime/workdayFunctions';
 export * from './05-logical/logicFunctions';
 export * from './05-logical/newLogicalFunctions';
 export * from './06-lookup-reference/lookupFunctions';
