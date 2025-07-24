@@ -177,3 +177,94 @@ export const N: CustomFormula = {
     return 0;
   }
 };
+
+// ISERR関数の実装（#N/A以外のエラー値か判定）
+export const ISERR: CustomFormula = {
+  name: 'ISERR',
+  pattern: /ISERR\(([^)]+)\)/i,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return typeof value === 'string' && value.startsWith('#') && value.endsWith('!') && value !== FormulaError.NA;
+  }
+};
+
+// ISNONTEXT関数の実装（文字列以外か判定）
+export const ISNONTEXT: CustomFormula = {
+  name: 'ISNONTEXT',
+  pattern: /ISNONTEXT\(([^)]+)\)/i,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    return !(typeof value === 'string' && !(value.startsWith('#') && value.endsWith('!')));
+  }
+};
+
+// ISREF関数の実装（参照か判定）
+export const ISREF: CustomFormula = {
+  name: 'ISREF',
+  pattern: /ISREF\(([^)]+)\)/i,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    
+    // セル参照パターンをチェック
+    return /^[A-Z]+\d+$/.test(valueRef) || /^[A-Z]+\d+:[A-Z]+\d+$/.test(valueRef);
+  }
+};
+
+// ISFORMULA関数の実装（数式か判定）
+export const ISFORMULA: CustomFormula = {
+  name: 'ISFORMULA',
+  pattern: /ISFORMULA\(([^)]+)\)/i,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    
+    if (valueRef.match(/^[A-Z]+\d+$/)) {
+      const cellData = context.data[parseInt(valueRef.match(/\d+/)![0]) - 1];
+      if (cellData) {
+        const colIndex = valueRef.match(/^[A-Z]+/)![0].charCodeAt(0) - 65;
+        const cell = cellData[colIndex];
+        return typeof cell === 'object' && cell !== null && 'formula' in cell;
+      }
+    }
+    
+    return false;
+  }
+};
+
+// NA関数の実装（#N/Aエラーを返す）
+export const NA: CustomFormula = {
+  name: 'NA',
+  pattern: /NA\(\)/i,
+  calculate: () => {
+    return FormulaError.NA;
+  }
+};
+
+// ERROR.TYPE関数の実装（エラーの種類を返す）
+export const ERROR_TYPE: CustomFormula = {
+  name: 'ERROR.TYPE',
+  pattern: /ERROR\.TYPE\(([^)]+)\)/i,
+  calculate: (matches, context) => {
+    const valueRef = matches[1].trim();
+    const value = getCellValue(valueRef, context);
+    
+    if (typeof value !== 'string' || !value.startsWith('#') || !value.endsWith('!')) {
+      return FormulaError.NA;
+    }
+    
+    // Excelのエラータイプ番号
+    switch (value) {
+      case FormulaError.NULL: return 1;
+      case FormulaError.DIV0: return 2;
+      case FormulaError.VALUE: return 3;
+      case FormulaError.REF: return 4;
+      case FormulaError.NAME: return 5;
+      case FormulaError.NUM: return 6;
+      case FormulaError.NA: return 7;
+      default: return FormulaError.NA;
+    }
+  }
+};

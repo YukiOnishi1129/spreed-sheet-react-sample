@@ -54,7 +54,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | SUMX2MY2 | x^2-y^2の和を計算 | `=SUMX2MY2(配列x, 配列y)` | ✅ |
 | SUMX2PY2 | x^2+y^2の和を計算 | `=SUMX2PY2(配列x, 配列y)` | ✅ |
 | SUMXMY2 | (x-y)^2の和を計算 | `=SUMXMY2(配列x, 配列y)` | ✅ |
-| AGGREGATE | 集計関数（エラー値を除外） | `=AGGREGATE(関数番号, オプション, 配列, [k])` | ❌ |
+| AGGREGATE | 集計関数（エラー値を除外） | `=AGGREGATE(関数番号, オプション, 配列, [k])` | ✅ |
 | ARABIC | ローマ数字をアラビア数字に変換 | `=ARABIC(文字列)` | ✅ |
 | BASE | 数値を指定した基数に変換 | `=BASE(数値, 基数, [最小長])` | ✅ |
 | CEILING.MATH | 数学的な切り上げ | `=CEILING.MATH(数値, [基準値], [モード])` | ✅ |
@@ -72,9 +72,9 @@ https://support.google.com/docs/table/25273?hl=ja
 | RANDARRAY | ランダム配列を生成 | `=RANDARRAY([行], [列], [最小値], [最大値], [整数])` | ✅ |
 | ROMAN | アラビア数字をローマ数字に変換 | `=ROMAN(数値, [形式])` | ✅ |
 | SEQUENCE | 連続値を生成 | `=SEQUENCE(行, [列], [開始], [ステップ])` | ✅ |
-| SERIESSUM | べき級数を計算 | `=SERIESSUM(x, n, m, 係数)` | ❌ |
+| SERIESSUM | べき級数を計算 | `=SERIESSUM(x, n, m, 係数)` | ✅ |
 | SQRTPI | π倍の平方根を計算 | `=SQRTPI(数値)` | ✅ |
-| SUBTOTAL | 小計を計算 | `=SUBTOTAL(関数番号, 参照1, [参照2], ...)` | ❌ |
+| SUBTOTAL | 小計を計算 | `=SUBTOTAL(関数番号, 参照1, [参照2], ...)` | ✅ |
 
 ### 三角関数
 | 関数名 | 説明 | 構文 | 実装状況 |

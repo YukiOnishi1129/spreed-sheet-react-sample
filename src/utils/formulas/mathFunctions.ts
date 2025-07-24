@@ -4,6 +4,7 @@ import type { CustomFormula, FormulaContext } from './types';
 import { FormulaError } from './types';
 import { getCellValue, getCellRangeValues } from './utils';
 
+
 // 引数を数値の配列に変換するユーティリティ関数
 function parseArgumentsToNumbers(args: string, context: FormulaContext): number[] {
   const values: number[] = [];
@@ -1787,19 +1788,6 @@ export const DECIMAL: CustomFormula = {
   }
 };
 
-// SUBTOTAL関数（小計）
-export const SUBTOTAL: CustomFormula = {
-  name: 'SUBTOTAL',
-  pattern: /SUBTOTAL\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
-};
-
-// AGGREGATE関数（集計関数、エラー値を除外）
-export const AGGREGATE: CustomFormula = {
-  name: 'AGGREGATE',
-  pattern: /AGGREGATE\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
-};
 
 // CEILING.MATH関数（数学的な切り上げ）
 export const CEILING_MATH: CustomFormula = {
@@ -1964,6 +1952,98 @@ export const RANDARRAY: CustomFormula = {
     }
     
     return result;
+  }
+};
+
+// AGGREGATE関数用の計算ロジック
+function performAggregateCalculation(functionNum: number, values: number[], k?: number): number | string {
+  if (values.length === 0) return FormulaError.DIV0;
+  
+  switch (functionNum) {
+    case 1: // AVERAGE
+      return values.reduce((sum, val) => sum + val, 0) / values.length;
+    case 2: // COUNT（数値のみカウント）
+      return values.length;
+    case 3: // COUNTA（空でない値をカウント）
+      return values.length;
+    case 4: // MAX
+      return Math.max(...values);
+    case 5: // MIN
+      return Math.min(...values);
+    case 6: // PRODUCT
+      return values.reduce((prod, val) => prod * val, 1);
+    case 9: // SUM
+      return values.reduce((sum, val) => sum + val, 0);
+    case 14: { // LARGE（k番目に大きい値）
+      if (k === undefined || k <= 0 || k > values.length) return FormulaError.NUM;
+      const sortedDesc = values.sort((a, b) => b - a);
+      return sortedDesc[k - 1];
+    }
+    case 15: { // SMALL（k番目に小さい値）
+      if (k === undefined || k <= 0 || k > values.length) return FormulaError.NUM;
+      const sortedAsc = values.sort((a, b) => a - b);
+      return sortedAsc[k - 1];
+    }
+    default:
+      return FormulaError.VALUE;
+  }
+}
+
+// AGGREGATE関数（集計関数、エラー値を除外）
+export const AGGREGATE: CustomFormula = {
+  name: 'AGGREGATE',
+  pattern: /AGGREGATE\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, functionNumRef, optionRef, arrayRef, kRef] = matches;
+    
+    const functionNum = Number(getCellValue(functionNumRef, context) ?? functionNumRef);
+    const option = Number(getCellValue(optionRef, context) ?? optionRef);
+    const k = kRef ? Number(getCellValue(kRef, context) ?? kRef) : undefined;
+    
+    if (isNaN(functionNum) || isNaN(option)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (!Number.isInteger(functionNum) || !Number.isInteger(option)) {
+      return FormulaError.NUM;
+    }
+    
+    // 配列の値を取得
+    const arrayValues = getCellRangeValues(arrayRef, context);
+    let numbers = arrayValues.map(v => Number(v)).filter(n => !isNaN(n) && isFinite(n));
+    
+    // オプションに応じてエラー値や隠し行の処理
+    if (option >= 4) {
+      // エラー値を除外（オプション4-7はエラー値を無視）
+      numbers = numbers.filter(n => !isNaN(n) && isFinite(n));
+    }
+    
+    return performAggregateCalculation(functionNum, numbers, k);
+  }
+};
+
+// SUBTOTAL関数（小計を計算）
+export const SUBTOTAL: CustomFormula = {
+  name: 'SUBTOTAL',
+  pattern: /SUBTOTAL\(([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, functionNumRef, ref1] = matches;
+    
+    const functionNum = Number(getCellValue(functionNumRef, context) ?? functionNumRef);
+    
+    if (isNaN(functionNum) || !Number.isInteger(functionNum)) {
+      return FormulaError.VALUE;
+    }
+    
+    // 参照範囲の値を取得
+    const values = getCellRangeValues(ref1, context);
+    const numbers = values.map(v => Number(v)).filter(n => !isNaN(n) && isFinite(n));
+    
+    // 関数番号を基本関数に変換（100番台は非表示行を除外）
+    const baseFunctionNum = functionNum > 100 ? functionNum - 100 : functionNum;
+    
+    // 基本的な計算を実行
+    return performAggregateCalculation(baseFunctionNum, numbers);
   }
 };
 

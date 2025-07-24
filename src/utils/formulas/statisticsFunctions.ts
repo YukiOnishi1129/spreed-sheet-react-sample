@@ -35,6 +35,83 @@ function extractNumbersFromRange(rangeRef: string, context: FormulaContext): num
   return numbers;
 }
 
+// AVEDEV関数の実装（平均偏差）
+export const AVEDEV: CustomFormula = {
+  name: 'AVEDEV',
+  pattern: /AVEDEV\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const avedev = numbers.reduce((sum, num) => sum + Math.abs(num - mean), 0) / numbers.length;
+    
+    return avedev;
+  }
+};
+
+// GEOMEAN関数の実装（幾何平均）
+export const GEOMEAN: CustomFormula = {
+  name: 'GEOMEAN',
+  pattern: /GEOMEAN\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length === 0) {
+      return FormulaError.NUM;
+    }
+    
+    // 全ての値が正数である必要がある
+    if (numbers.some(num => num <= 0)) {
+      return FormulaError.NUM;
+    }
+    
+    const product = numbers.reduce((prod, num) => prod * num, 1);
+    return Math.pow(product, 1 / numbers.length);
+  }
+};
+
+// HARMEAN関数の実装（調和平均）
+export const HARMEAN: CustomFormula = {
+  name: 'HARMEAN',
+  pattern: /HARMEAN\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length === 0) {
+      return FormulaError.NUM;
+    }
+    
+    // 全ての値が正数である必要がある
+    if (numbers.some(num => num <= 0)) {
+      return FormulaError.NUM;
+    }
+    
+    const reciprocalSum = numbers.reduce((sum, num) => sum + (1 / num), 0);
+    return numbers.length / reciprocalSum;
+  }
+};
 
 // MEDIAN関数の実装（中央値）
 export const MEDIAN: CustomFormula = {
