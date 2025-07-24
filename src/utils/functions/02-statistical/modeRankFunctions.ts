@@ -53,7 +53,7 @@ export const MODE_SNGL: CustomFormula = {
       // 頻度をカウント
       const frequency: Map<number, number> = new Map();
       for (const value of values) {
-        frequency.set(value, (frequency.get(value) || 0) + 1);
+        frequency.set(value, (frequency.get(value) ?? 0) + 1);
       }
       
       // 最頻値を見つける
@@ -71,7 +71,7 @@ export const MODE_SNGL: CustomFormula = {
         return FormulaError.NA; // すべての値がユニークな場合
       }
       
-      return mode!;
+      return mode ?? FormulaError.NA;
     } catch {
       return FormulaError.VALUE;
     }
@@ -127,7 +127,7 @@ export const MODE_MULT: CustomFormula = {
       // 頻度をカウント
       const frequency: Map<number, number> = new Map();
       for (const value of values) {
-        frequency.set(value, (frequency.get(value) || 0) + 1);
+        frequency.set(value, (frequency.get(value) ?? 0) + 1);
       }
       
       // 最大頻度を見つける

@@ -38,13 +38,13 @@ function gamma(n: number): number {
     1.5056327351493116e-7
   ];
   
-  let z = n - 1;
+  const z = n - 1;
   let x = coef[0];
   for (let i = 1; i < 9; i++) {
     x += coef[i] / (z + i);
   }
   
-  let t = z + g + 0.5;
+  const t = z + g + 0.5;
   return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
 }
 

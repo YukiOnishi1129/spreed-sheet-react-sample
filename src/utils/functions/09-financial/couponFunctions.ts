@@ -25,11 +25,11 @@ function getDayCountBasis(basis: number = 0): { daysInYear: number; daysInMonth:
 // 30/360方式での日数計算
 function days360(startDate: Date, endDate: Date, european: boolean = false): number {
   let startDay = startDate.getDate();
-  let startMonth = startDate.getMonth() + 1;
-  let startYear = startDate.getFullYear();
+  const startMonth = startDate.getMonth() + 1;
+  const startYear = startDate.getFullYear();
   let endDay = endDate.getDate();
-  let endMonth = endDate.getMonth() + 1;
-  let endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth() + 1;
+  const endYear = endDate.getFullYear();
 
   if (!european) {
     // US方式
@@ -53,7 +53,7 @@ function actualDays(startDate: Date, endDate: Date): number {
 // 次の利払日を計算
 function getNextCouponDate(settlement: Date, maturity: Date, frequency: number): Date {
   const monthsPerPeriod = 12 / frequency;
-  let currentDate = new Date(maturity);
+  const currentDate = new Date(maturity);
   
   while (currentDate > settlement) {
     currentDate.setMonth(currentDate.getMonth() - monthsPerPeriod);
@@ -66,7 +66,7 @@ function getNextCouponDate(settlement: Date, maturity: Date, frequency: number):
 // 直前の利払日を計算
 function getPreviousCouponDate(settlement: Date, maturity: Date, frequency: number): Date {
   const monthsPerPeriod = 12 / frequency;
-  let currentDate = new Date(maturity);
+  const currentDate = new Date(maturity);
   
   while (currentDate > settlement) {
     currentDate.setMonth(currentDate.getMonth() - monthsPerPeriod);
@@ -261,7 +261,7 @@ export const COUPNUM: CustomFormula = {
       // 利払回数を計算
       const monthsPerPeriod = 12 / frequency;
       let count = 0;
-      let currentDate = new Date(maturity);
+      const currentDate = new Date(maturity);
       
       while (currentDate > settlement) {
         count++;

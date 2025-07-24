@@ -14,11 +14,11 @@ function actualDays(startDate: Date, endDate: Date): number {
 // 30/360方式での日数計算
 function days360(startDate: Date, endDate: Date, european: boolean = false): number {
   let startDay = startDate.getDate();
-  let startMonth = startDate.getMonth() + 1;
-  let startYear = startDate.getFullYear();
+  const startMonth = startDate.getMonth() + 1;
+  const startYear = startDate.getFullYear();
   let endDay = endDate.getDate();
-  let endMonth = endDate.getMonth() + 1;
-  let endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth() + 1;
+  const endYear = endDate.getFullYear();
 
   if (!european) {
     // US方式

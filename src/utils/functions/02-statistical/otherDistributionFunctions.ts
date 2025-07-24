@@ -33,8 +33,8 @@ function gamma(x: number): number {
     1.5056327351493116e-7
   ];
   
-  let z = x - 1;
-  let base = z + g + 0.5;
+  const z = x - 1;
+  const base = z + g + 0.5;
   let sum = coef[0];
   
   for (let i = 1; i < 9; i++) {

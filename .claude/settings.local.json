@@ -34,7 +34,8 @@
       "WebFetch(domain:hyperformula.handsontable.com)",
       "Bash(python3:*)",
       "WebFetch(domain:github.com)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(comm:*)"
     ],
     "deny": []
   }

@@ -71,7 +71,7 @@ import { SWITCH, LET } from './05-logical/newLogicalFunctions';
 
 import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE } from './06-lookup-reference/lookupFunctions';
 
-import { JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN } from './16-google-sheets/googleSheetsFunctions';
+import { JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN } from './14-google-sheets/googleSheetsFunctions';
 
 import { 
   ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N,
@@ -111,12 +111,12 @@ import {
 } from './06-lookup-reference/dynamicArrayFunctions';
 import { BYROW, BYCOL, MAP, REDUCE, SCAN, MAKEARRAY } from './06-lookup-reference/lambdaArrayFunctions';
 
-import { MDETERM, MINVERSE, MMULT, MUNIT } from './15-others/matrixFunctions';
+import { MDETERM, MINVERSE, MMULT, MUNIT } from './01-math-trigonometry/matrixFunctions';
 import { WEBSERVICE, FILTERXML, ENCODEURL } from './12-web/webFunctions';
 import { IMPORTDATA, IMPORTFEED, IMPORTHTML, IMPORTXML, IMPORTRANGE, IMAGE } from './12-web/importFunctions';
-import { CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER } from './15-others/cubeFunctions';
+import { CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER } from './11-cube/cubeFunctions';
 import { ISOMITTED, STOCKHISTORY, GPT } from './15-others/excelNewFunctions';
-import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT } from './16-google-sheets/googleSheetsExtraFunctions';
+import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT } from './14-google-sheets/googleSheetsExtraFunctions';
 
 // すべての関数を配列にまとめる
 export const ALL_FUNCTIONS = [
@@ -247,7 +247,8 @@ export const FUNCTION_CATEGORIES = {
     AGGREGATE, CEILING_MATH, CEILING_PRECISE, FLOOR_MATH, FLOOR_PRECISE, ISO_CEILING, SERIESSUM,
     RANDARRAY, SEQUENCE,
     SIN, COS, TAN, ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH,
-    ASINH, ACOSH, ATANH, CSC, SEC, COT, ACOT, CSCH, SECH, COTH, ACOTH
+    ASINH, ACOSH, ATANH, CSC, SEC, COT, ACOT, CSCH, SECH, COTH, ACOTH,
+    MDETERM, MINVERSE, MMULT, MUNIT
   ] as CustomFormula[],
   statistical: [
     MEDIAN, MODE, COUNTA, COUNTBLANK, LARGE, SMALL, RANK,
@@ -298,9 +299,9 @@ export const FUNCTION_CATEGORIES = {
     ERF, ERF_PRECISE, ERFC, ERFC_PRECISE, DELTA, GESTEP,
     BITAND, BITOR, BITXOR, BITLSHIFT, BITRSHIFT
   ] as CustomFormula[],
-  matrix: [MDETERM, MINVERSE, MMULT, MUNIT, CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER] as CustomFormula[],
   web: [WEBSERVICE, FILTERXML, ENCODEURL, IMPORTDATA, IMPORTFEED, IMPORTHTML, IMPORTXML, IMPORTRANGE, IMAGE] as CustomFormula[],
   googleSheets: [JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN, SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT] as CustomFormula[],
+  cube: [CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER] as CustomFormula[],
   others: [ISOMITTED, STOCKHISTORY, GPT] as CustomFormula[]
 };
 
@@ -340,7 +341,7 @@ export const getFunctionType = (functionName: string): string => {
   if (FUNCTION_CATEGORIES.matrix.some(f => f.name === name)) return 'matrix';
   if (FUNCTION_CATEGORIES.web.some(f => f.name === name)) return 'web';
   if (FUNCTION_CATEGORIES.googleSheets.some(f => f.name === name)) return 'googleSheets';
-  if (FUNCTION_CATEGORIES.others && FUNCTION_CATEGORIES.others.some(f => f.name === name)) return 'others';
+  if (FUNCTION_CATEGORIES.others?.some(f => f.name === name)) return 'others';
   
   return 'other';
 };
@@ -386,5 +387,8 @@ export * from './06-lookup-reference/additionalLookupFunctions';
 export * from './06-lookup-reference/dynamicArrayFunctions';
 export * from './08-database/statisticalDatabaseFunctions';
 export * from './12-web/webFunctions';
-export * from './15-others/matrixFunctions';
-export * from './16-google-sheets/googleSheetsFunctions';
+export * from './01-math-trigonometry/matrixFunctions';
+export * from './11-cube/cubeFunctions';
+export * from './14-google-sheets/googleSheetsFunctions';
+export * from './14-google-sheets/googleSheetsExtraFunctions';
+export * from './15-others/excelNewFunctions';
