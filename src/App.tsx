@@ -1,6 +1,8 @@
+import { Routes, Route, Link } from 'react-router-dom';
 import ChatGPTSpreadsheet from './components/ChatGPTSpreadsheet';
+import TestSpreadsheet from './components/TestSpreadsheet';
 
-function App() {
+function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -27,12 +29,31 @@ function App() {
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
               自然言語でExcel関数を検索・学習できる次世代ツール
             </p>
+            
+            {/* Navigation */}
+            <div className="mt-8 flex gap-4 justify-center">
+              <Link 
+                to="/test" 
+                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
+              >
+                関数テストモード
+              </Link>
+            </div>
           </div>
           
           <ChatGPTSpreadsheet />
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/test" element={<TestSpreadsheet />} />
+    </Routes>
   );
 }
 
