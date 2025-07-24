@@ -141,6 +141,98 @@ export const MEDIAN: CustomFormula = {
   }
 };
 
+// STDEV.S関数の実装（標準偏差、標本）
+export const STDEV_S: CustomFormula = {
+  name: 'STDEV.S',
+  pattern: /STDEV\.S\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length < 2) {
+      return FormulaError.DIV0;
+    }
+    
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / (numbers.length - 1);
+    
+    return Math.sqrt(variance);
+  }
+};
+
+// STDEV.P関数の実装（標準偏差、母集団）
+export const STDEV_P: CustomFormula = {
+  name: 'STDEV.P',
+  pattern: /STDEV\.P\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / numbers.length;
+    
+    return Math.sqrt(variance);
+  }
+};
+
+// VAR.S関数の実装（分散、標本）
+export const VAR_S: CustomFormula = {
+  name: 'VAR.S',
+  pattern: /VAR\.S\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length < 2) {
+      return FormulaError.DIV0;
+    }
+    
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    return numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / (numbers.length - 1);
+  }
+};
+
+// VAR.P関数の実装（分散、母集団）
+export const VAR_P: CustomFormula = {
+  name: 'VAR.P',
+  pattern: /VAR\.P\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const parts = args.split(',').map(part => part.trim());
+    let numbers: number[] = [];
+    
+    for (const part of parts) {
+      numbers = numbers.concat(extractNumbersFromRange(part, context));
+    }
+    
+    if (numbers.length === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    return numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / numbers.length;
+  }
+};
+
 // MODE関数の実装（最頻値）
 export const MODE: CustomFormula = {
   name: 'MODE',
@@ -504,19 +596,6 @@ export const PERCENTILE: CustomFormula = {
   }
 };
 
-// GEOMEAN関数の実装（幾何平均）
-export const GEOMEAN: CustomFormula = {
-  name: 'GEOMEAN',
-  pattern: /GEOMEAN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
-
-// HARMEAN関数の実装（調和平均）
-export const HARMEAN: CustomFormula = {
-  name: 'HARMEAN',
-  pattern: /HARMEAN\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
 // TRIMMEAN関数の実装（トリム平均）
 export const TRIMMEAN: CustomFormula = {
@@ -551,33 +630,7 @@ export const TRIMMEAN: CustomFormula = {
   }
 };
 
-// MAXIFS関数（条件付き最大値）
-export const MAXIFS: CustomFormula = {
-  name: 'MAXIFS',
-  pattern: /MAXIFS\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
-// MINIFS関数（条件付き最小値）
-export const MINIFS: CustomFormula = {
-  name: 'MINIFS',
-  pattern: /MINIFS\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
-
-// STDEV.S関数（標本標準偏差）
-export const STDEV_S: CustomFormula = {
-  name: 'STDEV.S',
-  pattern: /STDEV\.S\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
-
-// STDEV.P関数（母集団標準偏差）
-export const STDEV_P: CustomFormula = {
-  name: 'STDEV.P',
-  pattern: /STDEV\.P\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
 // STDEVA関数（文字列含む標本標準偏差）
 export const STDEVA: CustomFormula = {
@@ -593,19 +646,6 @@ export const STDEVPA: CustomFormula = {
   calculate: () => null // HyperFormulaが処理
 };
 
-// VAR.S関数（標本分散）
-export const VAR_S: CustomFormula = {
-  name: 'VAR.S',
-  pattern: /VAR\.S\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
-
-// VAR.P関数（母集団分散）
-export const VAR_P: CustomFormula = {
-  name: 'VAR.P',
-  pattern: /VAR\.P\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
 // VARA関数（文字列含む標本分散）
 export const VARA: CustomFormula = {
@@ -621,12 +661,6 @@ export const VARPA: CustomFormula = {
   calculate: () => null // HyperFormulaが処理
 };
 
-// AVEDEV関数（平均偏差）
-export const AVEDEV: CustomFormula = {
-  name: 'AVEDEV',
-  pattern: /AVEDEV\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
-};
 
 // DEVSQ関数（偏差平方和）
 export const DEVSQ: CustomFormula = {

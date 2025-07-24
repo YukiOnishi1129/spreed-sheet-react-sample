@@ -2047,6 +2047,124 @@ export const SUBTOTAL: CustomFormula = {
   }
 };
 
+// MAXIFS関数（条件付き最大値）
+export const MAXIFS: CustomFormula = {
+  name: 'MAXIFS',
+  pattern: /MAXIFS\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+),\s*([^,]+))*\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, maxRange, ...criteriaArgs] = matches;
+    
+    try {
+      // 最大値を求める範囲の値を取得
+      const maxRangeValues = getCellRangeValues(maxRange.trim(), context);
+      
+      // 条件をペアに分ける
+      const conditions: Array<{range: string, criteria: string}> = [];
+      for (let i = 0; i < criteriaArgs.length; i += 2) {
+        if (criteriaArgs[i] && criteriaArgs[i + 1]) {
+          conditions.push({
+            range: criteriaArgs[i].trim(),
+            criteria: criteriaArgs[i + 1].replace(/^["']|["']$/g, '')
+          });
+        }
+      }
+      
+      if (conditions.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
+      const validValues: number[] = [];
+      
+      // 各値に対して条件をチェック
+      for (let i = 0; i < maxRangeValues.length; i++) {
+        let allConditionsMet = true;
+        
+        for (const condition of conditions) {
+          const conditionRangeValues = getCellRangeValues(condition.range, context);
+          if (i >= conditionRangeValues.length || !evaluateCondition(conditionRangeValues[i], condition.criteria)) {
+            allConditionsMet = false;
+            break;
+          }
+        }
+        
+        if (allConditionsMet) {
+          const num = Number(maxRangeValues[i]);
+          if (!isNaN(num)) {
+            validValues.push(num);
+          }
+        }
+      }
+      
+      if (validValues.length === 0) {
+        return 0;
+      }
+      
+      return Math.max(...validValues);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// MINIFS関数（条件付き最小値）
+export const MINIFS: CustomFormula = {
+  name: 'MINIFS',
+  pattern: /MINIFS\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+),\s*([^,]+))*\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, minRange, ...criteriaArgs] = matches;
+    
+    try {
+      // 最小値を求める範囲の値を取得
+      const minRangeValues = getCellRangeValues(minRange.trim(), context);
+      
+      // 条件をペアに分ける
+      const conditions: Array<{range: string, criteria: string}> = [];
+      for (let i = 0; i < criteriaArgs.length; i += 2) {
+        if (criteriaArgs[i] && criteriaArgs[i + 1]) {
+          conditions.push({
+            range: criteriaArgs[i].trim(),
+            criteria: criteriaArgs[i + 1].replace(/^["']|["']$/g, '')
+          });
+        }
+      }
+      
+      if (conditions.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
+      const validValues: number[] = [];
+      
+      // 各値に対して条件をチェック
+      for (let i = 0; i < minRangeValues.length; i++) {
+        let allConditionsMet = true;
+        
+        for (const condition of conditions) {
+          const conditionRangeValues = getCellRangeValues(condition.range, context);
+          if (i >= conditionRangeValues.length || !evaluateCondition(conditionRangeValues[i], condition.criteria)) {
+            allConditionsMet = false;
+            break;
+          }
+        }
+        
+        if (allConditionsMet) {
+          const num = Number(minRangeValues[i]);
+          if (!isNaN(num)) {
+            validValues.push(num);
+          }
+        }
+      }
+      
+      if (validValues.length === 0) {
+        return 0;
+      }
+      
+      return Math.min(...validValues);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
 // SEQUENCE関数（連続値を生成）
 export const SEQUENCE: CustomFormula = {
   name: 'SEQUENCE',
