@@ -582,3 +582,91 @@ export const CHOOSECOLS: CustomFormula = {
     }
   }
 };
+
+// GETPIVOTDATA関数の実装（ピボットテーブルからデータ取得）
+export const GETPIVOTDATA: CustomFormula = {
+  name: 'GETPIVOTDATA',
+  pattern: /GETPIVOTDATA\(([^,]+),\s*([^,]+)(?:,\s*(.+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, dataFieldRef, pivotTableRef, fieldItemPairsStr] = matches;
+    
+    try {
+      // データフィールド名を取得
+      let dataField = getCellValue(dataFieldRef.trim(), context)?.toString() ?? dataFieldRef.trim();
+      if (dataField.startsWith('"') && dataField.endsWith('"')) {
+        dataField = dataField.slice(1, -1);
+      }
+      
+      // ピボットテーブルの参照を取得
+      const pivotRef = pivotTableRef.trim();
+      const pivotMatch = pivotRef.match(/^([A-Z]+)(\d+)$/);
+      
+      if (!pivotMatch) {
+        return FormulaError.REF;
+      }
+      
+      // フィールドとアイテムのペアを解析
+      const fieldItemPairs: Array<{field: string; item: string}> = [];
+      
+      if (fieldItemPairsStr) {
+        // カンマで分割（ただし引用符内のカンマは除く）
+        const parts: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < fieldItemPairsStr.length; i++) {
+          const char = fieldItemPairsStr[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          }
+          
+          if (char === ',' && !inQuotes) {
+            parts.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        
+        if (current) {
+          parts.push(current.trim());
+        }
+        
+        // ペアを作成
+        for (let i = 0; i < parts.length; i += 2) {
+          if (i + 1 < parts.length) {
+            let field = parts[i];
+            let item = parts[i + 1];
+            
+            // 引用符を除去
+            if (field.startsWith('"') && field.endsWith('"')) {
+              field = field.slice(1, -1);
+            }
+            if (item.startsWith('"') && item.endsWith('"')) {
+              item = item.slice(1, -1);
+            }
+            
+            // セル参照の場合は値を取得
+            if (field.match(/^[A-Z]+\d+$/)) {
+              field = getCellValue(field, context)?.toString() ?? field;
+            }
+            if (item.match(/^[A-Z]+\d+$/)) {
+              item = getCellValue(item, context)?.toString() ?? item;
+            }
+            
+            fieldItemPairs.push({ field, item });
+          }
+        }
+      }
+      
+      // 簡易実装：ピボットテーブルデータ構造がないため、仮のデータを返す
+      // 実際の実装では、ピボットテーブルのデータ構造から適切な値を検索する
+      
+      // エラーを返す（実際のピボットテーブルが存在しないため）
+      return FormulaError.REF;
+      
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};

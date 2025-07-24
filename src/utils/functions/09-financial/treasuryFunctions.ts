@@ -326,3 +326,229 @@ export const RECEIVED: CustomFormula = {
     }
   }
 };
+
+// INTRATE関数の実装（満期一括証券の利率）
+export const INTRATE: CustomFormula = {
+  name: 'INTRATE',
+  pattern: /INTRATE\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, settlementRef, maturityRef, investmentRef, redemptionRef, basisRef] = matches;
+    
+    try {
+      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
+      const investment = parseFloat(getCellValue(investmentRef.trim(), context)?.toString() ?? investmentRef.trim());
+      const redemption = parseFloat(getCellValue(redemptionRef.trim(), context)?.toString() ?? redemptionRef.trim());
+      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      
+      if (!settlement || !maturity) {
+        return FormulaError.VALUE;
+      }
+      
+      if (isNaN(investment) || isNaN(redemption) || investment <= 0 || redemption <= 0) {
+        return FormulaError.NUM;
+      }
+      
+      if (settlement >= maturity) {
+        return FormulaError.NUM;
+      }
+      
+      const days = actualDays(settlement, maturity);
+      let daysInYear: number;
+      
+      switch (basis) {
+        case 0: // 30/360 US
+        case 4: // 30/360 European
+          daysInYear = 360;
+          break;
+        case 1: // Actual/actual
+        case 3: // Actual/365
+          daysInYear = 365;
+          break;
+        case 2: // Actual/360
+          daysInYear = 360;
+          break;
+        default:
+          daysInYear = 360;
+      }
+      
+      // 利率 = ((償還額 - 投資額) / 投資額) × (年間日数 / 期間日数)
+      return ((redemption - investment) / investment) * (daysInYear / days);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// PRICEMAT関数の実装（満期利付証券の価格）
+export const PRICEMAT: CustomFormula = {
+  name: 'PRICEMAT',
+  pattern: /PRICEMAT\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, settlementRef, maturityRef, issueRef, rateRef, yieldRef, basisRef] = matches;
+    
+    try {
+      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
+      const issue = parseDate(getCellValue(issueRef.trim(), context)?.toString() ?? issueRef.trim());
+      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const yld = parseFloat(getCellValue(yieldRef.trim(), context)?.toString() ?? yieldRef.trim());
+      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      
+      if (!settlement || !maturity || !issue) {
+        return FormulaError.VALUE;
+      }
+      
+      if (isNaN(rate) || isNaN(yld) || rate < 0 || yld < 0) {
+        return FormulaError.NUM;
+      }
+      
+      if (settlement >= maturity || issue >= settlement) {
+        return FormulaError.NUM;
+      }
+      
+      const daysIM = actualDays(issue, maturity);
+      const daysSM = actualDays(settlement, maturity);
+      const daysIS = actualDays(issue, settlement);
+      
+      let daysInYear: number;
+      switch (basis) {
+        case 0: // 30/360 US
+        case 4: // 30/360 European
+          daysInYear = 360;
+          break;
+        case 1: // Actual/actual
+        case 3: // Actual/365
+          daysInYear = 365;
+          break;
+        case 2: // Actual/360
+          daysInYear = 360;
+          break;
+        default:
+          daysInYear = 360;
+      }
+      
+      // 価格計算
+      const A = daysIS / daysInYear;
+      const B = daysSM / daysInYear;
+      const price = (100 + (rate * 100 * daysIM / daysInYear)) / (1 + (yld * B)) - (rate * 100 * A);
+      
+      return price;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// YIELDDISC関数の実装（割引証券の利回り）
+export const YIELDDISC: CustomFormula = {
+  name: 'YIELDDISC',
+  pattern: /YIELDDISC\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, settlementRef, maturityRef, priceRef, redemptionRef, basisRef] = matches;
+    
+    try {
+      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
+      const price = parseFloat(getCellValue(priceRef.trim(), context)?.toString() ?? priceRef.trim());
+      const redemption = parseFloat(getCellValue(redemptionRef.trim(), context)?.toString() ?? redemptionRef.trim());
+      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      
+      if (!settlement || !maturity) {
+        return FormulaError.VALUE;
+      }
+      
+      if (isNaN(price) || isNaN(redemption) || price <= 0 || redemption <= 0) {
+        return FormulaError.NUM;
+      }
+      
+      if (settlement >= maturity) {
+        return FormulaError.NUM;
+      }
+      
+      const days = actualDays(settlement, maturity);
+      let daysInYear: number;
+      
+      switch (basis) {
+        case 0: // 30/360 US
+        case 4: // 30/360 European
+          daysInYear = 360;
+          break;
+        case 1: // Actual/actual
+        case 3: // Actual/365
+          daysInYear = 365;
+          break;
+        case 2: // Actual/360
+          daysInYear = 360;
+          break;
+        default:
+          daysInYear = 360;
+      }
+      
+      // 利回り = ((償還額 - 価格) / 価格) × (年間日数 / 期間日数)
+      return ((redemption - price) / price) * (daysInYear / days);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// YIELDMAT関数の実装（満期利付証券の利回り）
+export const YIELDMAT: CustomFormula = {
+  name: 'YIELDMAT',
+  pattern: /YIELDMAT\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, settlementRef, maturityRef, issueRef, rateRef, priceRef, basisRef] = matches;
+    
+    try {
+      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
+      const issue = parseDate(getCellValue(issueRef.trim(), context)?.toString() ?? issueRef.trim());
+      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const price = parseFloat(getCellValue(priceRef.trim(), context)?.toString() ?? priceRef.trim());
+      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      
+      if (!settlement || !maturity || !issue) {
+        return FormulaError.VALUE;
+      }
+      
+      if (isNaN(rate) || isNaN(price) || rate < 0 || price <= 0) {
+        return FormulaError.NUM;
+      }
+      
+      if (settlement >= maturity || issue >= settlement) {
+        return FormulaError.NUM;
+      }
+      
+      const daysIM = actualDays(issue, maturity);
+      const daysSM = actualDays(settlement, maturity);
+      const daysIS = actualDays(issue, settlement);
+      
+      let daysInYear: number;
+      switch (basis) {
+        case 0: // 30/360 US
+        case 4: // 30/360 European
+          daysInYear = 360;
+          break;
+        case 1: // Actual/actual
+        case 3: // Actual/365
+          daysInYear = 365;
+          break;
+        case 2: // Actual/360
+          daysInYear = 360;
+          break;
+        default:
+          daysInYear = 360;
+      }
+      
+      // 利回り計算（簡易実装）
+      const A = daysIS / daysInYear;
+      const B = daysSM / daysInYear;
+      const yld = ((100 + (rate * 100 * daysIM / daysInYear)) / (price + (rate * 100 * A)) - 1) / B;
+      
+      return yld;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};

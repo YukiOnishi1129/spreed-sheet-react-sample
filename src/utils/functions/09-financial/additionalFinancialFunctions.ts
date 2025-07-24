@@ -612,3 +612,38 @@ export const RRI: CustomFormula = {
     }
   }
 };
+
+// ISPMT関数の実装（元金均等返済の利息）
+export const ISPMT: CustomFormula = {
+  name: 'ISPMT',
+  pattern: /ISPMT\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, rateRef, perRef, nperRef, pvRef] = matches;
+    
+    try {
+      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const per = parseInt(getCellValue(perRef.trim(), context)?.toString() ?? perRef.trim());
+      const nper = parseInt(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
+      const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
+      
+      if (isNaN(rate) || isNaN(per) || isNaN(nper) || isNaN(pv)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (nper === 0) {
+        return FormulaError.NUM;
+      }
+      
+      if (per < 1 || per > nper) {
+        return FormulaError.NUM;
+      }
+      
+      // 元金均等返済の利息 = 元金 × 利率 × (1 - (期 - 1) / 期間数)
+      // これは残債に対する利息を計算
+      const remainingBalance = pv * (1 - (per - 1) / nper);
+      return -remainingBalance * rate;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};

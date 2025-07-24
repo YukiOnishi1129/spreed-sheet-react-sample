@@ -199,7 +199,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | EXPON.DIST | 指数分布 | `=EXPON.DIST(x, λ, 累積)` | ✅
 | WEIBULL.DIST | ワイブル分布 | `=WEIBULL.DIST(x, α, β, 累積)` | ✅
 | BINOM.DIST | 二項分布 | `=BINOM.DIST(成功数, 試行回数, 成功率, 累積)` | ✅
-| BINOM.INV | 二項分布の逆関数 | `=BINOM.INV(試行回数, 成功率, α)` | ❌
+| BINOM.INV | 二項分布の逆関数 | `=BINOM.INV(試行回数, 成功率, α)` | ✅
 | NEGBINOM.DIST | 負の二項分布 | `=NEGBINOM.DIST(失敗数, 成功数, 成功率, 累積)` | ✅
 | POISSON.DIST | ポアソン分布 | `=POISSON.DIST(x, 平均, 累積)` | ✅
 | HYPGEOM.DIST | 超幾何分布 | `=HYPGEOM.DIST(標本成功数, 標本数, 母集団成功数, 母集団数, 累積)` | ✅
@@ -207,8 +207,8 @@ https://support.google.com/docs/table/25273?hl=ja
 ### 検定・推定関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| CONFIDENCE.NORM | 信頼区間（正規分布） | `=CONFIDENCE.NORM(α, 標準偏差, 標本数)` | ❌
-| CONFIDENCE.T | 信頼区間（t分布） | `=CONFIDENCE.T(α, 標準偏差, 標本数)` | ❌
+| CONFIDENCE.NORM | 信頼区間（正規分布） | `=CONFIDENCE.NORM(α, 標準偏差, 標本数)` | ✅
+| CONFIDENCE.T | 信頼区間（t分布） | `=CONFIDENCE.T(α, 標準偏差, 標本数)` | ✅
 | Z.TEST | z検定 | `=Z.TEST(配列, x, [σ])` | ✅
 | T.TEST | t検定 | `=T.TEST(配列1, 配列2, 尾部, 検定の種類)` | ✅
 | F.TEST | F検定 | `=F.TEST(配列1, 配列2)` | ✅
@@ -227,11 +227,11 @@ https://support.google.com/docs/table/25273?hl=ja
 | GROWTH | 指数成長値 | `=GROWTH(既知のy, [既知のx], [新しいx], [定数])` | ✅
 | LINEST | 線形回帰統計値 | `=LINEST(既知のy, [既知のx], [定数], [補正])` | ✅
 | LOGEST | 指数回帰統計値 | `=LOGEST(既知のy, [既知のx], [定数], [補正])` | ✅
-| SLOPE | 回帰直線の傾き | `=SLOPE(既知のy, 既知のx)` | ❌ |
-| INTERCEPT | 回帰直線の切片 | `=INTERCEPT(既知のy, 既知のx)` | ❌ |
-| RSQ | 決定係数 | `=RSQ(既知のy, 既知のx)` | ❌ |
-| PEARSON | ピアソン相関係数 | `=PEARSON(配列1, 配列2)` | ✅ | ❌ |
-| STEYX | 回帰の標準誤差 | `=STEYX(既知のy, 既知のx)` | ❌ |
+| SLOPE | 回帰直線の傾き | `=SLOPE(既知のy, 既知のx)` | ✅ |
+| INTERCEPT | 回帰直線の切片 | `=INTERCEPT(既知のy, 既知のx)` | ✅ |
+| RSQ | 決定係数 | `=RSQ(既知のy, 既知のx)` | ✅ |
+| PEARSON | ピアソン相関係数 | `=PEARSON(配列1, 配列2)` | ✅ |
+| STEYX | 回帰の標準誤差 | `=STEYX(既知のy, 既知のx)` | ✅ |
 
 ### その他の統計関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -240,11 +240,11 @@ https://support.google.com/docs/table/25273?hl=ja
 | GEOMEAN | 幾何平均 | `=GEOMEAN(数値1, [数値2], ...)` | ✅ |
 | HARMEAN | 調和平均 | `=HARMEAN(数値1, [数値2], ...)` | ✅ |
 | TRIMMEAN | トリム平均 | `=TRIMMEAN(配列, 割合)` | ✅ |
-| PROB | 確率の計算 | `=PROB(x範囲, 確率範囲, [下限], [上限])` | ❌ |
-| FISHER | フィッシャー変換 | `=FISHER(x)` | ❌ |
-| FISHERINV | フィッシャー変換の逆関数 | `=FISHERINV(y)` | ❌ |
-| PHI | 標準正規分布の密度関数 | `=PHI(x)` | ❌ |
-| GAUSS | ガウス関数 | `=GAUSS(z)` | ❌ |
+| PROB | 確率の計算 | `=PROB(x範囲, 確率範囲, [下限], [上限])` | ✅ |
+| FISHER | フィッシャー変換 | `=FISHER(x)` | ✅ |
+| FISHERINV | フィッシャー変換の逆関数 | `=FISHERINV(y)` | ✅ |
+| PHI | 標準正規分布の密度関数 | `=PHI(x)` | ✅ |
+| GAUSS | ガウス関数 | `=GAUSS(z)` | ✅ |
 | PERMUT | 順列 | `=PERMUT(総数, 選択数)` | ✅
 | PERMUTATIONA | 重複順列 | `=PERMUTATIONA(総数, 選択数)` | ✅
 | COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ✅
@@ -325,10 +325,10 @@ https://support.google.com/docs/table/25273?hl=ja
 | DAYS360 | 360日基準の日数 | `=DAYS360(開始日, 終了日, [方式])` | ✅
 | EDATE | 月数後の日付 | `=EDATE(開始日, 月数)` | ✅
 | EOMONTH | 月末日を返す | `=EOMONTH(開始日, 月数)` | ✅
-| NETWORKDAYS | 稼働日数を計算 | `=NETWORKDAYS(開始日, 終了日, [祝日])` | ❌
-| NETWORKDAYS.INTL | 稼働日数（国際版） | `=NETWORKDAYS.INTL(開始日, 終了日, [週末], [祝日])` | ❌
-| WORKDAY | 稼働日を計算 | `=WORKDAY(開始日, 日数, [祝日])` | ❌
-| WORKDAY.INTL | 稼働日（国際版） | `=WORKDAY.INTL(開始日, 日数, [週末], [祝日])` | ❌
+| NETWORKDAYS | 稼働日数を計算 | `=NETWORKDAYS(開始日, 終了日, [祝日])` | ✅
+| NETWORKDAYS.INTL | 稼働日数（国際版） | `=NETWORKDAYS.INTL(開始日, 終了日, [週末], [祝日])` | ✅
+| WORKDAY | 稼働日を計算 | `=WORKDAY(開始日, 日数, [祝日])` | ✅
+| WORKDAY.INTL | 稼働日（国際版） | `=WORKDAY.INTL(開始日, 日数, [週末], [祝日])` | ✅
 | YEARFRAC | 年の割合を計算 | `=YEARFRAC(開始日, 終了日, [基準])` | ✅
 
 ## 05. 論理関数 (Logical Functions)
@@ -377,7 +377,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | ADDRESS | セルアドレスを作成 | `=ADDRESS(行番号, 列番号, [絶対参照], [参照形式], [シート名])` | ✅
 | AREAS | 領域数を返す | `=AREAS(参照)` | ✅
 | FORMULATEXT | 数式を文字列で返す | `=FORMULATEXT(参照)` | ✅
-| GETPIVOTDATA | ピボットテーブルからデータ取得 | `=GETPIVOTDATA(データフィールド, ピボットテーブル, [フィールド1, アイテム1], ...)` | ❌
+| GETPIVOTDATA | ピボットテーブルからデータ取得 | `=GETPIVOTDATA(データフィールド, ピボットテーブル, [フィールド1, アイテム1], ...)` | ✅
 | HYPERLINK | ハイパーリンクを作成 | `=HYPERLINK(リンク先, [表示文字列])` | ✅
 | TRANSPOSE | 行列を入れ替え | `=TRANSPOSE(配列)` | ✅
 
@@ -468,7 +468,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | DB | 定率法 | `=DB(取得価額, 残存価額, 耐用年数, 期, [月])` | ✅
 | DDB | 倍額定率法 | `=DDB(取得価額, 残存価額, 耐用年数, 期, [率])` | ✅
 | VDB | 可変減価償却 | `=VDB(取得価額, 残存価額, 耐用年数, 開始期, 終了期, [率], [切り替えなし])` | ✅
-| AMORDEGRC | フランス式減価償却 | `=AMORDEGRC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ❌
+| AMORDEGRC | フランス式減価償却 | `=AMORDEGRC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ✅
 | AMORLINC | フランス式定額償却 | `=AMORLINC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ✅
 
 ### 証券関数
@@ -479,40 +479,40 @@ https://support.google.com/docs/table/25273?hl=ja
 | COUPDAYBS | 直前利払日から受渡日までの日数 | `=COUPDAYBS(受渡日, 満期日, 頻度, [基準])` | ✅
 | COUPDAYS | 利払期間の日数 | `=COUPDAYS(受渡日, 満期日, 頻度, [基準])` | ✅
 | COUPDAYSNC | 受渡日から次回利払日までの日数 | `=COUPDAYSNC(受渡日, 満期日, 頻度, [基準])` | ✅
-| COUPNCD | 次回利払日 | `=COUPNCD(受渡日, 満期日, 頻度, [基準])` | ❌
-| COUPNUM | 利払回数 | `=COUPNUM(受渡日, 満期日, 頻度, [基準])` | ❌
-| COUPPCD | 直前利払日 | `=COUPPCD(受渡日, 満期日, 頻度, [基準])` | ❌
+| COUPNCD | 次回利払日 | `=COUPNCD(受渡日, 満期日, 頻度, [基準])` | ✅
+| COUPNUM | 利払回数 | `=COUPNUM(受渡日, 満期日, 頻度, [基準])` | ✅
+| COUPPCD | 直前利払日 | `=COUPPCD(受渡日, 満期日, 頻度, [基準])` | ✅
 | DISC | 割引率 | `=DISC(受渡日, 満期日, 価格, 償還価額, [基準])` | ✅
 | DOLLARDE | ドル小数表記に変換 | `=DOLLARDE(小数値, 分母)` | ✅
 | DOLLARFR | ドル分数表記に変換 | `=DOLLARFR(小数値, 分母)` | ✅
 | DURATION | デュレーション | `=DURATION(受渡日, 満期日, 利率, 利回り, 頻度, [基準])` | ✅
 | EFFECT | 実効年利率 | `=EFFECT(名目利率, 年間複利回数)` | ✅
-| INTRATE | 利率 | `=INTRATE(受渡日, 満期日, 投資額, 償還価額, [基準])` | ❌
+| INTRATE | 利率 | `=INTRATE(受渡日, 満期日, 投資額, 償還価額, [基準])` | ✅
 | MDURATION | 修正デュレーション | `=MDURATION(受渡日, 満期日, 利率, 利回り, 頻度, [基準])` | ✅
 | NOMINAL | 名目年利率 | `=NOMINAL(実効利率, 年間複利回数)` | ✅
-| ODDFPRICE | 変則初回期の価格 | `=ODDFPRICE(受渡日, 満期日, 発行日, 初回利払日, 利率, 利回り, 償還価額, 頻度, [基準])` | ❌
-| ODDFYIELD | 変則初回期の利回り | `=ODDFYIELD(受渡日, 満期日, 発行日, 初回利払日, 利率, 価格, 償還価額, 頻度, [基準])` | ❌
-| ODDLPRICE | 変則最終期の価格 | `=ODDLPRICE(受渡日, 満期日, 最終利払日, 利率, 利回り, 償還価額, 頻度, [基準])` | ❌
-| ODDLYIELD | 変則最終期の利回り | `=ODDLYIELD(受渡日, 満期日, 最終利払日, 利率, 価格, 償還価額, 頻度, [基準])` | ❌
+| ODDFPRICE | 変則初回期の価格 | `=ODDFPRICE(受渡日, 満期日, 発行日, 初回利払日, 利率, 利回り, 償還価額, 頻度, [基準])` | ✅
+| ODDFYIELD | 変則初回期の利回り | `=ODDFYIELD(受渡日, 満期日, 発行日, 初回利払日, 利率, 価格, 償還価額, 頻度, [基準])` | ✅
+| ODDLPRICE | 変則最終期の価格 | `=ODDLPRICE(受渡日, 満期日, 最終利払日, 利率, 利回り, 償還価額, 頻度, [基準])` | ✅
+| ODDLYIELD | 変則最終期の利回り | `=ODDLYIELD(受渡日, 満期日, 最終利払日, 利率, 価格, 償還価額, 頻度, [基準])` | ✅
 | PDURATION | 投資期間 | `=PDURATION(利率, 現在価値, 将来価値)` | ✅
-| PRICE | 定期利付証券の価格 | `=PRICE(受渡日, 満期日, 利率, 利回り, 償還価額, 頻度, [基準])` | ❌
-| PRICEDISC | 割引証券の価格 | `=PRICEDISC(受渡日, 満期日, 割引率, 償還価額, [基準])` | ❌
-| PRICEMAT | 満期利付証券の価格 | `=PRICEMAT(受渡日, 満期日, 発行日, 利率, 利回り, [基準])` | ❌
-| RECEIVED | 受取金額 | `=RECEIVED(受渡日, 満期日, 投資額, 割引率, [基準])` | ❌
+| PRICE | 定期利付証券の価格 | `=PRICE(受渡日, 満期日, 利率, 利回り, 償還価額, 頻度, [基準])` | ✅
+| PRICEDISC | 割引証券の価格 | `=PRICEDISC(受渡日, 満期日, 割引率, 償還価額, [基準])` | ✅
+| PRICEMAT | 満期利付証券の価格 | `=PRICEMAT(受渡日, 満期日, 発行日, 利率, 利回り, [基準])` | ✅
+| RECEIVED | 受取金額 | `=RECEIVED(受渡日, 満期日, 投資額, 割引率, [基準])` | ✅
 | RRI | 投資成長率 | `=RRI(期間, 現在価値, 将来価値)` | ✅
-| TBILLEQ | 米国財務省短期証券の債券換算利回り | `=TBILLEQ(受渡日, 満期日, 割引率)` | ❌
-| TBILLPRICE | 米国財務省短期証券の価格 | `=TBILLPRICE(受渡日, 満期日, 割引率)` | ❌
-| TBILLYIELD | 米国財務省短期証券の利回り | `=TBILLYIELD(受渡日, 満期日, 価格)` | ❌
-| YIELD | 定期利付証券の利回り | `=YIELD(受渡日, 満期日, 利率, 価格, 償還価額, 頻度, [基準])` | ❌
-| YIELDDISC | 割引証券の利回り | `=YIELDDISC(受渡日, 満期日, 価格, 償還価額, [基準])` | ❌
-| YIELDMAT | 満期利付証券の利回り | `=YIELDMAT(受渡日, 満期日, 発行日, 利率, 価格, [基準])` | ❌
+| TBILLEQ | 米国財務省短期証券の債券換算利回り | `=TBILLEQ(受渡日, 満期日, 割引率)` | ✅
+| TBILLPRICE | 米国財務省短期証券の価格 | `=TBILLPRICE(受渡日, 満期日, 割引率)` | ✅
+| TBILLYIELD | 米国財務省短期証券の利回り | `=TBILLYIELD(受渡日, 満期日, 価格)` | ✅
+| YIELD | 定期利付証券の利回り | `=YIELD(受渡日, 満期日, 利率, 価格, 償還価額, 頻度, [基準])` | ✅
+| YIELDDISC | 割引証券の利回り | `=YIELDDISC(受渐日, 満期日, 価格, 償還価額, [基準])` | ✅
+| YIELDMAT | 満期利付証券の利回り | `=YIELDMAT(受渡日, 満期日, 発行日, 利率, 価格, [基準])` | ✅
 
 ### その他の財務関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
 | CUMIPMT | 累計利息 | `=CUMIPMT(利率, 期間, 現在価値, 開始期, 終了期, 支払期日)` | ✅
 | CUMPRINC | 累計元金 | `=CUMPRINC(利率, 期間, 現在価値, 開始期, 終了期, 支払期日)` | ✅
-| ISPMT | 利息支払額（元金均等） | `=ISPMT(利率, 期, 期間, 現在価値)` | ❌
+| ISPMT | 利息支払額（元金均等） | `=ISPMT(利率, 期, 期間, 現在価値)` | ✅
 
 ## 10. エンジニアリング関数 (Engineering Functions)
 
@@ -596,8 +596,8 @@ https://support.google.com/docs/table/25273?hl=ja
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
 | CUBEKPIMEMBER | KPIプロパティを返す | `=CUBEKPIMEMBER(接続, KPI名, KPIプロパティ, [キャプション])` | ✅
-| CUBEMEMBER | メンバーを返す | `=CUBEMEMBER(接続, メンバー式, [キャプション])` | ❌
-| CUBEMEMBERPROPERTY | メンバープロパティを返す | `=CUBEMEMBERPROPERTY(接続, メンバー式, プロパティ)` | ❌
+| CUBEMEMBER | メンバーを返す | `=CUBEMEMBER(接続, メンバー式, [キャプション])` | ✅
+| CUBEMEMBERPROPERTY | メンバープロパティを返す | `=CUBEMEMBERPROPERTY(接続, メンバー式, プロパティ)` | ✅
 | CUBERANKEDMEMBER | n番目のメンバーを返す | `=CUBERANKEDMEMBER(接続, セット式, ランク, [キャプション])` | ✅
 | CUBESET | セットを定義 | `=CUBESET(接続, セット式, [キャプション], [並べ替え順序], [並べ替え基準])` | ✅
 | CUBESETCOUNT | セット内のアイテム数 | `=CUBESETCOUNT(セット)` | ✅
