@@ -18,13 +18,14 @@ function TestSpreadsheet() {
   const [spreadsheetData, setSpreadsheetData] = useState<Matrix<CellBase>>([]);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string } | null>(null);
 
-  // カテゴリ選択時にデータを初期化
+  // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
-    initializeSpreadsheet();
+    initializeAndCalculate();
   }, [selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const initializeSpreadsheet = () => {
+  const initializeAndCalculate = () => {
     const initialData: Matrix<CellBase> = selectedCategory.data.map((row, rowIndex) => 
       row.map((cellValue, colIndex) => {
         // 数式がある場所を探す
@@ -46,15 +47,15 @@ function TestSpreadsheet() {
       })
     );
     
-    setSpreadsheetData(initialData);
-    setTestResults([]);
-    setShowResults(false);
+    // 自動的に計算を実行
+    calculateFormulas(initialData);
+    setSelectedCell(null);
   };
 
-  const runTests = () => {
-    // カスタム関数システムで再計算
+  const calculateFormulas = (data: Matrix<CellBase>) => {
+    // カスタム関数システムで計算
     const mockFunction: ExcelFunctionResponse = {
-      spreadsheet_data: spreadsheetData.map(row => 
+      spreadsheet_data: data.map(row => 
         row.map(cell => {
           if (typeof cell === 'object' && cell !== null && 'value' in cell) {
             const cellWithFormula = cell as { value?: string | number | null; formula?: string };
@@ -70,32 +71,45 @@ function TestSpreadsheet() {
     };
     
     recalculateFormulas(
-      spreadsheetData,
+      data,
       mockFunction,
       (name: string, value: SpreadsheetData) => {
         if (name === 'spreadsheetData') {
-          // 計算結果を取得してテスト
-          const results: TestResult[] = [];
-          
-          selectedCategory.expectedResults?.forEach(expected => {
-            const actualCell = value[expected.row]?.[expected.col];
-            const actualValue = actualCell?.value ?? null;
-            
-            results.push({
-              row: expected.row,
-              col: expected.col,
-              expected: expected.value,
-              actual: actualValue,
-              passed: compareValues(expected.value, actualValue)
-            });
-          });
-          
-          setTestResults(results);
-          setShowResults(true);
           setSpreadsheetData(value as Matrix<CellBase>);
+          
+          // 自動的にテスト結果を計算
+          if (selectedCategory.expectedResults) {
+            const results: TestResult[] = [];
+            
+            selectedCategory.expectedResults.forEach(expected => {
+              const actualCell = value[expected.row]?.[expected.col];
+              const actualValue = actualCell?.value ?? null;
+              
+              results.push({
+                row: expected.row,
+                col: expected.col,
+                expected: expected.value,
+                actual: actualValue,
+                passed: compareValues(expected.value, actualValue)
+              });
+            });
+            
+            setTestResults(results);
+            setShowResults(true);
+          }
         }
       }
     );
+  };
+
+  const handleCellClick = (row: number, col: number) => {
+    const cell = spreadsheetData[row]?.[col];
+    if (cell && typeof cell === 'object' && 'formula' in cell) {
+      const cellWithFormula = cell as { formula?: string };
+      setSelectedCell({ row, col, formula: cellWithFormula.formula });
+    } else {
+      setSelectedCell({ row, col });
+    }
   };
 
   const compareValues = (expected: string | number, actual: string | number | null): boolean => {
@@ -168,27 +182,28 @@ function TestSpreadsheet() {
           <p className="text-sm text-blue-700">{selectedCategory.description}</p>
         </div>
 
-        {/* アクションボタン */}
-        <div className="mb-4 flex gap-4">
-          <button
-            onClick={runTests}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            テスト実行
-          </button>
-          <button
-            onClick={initializeSpreadsheet}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            リセット
-          </button>
-        </div>
+        {/* 選択中のセルの数式表示 */}
+        {selectedCell?.formula && (
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">
+              セル {getCellAddress(selectedCell.row, selectedCell.col)} の数式:
+            </div>
+            <div className="mt-1 font-mono text-lg text-gray-900">
+              {selectedCell.formula}
+            </div>
+          </div>
+        )}
 
         {/* スプレッドシート */}
         <div className="mb-6 border rounded-lg overflow-hidden bg-white">
           <Spreadsheet
             data={spreadsheetData}
             onChange={setSpreadsheetData}
+            onCellCommit={(_prevCell, _nextCell, coords) => {
+              if (coords) {
+                handleCellClick(coords.row, coords.column);
+              }
+            }}
             darkMode={false}
           />
         </div>

@@ -44,7 +44,8 @@
       "Bash(# Create a list of missing functions\ncomm -23 /tmp/logic_functions.txt /tmp/definition_functions.txt > /tmp/missing_functions.txt\n\n# For each missing function, find which logic file it's in\necho \"=== Missing Functions by Category ===\"\nfor func in $(cat /tmp/missing_functions.txt); do\n    file=$(rg -l \"export const $func:\\s*CustomFormula\" src/utils/spreadsheet/logic)\n    echo \"$func:$file\"\ndone | sort -t: -k2 | awk -F: '{\n    if ($2 != prev) {\n        if (prev != \"\") print \"\"\n        print \"\\n\" $2 \":\"\n        prev = $2\n    }\n    print \"  - \" $1\n}' | sed 's|/Users/yuki/created-system/spreed-sheet-react-sample/src/utils/spreadsheet/logic/||g')",
       "Bash(# Create a list of missing functions\ncomm -23 /tmp/logic_functions.txt /tmp/definition_functions.txt > /tmp/missing_functions.txt\n\n# For each missing function, find which logic file it's in\necho \"=== Missing Functions by Category ===\"\nfor func in $(cat /tmp/missing_functions.txt); do\n    file=$(rg -l \"export const $func:\\s*CustomFormula\" src/utils/spreadsheet/logic | head -1)\n    echo \"$func:$file\"\ndone | sort -t: -k2 | awk -F: 'BEGIN {prev=\"\"} {\n    if ($2 != prev) {\n        if (prev != \"\") print \"\"\n        gsub(/.*\\/logic\\//, \"\", $2)\n        print \"\\n\" $2 \":\"\n        prev = $2\n    }\n    print \"  - \" $1\n}')",
       "Bash(python:*)",
-      "Bash(pnpm tsc:*)"
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm test:*)"
     ],
     "deny": []
   }
