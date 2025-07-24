@@ -16,7 +16,8 @@ describe('Logical Functions', () => {
       ]);
       
       // =IF(A1>=100,"合格","不合格")
-      const matches = 'IF(A1>=100,"合格","不合格")'.match(/^IF\s*\((.+)\)$/i)!;
+      const matches = 'IF(A1>=100,"合格","不合格")'.match(/^IF\s*\((.+)\)$/i);
+      if (!matches) throw new Error('Pattern match failed');
       const result = IF.calculate(matches, context);
       expect(result).toBe('合格');
     });
@@ -27,7 +28,8 @@ describe('Logical Functions', () => {
       ]);
       
       // =IF(A1>=100,"合格","不合格")
-      const matches = 'IF(A1>=100,"合格","不合格")'.match(/^IF\s*\((.+)\)$/i)!;
+      const matches = 'IF(A1>=100,"合格","不合格")'.match(/^IF\s*\((.+)\)$/i);
+      if (!matches) throw new Error('Pattern match failed');
       const result = IF.calculate(matches, context);
       expect(result).toBe('不合格');
     });
@@ -38,7 +40,8 @@ describe('Logical Functions', () => {
       ]);
       
       // =IF(A1="Apple","Found","Not Found")
-      const matches = 'IF(A1="Apple","Found","Not Found")'.match(/^IF\s*\((.+)\)$/i)!;
+      const matches = 'IF(A1="Apple","Found","Not Found")'.match(/^IF\s*\((.+)\)$/i);
+      if (!matches) throw new Error('Pattern match failed');
       const result = IF.calculate(matches, context);
       expect(result).toBe('Found');
     });
@@ -49,7 +52,8 @@ describe('Logical Functions', () => {
       ]);
       
       // =IF(A1,"Yes","No")
-      const matches = 'IF(A1,"Yes","No")'.match(/^IF\s*\((.+)\)$/i)!;
+      const matches = 'IF(A1,"Yes","No")'.match(/^IF\s*\((.+)\)$/i);
+      if (!matches) throw new Error('Pattern match failed');
       const result = IF.calculate(matches, context);
       expect(result).toBe('Yes');
     });

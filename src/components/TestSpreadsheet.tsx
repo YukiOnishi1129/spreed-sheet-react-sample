@@ -5,20 +5,10 @@ import { Link } from 'react-router-dom';
 import { recalculateFormulas } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
 
-interface TestResult {
-  row: number;
-  col: number;
-  expected: string | number;
-  actual: string | number | null;
-  passed: boolean;
-}
-
 function TestSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<TestCategory>(testCategories[0]);
   const [spreadsheetData, setSpreadsheetData] = useState<Matrix<CellBase>>([]);
-  const [testResults, setTestResults] = useState<TestResult[]>([]);
-  const [showResults, setShowResults] = useState(false);
-  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string } | null>(null);
+  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string; value?: string | number | null } | null>(null);
 
   // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
@@ -76,27 +66,6 @@ function TestSpreadsheet() {
       (name: string, value: SpreadsheetData) => {
         if (name === 'spreadsheetData') {
           setSpreadsheetData(value as Matrix<CellBase>);
-          
-          // 自動的にテスト結果を計算
-          if (selectedCategory.expectedResults) {
-            const results: TestResult[] = [];
-            
-            selectedCategory.expectedResults.forEach(expected => {
-              const actualCell = value[expected.row]?.[expected.col];
-              const actualValue = actualCell?.value ?? null;
-              
-              results.push({
-                row: expected.row,
-                col: expected.col,
-                expected: expected.value,
-                actual: actualValue,
-                passed: compareValues(expected.value, actualValue)
-              });
-            });
-            
-            setTestResults(results);
-            setShowResults(true);
-          }
         }
       }
     );
@@ -104,25 +73,19 @@ function TestSpreadsheet() {
 
   const handleCellClick = (row: number, col: number) => {
     const cell = spreadsheetData[row]?.[col];
-    if (cell && typeof cell === 'object' && 'formula' in cell) {
-      const cellWithFormula = cell as { formula?: string };
-      setSelectedCell({ row, col, formula: cellWithFormula.formula });
+    if (cell && typeof cell === 'object') {
+      const cellData = cell as { formula?: string; value?: string | number | null };
+      setSelectedCell({ 
+        row, 
+        col, 
+        formula: cellData.formula,
+        value: cellData.value
+      });
     } else {
-      setSelectedCell({ row, col });
+      setSelectedCell({ row, col, value: cell !== undefined ? cell as string | number | null : null });
     }
   };
 
-  const compareValues = (expected: string | number, actual: string | number | null): boolean => {
-    if (actual === null) return false;
-    
-    // 数値の場合は小数点以下2桁で比較
-    if (typeof expected === 'number' && typeof actual === 'number') {
-      return Math.abs(expected - actual) < 0.01;
-    }
-    
-    // 文字列の場合は完全一致
-    return String(expected) === String(actual);
-  };
 
   const getColumnLabel = (col: number): string => {
     return String.fromCharCode(65 + col);
@@ -182,98 +145,44 @@ function TestSpreadsheet() {
           <p className="text-sm text-blue-700">{selectedCategory.description}</p>
         </div>
 
-        {/* 選択中のセルの数式表示 */}
-        {selectedCell?.formula && (
-          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-            <div className="text-sm text-gray-600">
-              セル {getCellAddress(selectedCell.row, selectedCell.col)} の数式:
+        {/* 数式バー */}
+        <div className="mb-4 bg-white border rounded-lg shadow-sm">
+          <div className="flex items-center border-b">
+            <div className="px-4 py-2 border-r bg-gray-50 min-w-[80px]">
+              <span className="text-sm font-medium text-gray-700">
+                {selectedCell ? getCellAddress(selectedCell.row, selectedCell.col) : 'A1'}
+              </span>
             </div>
-            <div className="mt-1 font-mono text-lg text-gray-900">
-              {selectedCell.formula}
+            <div className="flex-1 px-4 py-2">
+              <input
+                type="text"
+                readOnly
+                className="w-full bg-transparent outline-none text-sm font-mono"
+                value={
+                  selectedCell?.formula ?? 
+                  (selectedCell?.value !== null && selectedCell?.value !== undefined ? String(selectedCell.value) : '')
+                }
+                placeholder="セルを選択してください"
+              />
             </div>
           </div>
-        )}
+        </div>
 
         {/* スプレッドシート */}
         <div className="mb-6 border rounded-lg overflow-hidden bg-white">
           <Spreadsheet
             data={spreadsheetData}
             onChange={setSpreadsheetData}
-            onCellCommit={(_prevCell, _nextCell, coords) => {
-              if (coords) {
-                handleCellClick(coords.row, coords.column);
+            onSelect={(selection) => {
+              if (selection && 'row' in selection && 'column' in selection) {
+                const sel = selection as { row: number; column: number };
+                handleCellClick(sel.row, sel.column);
               }
             }}
             darkMode={false}
           />
         </div>
 
-        {/* テスト結果 */}
-        {showResults && testResults.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">テスト結果</h3>
-            
-            {/* サマリー */}
-            <div className="mb-4 p-4 bg-gray-50 rounded">
-              <div className="text-sm">
-                <span className="font-medium">合計: </span>
-                {testResults.length} テスト
-              </div>
-              <div className="text-sm">
-                <span className="font-medium text-green-600">成功: </span>
-                {testResults.filter(r => r.passed).length}
-              </div>
-              <div className="text-sm">
-                <span className="font-medium text-red-600">失敗: </span>
-                {testResults.filter(r => !r.passed).length}
-              </div>
-            </div>
-
-            {/* 詳細結果 */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      セル
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      期待値
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      実際の値
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      結果
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {testResults.map((result, index) => (
-                    <tr key={index} className={result.passed ? '' : 'bg-red-50'}>
-                      <td className="px-4 py-2 text-sm font-mono">
-                        {getCellAddress(result.row, result.col)}
-                      </td>
-                      <td className="px-4 py-2 text-sm">
-                        {result.expected}
-                      </td>
-                      <td className="px-4 py-2 text-sm">
-                        {result.actual ?? '(null)'}
-                      </td>
-                      <td className="px-4 py-2 text-sm">
-                        {result.passed ? (
-                          <span className="text-green-600 font-medium">✓ OK</span>
-                        ) : (
-                          <span className="text-red-600 font-medium">✗ NG</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
