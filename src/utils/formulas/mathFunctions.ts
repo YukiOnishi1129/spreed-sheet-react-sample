@@ -1390,7 +1390,48 @@ export const ROMAN: CustomFormula = {
 export const COMBINA: CustomFormula = {
   name: 'COMBINA',
   pattern: /COMBINA\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, nRef, kRef] = matches;
+    
+    const n = Number(getCellValue(nRef, context) ?? nRef);
+    const k = Number(getCellValue(kRef, context) ?? kRef);
+    
+    if (isNaN(n) || isNaN(k)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (!Number.isInteger(n) || !Number.isInteger(k)) {
+      return FormulaError.NUM;
+    }
+    
+    if (n < 0 || k < 0) {
+      return FormulaError.NUM;
+    }
+    
+    if (n === 0 && k > 0) {
+      return 0;
+    }
+    
+    // 重複組合せの公式: C(n+k-1, k)
+    const newN = n + k - 1;
+    
+    if (k === 0 || k === newN) {
+      return 1;
+    }
+    
+    // 計算効率を上げるため、k > newN/2の場合はnewN-kを使う
+    let k2 = k;
+    if (k2 > newN / 2) {
+      k2 = newN - k2;
+    }
+    
+    let result = 1;
+    for (let i = 0; i < k2; i++) {
+      result = result * (newN - i) / (i + 1);
+    }
+    
+    return Math.round(result);
+  }
 };
 
 // PERMUT関数（順列）
@@ -1474,14 +1515,55 @@ export const PERMUTATIONA: CustomFormula = {
 export const FACTDOUBLE: CustomFormula = {
   name: 'FACTDOUBLE',
   pattern: /FACTDOUBLE\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (!Number.isInteger(number) || number < -1) {
+      return FormulaError.NUM;
+    }
+    
+    if (number > 300) {
+      return FormulaError.NUM; // オーバーフロー防止
+    }
+    
+    if (number === -1 || number === 0) {
+      return 1;
+    }
+    
+    let result = 1;
+    for (let i = number; i > 0; i -= 2) {
+      result *= i;
+    }
+    
+    return result;
+  }
 };
 
 // SQRTPI関数（π倍の平方根）
 export const SQRTPI: CustomFormula = {
   name: 'SQRTPI',
   pattern: /SQRTPI\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    
+    if (isNaN(number)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (number < 0) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.sqrt(number * Math.PI);
+  }
 };
 
 // SUMX2MY2関数（x^2-y^2の和）
@@ -1585,7 +1667,43 @@ export const SUMXMY2: CustomFormula = {
 export const MULTINOMIAL: CustomFormula = {
   name: 'MULTINOMIAL',
   pattern: /MULTINOMIAL\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    // すべて非負整数である必要がある
+    for (const num of numbers) {
+      if (!Number.isInteger(num) || num < 0) {
+        return FormulaError.NUM;
+      }
+    }
+    
+    // 多項係数の計算: (n1 + n2 + ... + nk)! / (n1! * n2! * ... * nk!)
+    const sum = numbers.reduce((a, b) => a + b, 0);
+    
+    if (sum > 170) {
+      return FormulaError.NUM; // オーバーフロー防止
+    }
+    
+    // 階乗を計算
+    let numerator = 1;
+    for (let i = 2; i <= sum; i++) {
+      numerator *= i;
+    }
+    
+    let denominator = 1;
+    for (const num of numbers) {
+      for (let i = 2; i <= num; i++) {
+        denominator *= i;
+      }
+    }
+    
+    return numerator / denominator;
+  }
 };
 
 
@@ -1687,35 +1805,126 @@ export const AGGREGATE: CustomFormula = {
 export const CEILING_MATH: CustomFormula = {
   name: 'CEILING.MATH',
   pattern: /CEILING\.MATH\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, significanceRef, modeRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const significance = significanceRef ? Number(getCellValue(significanceRef, context) ?? significanceRef) : 1;
+    const mode = modeRef ? Number(getCellValue(modeRef, context) ?? modeRef) : 0;
+    
+    if (isNaN(number) || isNaN(significance) || isNaN(mode)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (significance === 0) {
+      return 0;
+    }
+    
+    const absSignificance = Math.abs(significance);
+    
+    if (number >= 0 || mode === 0) {
+      return Math.ceil(number / absSignificance) * absSignificance;
+    } else {
+      return -Math.floor(Math.abs(number) / absSignificance) * absSignificance;
+    }
+  }
 };
 
 // CEILING.PRECISE関数（精密な切り上げ）
 export const CEILING_PRECISE: CustomFormula = {
   name: 'CEILING.PRECISE',
   pattern: /CEILING\.PRECISE\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, significanceRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const significance = significanceRef ? Number(getCellValue(significanceRef, context) ?? significanceRef) : 1;
+    
+    if (isNaN(number) || isNaN(significance)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (significance === 0) {
+      return 0;
+    }
+    
+    const absSignificance = Math.abs(significance);
+    return Math.ceil(number / absSignificance) * absSignificance;
+  }
 };
 
 // FLOOR.MATH関数（数学的な切り下げ）
 export const FLOOR_MATH: CustomFormula = {
   name: 'FLOOR.MATH',
   pattern: /FLOOR\.MATH\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, significanceRef, modeRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const significance = significanceRef ? Number(getCellValue(significanceRef, context) ?? significanceRef) : 1;
+    const mode = modeRef ? Number(getCellValue(modeRef, context) ?? modeRef) : 0;
+    
+    if (isNaN(number) || isNaN(significance) || isNaN(mode)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (significance === 0) {
+      return 0;
+    }
+    
+    const absSignificance = Math.abs(significance);
+    
+    if (number >= 0 || mode === 0) {
+      return Math.floor(number / absSignificance) * absSignificance;
+    } else {
+      return -Math.ceil(Math.abs(number) / absSignificance) * absSignificance;
+    }
+  }
 };
 
 // FLOOR.PRECISE関数（精密な切り下げ）
 export const FLOOR_PRECISE: CustomFormula = {
   name: 'FLOOR.PRECISE',
   pattern: /FLOOR\.PRECISE\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, significanceRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const significance = significanceRef ? Number(getCellValue(significanceRef, context) ?? significanceRef) : 1;
+    
+    if (isNaN(number) || isNaN(significance)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (significance === 0) {
+      return 0;
+    }
+    
+    const absSignificance = Math.abs(significance);
+    return Math.floor(number / absSignificance) * absSignificance;
+  }
 };
 
 // ISO.CEILING関数（ISO標準の切り上げ）
 export const ISO_CEILING: CustomFormula = {
   name: 'ISO.CEILING',
   pattern: /ISO\.CEILING\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, significanceRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const significance = significanceRef ? Number(getCellValue(significanceRef, context) ?? significanceRef) : 1;
+    
+    if (isNaN(number) || isNaN(significance)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (significance === 0) {
+      return 0;
+    }
+    
+    return Math.ceil(number / Math.abs(significance)) * Math.abs(significance);
+  }
 };
 
 // SERIESSUM関数（べき級数を計算）
@@ -1919,33 +2128,112 @@ export const COT: CustomFormula = {
 export const ACOT: CustomFormula = {
   name: 'ACOT',
   pattern: /ACOT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    // acot(x) = atan(1/x) for x != 0
+    // acot(0) = π/2
+    if (value === 0) {
+      return Math.PI / 2;
+    }
+    
+    return Math.atan(1 / value);
+  }
 };
 
 // 双曲線余割（CSCH）
 export const CSCH: CustomFormula = {
   name: 'CSCH',
   pattern: /CSCH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    const sinhValue = Math.sinh(value);
+    
+    if (Math.abs(sinhValue) < 1e-10) {
+      return FormulaError.DIV0;
+    }
+    
+    return 1 / sinhValue;
+  }
 };
 
 // 双曲線正割（SECH）
 export const SECH: CustomFormula = {
   name: 'SECH',
   pattern: /SECH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    const coshValue = Math.cosh(value);
+    
+    if (Math.abs(coshValue) < 1e-10) {
+      return FormulaError.DIV0;
+    }
+    
+    return 1 / coshValue;
+  }
 };
 
 // 双曲線余接（COTH）
 export const COTH: CustomFormula = {
   name: 'COTH',
   pattern: /COTH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    const tanhValue = Math.tanh(value);
+    
+    if (Math.abs(tanhValue) < 1e-10) {
+      return FormulaError.DIV0;
+    }
+    
+    return 1 / tanhValue;
+  }
 };
 
 // 双曲線逆余接（ACOTH）
 export const ACOTH: CustomFormula = {
   name: 'ACOTH',
   pattern: /ACOTH\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (Math.abs(value) <= 1) {
+      return FormulaError.NUM;
+    }
+    
+    // acoth(x) = 0.5 * ln((x+1)/(x-1))
+    return 0.5 * Math.log((value + 1) / (value - 1));
+  }
 };

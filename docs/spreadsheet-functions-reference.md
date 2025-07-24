@@ -57,23 +57,23 @@ https://support.google.com/docs/table/25273?hl=ja
 | AGGREGATE | 集計関数（エラー値を除外） | `=AGGREGATE(関数番号, オプション, 配列, [k])` | ❌ |
 | ARABIC | ローマ数字をアラビア数字に変換 | `=ARABIC(文字列)` | ✅ |
 | BASE | 数値を指定した基数に変換 | `=BASE(数値, 基数, [最小長])` | ✅ |
-| CEILING.MATH | 数学的な切り上げ | `=CEILING.MATH(数値, [基準値], [モード])` | ❌ |
-| CEILING.PRECISE | 精密な切り上げ | `=CEILING.PRECISE(数値, [基準値])` | ❌ |
-| COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ❌ |
+| CEILING.MATH | 数学的な切り上げ | `=CEILING.MATH(数値, [基準値], [モード])` | ✅ |
+| CEILING.PRECISE | 精密な切り上げ | `=CEILING.PRECISE(数値, [基準値])` | ✅ |
+| COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ✅ |
 | DECIMAL | 指定した基数の数値を10進数に変換 | `=DECIMAL(文字列, 基数)` | ✅ |
 | EVEN | 最も近い偶数に切り上げ | `=EVEN(数値)` | ✅ |
-| FACTDOUBLE | 二重階乗を計算 | `=FACTDOUBLE(数値)` | ❌ |
-| FLOOR.MATH | 数学的な切り下げ | `=FLOOR.MATH(数値, [基準値], [モード])` | ❌ |
-| FLOOR.PRECISE | 精密な切り下げ | `=FLOOR.PRECISE(数値, [基準値])` | ❌ |
-| ISO.CEILING | ISO標準の切り上げ | `=ISO.CEILING(数値, [基準値])` | ❌ |
-| MULTINOMIAL | 多項係数を計算 | `=MULTINOMIAL(数値1, [数値2], ...)` | ❌ |
+| FACTDOUBLE | 二重階乗を計算 | `=FACTDOUBLE(数値)` | ✅ |
+| FLOOR.MATH | 数学的な切り下げ | `=FLOOR.MATH(数値, [基準値], [モード])` | ✅ |
+| FLOOR.PRECISE | 精密な切り下げ | `=FLOOR.PRECISE(数値, [基準値])` | ✅ |
+| ISO.CEILING | ISO標準の切り上げ | `=ISO.CEILING(数値, [基準値])` | ✅ |
+| MULTINOMIAL | 多項係数を計算 | `=MULTINOMIAL(数値1, [数値2], ...)` | ✅ |
 | ODD | 最も近い奇数に切り上げ | `=ODD(数値)` | ✅ |
 | PERMUTATIONA | 重複順列を計算 | `=PERMUTATIONA(総数, 選択数)` | ✅ |
 | RANDARRAY | ランダム配列を生成 | `=RANDARRAY([行], [列], [最小値], [最大値], [整数])` | ✅ |
 | ROMAN | アラビア数字をローマ数字に変換 | `=ROMAN(数値, [形式])` | ✅ |
 | SEQUENCE | 連続値を生成 | `=SEQUENCE(行, [列], [開始], [ステップ])` | ✅ |
 | SERIESSUM | べき級数を計算 | `=SERIESSUM(x, n, m, 係数)` | ❌ |
-| SQRTPI | π倍の平方根を計算 | `=SQRTPI(数値)` | ❌ |
+| SQRTPI | π倍の平方根を計算 | `=SQRTPI(数値)` | ✅ |
 | SUBTOTAL | 小計を計算 | `=SUBTOTAL(関数番号, 参照1, [参照2], ...)` | ❌ |
 
 ### 三角関数
@@ -98,11 +98,11 @@ https://support.google.com/docs/table/25273?hl=ja
 | CSC | 余割を計算 | `=CSC(角度)` | ✅ |
 | SEC | 正割を計算 | `=SEC(角度)` | ✅ |
 | COT | 余接を計算 | `=COT(角度)` | ✅ |
-| ACOT | 逆余接を計算 | `=ACOT(数値)` | ❌ |
-| CSCH | 双曲線余割を計算 | `=CSCH(数値)` | ❌ |
-| SECH | 双曲線正割を計算 | `=SECH(数値)` | ❌ |
-| COTH | 双曲線余接を計算 | `=COTH(数値)` | ❌ |
-| ACOTH | 双曲線逆余接を計算 | `=ACOTH(数値)` | ❌ |
+| ACOT | 逆余接を計算 | `=ACOT(数値)` | ✅ |
+| CSCH | 双曲線余割を計算 | `=CSCH(数値)` | ✅ |
+| SECH | 双曲線正割を計算 | `=SECH(数値)` | ✅ |
+| COTH | 双曲線余接を計算 | `=COTH(数値)` | ✅ |
+| ACOTH | 双曲線逆余接を計算 | `=ACOTH(数値)` | ✅ |
 
 ### 行列関数
 | 関数名 | 説明 | 構文 | 実装状況 |
