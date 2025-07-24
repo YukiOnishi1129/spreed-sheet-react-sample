@@ -1,5 +1,6 @@
 // 数学・三角関数の定義
-import { type FunctionDefinition, COLOR_SCHEMES } from '../functionDefinitions';
+import { type FunctionDefinition } from '../types';
+import { COLOR_SCHEMES } from '../colorSchemes';
 
 export const MATH_FUNCTIONS: Record<string, FunctionDefinition> = {
   SUM: {

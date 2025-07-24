@@ -1,5 +1,6 @@
 // 文字列操作関数の定義
-import { type FunctionDefinition, COLOR_SCHEMES } from '../functionDefinitions';
+import { type FunctionDefinition } from '../types';
+import { COLOR_SCHEMES } from '../colorSchemes';
 
 export const TEXT_FUNCTIONS: Record<string, FunctionDefinition> = {
   CONCATENATE: {

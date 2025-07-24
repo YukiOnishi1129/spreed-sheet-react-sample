@@ -1,5 +1,6 @@
 // 日付・時刻関数の定義
-import { type FunctionDefinition, COLOR_SCHEMES } from '../functionDefinitions';
+import { type FunctionDefinition } from '../types';
+import { COLOR_SCHEMES } from '../colorSchemes';
 
 export const DATETIME_FUNCTIONS: Record<string, FunctionDefinition> = {
   TODAY: {

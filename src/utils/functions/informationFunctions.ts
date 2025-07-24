@@ -1,5 +1,6 @@
 // 情報関数の定義
-import { type FunctionDefinition, COLOR_SCHEMES } from '../functionDefinitions';
+import { type FunctionDefinition } from '../types';
+import { COLOR_SCHEMES } from '../colorSchemes';
 
 export const INFORMATION_FUNCTIONS: Record<string, FunctionDefinition> = {
   ISBLANK: {
