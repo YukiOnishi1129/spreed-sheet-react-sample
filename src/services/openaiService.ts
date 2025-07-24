@@ -4,7 +4,7 @@ import type { ExcelFunctionResponse } from '../types/spreadsheet';
 import { OPENAI_JSON_SCHEMA, ExcelFunctionResponseSchema } from '../types/spreadsheet';
 import { getMockFunction } from './mockData';
 import { enhanceUserPrompt } from './promptEnhancer';
-import { extractFunctionsFromName, generateFunctionDetails } from '../utils/functionDefinitions';
+import { extractFunctionsFromName, generateFunctionDetails } from '../utils/spreadsheet/definitions/functionDefinitions';
 
 // OpenAI クライアントの初期化
 const openai = new OpenAI({
