@@ -35,17 +35,12 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
       setValue('currentFunction', response);
       
       // カスタム関数システム用のデータ準備
-      const cellData: CellData[][] = response.spreadsheet_data.map((row, rowIndex) => 
-        row.map((cell, colIndex) => {
+      const cellData: CellData[][] = response.spreadsheet_data.map((row) => 
+        row.map((cell) => {
           if (!cell) return { value: '' };
           
-          // デバッグ: セルの内容を確認
-          if (cell.f) {
-            console.log(`セル[${rowIndex}][${colIndex}]の内容:`, cell);
-          }
           
           if (hasFormulaProperty(cell)) {
-            console.log('数式セル検出:', cell.f);
             return { value: '', formula: cell.f };
           }
           if (hasValueProperty(cell)) {
@@ -59,8 +54,6 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
       
       // カスタム関数システムで数式を計算
       const calculatedData = await calculateCustomFormulas(cellData);
-      
-      console.log('計算後のデータ:', calculatedData);
       
       setLoadingMessage('結果を整形しています');
       
@@ -122,7 +115,7 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
           }
           
           // 数式セルの場合、関数タイプに基づいてCSSクラスを設定
-          if (cell.formula) {
+          if (cell?.formula) {
             const formulaWithoutEquals = cell.formula.startsWith('=') ? cell.formula.substring(1) : cell.formula;
             const functionMatch = formulaWithoutEquals.match(/^([A-Z_]+)\s*\(/);
             
@@ -163,15 +156,6 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
         })
       );
       
-      console.log('最終データ:', processedData);
-      // デバッグ: 数式が含まれているか確認
-      processedData.forEach((row, rowIndex) => {
-        row.forEach((cell, colIndex) => {
-          if (cell && cell.formula) {
-            console.log(`数式発見 [${rowIndex}][${colIndex}]:`, cell.formula);
-          }
-        });
-      });
       setValue('spreadsheetData', processedData);
       
     } catch (error) {
@@ -195,7 +179,7 @@ async function calculateCustomFormulas(data: CellData[][]): Promise<CellData[][]
       for (let colIndex = 0; colIndex < result[rowIndex].length; colIndex++) {
         const cell = result[rowIndex][colIndex];
         
-        if (cell.formula && (cell.value === undefined || cell.value === '' || typeof cell.value === 'string')) {
+        if (cell?.formula && (cell.value === undefined || cell.value === '' || typeof cell.value === 'string')) {
           const calculatedValue = calculateFormula(cell.formula, result, rowIndex, colIndex);
           
           if (calculatedValue !== cell.value) {
@@ -225,8 +209,6 @@ function calculateFormula(formula: string, data: CellData[][], currentRow: numbe
     const matchResult = matchFormula(cleanFormula);
     
     if (matchResult) {
-      console.log(`数式 ${cleanFormula} を関数 ${matchResult.function.name} で計算中`);
-      
       // FormulaContextを作成
       const context: FormulaContext = {
         data,
@@ -236,11 +218,8 @@ function calculateFormula(formula: string, data: CellData[][], currentRow: numbe
       
       // 関数を実行
       const result = matchResult.function.calculate(matchResult.matches, context);
-      console.log(`計算結果:`, result);
-      
       return result;
     } else {
-      console.warn(`未対応の数式: ${cleanFormula}`);
       return `#NAME?`; // 未対応の関数エラー
     }
   } catch (error) {
