@@ -54,8 +54,9 @@ import {
 } from './03-text/textFunctions';
 
 import { IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA } from './05-logical/logicFunctions';
+import { SWITCH, LET } from './05-logical/newLogicalFunctions';
 
-import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE } from './06-lookup-reference/lookupFunctions';
+import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE } from './06-lookup-reference/lookupFunctions';
 
 import { 
   ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N,
@@ -64,7 +65,7 @@ import {
 
 import { DSUM, DAVERAGE, DCOUNT, DCOUNTA, DMAX, DMIN, DPRODUCT, DGET } from './08-database/databaseFunctions';
 
-import { PMT, PV, FV, NPV, IRR, PPMT, IPMT } from './09-financial/financialFunctions';
+import { PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE } from './09-financial/financialFunctions';
 
 import { MDETERM, MINVERSE, MMULT, MUNIT } from './15-others/matrixFunctions';
 
@@ -119,12 +120,12 @@ export const ALL_FUNCTIONS = [
 
   // 05. 論理関数
   ...Object.values({
-    IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA
+    IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA, SWITCH, LET
   }),
 
   // 06. 検索・参照関数
   ...Object.values({
-    VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE
+    VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE
   }),
 
   // 07. 情報関数
@@ -140,7 +141,7 @@ export const ALL_FUNCTIONS = [
 
   // 09. 財務関数
   ...Object.values({
-    PMT, PV, FV, NPV, IRR, PPMT, IPMT
+    PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE
   }),
 
   // 15. その他 (行列関数など)
@@ -190,14 +191,14 @@ export const FUNCTION_CATEGORIES = {
   datetime: [
     DATEDIF, NETWORKDAYS, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC, DATEVALUE, TIMEVALUE, ISOWEEKNUM, NETWORKDAYS_INTL, WORKDAY, WORKDAY_INTL
   ] as CustomFormula[],
-  logical: [IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA] as CustomFormula[],
-  lookupReference: [VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE] as CustomFormula[],
+  logical: [IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA, SWITCH, LET] as CustomFormula[],
+  lookupReference: [VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE] as CustomFormula[],
   information: [
     ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N,
     ISERR, ISNONTEXT, ISREF, ISFORMULA, NA, ERROR_TYPE, INFO, SHEET, SHEETS, CELL
   ] as CustomFormula[],
   database: [DSUM, DAVERAGE, DCOUNT, DCOUNTA, DMAX, DMIN, DPRODUCT, DGET] as CustomFormula[],
-  financial: [PMT, PV, FV, NPV, IRR, PPMT, IPMT] as CustomFormula[],
+  financial: [PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE] as CustomFormula[],
   matrix: [MDETERM, MINVERSE, MMULT, MUNIT] as CustomFormula[]
 };
 
@@ -249,6 +250,7 @@ export * from './02-statistical/distributionFunctions';
 export * from './03-text/textFunctions';
 export * from './04-datetime/dateFunctions';
 export * from './05-logical/logicFunctions';
+export * from './05-logical/newLogicalFunctions';
 export * from './06-lookup-reference/lookupFunctions';
 export * from './07-information/informationFunctions';
 export * from './08-database/databaseFunctions';

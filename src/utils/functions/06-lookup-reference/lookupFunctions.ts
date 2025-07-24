@@ -664,3 +664,283 @@ export const TRANSPOSE: CustomFormula = {
     }
   }
 };
+
+// FILTER関数の実装
+export const FILTER: CustomFormula = {
+  name: 'FILTER',
+  pattern: /FILTER\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, arrayRef, includeRef, ifEmptyRef] = matches;
+    
+    try {
+      // 配列データを取得
+      const arrayValues = getCellRangeValues(arrayRef.trim(), context);
+      const includeValues = getCellRangeValues(includeRef.trim(), context);
+      
+      if (arrayValues.length !== includeValues.length) {
+        return FormulaError.VALUE;
+      }
+      
+      // フィルタ条件に基づいて要素を抽出
+      const filteredValues: unknown[] = [];
+      for (let i = 0; i < arrayValues.length; i++) {
+        const includeValue = includeValues[i];
+        // TRUE、1、または0以外の数値をTRUEとして扱う
+        if (includeValue === true || includeValue === 1 || 
+            (typeof includeValue === 'string' && includeValue.toUpperCase() === 'TRUE') ||
+            (typeof includeValue === 'number' && includeValue !== 0)) {
+          filteredValues.push(arrayValues[i]);
+        }
+      }
+      
+      // 結果が空の場合
+      if (filteredValues.length === 0) {
+        if (ifEmptyRef) {
+          const emptyValue = getCellValue(ifEmptyRef.trim(), context) ?? ifEmptyRef.trim().replace(/^['"]|['"]$/g, '');
+          return emptyValue as FormulaResult;
+        }
+        return FormulaError.CALC; // #CALC!エラー
+      }
+      
+      return filteredValues.length === 1 ? filteredValues[0] as FormulaResult : filteredValues as FormulaResult;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// SORT関数の実装
+export const SORT: CustomFormula = {
+  name: 'SORT',
+  pattern: /SORT\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, arrayRef, sortIndexRef, sortOrderRef, byColRef] = matches;
+    
+    try {
+      // 配列データを取得
+      const values = getCellRangeValues(arrayRef.trim(), context);
+      
+      if (!Array.isArray(values) || values.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
+      // ソートインデックス（デフォルトは1列目）
+      const sortIndex = sortIndexRef ? parseInt(getCellValue(sortIndexRef.trim(), context)?.toString() ?? sortIndexRef.trim()) : 1;
+      
+      // ソート順序（デフォルトは昇順=1、降順=-1）
+      const sortOrder = sortOrderRef ? parseInt(getCellValue(sortOrderRef.trim(), context)?.toString() ?? sortOrderRef.trim()) : 1;
+      
+      // 列でソートするか（デフォルトはFALSE=行でソート）
+      const byCol = byColRef ? (getCellValue(byColRef.trim(), context)?.toString().toUpperCase() === 'TRUE' || byColRef.trim() === '1') : false;
+      
+      if (byCol) {
+        // 列でのソートは複雑なため、簡単な実装
+        return FormulaError.VALUE; // 未対応
+      }
+      
+      // 範囲から行数と列数を計算
+      const rangeParts = arrayRef.trim().split(':');
+      if (rangeParts.length !== 2) {
+        // 単一列の場合、そのままソート
+        const sortedValues = [...values].sort((a, b) => {
+          const aVal = a === null || a === undefined ? '' : String(a);
+          const bVal = b === null || b === undefined ? '' : String(b);
+          
+          // 数値として比較可能な場合
+          const aNum = Number(aVal);
+          const bNum = Number(bVal);
+          if (!isNaN(aNum) && !isNaN(bNum)) {
+            return sortOrder === 1 ? aNum - bNum : bNum - aNum;
+          }
+          
+          // 文字列として比較
+          return sortOrder === 1 ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+        
+        return sortedValues as FormulaResult;
+      }
+      
+      const [startCell, endCell] = rangeParts;
+      const startMatch = startCell.match(/([A-Z]+)(\d+)/);
+      const endMatch = endCell.match(/([A-Z]+)(\d+)/);
+      
+      if (!startMatch || !endMatch) {
+        return FormulaError.REF;
+      }
+      
+      const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+      const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+      const startRow = parseInt(startMatch[2]);
+      const endRow = parseInt(endMatch[2]);
+      
+      const cols = endCol - startCol + 1;
+      const rows = endRow - startRow + 1;
+      
+      if (sortIndex < 1 || sortIndex > cols) {
+        return FormulaError.VALUE;
+      }
+      
+      // 2次元配列に変換
+      const matrix: unknown[][] = [];
+      for (let i = 0; i < rows; i++) {
+        const row: unknown[] = [];
+        for (let j = 0; j < cols; j++) {
+          const index = i * cols + j;
+          row.push(index < values.length ? values[index] : null);
+        }
+        matrix.push(row);
+      }
+      
+      // 指定された列でソート
+      const sortColIndex = sortIndex - 1;
+      matrix.sort((rowA, rowB) => {
+        const aVal = rowA[sortColIndex];
+        const bVal = rowB[sortColIndex];
+        
+        const aStr = aVal === null || aVal === undefined ? '' : String(aVal);
+        const bStr = bVal === null || bVal === undefined ? '' : String(bVal);
+        
+        // 数値として比較可能な場合
+        const aNum = Number(aStr);
+        const bNum = Number(bStr);
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return sortOrder === 1 ? aNum - bNum : bNum - aNum;
+        }
+        
+        // 文字列として比較
+        return sortOrder === 1 ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+      });
+      
+      // 1次元配列に戻す
+      const result = matrix.flat();
+      return result as FormulaResult;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// UNIQUE関数の実装
+export const UNIQUE: CustomFormula = {
+  name: 'UNIQUE',
+  pattern: /UNIQUE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, arrayRef, byColRef, exactlyOnceRef] = matches;
+    
+    try {
+      // 配列データを取得
+      const values = getCellRangeValues(arrayRef.trim(), context);
+      
+      if (!Array.isArray(values) || values.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
+      // 列で一意性を判定するか（デフォルトはFALSE=行で判定）
+      const byCol = byColRef ? (getCellValue(byColRef.trim(), context)?.toString().toUpperCase() === 'TRUE' || byColRef.trim() === '1') : false;
+      
+      // 一度だけ出現する要素のみを返すか（デフォルトはFALSE=最初の出現を残す）
+      const exactlyOnce = exactlyOnceRef ? (getCellValue(exactlyOnceRef.trim(), context)?.toString().toUpperCase() === 'TRUE' || exactlyOnceRef.trim() === '1') : false;
+      
+      if (byCol) {
+        // 列での一意性判定は複雑なため、簡単な実装
+        return FormulaError.VALUE; // 未対応
+      }
+      
+      // 単純な配列の場合
+      const rangeParts = arrayRef.trim().split(':');
+      if (rangeParts.length !== 2) {
+        // 単一列の場合
+        const uniqueValues: unknown[] = [];
+        const seen = new Map<string, number>();
+        
+        // 出現回数をカウント
+        for (const value of values) {
+          const key = String(value ?? '');
+          seen.set(key, (seen.get(key) ?? 0) + 1);
+        }
+        
+        // exactlyOnceフラグに基づいて結果を決定
+        for (const value of values) {
+          const key = String(value ?? '');
+          const count = seen.get(key) ?? 0;
+          
+          if (exactlyOnce) {
+            // 一度だけ出現する要素
+            if (count === 1 && !uniqueValues.some(v => String(v ?? '') === key)) {
+              uniqueValues.push(value);
+            }
+          } else {
+            // 最初の出現を残す
+            if (!uniqueValues.some(v => String(v ?? '') === key)) {
+              uniqueValues.push(value);
+            }
+          }
+        }
+        
+        return uniqueValues.length === 1 ? uniqueValues[0] as FormulaResult : uniqueValues as FormulaResult;
+      }
+      
+      // 2次元配列の場合（行での一意性判定）
+      const [startCell, endCell] = rangeParts;
+      const startMatch = startCell.match(/([A-Z]+)(\d+)/);
+      const endMatch = endCell.match(/([A-Z]+)(\d+)/);
+      
+      if (!startMatch || !endMatch) {
+        return FormulaError.REF;
+      }
+      
+      const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+      const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+      const startRow = parseInt(startMatch[2]);
+      const endRow = parseInt(endMatch[2]);
+      
+      const cols = endCol - startCol + 1;
+      const rows = endRow - startRow + 1;
+      
+      // 2次元配列に変換
+      const matrix: unknown[][] = [];
+      for (let i = 0; i < rows; i++) {
+        const row: unknown[] = [];
+        for (let j = 0; j < cols; j++) {
+          const index = i * cols + j;
+          row.push(index < values.length ? values[index] : null);
+        }
+        matrix.push(row);
+      }
+      
+      // 行の一意性を判定
+      const uniqueRows: unknown[][] = [];
+      const rowKeys = new Map<string, number>();
+      
+      // 各行をキーとして出現回数をカウント
+      for (const row of matrix) {
+        const key = row.map(cell => String(cell ?? '')).join('|');
+        rowKeys.set(key, (rowKeys.get(key) ?? 0) + 1);
+      }
+      
+      // exactlyOnceフラグに基づいて結果を決定
+      for (const row of matrix) {
+        const key = row.map(cell => String(cell ?? '')).join('|');
+        const count = rowKeys.get(key) ?? 0;
+        
+        if (exactlyOnce) {
+          // 一度だけ出現する行
+          if (count === 1 && !uniqueRows.some(r => r.map(cell => String(cell ?? '')).join('|') === key)) {
+            uniqueRows.push(row);
+          }
+        } else {
+          // 最初の出現を残す
+          if (!uniqueRows.some(r => r.map(cell => String(cell ?? '')).join('|') === key)) {
+            uniqueRows.push(row);
+          }
+        }
+      }
+      
+      // 1次元配列に戻す
+      const result = uniqueRows.flat();
+      return result as FormulaResult;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};

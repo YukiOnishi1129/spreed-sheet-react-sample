@@ -30,7 +30,8 @@ export const FormulaError = {
   DIV0: '#DIV/0!',
   NULL: '#NULL!',
   NA: '#N/A',
-  CYCLE: '#CYCLE!'
+  CYCLE: '#CYCLE!',
+  CALC: '#CALC!'
 } as const;
 
 export type FormulaErrorType = typeof FormulaError[keyof typeof FormulaError];
