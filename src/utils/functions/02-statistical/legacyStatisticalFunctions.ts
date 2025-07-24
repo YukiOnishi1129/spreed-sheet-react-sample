@@ -409,3 +409,467 @@ export const ZTEST: CustomFormula = {
     }
   }
 };
+
+// BETADIST関数の実装（ベータ分布）- レガシー版
+export const BETADIST: CustomFormula = {
+  name: 'BETADIST',
+  pattern: /BETADIST\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, xRef, alphaRef, betaRef, aRef, bRef] = matches;
+    
+    try {
+      const x = parseFloat(getCellValue(xRef.trim(), context)?.toString() ?? xRef.trim());
+      const alpha = parseFloat(getCellValue(alphaRef.trim(), context)?.toString() ?? alphaRef.trim());
+      const beta = parseFloat(getCellValue(betaRef.trim(), context)?.toString() ?? betaRef.trim());
+      const a = aRef ? parseFloat(getCellValue(aRef.trim(), context)?.toString() ?? aRef.trim()) : 0;
+      const b = bRef ? parseFloat(getCellValue(bRef.trim(), context)?.toString() ?? bRef.trim()) : 1;
+      
+      if (isNaN(x) || isNaN(alpha) || isNaN(beta) || isNaN(a) || isNaN(b)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (alpha <= 0 || beta <= 0 || a >= b || x < a || x > b) {
+        return FormulaError.NUM;
+      }
+      
+      // 標準化
+      const y = (x - a) / (b - a);
+      
+      // ベータ関数の計算（ガンマ関数を使用）
+      const lnBeta = (p: number, q: number): number => {
+        let lnGamma = (z: number): number => {
+          const cof = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+                       -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+          let x = z;
+          let y = z;
+          let tmp = x + 5.5;
+          tmp -= (x + 0.5) * Math.log(tmp);
+          let ser = 1.000000000190015;
+          for (let j = 0; j < 6; j++) {
+            ser += cof[j] / ++y;
+          }
+          return -tmp + Math.log(2.5066282746310005 * ser / x);
+        };
+        
+        return lnGamma(p) + lnGamma(q) - lnGamma(p + q);
+      };
+      
+      // 不完全ベータ関数の計算（連分数展開）
+      const betaInc = (x: number, a: number, b: number): number => {
+        if (x === 0 || x === 1) return x;
+        
+        const lnBetaVal = lnBeta(a, b);
+        const factor = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lnBetaVal);
+        
+        if (x < (a + 1) / (a + b + 2)) {
+          // 連分数展開
+          const maxIter = 100;
+          const eps = 1e-10;
+          let c = 1;
+          let d = 1 / (1 - (a + b) * x / (a + 1));
+          let h = d;
+          
+          for (let m = 1; m <= maxIter; m++) {
+            const m2 = 2 * m;
+            let aa = m * (b - m) * x / ((a + m2 - 1) * (a + m2));
+            d = 1 / (1 + aa * d);
+            c = 1 + aa / c;
+            h *= d * c;
+            
+            aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + m2 + 1));
+            d = 1 / (1 + aa * d);
+            c = 1 + aa / c;
+            const del = d * c;
+            h *= del;
+            
+            if (Math.abs(del - 1) < eps) break;
+          }
+          
+          return factor * h / a;
+        } else {
+          // 対称性を利用
+          return 1 - betaInc(1 - x, b, a);
+        }
+      };
+      
+      return betaInc(y, alpha, beta);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// BETAINV関数の実装（ベータ分布の逆関数）- レガシー版
+export const BETAINV: CustomFormula = {
+  name: 'BETAINV',
+  pattern: /BETAINV\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, probRef, alphaRef, betaRef, aRef, bRef] = matches;
+    
+    try {
+      const prob = parseFloat(getCellValue(probRef.trim(), context)?.toString() ?? probRef.trim());
+      const alpha = parseFloat(getCellValue(alphaRef.trim(), context)?.toString() ?? alphaRef.trim());
+      const beta = parseFloat(getCellValue(betaRef.trim(), context)?.toString() ?? betaRef.trim());
+      const a = aRef ? parseFloat(getCellValue(aRef.trim(), context)?.toString() ?? aRef.trim()) : 0;
+      const b = bRef ? parseFloat(getCellValue(bRef.trim(), context)?.toString() ?? bRef.trim()) : 1;
+      
+      if (isNaN(prob) || isNaN(alpha) || isNaN(beta) || isNaN(a) || isNaN(b)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (prob < 0 || prob > 1 || alpha <= 0 || beta <= 0 || a >= b) {
+        return FormulaError.NUM;
+      }
+      
+      // ニュートン法で逆関数を計算
+      let x = 0.5; // 初期値
+      const maxIter = 100;
+      const tol = 1e-10;
+      
+      for (let iter = 0; iter < maxIter; iter++) {
+        // BETADIST相当の計算
+        const betaDist = BETADIST.calculate(['', x.toString(), alpha.toString(), beta.toString(), '0', '1'], context) as number;
+        const error = betaDist - prob;
+        
+        if (Math.abs(error) < tol) {
+          return a + x * (b - a);
+        }
+        
+        // ベータ分布の確率密度関数
+        const pdf = Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1) * 
+                    Math.exp(-lnBeta(alpha, beta));
+        
+        x -= error / pdf;
+        x = Math.max(0.0001, Math.min(0.9999, x));
+      }
+      
+      return FormulaError.NUM;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// ベータ関数の対数を計算するヘルパー関数
+function lnBeta(a: number, b: number): number {
+  const lnGamma = (z: number): number => {
+    const cof = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+                 -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+    let x = z;
+    let y = z;
+    let tmp = x + 5.5;
+    tmp -= (x + 0.5) * Math.log(tmp);
+    let ser = 1.000000000190015;
+    for (let j = 0; j < 6; j++) {
+      ser += cof[j] / ++y;
+    }
+    return -tmp + Math.log(2.5066282746310005 * ser / x);
+  };
+  
+  return lnGamma(a) + lnGamma(b) - lnGamma(a + b);
+}
+
+// CHIDIST関数の実装（カイ二乗分布）- レガシー版
+export const CHIDIST: CustomFormula = {
+  name: 'CHIDIST',
+  pattern: /CHIDIST\(([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, xRef, degFreedomRef] = matches;
+    
+    try {
+      const x = parseFloat(getCellValue(xRef.trim(), context)?.toString() ?? xRef.trim());
+      const degFreedom = parseInt(getCellValue(degFreedomRef.trim(), context)?.toString() ?? degFreedomRef.trim());
+      
+      if (isNaN(x) || isNaN(degFreedom)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (x < 0 || degFreedom < 1 || degFreedom > 10e10) {
+        return FormulaError.NUM;
+      }
+      
+      // ガンマ関数を使ったカイ二乗分布の計算
+      const gammaInc = (a: number, x: number): number => {
+        if (x < 0 || a <= 0) return NaN;
+        
+        if (x < a + 1) {
+          // 級数展開
+          let sum = 1 / a;
+          let term = 1 / a;
+          const maxIter = 100;
+          
+          for (let n = 1; n < maxIter; n++) {
+            term *= x / (a + n);
+            sum += term;
+            if (Math.abs(term) < Math.abs(sum) * 1e-10) break;
+          }
+          
+          return sum * Math.exp(-x + a * Math.log(x) - lnGamma(a));
+        } else {
+          // 連分数展開
+          const maxIter = 100;
+          const eps = 1e-10;
+          let b = x + 1 - a;
+          let c = 1 / 1e-30;
+          let d = 1 / b;
+          let h = d;
+          
+          for (let i = 1; i <= maxIter; i++) {
+            const an = -i * (i - a);
+            b += 2;
+            d = an * d + b;
+            if (Math.abs(d) < 1e-30) d = 1e-30;
+            c = b + an / c;
+            if (Math.abs(c) < 1e-30) c = 1e-30;
+            d = 1 / d;
+            const del = d * c;
+            h *= del;
+            if (Math.abs(del - 1) < eps) break;
+          }
+          
+          return 1 - Math.exp(-x + a * Math.log(x) - lnGamma(a)) * h;
+        }
+      };
+      
+      // カイ二乗分布の右側確率
+      return 1 - gammaInc(degFreedom / 2, x / 2);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// CHIINV関数の実装（カイ二乗分布の逆関数）- レガシー版
+export const CHIINV: CustomFormula = {
+  name: 'CHIINV',
+  pattern: /CHIINV\(([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, probRef, degFreedomRef] = matches;
+    
+    try {
+      const prob = parseFloat(getCellValue(probRef.trim(), context)?.toString() ?? probRef.trim());
+      const degFreedom = parseInt(getCellValue(degFreedomRef.trim(), context)?.toString() ?? degFreedomRef.trim());
+      
+      if (isNaN(prob) || isNaN(degFreedom)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (prob < 0 || prob > 1 || degFreedom < 1 || degFreedom > 10e10) {
+        return FormulaError.NUM;
+      }
+      
+      // ニュートン法で逆関数を計算
+      let x = degFreedom; // 初期値
+      const maxIter = 100;
+      const tol = 1e-10;
+      
+      for (let iter = 0; iter < maxIter; iter++) {
+        const chiDist = CHIDIST.calculate(['', x.toString(), degFreedom.toString()], context) as number;
+        const error = chiDist - prob;
+        
+        if (Math.abs(error) < tol) {
+          return x;
+        }
+        
+        // カイ二乗分布の確率密度関数
+        const k = degFreedom / 2;
+        const pdf = Math.pow(x, k - 1) * Math.exp(-x / 2) / (Math.pow(2, k) * Math.exp(lnGamma(k)));
+        
+        x += error / pdf;
+        x = Math.max(0.0001, x);
+      }
+      
+      return FormulaError.NUM;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// ガンマ関数の対数を計算するヘルパー関数
+function lnGamma(z: number): number {
+  const cof = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+               -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+  let x = z;
+  let y = z;
+  let tmp = x + 5.5;
+  tmp -= (x + 0.5) * Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j = 0; j < 6; j++) {
+    ser += cof[j] / ++y;
+  }
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+
+// GAMMADIST関数の実装（ガンマ分布）- レガシー版
+export const GAMMADIST: CustomFormula = {
+  name: 'GAMMADIST',
+  pattern: /GAMMADIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, xRef, alphaRef, betaRef, cumulativeRef] = matches;
+    
+    try {
+      const x = parseFloat(getCellValue(xRef.trim(), context)?.toString() ?? xRef.trim());
+      const alpha = parseFloat(getCellValue(alphaRef.trim(), context)?.toString() ?? alphaRef.trim());
+      const beta = parseFloat(getCellValue(betaRef.trim(), context)?.toString() ?? betaRef.trim());
+      const cumulative = getCellValue(cumulativeRef.trim(), context)?.toString().toLowerCase() === 'true';
+      
+      if (isNaN(x) || isNaN(alpha) || isNaN(beta)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (x < 0 || alpha <= 0 || beta <= 0) {
+        return FormulaError.NUM;
+      }
+      
+      if (cumulative) {
+        // 累積分布関数
+        const gammaInc = (a: number, x: number): number => {
+          if (x < 0 || a <= 0) return NaN;
+          
+          if (x < a + 1) {
+            // 級数展開
+            let sum = 1 / a;
+            let term = 1 / a;
+            const maxIter = 100;
+            
+            for (let n = 1; n < maxIter; n++) {
+              term *= x / (a + n);
+              sum += term;
+              if (Math.abs(term) < Math.abs(sum) * 1e-10) break;
+            }
+            
+            return sum * Math.exp(-x + a * Math.log(x) - lnGamma(a));
+          } else {
+            // 連分数展開
+            const maxIter = 100;
+            const eps = 1e-10;
+            let b = x + 1 - a;
+            let c = 1 / 1e-30;
+            let d = 1 / b;
+            let h = d;
+            
+            for (let i = 1; i <= maxIter; i++) {
+              const an = -i * (i - a);
+              b += 2;
+              d = an * d + b;
+              if (Math.abs(d) < 1e-30) d = 1e-30;
+              c = b + an / c;
+              if (Math.abs(c) < 1e-30) c = 1e-30;
+              d = 1 / d;
+              const del = d * c;
+              h *= del;
+              if (Math.abs(del - 1) < eps) break;
+            }
+            
+            return 1 - Math.exp(-x + a * Math.log(x) - lnGamma(a)) * h;
+          }
+        };
+        
+        return gammaInc(alpha, x / beta);
+      } else {
+        // 確率密度関数
+        return Math.pow(x, alpha - 1) * Math.exp(-x / beta) / (Math.pow(beta, alpha) * Math.exp(lnGamma(alpha)));
+      }
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// GAMMAINV関数の実装（ガンマ分布の逆関数）- レガシー版
+export const GAMMAINV: CustomFormula = {
+  name: 'GAMMAINV',
+  pattern: /GAMMAINV\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, probRef, alphaRef, betaRef] = matches;
+    
+    try {
+      const prob = parseFloat(getCellValue(probRef.trim(), context)?.toString() ?? probRef.trim());
+      const alpha = parseFloat(getCellValue(alphaRef.trim(), context)?.toString() ?? alphaRef.trim());
+      const beta = parseFloat(getCellValue(betaRef.trim(), context)?.toString() ?? betaRef.trim());
+      
+      if (isNaN(prob) || isNaN(alpha) || isNaN(beta)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (prob < 0 || prob > 1 || alpha <= 0 || beta <= 0) {
+        return FormulaError.NUM;
+      }
+      
+      // ニュートン法で逆関数を計算
+      let x = alpha * beta; // 初期値（平均値）
+      const maxIter = 100;
+      const tol = 1e-10;
+      
+      for (let iter = 0; iter < maxIter; iter++) {
+        const gammaDist = GAMMADIST.calculate(['', x.toString(), alpha.toString(), beta.toString(), 'TRUE'], context) as number;
+        const error = gammaDist - prob;
+        
+        if (Math.abs(error) < tol) {
+          return x;
+        }
+        
+        // ガンマ分布の確率密度関数
+        const pdf = Math.pow(x, alpha - 1) * Math.exp(-x / beta) / (Math.pow(beta, alpha) * Math.exp(lnGamma(alpha)));
+        
+        x -= error / pdf;
+        x = Math.max(0.0001, x);
+      }
+      
+      return FormulaError.NUM;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// HYPGEOMDIST関数の実装（超幾何分布）- レガシー版
+export const HYPGEOMDIST: CustomFormula = {
+  name: 'HYPGEOMDIST',
+  pattern: /HYPGEOMDIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, sampleSRef, numberSampleRef, populationSRef, numberPopRef] = matches;
+    
+    try {
+      const sampleS = parseInt(getCellValue(sampleSRef.trim(), context)?.toString() ?? sampleSRef.trim());
+      const numberSample = parseInt(getCellValue(numberSampleRef.trim(), context)?.toString() ?? numberSampleRef.trim());
+      const populationS = parseInt(getCellValue(populationSRef.trim(), context)?.toString() ?? populationSRef.trim());
+      const numberPop = parseInt(getCellValue(numberPopRef.trim(), context)?.toString() ?? numberPopRef.trim());
+      
+      if (isNaN(sampleS) || isNaN(numberSample) || isNaN(populationS) || isNaN(numberPop)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (sampleS < 0 || sampleS > numberSample || sampleS > populationS ||
+          numberSample <= 0 || numberSample > numberPop ||
+          populationS <= 0 || populationS > numberPop ||
+          numberPop <= 0) {
+        return FormulaError.NUM;
+      }
+      
+      // 組み合わせ数を計算
+      const combination = (n: number, k: number): number => {
+        if (k > n || k < 0) return 0;
+        if (k === 0 || k === n) return 1;
+        
+        k = Math.min(k, n - k);
+        let result = 1;
+        
+        for (let i = 0; i < k; i++) {
+          result *= (n - i) / (i + 1);
+        }
+        
+        return result;
+      };
+      
+      // 超幾何分布の確率質量関数
+      const numerator = combination(populationS, sampleS) * combination(numberPop - populationS, numberSample - sampleS);
+      const denominator = combination(numberPop, numberSample);
+      
+      return numerator / denominator;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};

@@ -617,22 +617,22 @@ https://support.google.com/docs/table/25273?hl=ja
 
 | 関数名 | 説明 | 新しい関数 | 実装状況 | サポート |
 |--------|------|----------|----------|----------|
-| BETADIST | ベータ分布 | BETA.DIST | ❌
-| BETAINV | ベータ分布の逆関数 | BETA.INV | ❌
+| BETADIST | ベータ分布 | BETA.DIST | ✅
+| BETAINV | ベータ分布の逆関数 | BETA.INV | ✅
 | BINOMDIST | 二項分布 | BINOM.DIST | ✅
-| CHIDIST | カイ二乗分布 | CHISQ.DIST.RT | ❌
-| CHIINV | カイ二乗分布の逆関数 | CHISQ.INV.RT | ❌
+| CHIDIST | カイ二乗分布 | CHISQ.DIST.RT | ✅
+| CHIINV | カイ二乗分布の逆関数 | CHISQ.INV.RT | ✅
 | CHITEST | カイ二乗検定 | CHISQ.TEST | ✅
-| CONFIDENCE | 信頼区間 | CONFIDENCE.NORM | ❌
+| CONFIDENCE | 信頼区間 | CONFIDENCE.NORM | ✅
 | COVAR | 共分散 | COVARIANCE.P | ✅
-| CRITBINOM | 二項分布の臨界値 | BINOM.INV | ❌
+| CRITBINOM | 二項分布の臨界値 | BINOM.INV | ✅
 | EXPONDIST | 指数分布 | EXPON.DIST | ✅
 | FDIST | F分布 | F.DIST.RT | ✅
 | FINV | F分布の逆関数 | F.INV.RT | ✅
 | FTEST | F検定 | F.TEST | ✅
-| GAMMADIST | ガンマ分布 | GAMMA.DIST | ❌
-| GAMMAINV | ガンマ分布の逆関数 | GAMMA.INV | ❌
-| HYPGEOMDIST | 超幾何分布 | HYPGEOM.DIST | ❌
+| GAMMADIST | ガンマ分布 | GAMMA.DIST | ✅
+| GAMMAINV | ガンマ分布の逆関数 | GAMMA.INV | ✅
+| HYPGEOMDIST | 超幾何分布 | HYPGEOM.DIST | ✅
 | LOGINV | 対数正規分布の逆関数 | LOGNORM.INV | ✅
 | LOGNORMDIST | 対数正規分布 | LOGNORM.DIST | ✅
 | MODE | 最頻値 | MODE.SNGL | ✅
@@ -654,7 +654,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | VAR | 分散 | VAR.S | ✅
 | VARP | 分散（母集団） | VAR.P | ✅
 | WEIBULL | ワイブル分布 | WEIBULL.DIST | ✅
-| ZTEST | z検定 | Z.TEST | ❌
+| ZTEST | z検定 | Z.TEST | ✅
 
 ## 14. Google Sheets専用関数 🔵
 
@@ -669,12 +669,12 @@ https://support.google.com/docs/table/25273?hl=ja
 ### データ取得関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| IMPORTDATA | CSVやTSVをインポート | `=IMPORTDATA(URL)` | ❌ 📗 |
-| IMPORTFEED | RSSやAtomフィードを取得 | `=IMPORTFEED(URL, [クエリ], [ヘッダー], [アイテム数])` | ❌ 📗 |
-| IMPORTHTML | HTMLテーブルやリストを取得 | `=IMPORTHTML(URL, クエリ, インデックス)` | ❌ 📗 |
-| IMPORTXML | XMLデータを取得 | `=IMPORTXML(URL, XPathクエリ)` | ❌ 📗 |
-| IMPORTRANGE | 他のスプレッドシートから取得 | `=IMPORTRANGE(スプレッドシートURL, 範囲文字列)` | ❌ 📗 |
-| IMAGE | 画像を挿入 | `=IMAGE(URL, [モード], [高さ], [幅])` | ❌ 📗 |
+| IMPORTDATA | CSVやTSVをインポート | `=IMPORTDATA(URL)` | ✅ 📗 |
+| IMPORTFEED | RSSやAtomフィードを取得 | `=IMPORTFEED(URL, [クエリ], [ヘッダー], [アイテム数])` | ✅ 📗 |
+| IMPORTHTML | HTMLテーブルやリストを取得 | `=IMPORTHTML(URL, クエリ, インデックス)` | ✅ 📗 |
+| IMPORTXML | XMLデータを取得 | `=IMPORTXML(URL, XPathクエリ)` | ✅ 📗 |
+| IMPORTRANGE | 他のスプレッドシートから取得 | `=IMPORTRANGE(スプレッドシートURL, 範囲文字列)` | ✅ 📗 |
+| IMAGE | 画像を挿入 | `=IMAGE(URL, [モード], [高さ], [幅])` | ✅ 📗 |
 
 ### Google固有の関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -696,7 +696,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | TO_DOLLARS | 数値をドル表記に変換 | `=TO_DOLLARS(値)` | ✅ 📗 |
 | TO_PERCENT | 数値をパーセント表記に変換 | `=TO_PERCENT(値)` | ✅ 📗 |
 | TO_TEXT | 値をテキストに変換 | `=TO_TEXT(値)` | ✅ 📗 |
-| ISBETWEEN | 値が範囲内か判定 | `=ISBETWEEN(値, 下限, 上限, [下限含む], [上限含む])` | ❌ 📗 |
+| ISBETWEEN | 値が範囲内か判定 | `=ISBETWEEN(値, 下限, 上限, [下限含む], [上限含む])` | ✅ 📗 |
 
 ## 15. 新しい関数・その他
 
@@ -713,13 +713,13 @@ https://support.google.com/docs/table/25273?hl=ja
 ### Excel専用の新関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| ISOMITTED | 引数が省略されたか判定 | `=ISOMITTED(引数)` | ❌ 📘 |
-| STOCKHISTORY | 株価履歴を取得 | `=STOCKHISTORY(銘柄, 開始日, [終了日], [間隔], [列], [プロパティ])` | ❌ 📘 |
+| ISOMITTED | 引数が省略されたか判定 | `=ISOMITTED(引数)` | ✅ 📘 |
+| STOCKHISTORY | 株価履歴を取得 | `=STOCKHISTORY(銘柄, 開始日, [終了日], [間隔], [列], [プロパティ])` | ✅ 📘 |
 
 ### AI関連関数（Excel Labs）
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| GPT | ChatGPTを呼び出し | `=GPT(プロンプト, [温度], [最大トークン])` | ❌ |
+| GPT | ChatGPTを呼び出し | `=GPT(プロンプト, [温度], [最大トークン])` | ✅ |
 
 ## ローカライズ設定（日付・時刻関数）
 

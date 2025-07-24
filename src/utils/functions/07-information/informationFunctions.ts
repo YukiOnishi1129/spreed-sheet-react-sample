@@ -381,3 +381,37 @@ export const CELL: CustomFormula = {
     }
   }
 };
+
+// ISBETWEEN関数の実装（値が範囲内か判定）- Google Sheets専用
+export const ISBETWEEN: CustomFormula = {
+  name: 'ISBETWEEN',
+  pattern: /ISBETWEEN\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches, context): FormulaResult => {
+    const [, valueRef, lowerRef, upperRef, lowerInclusiveRef, upperInclusiveRef] = matches;
+    
+    const value = getCellValue(valueRef.trim(), context);
+    const lower = getCellValue(lowerRef.trim(), context);
+    const upper = getCellValue(upperRef.trim(), context);
+    
+    // デフォルトは両方含む
+    const lowerInclusive = lowerInclusiveRef ? 
+      getCellValue(lowerInclusiveRef.trim(), context)?.toString().toLowerCase() !== 'false' : true;
+    const upperInclusive = upperInclusiveRef ? 
+      getCellValue(upperInclusiveRef.trim(), context)?.toString().toLowerCase() !== 'false' : true;
+    
+    // 数値に変換
+    const numValue = Number(value);
+    const numLower = Number(lower);
+    const numUpper = Number(upper);
+    
+    if (isNaN(numValue) || isNaN(numLower) || isNaN(numUpper)) {
+      return FormulaError.VALUE;
+    }
+    
+    // 範囲チェック
+    const lowerCheck = lowerInclusive ? numValue >= numLower : numValue > numLower;
+    const upperCheck = upperInclusive ? numValue <= numUpper : numValue < numUpper;
+    
+    return lowerCheck && upperCheck;
+  }
+};
