@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { matchFormula, ALL_FUNCTIONS, getFunctionType } from "../../utils/spreadsheet/logic";
+import { matchFormula, ALL_FUNCTIONS } from "../../utils/spreadsheet/logic";
+import { getFunctionType } from "../../utils/spreadsheet/definitions/functionDefinitions";
 import type { CellData, FormulaContext, FormulaResult } from "../../utils/spreadsheet/logic";
 import type { SpreadsheetData, ExcelFunctionResponse } from '../../types/spreadsheet';
 import { fetchExcelFunction } from '../../services/openaiService';

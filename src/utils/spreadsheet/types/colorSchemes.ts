@@ -9,9 +9,11 @@
 // 🔧 その他/未対応 - グレー系
 
 export const COLOR_SCHEMES = {
-  // 📊 数学・統計関数 - オレンジ系
+  // 📊 数学・三角関数 - オレンジ系
   math: { bg: "#FFF3E0", fc: "#E65100" },         // 数学・三角関数
-  statistical: { bg: "#FFF3E0", fc: "#E65100" },  // 統計関数
+  
+  // 📈 統計関数 - 赤系
+  statistical: { bg: "#FFEBEE", fc: "#C62828" },  // 統計関数
   
   // 📝 文字列関数 - ピンク系
   text: { bg: "#FCE4EC", fc: "#C2185B" },         
@@ -28,12 +30,24 @@ export const COLOR_SCHEMES = {
   // 💰 財務関数 - 金色/黄色系
   financial: { bg: "#FFFDE7", fc: "#F57F17" },    
   
-  // 🔧 その他/未対応 - グレー系
-  information: { bg: "#F5F5F5", fc: "#616161" },   // 情報関数
-  database: { bg: "#F5F5F5", fc: "#616161" },     // データベース関数
-  engineering: { bg: "#F5F5F5", fc: "#616161" },  // エンジニアリング関数
-  cube: { bg: "#F5F5F5", fc: "#616161" },         // キューブ関数
-  web: { bg: "#F5F5F5", fc: "#616161" },          // Web関数
-  googlesheets: { bg: "#F5F5F5", fc: "#616161" }, // Google Sheets専用
+  // 🔧 情報関数 - 水色系
+  information: { bg: "#E0F2F1", fc: "#00695C" },   // 情報関数
+  
+  // 🗄️ データベース関数 - 茶色系
+  database: { bg: "#EFEBE9", fc: "#5D4037" },     // データベース関数
+  
+  // ⚙️ エンジニアリング関数 - 深緑系
+  engineering: { bg: "#E8F5E8", fc: "#388E3C" },  // エンジニアリング関数
+  
+  // 📊 キューブ関数 - インディゴ系
+  cube: { bg: "#E8EAF6", fc: "#3F51B5" },         // キューブ関数
+  
+  // 🌐 Web関数 - シアン系
+  web: { bg: "#E0F7FA", fc: "#0097A7" },          // Web関数
+  
+  // 📋 Google Sheets専用 - ライム系
+  googlesheets: { bg: "#F1F8E9", fc: "#689F38" }, // Google Sheets専用
+  
+  // 🔧 その他 - グレー系
   other: { bg: "#F5F5F5", fc: "#616161" }         // その他
 };

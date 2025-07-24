@@ -1,5 +1,5 @@
 import type { ApiCellData, ExcelFunctionResponse } from '../../types/spreadsheet';
-import type { FormulaResult } from "../../utils/functions";
+import type { FormulaResult } from "../../utils/spreadsheet/logic";
 
 // 型ガード関数
 export const hasFormulaProperty = (cell: ApiCellData | null): cell is ApiCellData & { f: string } => {

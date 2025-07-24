@@ -3,8 +3,8 @@
 import type { CustomFormula } from './shared/types';
 
 // 各カテゴリから関数をインポート
-import { DATEDIF, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC, DATEVALUE, TIMEVALUE, ISOWEEKNUM } from './04-datetime/dateFunctions';
-import { NETWORKDAYS, NETWORKDAYS_INTL, WORKDAY, WORKDAY_INTL } from './04-datetime/workdayFunctions';
+import { DATEDIF, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC, DATEVALUE, TIMEVALUE, ISOWEEKNUM } from './04-datetime/dateLogic';
+import { NETWORKDAYS, NETWORKDAYS_INTL, WORKDAY, WORKDAY_INTL } from './04-datetime/workdayLogic';
 
 import { 
   SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND,
@@ -16,23 +16,23 @@ import {
   SUMX2MY2, SUMX2PY2, SUMXMY2, MULTINOMIAL, PERMUTATIONA, BASE, DECIMAL, SUBTOTAL,
   AGGREGATE, CEILING_MATH, CEILING_PRECISE, FLOOR_MATH, FLOOR_PRECISE, ISO_CEILING, SERIESSUM,
   RANDARRAY, SEQUENCE
-} from './01-math-trigonometry/mathFunctions';
+} from './01-math-trigonometry/mathLogic';
 
 import {
   SIN, COS, TAN, ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH,
   ASINH, ACOSH, ATANH, CSC, SEC, COT, ACOT, CSCH, SECH, COTH, ACOTH
-} from './01-math-trigonometry/trigonometricFunctions';
+} from './01-math-trigonometry/trigonometricLogic';
 
 import { 
   MEDIAN, MODE, COUNTA, COUNTBLANK, LARGE, SMALL, RANK,
   GEOMEAN, HARMEAN, TRIMMEAN
-} from './02-statistical/basicStatisticsFunctions';
+} from './02-statistical/basicStatisticsLogic';
 
 import {
   DEVSQ, KURT, SKEW, PEARSON, PERCENTRANK,
   STANDARDIZE, COVARIANCE_P, COVARIANCE_S, SKEW_P,
   PERCENTILE_INC, PERCENTILE_EXC, QUARTILE_INC, QUARTILE_EXC
-} from './02-statistical/advancedStatisticsFunctions';
+} from './02-statistical/advancedStatisticsLogic';
 
 import {
   NORM_DIST, NORM_INV, NORM_S_DIST, NORM_S_INV, LOGNORM_DIST, LOGNORM_INV,
@@ -41,83 +41,83 @@ import {
   GAMMA_DIST, EXPON_DIST, WEIBULL_DIST, BINOM_DIST,
   NEGBINOM_DIST, POISSON_DIST, HYPGEOM_DIST, CONFIDENCE_NORM,
   CONFIDENCE_T, Z_TEST, T_TEST, F_TEST, CHISQ_TEST
-} from './02-statistical/distributionFunctions';
+} from './02-statistical/distributionLogic';
 
 import {
   T_INV, T_INV_2T, CHISQ_INV, CHISQ_INV_RT, F_INV, F_INV_RT, BETA_INV, GAMMA_INV
-} from './02-statistical/inverseDistributionFunctions';
+} from './02-statistical/inverseDistributionLogic';
 
 import {
   SLOPE, INTERCEPT, RSQ, STEYX, FORECAST, LINEST
-} from './02-statistical/regressionFunctions';
+} from './02-statistical/regressionLogic';
 
 import {
   FISHER, FISHERINV, PHI, GAUSS, PROB, BINOM_INV
-} from './02-statistical/otherStatisticalFunctions';
+} from './02-statistical/otherStatisticalLogic';
 import {
   MODE_SNGL, MODE_MULT, RANK_AVG, RANK_EQ
-} from './02-statistical/modeRankFunctions';
-import { NORMDIST, NORMINV, NORMSDIST, NORMSINV, BINOMDIST, POISSON, CRITBINOM, CONFIDENCE, ZTEST, BETADIST, BETAINV, CHIDIST, CHIINV, GAMMADIST, GAMMAINV, HYPGEOMDIST } from './02-statistical/legacyStatisticalFunctions';
-import { LOGNORMDIST, LOGINV, EXPONDIST, WEIBULL } from './02-statistical/otherDistributionFunctions';
-import { FDIST, FINV, TDIST, TINV, FTEST, TTEST, CHITEST, NEGBINOMDIST } from './02-statistical/legacyDistributionFunctions';
+} from './02-statistical/modeRankLogic';
+import { NORMDIST, NORMINV, NORMSDIST, NORMSINV, BINOMDIST, POISSON, CRITBINOM, CONFIDENCE, ZTEST, BETADIST, BETAINV, CHIDIST, CHIINV, GAMMADIST, GAMMAINV, HYPGEOMDIST } from './02-statistical/legacyStatisticalLogic';
+import { LOGNORMDIST, LOGINV, EXPONDIST, WEIBULL } from './02-statistical/otherDistributionLogic';
+import { FDIST, FINV, TDIST, TINV, FTEST, TTEST, CHITEST, NEGBINOMDIST } from './02-statistical/legacyDistributionLogic';
 
 import { 
   CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT,
   PROPER, VALUE, TEXT, REPT, REPLACE, CHAR, CODE, EXACT, CLEAN, T, FIXED, NUMBERVALUE, DOLLAR, UNICHAR, UNICODE,
   LENB, FINDB, SEARCHB, REPLACEB, TEXTBEFORE, TEXTAFTER, TEXTSPLIT, ASC, JIS, DBCS, PHONETIC, BAHTTEXT
-} from './03-text/textFunctions';
+} from './03-text/textLogic';
 
-import { IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA } from './05-logical/logicFunctions';
-import { SWITCH, LET } from './05-logical/newLogicalFunctions';
+import { IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA } from './05-logical/logicLogic';
+import { SWITCH, LET } from './05-logical/newLogicalLogic';
 
-import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE } from './06-lookup-reference/lookupFunctions';
+import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE } from './06-lookup-reference/lookupLogic';
 
-import { JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN } from './13-google-sheets/googleSheetsFunctions';
+import { JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN } from './13-google-sheets/googleSheetsLogic';
 
 import { 
   ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N,
   ISERR, ISNONTEXT, ISREF, ISFORMULA, NA, ERROR_TYPE, INFO, SHEET, SHEETS, CELL, ISBETWEEN
-} from './07-information/informationFunctions';
+} from './07-information/informationLogic';
 
-import { DSUM, DAVERAGE, DCOUNT, DCOUNTA, DMAX, DMIN, DPRODUCT, DGET } from './08-database/databaseFunctions';
-import { DSTDEV, DSTDEVP, DVAR, DVARP } from './08-database/statisticalDatabaseFunctions';
+import { DSUM, DAVERAGE, DCOUNT, DCOUNTA, DMAX, DMIN, DPRODUCT, DGET } from './08-database/databaseLogic';
+import { DSTDEV, DSTDEVP, DVAR, DVARP } from './08-database/statisticalDatabaseLogic';
 
-import { PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE } from './09-financial/financialFunctions';
-import { NPER, XNPV, XIRR, MIRR, SLN, SYD, DB, DDB, VDB, PDURATION, RRI } from './09-financial/additionalFinancialFunctions';
-import { ACCRINT, ACCRINTM, DISC, DURATION, MDURATION, PRICE, YIELD } from './09-financial/bondFunctions';
-import { COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD } from './09-financial/couponFunctions';
-import { AMORDEGRC, AMORLINC, CUMIPMT, CUMPRINC } from './09-financial/depreciationFunctions';
-import { TBILLEQ, TBILLPRICE, TBILLYIELD, DOLLARDE, DOLLARFR, EFFECT, NOMINAL, PRICEDISC, RECEIVED, INTRATE, PRICEMAT, YIELDDISC, YIELDMAT } from './09-financial/treasuryFunctions';
-import { ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD } from './09-financial/oddPeriodFunctions';
-import { ISPMT } from './09-financial/additionalFinancialFunctions';
+import { PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE } from './09-financial/financialLogic';
+import { NPER, XNPV, XIRR, MIRR, SLN, SYD, DB, DDB, VDB, PDURATION, RRI } from './09-financial/additionalFinancialLogic';
+import { ACCRINT, ACCRINTM, DISC, DURATION, MDURATION, PRICE, YIELD } from './09-financial/bondLogic';
+import { COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD } from './09-financial/couponLogic';
+import { AMORDEGRC, AMORLINC, CUMIPMT, CUMPRINC } from './09-financial/depreciationLogic';
+import { TBILLEQ, TBILLPRICE, TBILLYIELD, DOLLARDE, DOLLARFR, EFFECT, NOMINAL, PRICEDISC, RECEIVED, INTRATE, PRICEMAT, YIELDDISC, YIELDMAT } from './09-financial/treasuryLogic';
+import { ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD } from './09-financial/oddPeriodLogic';
+import { ISPMT } from './09-financial/additionalFinancialLogic';
 
-import { CONVERT, BIN2DEC, DEC2BIN, HEX2DEC, DEC2HEX, BIN2HEX, HEX2BIN, OCT2DEC, DEC2OCT, BIN2OCT, HEX2OCT, OCT2BIN, OCT2HEX } from './10-engineering/engineeringFunctions';
+import { CONVERT, BIN2DEC, DEC2BIN, HEX2DEC, DEC2HEX, BIN2HEX, HEX2BIN, OCT2DEC, DEC2OCT, BIN2OCT, HEX2OCT, OCT2BIN, OCT2HEX } from './10-engineering/engineeringLogic';
 import { 
   COMPLEX, IMABS, IMAGINARY, IMREAL, IMARGUMENT, IMCONJUGATE, IMSUM, IMSUB, 
   IMPRODUCT, IMDIV, IMPOWER, IMSQRT, IMEXP, IMLN, IMLOG10, IMLOG2 
-} from './10-engineering/complexNumberFunctions';
+} from './10-engineering/complexNumberLogic';
 import { 
   IMSIN, IMCOS, IMTAN, IMSINH, IMCOSH, IMCSC, IMSEC, IMCOT, IMCSCH, IMSECH 
-} from './10-engineering/complexTrigFunctions';
-import { BESSELI, BESSELJ, BESSELK, BESSELY } from './10-engineering/besselFunctions';
-import { ERF, ERF_PRECISE, ERFC, ERFC_PRECISE, DELTA, GESTEP } from './10-engineering/errorFunctions';
-import { BITAND, BITOR, BITXOR, BITLSHIFT, BITRSHIFT } from './10-engineering/bitFunctions';
+} from './10-engineering/complexTrigLogic';
+import { BESSELI, BESSELJ, BESSELK, BESSELY } from './10-engineering/besselLogic';
+import { ERF, ERF_PRECISE, ERFC, ERFC_PRECISE, DELTA, GESTEP } from './10-engineering/errorLogic';
+import { BITAND, BITOR, BITXOR, BITLSHIFT, BITRSHIFT } from './10-engineering/bitLogic';
 import { 
   ROW, ROWS, COLUMN, COLUMNS, ADDRESS, AREAS, FORMULATEXT, XMATCH, LAMBDA, 
   HYPERLINK, CHOOSEROWS, CHOOSECOLS, GETPIVOTDATA 
-} from './06-lookup-reference/additionalLookupFunctions';
+} from './06-lookup-reference/additionalLookupLogic';
 
 import {
   SORTBY, TAKE, DROP, EXPAND, HSTACK, VSTACK, TOCOL, TOROW, WRAPROWS, WRAPCOLS
-} from './06-lookup-reference/dynamicArrayFunctions';
-import { BYROW, BYCOL, MAP, REDUCE, SCAN, MAKEARRAY } from './06-lookup-reference/lambdaArrayFunctions';
+} from './06-lookup-reference/dynamicArrayLogic';
+import { BYROW, BYCOL, MAP, REDUCE, SCAN, MAKEARRAY } from './06-lookup-reference/lambdaArrayLogic';
 
-import { MDETERM, MINVERSE, MMULT, MUNIT } from './01-math-trigonometry/matrixFunctions';
-import { WEBSERVICE, FILTERXML, ENCODEURL } from './12-web/webFunctions';
-import { IMPORTDATA, IMPORTFEED, IMPORTHTML, IMPORTXML, IMPORTRANGE, IMAGE } from './12-web/importFunctions';
-import { CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER } from './11-cube/cubeFunctions';
-import { ISOMITTED, STOCKHISTORY, GPT } from './14-others/excelNewFunctions';
-import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT } from './13-google-sheets/googleSheetsExtraFunctions';
+import { MDETERM, MINVERSE, MMULT, MUNIT } from './01-math-trigonometry/matrixLogic';
+import { WEBSERVICE, FILTERXML, ENCODEURL } from './12-web/webLogic';
+import { IMPORTDATA, IMPORTFEED, IMPORTHTML, IMPORTXML, IMPORTRANGE, IMAGE } from './12-web/importLogic';
+import { CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER } from './11-cube/cubeLogic';
+import { ISOMITTED, STOCKHISTORY, GPT } from './14-others/excelNewLogic';
+import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT } from './13-google-sheets/googleSheetsExtraLogic';
 
 // すべての関数を配列にまとめる
 export const ALL_FUNCTIONS = [
@@ -325,27 +325,7 @@ export const matchFormula = (formula: string): { function: CustomFormula; matche
   return null;
 };
 
-// 関数タイプの判定（色分けのため）
-export const getFunctionType = (functionName: string): string => {
-  const name = functionName.toUpperCase();
-  
-  if (FUNCTION_CATEGORIES.mathTrigonometry.some(f => f.name === name)) return 'math';
-  if (FUNCTION_CATEGORIES.statistical.some(f => f.name === name)) return 'statistics';
-  if (FUNCTION_CATEGORIES.text.some(f => f.name === name)) return 'text';
-  if (FUNCTION_CATEGORIES.datetime.some(f => f.name === name)) return 'date';
-  if (FUNCTION_CATEGORIES.logical.some(f => f.name === name)) return 'logic';
-  if (FUNCTION_CATEGORIES.lookupReference.some(f => f.name === name)) return 'lookup';
-  if (FUNCTION_CATEGORIES.information.some(f => f.name === name)) return 'information';
-  if (FUNCTION_CATEGORIES.database.some(f => f.name === name)) return 'database';
-  if (FUNCTION_CATEGORIES.financial.some(f => f.name === name)) return 'financial';
-  if (FUNCTION_CATEGORIES.engineering.some(f => f.name === name)) return 'engineering';
-  if (FUNCTION_CATEGORIES.web.some(f => f.name === name)) return 'web';
-  if (FUNCTION_CATEGORIES.googleSheets.some(f => f.name === name)) return 'googleSheets';
-  if (FUNCTION_CATEGORIES.cube?.some(f => f.name === name)) return 'cube';
-  if (FUNCTION_CATEGORIES.others?.some(f => f.name === name)) return 'others';
-  
-  return 'other';
-};
+// getFunctionType is exported from definitions/functionDefinitions.ts
 
 // エクスポート
 export * from './shared/types';
@@ -360,37 +340,37 @@ export {
   SUMX2MY2, SUMX2PY2, SUMXMY2, MULTINOMIAL, PERMUTATIONA, BASE, DECIMAL, SUBTOTAL,
   AGGREGATE, CEILING_MATH, CEILING_PRECISE, FLOOR_MATH, FLOOR_PRECISE, ISO_CEILING, SERIESSUM,
   RANDARRAY, SEQUENCE
-} from './01-math-trigonometry/mathFunctions';
-export * from './01-math-trigonometry/trigonometricFunctions';
-export * from './02-statistical/basicStatisticsFunctions';
-export * from './02-statistical/advancedStatisticsFunctions';
-export * from './02-statistical/distributionFunctions';
-export * from './02-statistical/inverseDistributionFunctions';
-export * from './02-statistical/regressionFunctions';
-export * from './02-statistical/otherStatisticalFunctions';
-export * from './02-statistical/modeRankFunctions';
-export * from './03-text/textFunctions';
-export * from './04-datetime/dateFunctions';
-export * from './04-datetime/workdayFunctions';
-export * from './05-logical/logicFunctions';
-export * from './05-logical/newLogicalFunctions';
-export * from './06-lookup-reference/lookupFunctions';
-export * from './07-information/informationFunctions';
-export * from './08-database/databaseFunctions';
-export * from './09-financial/financialFunctions';
-export * from './09-financial/additionalFinancialFunctions';
-export * from './10-engineering/engineeringFunctions';
-export * from './10-engineering/complexNumberFunctions';
-export * from './10-engineering/complexTrigFunctions';
-export * from './10-engineering/besselFunctions';
-export * from './10-engineering/errorFunctions';
-export * from './10-engineering/bitFunctions';
-export * from './06-lookup-reference/additionalLookupFunctions';
-export * from './06-lookup-reference/dynamicArrayFunctions';
-export * from './08-database/statisticalDatabaseFunctions';
-export * from './12-web/webFunctions';
-export * from './01-math-trigonometry/matrixFunctions';
-export * from './11-cube/cubeFunctions';
-export * from './13-google-sheets/googleSheetsFunctions';
-export * from './13-google-sheets/googleSheetsExtraFunctions';
-export * from './14-others/excelNewFunctions';
+} from './01-math-trigonometry/mathLogic';
+export * from './01-math-trigonometry/trigonometricLogic';
+export * from './02-statistical/basicStatisticsLogic';
+export * from './02-statistical/advancedStatisticsLogic';
+export * from './02-statistical/distributionLogic';
+export * from './02-statistical/inverseDistributionLogic';
+export * from './02-statistical/regressionLogic';
+export * from './02-statistical/otherStatisticalLogic';
+export * from './02-statistical/modeRankLogic';
+export * from './03-text/textLogic';
+export * from './04-datetime/dateLogic';
+export * from './04-datetime/workdayLogic';
+export * from './05-logical/logicLogic';
+export * from './05-logical/newLogicalLogic';
+export * from './06-lookup-reference/lookupLogic';
+export * from './07-information/informationLogic';
+export * from './08-database/databaseLogic';
+export * from './09-financial/financialLogic';
+export * from './09-financial/additionalFinancialLogic';
+export * from './10-engineering/engineeringLogic';
+export * from './10-engineering/complexNumberLogic';
+export * from './10-engineering/complexTrigLogic';
+export * from './10-engineering/besselLogic';
+export * from './10-engineering/errorLogic';
+export * from './10-engineering/bitLogic';
+export * from './06-lookup-reference/additionalLookupLogic';
+export * from './06-lookup-reference/dynamicArrayLogic';
+export * from './08-database/statisticalDatabaseLogic';
+export * from './12-web/webLogic';
+export * from './01-math-trigonometry/matrixLogic';
+export * from './11-cube/cubeLogic';
+export * from './13-google-sheets/googleSheetsLogic';
+export * from './13-google-sheets/googleSheetsExtraLogic';
+export * from './14-others/excelNewLogic';

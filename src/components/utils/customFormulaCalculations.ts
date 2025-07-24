@@ -1,7 +1,7 @@
 import type { Matrix } from 'react-spreadsheet';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../../types/spreadsheet';
-import { matchFormula } from "../../utils/functions";
-import type { CellData, FormulaContext, FormulaResult } from "../../utils/functions";
+import { matchFormula } from "../../utils/spreadsheet/logic";
+import type { CellData, FormulaContext, FormulaResult } from "../../utils/spreadsheet/logic";
 import { 
   hasSpreadsheetValue, 
   hasDataFormula, 

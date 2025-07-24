@@ -42,7 +42,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "データ1", "ct": {"t": "s"}},
       {"v": 100, "ct": {"t": "n"}},
       {"v": 200, "ct": {"t": "n"}},
-      {"v": null, "f": "=B2+C2", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=B2+C2", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null
     ],
     // ... 残り6行
@@ -66,24 +66,45 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
 1. **財務関数（PMT, NPER, PV, FV, RATE, IRR, NPV等）**
    - bg: "#FFFDE7", fc: "#F57F17" （黄色系）
 
-2. **数学・統計関数（SUM, AVERAGE, COUNT, MAX, MIN, ROUND, ABS, STDEV等）**  
-   - bg: "#FFE0B2", fc: "#D84315" （明るいオレンジ系）
+2. **数学・三角関数（SUM, AVERAGE, COUNT, MAX, MIN, ROUND, ABS, SIN, COS等）**  
+   - bg: "#FFF3E0", fc: "#E65100" （オレンジ系）
 
-3. **検索・参照関数（VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP等）**
+3. **統計関数（MEDIAN, MODE, STDEV, VAR, CORREL, PERCENTILE等）**  
+   - bg: "#FFEBEE", fc: "#C62828" （赤系）
+
+4. **検索・参照関数（VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP等）**
    - bg: "#E3F2FD", fc: "#1976D2" （青系）
 
-4. **論理関数（IF, AND, OR, NOT, TRUE, FALSE等）**
+5. **論理関数（IF, AND, OR, NOT, TRUE, FALSE等）**
    - bg: "#E8F5E8", fc: "#2E7D32" （緑系）
 
-5. **日付・時刻関数（TODAY, NOW, DATE, YEAR, MONTH, DAY, DATEDIF, NETWORKDAYS等）**
+6. **日付・時刻関数（TODAY, NOW, DATE, YEAR, MONTH, DAY, DATEDIF, NETWORKDAYS等）**
    - bg: "#F3E5F5", fc: "#7B1FA2" （紫系）
 
-6. **文字列関数（CONCATENATE, LEFT, RIGHT, MID, LEN, UPPER, LOWER等）**
+7. **文字列関数（CONCATENATE, LEFT, RIGHT, MID, LEN, UPPER, LOWER等）**
    - bg: "#FCE4EC", fc: "#C2185B" （ピンク系）
 
-7. **その他の関数・未対応の関数**
-   - bg: "#F5F5F5", fc: "#616161" （グレー系）
-   - 注意：上記のカテゴリに当てはまらない関数や、認識できない関数はすべてこの色になります
+8. **情報関数（ISBLANK, ISERROR, TYPE, INFO等）**
+   - bg: "#E0F2F1", fc: "#00695C" （水色系）
+
+9. **データベース関数（DSUM, DAVERAGE, DCOUNT等）**
+   - bg: "#EFEBE9", fc: "#5D4037" （茶色系）
+
+10. **エンジニアリング関数（CONVERT, BIN2DEC, COMPLEX等）**
+    - bg: "#E8F5E8", fc: "#388E3C" （深緑系）
+
+11. **キューブ関数（CUBEVALUE, CUBEMEMBER等）**
+    - bg: "#E8EAF6", fc: "#3F51B5" （インディゴ系）
+
+12. **Web関数（WEBSERVICE, FILTERXML等）**
+    - bg: "#E0F7FA", fc: "#0097A7" （シアン系）
+
+13. **Google Sheets専用関数（JOIN, ARRAYFORMULA, QUERY等）**
+    - bg: "#F1F8E9", fc: "#689F38" （ライム系）
+
+14. **その他の関数・未対応の関数**
+    - bg: "#F5F5F5", fc: "#616161" （グレー系）
+    - 注意：上記のカテゴリに当てはまらない関数や、認識できない関数はすべてこの色になります
 
 **極めて重要：数式フィールドの必須化**
 - ユーザーがリクエストした関数を使用する計算結果のセルには、必ず"f"フィールドに数式を含めてください
@@ -137,28 +158,28 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "1月", "ct": {"t": "s"}},
       {"v": 100000, "ct": {"t": "n"}},
       {"v": 30000, "ct": {"t": "n"}},
-      {"v": null, "f": "=B2-C2", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=B2-C2", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null
     ],
     [
       {"v": "2月", "ct": {"t": "s"}},
       {"v": 120000, "ct": {"t": "n"}},
       {"v": 35000, "ct": {"t": "n"}},
-      {"v": null, "f": "=B3-C3", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=B3-C3", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null
     ],
     [
       {"v": "3月", "ct": {"t": "s"}},
       {"v": 150000, "ct": {"t": "n"}},
       {"v": 40000, "ct": {"t": "n"}},
-      {"v": null, "f": "=B4-C4", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=B4-C4", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null
     ],
     [
-      {"v": "合計", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": null, "f": "=SUM(B2:B4)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=SUM(C2:C4)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=SUM(D2:D4)", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": "合計", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": null, "f": "=SUM(B2:B4)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=SUM(C2:C4)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=SUM(D2:D4)", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null
     ],
     [null, null, null, null, null, null, null, null],
@@ -275,36 +296,36 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "田中", "ct": {"t": "s"}},
       {"v": 80000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B2>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B2>=100000,"目標達成","要改善")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null, null
     ],
     [
       {"v": "佐藤", "ct": {"t": "s"}},
       {"v": 120000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B3>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B3>=100000,"目標達成","要改善")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null, null
     ],
     [
       {"v": "鈴木", "ct": {"t": "s"}},
       {"v": 95000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B4>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B4>=100000,"目標達成","要改善")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null, null
     ],
     [
       {"v": "山田", "ct": {"t": "s"}},
       {"v": 150000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B5>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B5>=100000,"目標達成","要改善")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null, null
     ],
     [
       {"v": "伊藤", "ct": {"t": "s"}},
       {"v": 110000, "ct": {"t": "n"}},
-      {"v": null, "f": "=IF(B6>=100000,"目標達成","要改善")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=IF(B6>=100000,"目標達成","要改善")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null, null
     ],
     [
-      {"v": "合計", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": null, "f": "=SUM(B2:B6)", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": "合計", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": null, "f": "=SUM(B2:B6)", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null, null, null
     ],
     [null, null, null, null, null, null, null, null]
@@ -334,7 +355,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "定期支払額", "ct": {"t": "s"}, "bg": "#E3F2FD"},
       {"v": "現在価値", "ct": {"t": "s"}, "bg": "#E3F2FD"},
       {"v": "将来価値", "ct": {"t": "s"}, "bg": "#E3F2FD"},
-      {"v": "期間", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      {"v": "期間", "ct": {"t": "s"}, "bg": "#FFF3E0"},
       null, null, null
     ],
     [
@@ -397,41 +418,41 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "田中", "ct": {"t": "s"}},
       {"v": "1990-05-15", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF("1990-05-15",TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF("1990-05-15",TODAY(),"Y")", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
       null
     ],
     [
       {"v": "佐藤", "ct": {"t": "s"}},
       {"v": "1985-11-20", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(DATE(1985,11,20),TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(DATE(1985,11,20),TODAY(),"Y")", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
       null
     ],
     [
       {"v": "鈴木", "ct": {"t": "s"}},
       {"v": "1992-02-10", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(DATE(1992,2,10),TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(DATE(1992,2,10),TODAY(),"Y")", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
       null
     ],
     [
       {"v": "山田", "ct": {"t": "s"}},
       {"v": "1995-08-30", "ct": {"t": "s"}},
-      {"v": null, "f": "=DATEDIF(DATE(1995,8,30),TODAY(),"Y")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=TODAY()", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=DATEDIF(DATE(1995,8,30),TODAY(),"Y")", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=TODAY()", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=YEAR(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=MONTH(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=DAY(TODAY())", "bg": "#FFF3E0", "fc": "#E65100"},
       null
     ],
     [null, null, null, null, null, null, null, null],
@@ -462,7 +483,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "田中", "ct": {"t": "s"}},
       {"v": "営業部", "ct": {"t": "s"}},
       {"v": 102, "ct": {"t": "n"}},
-      {"v": null, "f": "=INDEX(C2:C6,MATCH(D2,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D2,A2:A6,0))", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [
@@ -470,7 +491,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "佐藤", "ct": {"t": "s"}},
       {"v": "開発部", "ct": {"t": "s"}},
       {"v": 103, "ct": {"t": "n"}},
-      {"v": null, "f": "=INDEX(C2:C6,MATCH(D3,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D3,A2:A6,0))", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [
@@ -478,7 +499,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "鈴木", "ct": {"t": "s"}},
       {"v": "人事部", "ct": {"t": "s"}},
       {"v": 104, "ct": {"t": "n"}},
-      {"v": null, "f": "=INDEX(C2:C6,MATCH(D4,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D4,A2:A6,0))", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [
@@ -486,7 +507,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "山田", "ct": {"t": "s"}},
       {"v": "総務部", "ct": {"t": "s"}},
       {"v": 105, "ct": {"t": "n"}},
-      {"v": null, "f": "=INDEX(C2:C6,MATCH(D5,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D5,A2:A6,0))", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [
@@ -494,7 +515,7 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "伊藤", "ct": {"t": "s"}},
       {"v": "マーケティング部", "ct": {"t": "s"}},
       {"v": 101, "ct": {"t": "n"}},
-      {"v": null, "f": "=INDEX(C2:C6,MATCH(D6,A2:A6,0))", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=INDEX(C2:C6,MATCH(D6,A2:A6,0))", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [null, null, null, null, null, null, null, null],
@@ -554,10 +575,10 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       null, null
     ],
     [
-      {"v": "合計", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      {"v": "合計", "ct": {"t": "s"}, "bg": "#FFF3E0"},
       null, null,
-      {"v": null, "f": "=SUM(D2:D4)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=SUM(E2:E4)", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=SUM(D2:D4)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=SUM(E2:E4)", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [null, null, null, null, null, null, null, null],
@@ -647,17 +668,17 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": "ローン金額", "ct": {"t": "s"}, "bg": "#E3F2FD"},
       {"v": "年利率", "ct": {"t": "s"}, "bg": "#E3F2FD"},
       {"v": "期間（年）", "ct": {"t": "s"}, "bg": "#E3F2FD"},
-      {"v": "月利率", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "支払回数", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "月額支払", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      {"v": "月利率", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "支払回数", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "月額支払", "ct": {"t": "s"}, "bg": "#FFF3E0"},
       null, null
     ],
     [
       {"v": 1000000, "ct": {"t": "n"}},
       {"v": 0.03, "ct": {"t": "n"}},
       {"v": 5, "ct": {"t": "n"}},
-      {"v": null, "f": "=B2/12", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=C2*12", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=B2/12", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=C2*12", "bg": "#FFF3E0", "fc": "#E65100"},
       {"v": null, "f": "=PMT(D2,E2,-A2)", "bg": "#FFFDE7", "fc": "#F57F17"},
       null, null
     ],
@@ -665,8 +686,8 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       {"v": 2000000, "ct": {"t": "n"}},
       {"v": 0.025, "ct": {"t": "n"}},
       {"v": 10, "ct": {"t": "n"}},
-      {"v": null, "f": "=B3/12", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=C3*12", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=B3/12", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=C3*12", "bg": "#FFF3E0", "fc": "#E65100"},
       {"v": null, "f": "=PMT(D3,E3,-A3)", "bg": "#FFFDE7", "fc": "#F57F17"},
       null, null
     ],
@@ -689,22 +710,22 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "姓", "ct": {"t": "s"}, "bg": "#E3F2FD"},
       {"v": "名", "ct": {"t": "s"}, "bg": "#E3F2FD"},
-      {"v": "フルネーム", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "メールアドレス", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      {"v": "フルネーム", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "メールアドレス", "ct": {"t": "s"}, "bg": "#FFF3E0"},
       null, null, null, null
     ],
     [
       {"v": "田中", "ct": {"t": "s"}},
       {"v": "太郎", "ct": {"t": "s"}},
-      {"v": null, "f": "=CONCATENATE(A2,\" \",B2)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=CONCATENATE(B2,\".\",A2,\"@example.com\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=CONCATENATE(A2,\" \",B2)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=CONCATENATE(B2,\".\",A2,\"@example.com\")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null
     ],
     [
       {"v": "佐藤", "ct": {"t": "s"}},
       {"v": "花子", "ct": {"t": "s"}},
-      {"v": null, "f": "=CONCATENATE(A3,\" \",B3)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=CONCATENATE(B3,\".\",A3,\"@example.com\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=CONCATENATE(A3,\" \",B3)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=CONCATENATE(B3,\".\",A3,\"@example.com\")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null, null
     ],
     [null, null, null, null, null, null, null, null],
@@ -725,26 +746,26 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
   "spreadsheet_data": [
     [
       {"v": "元の数値", "ct": {"t": "s"}, "bg": "#E3F2FD"},
-      {"v": "小数第1位", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "整数", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "切り上げ", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "切り捨て", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      {"v": "小数第1位", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "整数", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "切り上げ", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "切り捨て", "ct": {"t": "s"}, "bg": "#FFF3E0"},
       null, null, null
     ],
     [
       {"v": 3.14159, "ct": {"t": "n"}},
-      {"v": null, "f": "=ROUND(A2,1)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=ROUND(A2,0)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=ROUNDUP(A2,1)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=ROUNDDOWN(A2,1)", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=ROUND(A2,1)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=ROUND(A2,0)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=ROUNDUP(A2,1)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=ROUNDDOWN(A2,1)", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [
       {"v": 123.456, "ct": {"t": "n"}},
-      {"v": null, "f": "=ROUND(A3,1)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=ROUND(A3,0)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=ROUNDUP(A3,1)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=ROUNDDOWN(A3,1)", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=ROUND(A3,1)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=ROUND(A3,0)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=ROUNDUP(A3,1)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=ROUNDDOWN(A3,1)", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [null, null, null, null, null, null, null, null],
@@ -766,17 +787,17 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
     [
       {"v": "データ", "ct": {"t": "s"}, "bg": "#E3F2FD"},
       {"v": "分類", "ct": {"t": "s"}, "bg": "#E3F2FD"},
-      {"v": "数値カウント", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "全カウント", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": "A分類カウント", "ct": {"t": "s"}, "bg": "#FFE0B2"},
+      {"v": "数値カウント", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "全カウント", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": "A分類カウント", "ct": {"t": "s"}, "bg": "#FFF3E0"},
       null, null, null
     ],
     [
       {"v": 100, "ct": {"t": "n"}},
       {"v": "A", "ct": {"t": "s"}},
-      {"v": null, "f": "=COUNT(A2:A6)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=COUNTA(A2:A6)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=COUNTIF(B2:B6,\"A\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": null, "f": "=COUNT(A2:A6)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=COUNTA(A2:A6)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=COUNTIF(B2:B6,\"A\")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null, null
     ],
     [
@@ -858,12 +879,12 @@ Structured Outputsにより、レスポンスは自動的に指定されたJSON�
       null, null
     ],
     [
-      {"v": "合計/平均", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": null, "f": "=SUM(B2:B5)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=COUNTIF(C2:C5,\"目標達成\")", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": "平均在庫", "ct": {"t": "s"}, "bg": "#FFE0B2"},
-      {"v": null, "f": "=AVERAGE(E2:E5)", "bg": "#FFE0B2", "fc": "#D84315"},
-      {"v": null, "f": "=COUNTIF(F2:F5,\"要発注\")", "bg": "#FFE0B2", "fc": "#D84315"},
+      {"v": "合計/平均", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": null, "f": "=SUM(B2:B5)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=COUNTIF(C2:C5,\"目標達成\")", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": "平均在庫", "ct": {"t": "s"}, "bg": "#FFF3E0"},
+      {"v": null, "f": "=AVERAGE(E2:E5)", "bg": "#FFF3E0", "fc": "#E65100"},
+      {"v": null, "f": "=COUNTIF(F2:F5,\"要発注\")", "bg": "#FFF3E0", "fc": "#E65100"},
       null, null
     ],
     [null, null, null, null, null, null, null, null],
