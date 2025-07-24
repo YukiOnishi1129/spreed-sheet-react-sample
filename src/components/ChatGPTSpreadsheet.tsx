@@ -388,6 +388,46 @@ const ChatGPTSpreadsheet: React.FC = () => {
               </button>
             )}
           </div>
+          
+          {/* 色の凡例 */}
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-sm font-semibold text-gray-700 mb-2">セルの色の意味:</p>
+            <div className="flex flex-wrap gap-3 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-blue-100 border border-gray-300 rounded"></div>
+                <span>ヘッダー</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-orange-100 border border-orange-600 rounded"></div>
+                <span>💰 財務関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-orange-200 border border-orange-400 rounded"></div>
+                <span>📊 数学・統計関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-blue-100 border border-blue-400 rounded"></div>
+                <span>🔍 検索・参照関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-green-100 border border-green-400 rounded"></div>
+                <span>⚡ 論理関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-purple-100 border border-purple-400 rounded"></div>
+                <span>📅 日付・時刻関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-pink-100 border border-pink-400 rounded"></div>
+                <span>📝 文字列関数</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-gray-100 border border-gray-400 rounded"></div>
+                <span>🔧 その他/未対応</span>
+              </div>
+            </div>
+          </div>
+          
           <Controller
             name="spreadsheetData"
             control={control}

@@ -319,18 +319,18 @@
 
 /* 財務関数用スタイル（NPER, PMT, PV, FV等） */
 .Spreadsheet__cell.financial-formula-cell {
-  background-color: #FFE0B2 !important;
-  color: #D84315 !important;
+  background-color: #FFF3E0 !important;
+  color: #E65100 !important;
   font-weight: bold !important;
-  border: 2px solid #FF9800 !important;
+  border: 2px solid #FF6F00 !important;
   position: relative;
   cursor: pointer;
 }
 
 .Spreadsheet__cell.financial-formula-cell:hover {
-  background-color: #FFCC80 !important;
+  background-color: #FFE0B2 !important;
   transform: scale(1.02);
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 111, 0, 0.3);
 }
 
 .Spreadsheet__cell.financial-formula-cell::before {
@@ -339,7 +339,7 @@
   top: -2px;
   right: -2px;
   font-size: 10px;
-  background-color: #FF9800;
+  background-color: #FF6F00;
   color: white;
   border-radius: 50%;
   width: 12px;

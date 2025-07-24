@@ -105,10 +105,20 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
           // 背景色情報を className として設定
           if (originalCell && hasBackgroundProperty(originalCell) && originalCell.bg) {
             // Tailwind CSSの動的クラスは機能しないので、特定の色に対してマッピング
-            if (originalCell.bg === '#FFE0B2') {
-              result.className = 'bg-orange-200';
+            if (originalCell.bg === '#FFF3E0') {
+              result.className = 'bg-orange-100';  // 財務関数（深いオレンジ）
+            } else if (originalCell.bg === '#FFE0B2') {
+              result.className = 'bg-orange-200';  // 数学・統計関数（明るいオレンジ）
             } else if (originalCell.bg === '#E3F2FD') {
-              result.className = 'bg-blue-100';
+              result.className = 'bg-blue-100';    // 検索・参照関数
+            } else if (originalCell.bg === '#E8F5E8') {
+              result.className = 'bg-green-100';   // 論理関数
+            } else if (originalCell.bg === '#F3E5F5') {
+              result.className = 'bg-purple-100';  // 日付・時刻関数
+            } else if (originalCell.bg === '#FCE4EC') {
+              result.className = 'bg-pink-100';    // 文字列関数
+            } else if (originalCell.bg === '#F5F5F5') {
+              result.className = 'bg-gray-100';    // その他/未対応
             } else {
               result.className = `bg-[${originalCell.bg}]`;
             }
