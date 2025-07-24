@@ -21,7 +21,7 @@ import {
 import {
   convertToMatrixCellBase,
 } from './utils/conversions';
-import { recalculateFormulas } from './utils/hyperFormulaCalculations';
+import { recalculateFormulas } from './utils/customFormulaCalculations';
 import { useExcelFunctionSearch } from './hooks/useExcelFunctionSearch';
 
 const ChatGPTSpreadsheet: React.FC = () => {
