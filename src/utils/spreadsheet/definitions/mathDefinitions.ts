@@ -104,6 +104,157 @@ export const MATH_FUNCTIONS: Record<string, FunctionDefinition> = {
     colorScheme: COLOR_SCHEMES.math
   },
 
+  RAND: {
+    name: 'RAND',
+    syntax: 'RAND()',
+    params: [],
+    description: '0以上1未満の乱数を返します',
+    category: 'math',
+    examples: ['=RAND()'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  RANDBETWEEN: {
+    name: 'RANDBETWEEN',
+    syntax: 'RANDBETWEEN(bottom, top)',
+    params: [
+      { name: 'bottom', desc: '最小値' },
+      { name: 'top', desc: '最大値' }
+    ],
+    description: '指定された範囲内の整数の乱数を返します',
+    category: 'math',
+    examples: ['=RANDBETWEEN(1,100)', '=RANDBETWEEN(-10,10)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  MOD: {
+    name: 'MOD',
+    syntax: 'MOD(number, divisor)',
+    params: [
+      { name: 'number', desc: '被除数' },
+      { name: 'divisor', desc: '除数' }
+    ],
+    description: '除算の余りを返します',
+    category: 'math',
+    examples: ['=MOD(10,3)', '=MOD(A1,B1)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  CEILING: {
+    name: 'CEILING',
+    syntax: 'CEILING(number, significance)',
+    params: [
+      { name: 'number', desc: '切り上げる数値' },
+      { name: 'significance', desc: '基準値' }
+    ],
+    description: '基準値の倍数に切り上げます',
+    category: 'math',
+    examples: ['=CEILING(4.3,1)', '=CEILING(4.3,0.5)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  CEILING_MATH: {
+    name: 'CEILING.MATH',
+    syntax: 'CEILING.MATH(number, [significance], [mode])',
+    params: [
+      { name: 'number', desc: '切り上げる数値' },
+      { name: 'significance', desc: '基準値', optional: true },
+      { name: 'mode', desc: '負の数の丸めモード', optional: true }
+    ],
+    description: '基準値の倍数に切り上げます（数学的な切り上げ）',
+    category: 'math',
+    examples: ['=CEILING.MATH(4.3)', '=CEILING.MATH(4.3,0.5)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  FLOOR: {
+    name: 'FLOOR',
+    syntax: 'FLOOR(number, significance)',
+    params: [
+      { name: 'number', desc: '切り下げる数値' },
+      { name: 'significance', desc: '基準値' }
+    ],
+    description: '基準値の倍数に切り下げます',
+    category: 'math',
+    examples: ['=FLOOR(4.7,1)', '=FLOOR(4.7,0.5)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  FLOOR_MATH: {
+    name: 'FLOOR.MATH',
+    syntax: 'FLOOR.MATH(number, [significance], [mode])',
+    params: [
+      { name: 'number', desc: '切り下げる数値' },
+      { name: 'significance', desc: '基準値', optional: true },
+      { name: 'mode', desc: '負の数の丸めモード', optional: true }
+    ],
+    description: '基準値の倍数に切り下げます（数学的な切り下げ）',
+    category: 'math',
+    examples: ['=FLOOR.MATH(4.7)', '=FLOOR.MATH(4.7,0.5)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  TRUNC: {
+    name: 'TRUNC',
+    syntax: 'TRUNC(number, [num_digits])',
+    params: [
+      { name: 'number', desc: '切り捨てる数値' },
+      { name: 'num_digits', desc: '残す桁数', optional: true }
+    ],
+    description: '数値の小数部を切り捨てて整数または指定桁数にします',
+    category: 'math',
+    examples: ['=TRUNC(4.7)', '=TRUNC(4.789,2)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  INT: {
+    name: 'INT',
+    syntax: 'INT(number)',
+    params: [
+      { name: 'number', desc: '切り捨てる数値' }
+    ],
+    description: '数値を切り捨てて整数にします',
+    category: 'math',
+    examples: ['=INT(4.7)', '=INT(-4.7)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  SIGN: {
+    name: 'SIGN',
+    syntax: 'SIGN(number)',
+    params: [
+      { name: 'number', desc: '符号を調べる数値' }
+    ],
+    description: '数値の符号を返します（正=1、ゼロ=0、負=-1）',
+    category: 'math',
+    examples: ['=SIGN(10)', '=SIGN(-5)', '=SIGN(0)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  EVEN: {
+    name: 'EVEN',
+    syntax: 'EVEN(number)',
+    params: [
+      { name: 'number', desc: '偶数に切り上げる数値' }
+    ],
+    description: '最も近い偶数に切り上げます',
+    category: 'math',
+    examples: ['=EVEN(3)', '=EVEN(4.5)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
+  ODD: {
+    name: 'ODD',
+    syntax: 'ODD(number)',
+    params: [
+      { name: 'number', desc: '奇数に切り上げる数値' }
+    ],
+    description: '最も近い奇数に切り上げます',
+    category: 'math',
+    examples: ['=ODD(2)', '=ODD(4.5)'],
+    colorScheme: COLOR_SCHEMES.math
+  },
+
   PRODUCT: {
     name: 'PRODUCT',
     syntax: 'PRODUCT(number1, [number2], ...)',

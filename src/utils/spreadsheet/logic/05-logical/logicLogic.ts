@@ -69,7 +69,7 @@ function toLogical(value: unknown): boolean {
 // IF関数の実装
 export const IF: CustomFormula = {
   name: 'IF',
-  pattern: /IF\s*\((.+)\)/i,
+  pattern: /^IF\s*\((.+)\)$/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const fullArgs = matches[1];
     

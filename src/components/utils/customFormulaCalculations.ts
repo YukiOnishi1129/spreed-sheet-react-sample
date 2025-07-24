@@ -136,6 +136,7 @@ function calculateSingleFormula(formula: string, data: CellData[][], currentRow:
     const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;
     
     // カスタム関数のマッチングを試行
+    console.log(`Attempting to match formula: ${cleanFormula}`);
     const matchResult = matchFormula(cleanFormula);
     
     if (matchResult) {
