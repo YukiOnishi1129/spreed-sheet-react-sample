@@ -15,7 +15,7 @@ https://support.google.com/docs/table/25273?hl=ja
 - 📗 = Google Sheets専用関数
 - 📘 = Excel専用関数
 
-## 1. 数学・三角関数 (Math & Trigonometry)
+## 01. 数学・三角関数 (Math & Trigonometry)
 
 ### 基本的な数学関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -112,7 +112,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | MMULT | 行列の積を計算 | `=MMULT(配列1, 配列2)` | ✅ |
 | MUNIT | 単位行列を作成 | `=MUNIT(サイズ)` | ✅ |
 
-## 2. 統計関数 (Statistical Functions)
+## 02. 統計関数 (Statistical Functions)
 
 ### 基本統計関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -173,36 +173,36 @@ https://support.google.com/docs/table/25273?hl=ja
 ### 分布関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| NORM.DIST | 正規分布 | `=NORM.DIST(x, 平均, 標準偏差, 累積)` | ❌
-| NORM.INV | 正規分布の逆関数 | `=NORM.INV(確率, 平均, 標準偏差)` | ❌
-| NORM.S.DIST | 標準正規分布 | `=NORM.S.DIST(z, 累積)` | ❌
-| NORM.S.INV | 標準正規分布の逆関数 | `=NORM.S.INV(確率)` | ❌
-| LOGNORM.DIST | 対数正規分布 | `=LOGNORM.DIST(x, 平均, 標準偏差, 累積)` | ❌
-| LOGNORM.INV | 対数正規分布の逆関数 | `=LOGNORM.INV(確率, 平均, 標準偏差)` | ❌
-| T.DIST | t分布（左側） | `=T.DIST(x, 自由度, 累積)` | ❌
-| T.DIST.2T | t分布（両側） | `=T.DIST.2T(x, 自由度)` | ❌
-| T.DIST.RT | t分布（右側） | `=T.DIST.RT(x, 自由度)` | ❌
+| NORM.DIST | 正規分布 | `=NORM.DIST(x, 平均, 標準偏差, 累積)` | ✅
+| NORM.INV | 正規分布の逆関数 | `=NORM.INV(確率, 平均, 標準偏差)` | ✅
+| NORM.S.DIST | 標準正規分布 | `=NORM.S.DIST(z, 累積)` | ✅
+| NORM.S.INV | 標準正規分布の逆関数 | `=NORM.S.INV(確率)` | ✅
+| LOGNORM.DIST | 対数正規分布 | `=LOGNORM.DIST(x, 平均, 標準偏差, 累積)` | ✅
+| LOGNORM.INV | 対数正規分布の逆関数 | `=LOGNORM.INV(確率, 平均, 標準偏差)` | ✅
+| T.DIST | t分布（左側） | `=T.DIST(x, 自由度, 累積)` | ✅
+| T.DIST.2T | t分布（両側） | `=T.DIST.2T(x, 自由度)` | ✅
+| T.DIST.RT | t分布（右側） | `=T.DIST.RT(x, 自由度)` | ✅
 | T.INV | t分布の逆関数（左側） | `=T.INV(確率, 自由度)` | ❌
 | T.INV.2T | t分布の逆関数（両側） | `=T.INV.2T(確率, 自由度)` | ❌
-| CHISQ.DIST | カイ二乗分布 | `=CHISQ.DIST(x, 自由度, 累積)` | ❌
-| CHISQ.DIST.RT | カイ二乗分布（右側） | `=CHISQ.DIST.RT(x, 自由度)` | ❌
+| CHISQ.DIST | カイ二乗分布 | `=CHISQ.DIST(x, 自由度, 累積)` | ✅
+| CHISQ.DIST.RT | カイ二乗分布（右側） | `=CHISQ.DIST.RT(x, 自由度)` | ✅
 | CHISQ.INV | カイ二乗分布の逆関数 | `=CHISQ.INV(確率, 自由度)` | ❌
 | CHISQ.INV.RT | カイ二乗分布の逆関数（右側） | `=CHISQ.INV.RT(確率, 自由度)` | ❌
-| F.DIST | F分布 | `=F.DIST(x, 自由度1, 自由度2, 累積)` | ❌
-| F.DIST.RT | F分布（右側） | `=F.DIST.RT(x, 自由度1, 自由度2)` | ❌
+| F.DIST | F分布 | `=F.DIST(x, 自由度1, 自由度2, 累積)` | ✅
+| F.DIST.RT | F分布（右側） | `=F.DIST.RT(x, 自由度1, 自由度2)` | ✅
 | F.INV | F分布の逆関数 | `=F.INV(確率, 自由度1, 自由度2)` | ❌
 | F.INV.RT | F分布の逆関数（右側） | `=F.INV.RT(確率, 自由度1, 自由度2)` | ❌
-| BETA.DIST | ベータ分布 | `=BETA.DIST(x, α, β, 累積, [A], [B])` | ❌
+| BETA.DIST | ベータ分布 | `=BETA.DIST(x, α, β, 累積, [A], [B])` | ✅
 | BETA.INV | ベータ分布の逆関数 | `=BETA.INV(確率, α, β, [A], [B])` | ❌
-| GAMMA.DIST | ガンマ分布 | `=GAMMA.DIST(x, α, β, 累積)` | ❌
+| GAMMA.DIST | ガンマ分布 | `=GAMMA.DIST(x, α, β, 累積)` | ✅
 | GAMMA.INV | ガンマ分布の逆関数 | `=GAMMA.INV(確率, α, β)` | ❌
-| EXPON.DIST | 指数分布 | `=EXPON.DIST(x, λ, 累積)` | ❌
-| WEIBULL.DIST | ワイブル分布 | `=WEIBULL.DIST(x, α, β, 累積)` | ❌
-| BINOM.DIST | 二項分布 | `=BINOM.DIST(成功数, 試行回数, 成功率, 累積)` | ❌
+| EXPON.DIST | 指数分布 | `=EXPON.DIST(x, λ, 累積)` | ✅
+| WEIBULL.DIST | ワイブル分布 | `=WEIBULL.DIST(x, α, β, 累積)` | ✅
+| BINOM.DIST | 二項分布 | `=BINOM.DIST(成功数, 試行回数, 成功率, 累積)` | ✅
 | BINOM.INV | 二項分布の逆関数 | `=BINOM.INV(試行回数, 成功率, α)` | ❌
-| NEGBINOM.DIST | 負の二項分布 | `=NEGBINOM.DIST(失敗数, 成功数, 成功率, 累積)` | ❌
-| POISSON.DIST | ポアソン分布 | `=POISSON.DIST(x, 平均, 累積)` | ❌
-| HYPGEOM.DIST | 超幾何分布 | `=HYPGEOM.DIST(標本成功数, 標本数, 母集団成功数, 母集団数, 累積)` | ❌
+| NEGBINOM.DIST | 負の二項分布 | `=NEGBINOM.DIST(失敗数, 成功数, 成功率, 累積)` | ✅
+| POISSON.DIST | ポアソン分布 | `=POISSON.DIST(x, 平均, 累積)` | ✅
+| HYPGEOM.DIST | 超幾何分布 | `=HYPGEOM.DIST(標本成功数, 標本数, 母集団成功数, 母集団数, 累積)` | ✅
 
 ### 検定・推定関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -249,7 +249,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | PERMUTATIONA | 重複順列 | `=PERMUTATIONA(総数, 選択数)` | ✅
 | COMBINA | 重複組合せ | `=COMBINA(総数, 選択数)` | ✅
 
-## 3. 文字列操作関数 (Text Functions)
+## 03. 文字列操作関数 (Text Functions)
 
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
@@ -296,7 +296,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | ARABIC | ローマ数字をアラビア数字に変換 | `=ARABIC(文字列)` | ✅
 | ROMAN | アラビア数字をローマ数字に変換 | `=ROMAN(数値, [書式])` | ✅
 
-## 4. 日付・時刻関数 (Date & Time Functions)
+## 04. 日付・時刻関数 (Date & Time Functions)
 
 ### 基本的な日付・時刻関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -331,7 +331,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | WORKDAY.INTL | 稼働日（国際版） | `=WORKDAY.INTL(開始日, 日数, [週末], [祝日])` | ❌
 | YEARFRAC | 年の割合を計算 | `=YEARFRAC(開始日, 終了日, [基準])` | ✅
 
-## 5. 論理関数 (Logical Functions)
+## 05. 論理関数 (Logical Functions)
 
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
@@ -349,27 +349,27 @@ https://support.google.com/docs/table/25273?hl=ja
 | LAMBDA | カスタム関数を作成 | `=LAMBDA([パラメータ1, ...], 計算式)` | ❌
 | LET | 変数を定義して使用 | `=LET(名前1, 値1, 計算式)` | ❌
 
-## 6. 検索・参照関数 (Lookup & Reference Functions)
+## 06. 検索・参照関数 (Lookup & Reference Functions)
 
 ### 基本的な検索関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| VLOOKUP | 垂直方向検索 | `=VLOOKUP(検索値, 範囲, 列番号, [検索方法])` | ❌
-| HLOOKUP | 水平方向検索 | `=HLOOKUP(検索値, 範囲, 行番号, [検索方法])` | ❌
+| VLOOKUP | 垂直方向検索 | `=VLOOKUP(検索値, 範囲, 列番号, [検索方法])` | ✅
+| HLOOKUP | 水平方向検索 | `=HLOOKUP(検索値, 範囲, 行番号, [検索方法])` | ✅
 | XLOOKUP | 柔軟な検索 | `=XLOOKUP(検索値, 検索範囲, 戻り範囲, [見つからない場合], [一致モード], [検索モード])` | ✅
-| LOOKUP | 検索（旧式） | `=LOOKUP(検索値, 検索範囲, [結果範囲])` | ❌
-| INDEX | 位置から値を取得 | `=INDEX(配列, 行番号, [列番号])` | ❌
-| MATCH | 値の位置を検索 | `=MATCH(検索値, 検索範囲, [照合の種類])` | ❌
+| LOOKUP | 検索（旧式） | `=LOOKUP(検索値, 検索範囲, [結果範囲])` | ✅
+| INDEX | 位置から値を取得 | `=INDEX(配列, 行番号, [列番号])` | ✅
+| MATCH | 値の位置を検索 | `=MATCH(検索値, 検索範囲, [照合の種類])` | ✅
 | XMATCH | 値の位置を検索（拡張版） | `=XMATCH(検索値, 検索配列, [一致モード], [検索モード])` | ❌  |
 
 ### 参照関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| CHOOSE | リストから選択 | `=CHOOSE(インデックス番号, 値1, [値2], ...)` | ❌
+| CHOOSE | リストから選択 | `=CHOOSE(インデックス番号, 値1, [値2], ...)` | ✅
 | CHOOSEROWS | 行を選択 | `=CHOOSEROWS(配列, 行番号1, [行番号2], ...)` | ❌  |
 | CHOOSECOLS | 列を選択 | `=CHOOSECOLS(配列, 列番号1, [列番号2], ...)` | ❌  |
-| OFFSET | オフセット参照 | `=OFFSET(参照, 行数, 列数, [高さ], [幅])` | ❌
-| INDIRECT | 文字列から参照を作成 | `=INDIRECT(参照文字列, [参照形式])` | ❌
+| OFFSET | オフセット参照 | `=OFFSET(参照, 行数, 列数, [高さ], [幅])` | ✅
+| INDIRECT | 文字列から参照を作成 | `=INDIRECT(参照文字列, [参照形式])` | ✅
 | ROW | 行番号を返す | `=ROW([参照])` | ❌
 | ROWS | 行数を返す | `=ROWS(配列)` | ❌
 | COLUMN | 列番号を返す | `=COLUMN([参照])` | ❌
@@ -379,7 +379,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | FORMULATEXT | 数式を文字列で返す | `=FORMULATEXT(参照)` | ❌
 | GETPIVOTDATA | ピボットテーブルからデータ取得 | `=GETPIVOTDATA(データフィールド, ピボットテーブル, [フィールド1, アイテム1], ...)` | ❌
 | HYPERLINK | ハイパーリンクを作成 | `=HYPERLINK(リンク先, [表示文字列])` | ❌
-| TRANSPOSE | 行列を入れ替え | `=TRANSPOSE(配列)` | ❌
+| TRANSPOSE | 行列を入れ替え | `=TRANSPOSE(配列)` | ✅
 
 ### 動的配列関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -400,49 +400,49 @@ https://support.google.com/docs/table/25273?hl=ja
 | WRAPROWS | 行で折り返し | `=WRAPROWS(ベクトル, 折り返し数, [パディング値])` | ❌ 📘 |
 | WRAPCOLS | 列で折り返し | `=WRAPCOLS(ベクトル, 折り返し数, [パディング値])` | ❌ 📘 |
 
-## 7. 情報関数 (Information Functions)
+## 07. 情報関数 (Information Functions)
 
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| ISBLANK | 空白セルか判定 | `=ISBLANK(値)` | ❌
-| ISERROR | エラー値か判定 | `=ISERROR(値)` | ❌
-| ISERR | エラー値か判定（#N/A以外） | `=ISERR(値)` | ❌
-| ISNA | #N/Aエラーか判定 | `=ISNA(値)` | ❌
-| ISTEXT | 文字列か判定 | `=ISTEXT(値)` | ❌
-| ISNONTEXT | 文字列以外か判定 | `=ISNONTEXT(値)` | ❌
-| ISNUMBER | 数値か判定 | `=ISNUMBER(値)` | ❌
-| ISLOGICAL | 論理値か判定 | `=ISLOGICAL(値)` | ❌
-| ISREF | 参照か判定 | `=ISREF(値)` | ❌
-| ISFORMULA | 数式か判定 | `=ISFORMULA(参照)` | ❌
-| ISEVEN | 偶数か判定 | `=ISEVEN(数値)` | ❌
-| ISODD | 奇数か判定 | `=ISODD(数値)` | ❌
-| INFO | システム情報を返す | `=INFO(検査の種類)` | ❌
+| ISBLANK | 空白セルか判定 | `=ISBLANK(値)` | ✅
+| ISERROR | エラー値か判定 | `=ISERROR(値)` | ✅
+| ISERR | エラー値か判定（#N/A以外） | `=ISERR(値)` | ✅
+| ISNA | #N/Aエラーか判定 | `=ISNA(値)` | ✅
+| ISTEXT | 文字列か判定 | `=ISTEXT(値)` | ✅
+| ISNONTEXT | 文字列以外か判定 | `=ISNONTEXT(値)` | ✅
+| ISNUMBER | 数値か判定 | `=ISNUMBER(値)` | ✅
+| ISLOGICAL | 論理値か判定 | `=ISLOGICAL(値)` | ✅
+| ISREF | 参照か判定 | `=ISREF(値)` | ✅
+| ISFORMULA | 数式か判定 | `=ISFORMULA(参照)` | ✅
+| ISEVEN | 偶数か判定 | `=ISEVEN(数値)` | ✅
+| ISODD | 奇数か判定 | `=ISODD(数値)` | ✅
+| INFO | システム情報を返す | `=INFO(検査の種類)` | ✅
 | TYPE | データ型を返す | `=TYPE(値)` | ✅
 | N | 数値に変換 | `=N(値)` | ✅
-| NA | #N/Aエラーを返す | `=NA()` | ❌
-| ERROR.TYPE | エラーの種類を返す | `=ERROR.TYPE(エラー値)` | ❌
-| SHEET | シート番号を返す | `=SHEET([値])` | ❌
-| SHEETS | シート数を返す | `=SHEETS([参照])` | ❌
-| CELL | セル情報を返す | `=CELL(検査の種類, [参照])` | ❌
+| NA | #N/Aエラーを返す | `=NA()` | ✅
+| ERROR.TYPE | エラーの種類を返す | `=ERROR.TYPE(エラー値)` | ✅
+| SHEET | シート番号を返す | `=SHEET([値])` | ✅
+| SHEETS | シート数を返す | `=SHEETS([参照])` | ✅
+| CELL | セル情報を返す | `=CELL(検査の種類, [参照])` | ✅
 
-## 8. データベース関数 (Database Functions)
+## 08. データベース関数 (Database Functions)
 
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| DSUM | 条件付き合計 | `=DSUM(データベース, フィールド, 条件)` | ❌
-| DAVERAGE | 条件付き平均 | `=DAVERAGE(データベース, フィールド, 条件)` | ❌
-| DCOUNT | 条件付きカウント | `=DCOUNT(データベース, フィールド, 条件)` | ❌
-| DCOUNTA | 条件付きカウント（空白以外） | `=DCOUNTA(データベース, フィールド, 条件)` | ❌
-| DMAX | 条件付き最大値 | `=DMAX(データベース, フィールド, 条件)` | ❌
-| DMIN | 条件付き最小値 | `=DMIN(データベース, フィールド, 条件)` | ❌
-| DPRODUCT | 条件付き積 | `=DPRODUCT(データベース, フィールド, 条件)` | ❌
+| DSUM | 条件付き合計 | `=DSUM(データベース, フィールド, 条件)` | ✅
+| DAVERAGE | 条件付き平均 | `=DAVERAGE(データベース, フィールド, 条件)` | ✅
+| DCOUNT | 条件付きカウント | `=DCOUNT(データベース, フィールド, 条件)` | ✅
+| DCOUNTA | 条件付きカウント（空白以外） | `=DCOUNTA(データベース, フィールド, 条件)` | ✅
+| DMAX | 条件付き最大値 | `=DMAX(データベース, フィールド, 条件)` | ✅
+| DMIN | 条件付き最小値 | `=DMIN(データベース, フィールド, 条件)` | ✅
+| DPRODUCT | 条件付き積 | `=DPRODUCT(データベース, フィールド, 条件)` | ✅
 | DSTDEV | 条件付き標準偏差（標本） | `=DSTDEV(データベース, フィールド, 条件)` | ❌
 | DSTDEVP | 条件付き標準偏差（母集団） | `=DSTDEVP(データベース, フィールド, 条件)` | ❌
 | DVAR | 条件付き分散（標本） | `=DVAR(データベース, フィールド, 条件)` | ❌
 | DVARP | 条件付き分散（母集団） | `=DVARP(データベース, フィールド, 条件)` | ❌
-| DGET | 条件に一致する値を取得 | `=DGET(データベース, フィールド, 条件)` | ❌
+| DGET | 条件に一致する値を取得 | `=DGET(データベース, フィールド, 条件)` | ✅
 
-## 9. 財務関数 (Financial Functions)
+## 09. 財務関数 (Financial Functions)
 
 ### 基本的な財務関数
 | 関数名 | 説明 | 構文 | 実装状況 |

@@ -1,6 +1,6 @@
 // 情報関数の実装
 
-import type { CustomFormula, FormulaContext } from './types';
+import type { CustomFormula, FormulaResult } from './types';
 import { FormulaError } from './types';
 import { getCellValue } from './utils';
 
@@ -206,7 +206,7 @@ export const ISNONTEXT: CustomFormula = {
 export const ISREF: CustomFormula = {
   name: 'ISREF',
   pattern: /ISREF\(([^)]+)\)/i,
-  calculate: (matches, context) => {
+  calculate: (matches) => {
     const valueRef = matches[1].trim();
     
     // セル参照パターンをチェック
@@ -222,9 +222,13 @@ export const ISFORMULA: CustomFormula = {
     const valueRef = matches[1].trim();
     
     if (valueRef.match(/^[A-Z]+\d+$/)) {
-      const cellData = context.data[parseInt(valueRef.match(/\d+/)![0]) - 1];
+      const rowMatch = valueRef.match(/\d+/);
+      if (!rowMatch) return false;
+      const cellData = context.data[parseInt(rowMatch[0]) - 1];
       if (cellData) {
-        const colIndex = valueRef.match(/^[A-Z]+/)![0].charCodeAt(0) - 65;
+        const colMatch = valueRef.match(/^[A-Z]+/);
+        if (!colMatch) return false;
+        const colIndex = colMatch[0].charCodeAt(0) - 65;
         const cell = cellData[colIndex];
         return typeof cell === 'object' && cell !== null && 'formula' in cell;
       }
@@ -265,6 +269,115 @@ export const ERROR_TYPE: CustomFormula = {
       case FormulaError.NUM: return 6;
       case FormulaError.NA: return 7;
       default: return FormulaError.NA;
+    }
+  }
+};
+
+// INFO関数の実装（システム情報を返す）
+export const INFO: CustomFormula = {
+  name: 'INFO',
+  pattern: /INFO\(([^)]+)\)/i,
+  calculate: (matches, context) => {
+    const typeRef = matches[1].trim();
+    const cellValue = getCellValue(typeRef, context);
+    const infoType = String(cellValue ?? typeRef.replace(/^['"]|['"]$/g, ''));
+    
+    switch (infoType.toLowerCase()) {
+      case 'directory':
+        return '/'; // デフォルトディレクトリ
+      case 'numfile':
+        return 1; // ファイル数
+      case 'origin':
+        return '$A$1'; // 原点
+      case 'osversion':
+        return 'Web'; // OS版本
+      case 'recalc':
+        return 'Automatic'; // 再計算モード
+      case 'release':
+        return '1.0'; // リリース版本
+      case 'system':
+        return 'Web'; // システム
+      case 'version':
+        return '1.0'; // 版本
+      default:
+        return FormulaError.VALUE;
+    }
+  }
+};
+
+// SHEET関数の実装（シート番号を返す）
+export const SHEET: CustomFormula = {
+  name: 'SHEET',
+  pattern: /SHEET\(([^)]*)\)/i,
+  calculate: () => {
+    // 現在のシート番号を返す（固定値として1を返す）
+    return 1;
+  }
+};
+
+// SHEETS関数の実装（シート数を返す）
+export const SHEETS: CustomFormula = {
+  name: 'SHEETS',
+  pattern: /SHEETS\(([^)]*)\)/i,
+  calculate: () => {
+    // シート数を返す（固定値として1を返す）
+    return 1;
+  }
+};
+
+// CELL関数の実装（セル情報を返す）
+export const CELL: CustomFormula = {
+  name: 'CELL',
+  pattern: /CELL\(([^,]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches, context): FormulaResult => {
+    const infoTypeRef = matches[1].trim();
+    const referenceRef = matches[2]?.trim() || 'A1';
+    
+    const infoTypeCellValue = getCellValue(infoTypeRef, context);
+    const infoType = String(infoTypeCellValue ?? infoTypeRef.replace(/^['"]|['"]$/g, ''));
+    const cellValue = getCellValue(referenceRef, context);
+    
+    switch (infoType.toLowerCase()) {
+      case 'address': {
+        return `$${referenceRef}`;
+      }
+      case 'col': {
+        const colMatch = referenceRef.match(/^([A-Z]+)/);
+        if (colMatch) {
+          const col = colMatch[1].split('').reduce((acc, char) => acc * 26 + char.charCodeAt(0) - 64, 0);
+          return col;
+        }
+        return 1;
+      }
+      case 'color':
+        return 0; // 色なし
+      case 'contents': {
+        const result: FormulaResult = cellValue !== null && cellValue !== undefined ? (cellValue as FormulaResult) : '';
+        return result;
+      }
+      case 'filename':
+        return 'spreadsheet.xlsx';
+      case 'format':
+        return 'G'; // 一般書式
+      case 'parentheses':
+        return 0; // 括弧なし
+      case 'prefix':
+        return ''; // プレフィックスなし
+      case 'protect':
+        return 0; // 保護なし
+      case 'row': {
+        const rowMatch = referenceRef.match(/(\d+)$/);
+        return rowMatch ? parseInt(rowMatch[1]) : 1;
+      }
+      case 'type':
+        if (typeof cellValue === 'string' && cellValue.startsWith('#')) return 'e'; // エラー
+        if (typeof cellValue === 'string') return 'l'; // ラベル
+        if (typeof cellValue === 'number') return 'v'; // 値
+        return 'b'; // 空白
+      case 'width':
+        return 10; // 列幅
+      default:
+        return FormulaError.VALUE;
     }
   }
 };
