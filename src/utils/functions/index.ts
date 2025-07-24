@@ -53,6 +53,12 @@ import {
 import {
   FISHER, FISHERINV, PHI, GAUSS, PROB, BINOM_INV
 } from './02-statistical/otherStatisticalFunctions';
+import {
+  MODE_SNGL, MODE_MULT, RANK_AVG, RANK_EQ
+} from './02-statistical/modeRankFunctions';
+import { NORMDIST, NORMINV, NORMSDIST, NORMSINV, BINOMDIST, POISSON, CRITBINOM, CONFIDENCE, ZTEST } from './02-statistical/legacyStatisticalFunctions';
+import { LOGNORMDIST, LOGINV, EXPONDIST, WEIBULL, GAMMADIST, GAMMAINV, BETADIST, BETAINV, CHIDIST, CHIINV } from './02-statistical/otherDistributionFunctions';
+import { FDIST, FINV, TDIST, TINV, FTEST, TTEST, CHITEST, NEGBINOMDIST } from './02-statistical/legacyDistributionFunctions';
 
 import { 
   CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT,
@@ -77,6 +83,10 @@ import { DSTDEV, DSTDEVP, DVAR, DVARP } from './08-database/statisticalDatabaseF
 
 import { PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE } from './09-financial/financialFunctions';
 import { NPER, XNPV, XIRR, MIRR, SLN, SYD, DB, DDB, VDB, PDURATION, RRI } from './09-financial/additionalFinancialFunctions';
+import { ACCRINT, ACCRINTM, DISC, DURATION, MDURATION, PRICE, YIELD } from './09-financial/bondFunctions';
+import { COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD } from './09-financial/couponFunctions';
+import { AMORDEGRC, AMORLINC, CUMIPMT, CUMPRINC } from './09-financial/depreciationFunctions';
+import { TBILLEQ, TBILLPRICE, TBILLYIELD, DOLLARDE, DOLLARFR, EFFECT, NOMINAL } from './09-financial/treasuryFunctions';
 
 import { CONVERT, BIN2DEC, DEC2BIN, HEX2DEC, DEC2HEX, BIN2HEX, HEX2BIN, OCT2DEC, DEC2OCT, BIN2OCT, HEX2OCT, OCT2BIN, OCT2HEX } from './10-engineering/engineeringFunctions';
 import { 
@@ -86,13 +96,23 @@ import {
 import { 
   IMSIN, IMCOS, IMTAN, IMSINH, IMCOSH, IMCSC, IMSEC, IMCOT, IMCSCH, IMSECH 
 } from './10-engineering/complexTrigFunctions';
+import { BESSELI, BESSELJ, BESSELK, BESSELY } from './10-engineering/besselFunctions';
+import { ERF, ERF_PRECISE, ERFC, ERFC_PRECISE, DELTA, GESTEP } from './10-engineering/errorFunctions';
+import { BITAND, BITOR, BITXOR, BITLSHIFT, BITRSHIFT } from './10-engineering/bitFunctions';
 import { 
   ROW, ROWS, COLUMN, COLUMNS, ADDRESS, AREAS, FORMULATEXT, XMATCH, LAMBDA, 
   HYPERLINK, CHOOSEROWS, CHOOSECOLS 
 } from './06-lookup-reference/additionalLookupFunctions';
 
+import {
+  SORTBY, TAKE, DROP, EXPAND, HSTACK, VSTACK, TOCOL, TOROW, WRAPROWS, WRAPCOLS
+} from './06-lookup-reference/dynamicArrayFunctions';
+import { BYROW, BYCOL, MAP, REDUCE, SCAN, MAKEARRAY } from './06-lookup-reference/lambdaArrayFunctions';
+
 import { MDETERM, MINVERSE, MMULT, MUNIT } from './15-others/matrixFunctions';
-import { WEBSERVICE, FILTERXML, ENCODEURL } from './14-web/webFunctions';
+import { WEBSERVICE, FILTERXML, ENCODEURL } from './12-web/webFunctions';
+import { CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER } from './15-others/cubeFunctions';
+import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT } from './16-google-sheets/googleSheetsExtraFunctions';
 
 // すべての関数を配列にまとめる
 export const ALL_FUNCTIONS = [
@@ -126,7 +146,11 @@ export const ALL_FUNCTIONS = [
     CONFIDENCE_T, Z_TEST, T_TEST, F_TEST, CHISQ_TEST,
     T_INV, T_INV_2T, CHISQ_INV, CHISQ_INV_RT, F_INV, F_INV_RT, BETA_INV, GAMMA_INV,
     SLOPE, INTERCEPT, RSQ, STEYX, FORECAST, LINEST,
-    FISHER, FISHERINV, PHI, GAUSS, PROB, BINOM_INV
+    FISHER, FISHERINV, PHI, GAUSS, PROB, BINOM_INV,
+    MODE_SNGL, MODE_MULT, RANK_AVG, RANK_EQ,
+    NORMDIST, NORMINV, NORMSDIST, NORMSINV, BINOMDIST, POISSON, CRITBINOM, CONFIDENCE, ZTEST,
+    LOGNORMDIST, LOGINV, EXPONDIST, WEIBULL, GAMMADIST, GAMMAINV, BETADIST, BETAINV, CHIDIST, CHIINV,
+    FDIST, FINV, TDIST, TINV, FTEST, TTEST, CHITEST, NEGBINOMDIST
   }),
 
   // 03. 文字列操作関数
@@ -149,7 +173,9 @@ export const ALL_FUNCTIONS = [
   // 06. 検索・参照関数
   ...Object.values({
     VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE,
-    ROW, ROWS, COLUMN, COLUMNS, ADDRESS, AREAS, FORMULATEXT, XMATCH, LAMBDA, HYPERLINK, CHOOSEROWS, CHOOSECOLS
+    ROW, ROWS, COLUMN, COLUMNS, ADDRESS, AREAS, FORMULATEXT, XMATCH, LAMBDA, HYPERLINK, CHOOSEROWS, CHOOSECOLS,
+    SORTBY, TAKE, DROP, EXPAND, HSTACK, VSTACK, TOCOL, TOROW, WRAPROWS, WRAPCOLS,
+    BYROW, BYCOL, MAP, REDUCE, SCAN, MAKEARRAY
   }),
 
   // 07. 情報関数
@@ -165,7 +191,11 @@ export const ALL_FUNCTIONS = [
 
   // 09. 財務関数
   ...Object.values({
-    PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE, NPER, XNPV, XIRR, MIRR, SLN, SYD, DB, DDB, VDB, PDURATION, RRI
+    PMT, PV, FV, NPV, IRR, PPMT, IPMT, RATE, NPER, XNPV, XIRR, MIRR, SLN, SYD, DB, DDB, VDB, PDURATION, RRI,
+    ACCRINT, ACCRINTM, DISC, DURATION, MDURATION, PRICE, YIELD,
+    COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD,
+    AMORDEGRC, AMORLINC, CUMIPMT, CUMPRINC,
+    TBILLEQ, TBILLPRICE, TBILLYIELD, DOLLARDE, DOLLARFR, EFFECT, NOMINAL
   }),
 
   // 10. エンジニアリング関数
@@ -173,22 +203,27 @@ export const ALL_FUNCTIONS = [
     CONVERT, BIN2DEC, DEC2BIN, HEX2DEC, DEC2HEX, BIN2HEX, HEX2BIN, OCT2DEC, DEC2OCT, BIN2OCT, HEX2OCT, OCT2BIN, OCT2HEX,
     COMPLEX, IMABS, IMAGINARY, IMREAL, IMARGUMENT, IMCONJUGATE, IMSUM, IMSUB, 
     IMPRODUCT, IMDIV, IMPOWER, IMSQRT, IMEXP, IMLN, IMLOG10, IMLOG2,
-    IMSIN, IMCOS, IMTAN, IMSINH, IMCOSH, IMCSC, IMSEC, IMCOT, IMCSCH, IMSECH
+    IMSIN, IMCOS, IMTAN, IMSINH, IMCOSH, IMCSC, IMSEC, IMCOT, IMCSCH, IMSECH,
+    BESSELI, BESSELJ, BESSELK, BESSELY,
+    ERF, ERF_PRECISE, ERFC, ERFC_PRECISE, DELTA, GESTEP,
+    BITAND, BITOR, BITXOR, BITLSHIFT, BITRSHIFT
   }),
 
   // 15. その他 (行列関数など)
   ...Object.values({
-    MDETERM, MINVERSE, MMULT, MUNIT
+    MDETERM, MINVERSE, MMULT, MUNIT,
+    CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER
   }),
 
-  // 14. Web関数
+  // 12. Web関数
   ...Object.values({
     WEBSERVICE, FILTERXML, ENCODEURL
   }),
 
   // 16. Google Sheets関数
   ...Object.values({
-    JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN
+    JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN,
+    SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT
   })
 ] as CustomFormula[];
 
@@ -221,7 +256,8 @@ export const FUNCTION_CATEGORIES = {
     CONFIDENCE_T, Z_TEST, T_TEST, F_TEST, CHISQ_TEST,
     T_INV, T_INV_2T, CHISQ_INV, CHISQ_INV_RT, F_INV, F_INV_RT, BETA_INV, GAMMA_INV,
     SLOPE, INTERCEPT, RSQ, STEYX, FORECAST, LINEST,
-    FISHER, FISHERINV, PHI, GAUSS, PROB, BINOM_INV
+    FISHER, FISHERINV, PHI, GAUSS, PROB, BINOM_INV,
+    MODE_SNGL, MODE_MULT, RANK_AVG, RANK_EQ
   ] as CustomFormula[],
   text: [
     CONCATENATE, CONCAT, LEFT, RIGHT, MID, LEN, UPPER, LOWER, TRIM, SUBSTITUTE, FIND, SEARCH, TEXTJOIN, SPLIT,
@@ -234,7 +270,8 @@ export const FUNCTION_CATEGORIES = {
   logical: [IF, AND, OR, NOT, IFS, XOR, TRUE, FALSE, IFERROR, IFNA, SWITCH, LET] as CustomFormula[],
   lookupReference: [
     VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE,
-    ROW, ROWS, COLUMN, COLUMNS, ADDRESS, AREAS, FORMULATEXT, XMATCH, LAMBDA, HYPERLINK, CHOOSEROWS, CHOOSECOLS
+    ROW, ROWS, COLUMN, COLUMNS, ADDRESS, AREAS, FORMULATEXT, XMATCH, LAMBDA, HYPERLINK, CHOOSEROWS, CHOOSECOLS,
+    SORTBY, TAKE, DROP, EXPAND, HSTACK, VSTACK, TOCOL, TOROW, WRAPROWS, WRAPCOLS
   ] as CustomFormula[],
   information: [
     ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N,
@@ -246,7 +283,10 @@ export const FUNCTION_CATEGORIES = {
     CONVERT, BIN2DEC, DEC2BIN, HEX2DEC, DEC2HEX, BIN2HEX, HEX2BIN, OCT2DEC, DEC2OCT, BIN2OCT, HEX2OCT, OCT2BIN, OCT2HEX,
     COMPLEX, IMABS, IMAGINARY, IMREAL, IMARGUMENT, IMCONJUGATE, IMSUM, IMSUB, 
     IMPRODUCT, IMDIV, IMPOWER, IMSQRT, IMEXP, IMLN, IMLOG10, IMLOG2,
-    IMSIN, IMCOS, IMTAN, IMSINH, IMCOSH, IMCSC, IMSEC, IMCOT, IMCSCH, IMSECH
+    IMSIN, IMCOS, IMTAN, IMSINH, IMCOSH, IMCSC, IMSEC, IMCOT, IMCSCH, IMSECH,
+    BESSELI, BESSELJ, BESSELK, BESSELY,
+    ERF, ERF_PRECISE, ERFC, ERFC_PRECISE, DELTA, GESTEP,
+    BITAND, BITOR, BITXOR, BITLSHIFT, BITRSHIFT
   ] as CustomFormula[],
   matrix: [MDETERM, MINVERSE, MMULT, MUNIT] as CustomFormula[],
   web: [WEBSERVICE, FILTERXML, ENCODEURL] as CustomFormula[],
@@ -314,6 +354,7 @@ export * from './02-statistical/distributionFunctions';
 export * from './02-statistical/inverseDistributionFunctions';
 export * from './02-statistical/regressionFunctions';
 export * from './02-statistical/otherStatisticalFunctions';
+export * from './02-statistical/modeRankFunctions';
 export * from './03-text/textFunctions';
 export * from './04-datetime/dateFunctions';
 export * from './05-logical/logicFunctions';
@@ -326,8 +367,12 @@ export * from './09-financial/additionalFinancialFunctions';
 export * from './10-engineering/engineeringFunctions';
 export * from './10-engineering/complexNumberFunctions';
 export * from './10-engineering/complexTrigFunctions';
+export * from './10-engineering/besselFunctions';
+export * from './10-engineering/errorFunctions';
+export * from './10-engineering/bitFunctions';
 export * from './06-lookup-reference/additionalLookupFunctions';
+export * from './06-lookup-reference/dynamicArrayFunctions';
 export * from './08-database/statisticalDatabaseFunctions';
-export * from './14-web/webFunctions';
+export * from './12-web/webFunctions';
 export * from './15-others/matrixFunctions';
 export * from './16-google-sheets/googleSheetsFunctions';

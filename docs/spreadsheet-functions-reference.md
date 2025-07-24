@@ -386,19 +386,19 @@ https://support.google.com/docs/table/25273?hl=ja
 |--------|------|----------|
 | FILTER | 条件でフィルタ | `=FILTER(配列, 条件, [空の場合])` | ✅  |
 | SORT | 並べ替え | `=SORT(配列, [並べ替えインデックス], [並べ替え順序], [列で並べ替え])` | ✅  |
-| SORTBY | 別の配列で並べ替え | `=SORTBY(配列, 基準配列1, [並べ替え順序1], ...)` | ❌ 📘 |
+| SORTBY | 別の配列で並べ替え | `=SORTBY(配列, 基準配列1, [並べ替え順序1], ...)` | ✅ 📘 |
 | UNIQUE | 一意の値を抽出 | `=UNIQUE(配列, [列の比較], [1回のみ])` | ✅  |
 | SEQUENCE | 連続値を生成 | `=SEQUENCE(行, [列], [開始], [ステップ])` | ✅ 📘 |
 | RANDARRAY | ランダム配列を生成 | `=RANDARRAY([行], [列], [最小], [最大], [整数])` | ✅ 📘 |
-| TAKE | 行/列を取得 | `=TAKE(配列, 行, [列])` | ❌ 📘 |
-| DROP | 行/列を除外 | `=DROP(配列, 行, [列])` | ❌ 📘 |
-| EXPAND | 配列を拡張 | `=EXPAND(配列, 行, [列], [パディング値])` | ❌ 📘 |
-| HSTACK | 水平方向に結合 | `=HSTACK(配列1, [配列2], ...)` | ❌  |
-| VSTACK | 垂直方向に結合 | `=VSTACK(配列1, [配列2], ...)` | ❌  |
-| TOCOL | 列に変換 | `=TOCOL(配列, [無視], [スキャンバイ列])` | ❌ 📘 |
-| TOROW | 行に変換 | `=TOROW(配列, [無視], [スキャンバイ列])` | ❌ 📘 |
-| WRAPROWS | 行で折り返し | `=WRAPROWS(ベクトル, 折り返し数, [パディング値])` | ❌ 📘 |
-| WRAPCOLS | 列で折り返し | `=WRAPCOLS(ベクトル, 折り返し数, [パディング値])` | ❌ 📘 |
+| TAKE | 行/列を取得 | `=TAKE(配列, 行, [列])` | ✅ 📘 |
+| DROP | 行/列を除外 | `=DROP(配列, 行, [列])` | ✅ 📘 |
+| EXPAND | 配列を拡張 | `=EXPAND(配列, 行, [列], [パディング値])` | ✅ 📘 |
+| HSTACK | 水平方向に結合 | `=HSTACK(配列1, [配列2], ...)` | ✅  |
+| VSTACK | 垂直方向に結合 | `=VSTACK(配列1, [配列2], ...)` | ✅  |
+| TOCOL | 列に変換 | `=TOCOL(配列, [無視], [スキャンバイ列])` | ✅ 📘 |
+| TOROW | 行に変換 | `=TOROW(配列, [無視], [スキャンバイ列])` | ✅ 📘 |
+| WRAPROWS | 行で折り返し | `=WRAPROWS(ベクトル, 折り返し数, [パディング値])` | ✅ 📘 |
+| WRAPCOLS | 列で折り返し | `=WRAPCOLS(ベクトル, 折り返し数, [パディング値])` | ✅ 📘 |
 
 ## 07. 情報関数 (Information Functions)
 
@@ -469,27 +469,27 @@ https://support.google.com/docs/table/25273?hl=ja
 | DDB | 倍額定率法 | `=DDB(取得価額, 残存価額, 耐用年数, 期, [率])` | ✅
 | VDB | 可変減価償却 | `=VDB(取得価額, 残存価額, 耐用年数, 開始期, 終了期, [率], [切り替えなし])` | ✅
 | AMORDEGRC | フランス式減価償却 | `=AMORDEGRC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ❌
-| AMORLINC | フランス式定額償却 | `=AMORLINC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ❌
+| AMORLINC | フランス式定額償却 | `=AMORLINC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ✅
 
 ### 証券関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| ACCRINT | 経過利息 | `=ACCRINT(発行日, 初回利払日, 受渡日, 利率, 額面, 頻度, [基準], [計算方式])` | ❌
-| ACCRINTM | 満期一括払証券の経過利息 | `=ACCRINTM(発行日, 満期日, 利率, 額面, [基準])` | ❌
-| COUPDAYBS | 直前利払日から受渡日までの日数 | `=COUPDAYBS(受渡日, 満期日, 頻度, [基準])` | ❌
-| COUPDAYS | 利払期間の日数 | `=COUPDAYS(受渡日, 満期日, 頻度, [基準])` | ❌
-| COUPDAYSNC | 受渡日から次回利払日までの日数 | `=COUPDAYSNC(受渡日, 満期日, 頻度, [基準])` | ❌
+| ACCRINT | 経過利息 | `=ACCRINT(発行日, 初回利払日, 受渡日, 利率, 額面, 頻度, [基準], [計算方式])` | ✅
+| ACCRINTM | 満期一括払証券の経過利息 | `=ACCRINTM(発行日, 満期日, 利率, 額面, [基準])` | ✅
+| COUPDAYBS | 直前利払日から受渡日までの日数 | `=COUPDAYBS(受渡日, 満期日, 頻度, [基準])` | ✅
+| COUPDAYS | 利払期間の日数 | `=COUPDAYS(受渡日, 満期日, 頻度, [基準])` | ✅
+| COUPDAYSNC | 受渡日から次回利払日までの日数 | `=COUPDAYSNC(受渡日, 満期日, 頻度, [基準])` | ✅
 | COUPNCD | 次回利払日 | `=COUPNCD(受渡日, 満期日, 頻度, [基準])` | ❌
 | COUPNUM | 利払回数 | `=COUPNUM(受渡日, 満期日, 頻度, [基準])` | ❌
 | COUPPCD | 直前利払日 | `=COUPPCD(受渡日, 満期日, 頻度, [基準])` | ❌
-| DISC | 割引率 | `=DISC(受渡日, 満期日, 価格, 償還価額, [基準])` | ❌
-| DOLLARDE | ドル小数表記に変換 | `=DOLLARDE(小数値, 分母)` | ❌
-| DOLLARFR | ドル分数表記に変換 | `=DOLLARFR(小数値, 分母)` | ❌
-| DURATION | デュレーション | `=DURATION(受渡日, 満期日, 利率, 利回り, 頻度, [基準])` | ❌
-| EFFECT | 実効年利率 | `=EFFECT(名目利率, 年間複利回数)` | ❌
+| DISC | 割引率 | `=DISC(受渡日, 満期日, 価格, 償還価額, [基準])` | ✅
+| DOLLARDE | ドル小数表記に変換 | `=DOLLARDE(小数値, 分母)` | ✅
+| DOLLARFR | ドル分数表記に変換 | `=DOLLARFR(小数値, 分母)` | ✅
+| DURATION | デュレーション | `=DURATION(受渡日, 満期日, 利率, 利回り, 頻度, [基準])` | ✅
+| EFFECT | 実効年利率 | `=EFFECT(名目利率, 年間複利回数)` | ✅
 | INTRATE | 利率 | `=INTRATE(受渡日, 満期日, 投資額, 償還価額, [基準])` | ❌
-| MDURATION | 修正デュレーション | `=MDURATION(受渡日, 満期日, 利率, 利回り, 頻度, [基準])` | ❌
-| NOMINAL | 名目年利率 | `=NOMINAL(実効利率, 年間複利回数)` | ❌
+| MDURATION | 修正デュレーション | `=MDURATION(受渡日, 満期日, 利率, 利回り, 頻度, [基準])` | ✅
+| NOMINAL | 名目年利率 | `=NOMINAL(実効利率, 年間複利回数)` | ✅
 | ODDFPRICE | 変則初回期の価格 | `=ODDFPRICE(受渡日, 満期日, 発行日, 初回利払日, 利率, 利回り, 償還価額, 頻度, [基準])` | ❌
 | ODDFYIELD | 変則初回期の利回り | `=ODDFYIELD(受渡日, 満期日, 発行日, 初回利払日, 利率, 価格, 償還価額, 頻度, [基準])` | ❌
 | ODDLPRICE | 変則最終期の価格 | `=ODDLPRICE(受渡日, 満期日, 最終利払日, 利率, 利回り, 償還価額, 頻度, [基準])` | ❌
@@ -510,8 +510,8 @@ https://support.google.com/docs/table/25273?hl=ja
 ### その他の財務関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| CUMIPMT | 累計利息 | `=CUMIPMT(利率, 期間, 現在価値, 開始期, 終了期, 支払期日)` | ❌
-| CUMPRINC | 累計元金 | `=CUMPRINC(利率, 期間, 現在価値, 開始期, 終了期, 支払期日)` | ❌
+| CUMIPMT | 累計利息 | `=CUMIPMT(利率, 期間, 現在価値, 開始期, 終了期, 支払期日)` | ✅
+| CUMPRINC | 累計元金 | `=CUMPRINC(利率, 期間, 現在価値, 開始期, 終了期, 支払期日)` | ✅
 | ISPMT | 利息支払額（元金均等） | `=ISPMT(利率, 期, 期間, 現在価値)` | ❌
 
 ## 10. エンジニアリング関数 (Engineering Functions)
@@ -570,37 +570,38 @@ https://support.google.com/docs/table/25273?hl=ja
 ### ベッセル関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| BESSELI | 修正ベッセル関数In(x) | `=BESSELI(x, n)` | ❌
-| BESSELJ | ベッセル関数Jn(x) | `=BESSELJ(x, n)` | ❌
-| BESSELK | 修正ベッセル関数Kn(x) | `=BESSELK(x, n)` | ❌
-| BESSELY | ベッセル関数Yn(x) | `=BESSELY(x, n)` | ❌
+| BESSELI | 修正ベッセル関数In(x) | `=BESSELI(x, n)` | ✅
+| BESSELJ | ベッセル関数Jn(x) | `=BESSELJ(x, n)` | ✅
+| BESSELK | 修正ベッセル関数Kn(x) | `=BESSELK(x, n)` | ✅
+| BESSELY | ベッセル関数Yn(x) | `=BESSELY(x, n)` | ✅
 
-### その他のエンジニアリング関数
+### その他のエンジニアリンBITAND
+グ関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| DELTA | クロネッカーのデルタ | `=DELTA(数値1, [数値2])` | ❌
-| ERF | 誤差関数 | `=ERF(下限, [上限])` | ❌
-| ERF.PRECISE | 誤差関数（精密） | `=ERF.PRECISE(x)` | ❌
-| ERFC | 相補誤差関数 | `=ERFC(x)` | ❌
-| ERFC.PRECISE | 相補誤差関数（精密） | `=ERFC.PRECISE(x)` | ❌
-| GESTEP | ステップ関数 | `=GESTEP(数値, [ステップ])` | ❌
-| BITAND | ビット単位AND | `=BITAND(数値1, 数値2)` | ❌
-| BITOR | ビット単位OR | `=BITOR(数値1, 数値2)` | ❌
-| BITXOR | ビット単位XOR | `=BITXOR(数値1, 数値2)` | ❌
-| BITLSHIFT | ビット左シフト | `=BITLSHIFT(数値, シフト量)` | ❌
-| BITRSHIFT | ビット右シフト | `=BITRSHIFT(数値, シフト量)` | ❌
+| DELTA | クロネッカーのデルタ | `=DELTA(数値1, [数値2])` | ✅
+| ERF | 誤差関数 | `=ERF(下限, [上限])` | ✅
+| ERF.PRECISE | 誤差関数（精密） | `=ERF.PRECISE(x)` | ✅
+| ERFC | 相補誤差関数 | `=ERFC(x)` | ✅
+| ERFC.PRECISE | 相補誤差関数（精密） | `=ERFC.PRECISE(x)` | ✅
+| GESTEP | ステップ関数 | `=GESTEP(数値, [ステップ])` | ✅
+| BITAND | ビット単位AND | `=BITAND(数値1, 数値2)` | ✅
+| BITOR | ビット単位OR | `=BITOR(数値1, 数値2)` | ✅
+| BITXOR | ビット単位XOR | `=BITXOR(数値1, 数値2)` | ✅
+| BITLSHIFT | ビット左シフト | `=BITLSHIFT(数値, シフト量)` | ✅
+| BITRSHIFT | ビット右シフト | `=BITRSHIFT(数値, シフト量)` | ✅
 
 ## 11. キューブ関数 (Cube Functions) 🟠
 
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| CUBEKPIMEMBER | KPIプロパティを返す | `=CUBEKPIMEMBER(接続, KPI名, KPIプロパティ, [キャプション])` | ❌
+| CUBEKPIMEMBER | KPIプロパティを返す | `=CUBEKPIMEMBER(接続, KPI名, KPIプロパティ, [キャプション])` | ✅
 | CUBEMEMBER | メンバーを返す | `=CUBEMEMBER(接続, メンバー式, [キャプション])` | ❌
 | CUBEMEMBERPROPERTY | メンバープロパティを返す | `=CUBEMEMBERPROPERTY(接続, メンバー式, プロパティ)` | ❌
-| CUBERANKEDMEMBER | n番目のメンバーを返す | `=CUBERANKEDMEMBER(接続, セット式, ランク, [キャプション])` | ❌
-| CUBESET | セットを定義 | `=CUBESET(接続, セット式, [キャプション], [並べ替え順序], [並べ替え基準])` | ❌
-| CUBESETCOUNT | セット内のアイテム数 | `=CUBESETCOUNT(セット)` | ❌
-| CUBEVALUE | 集計値を返す | `=CUBEVALUE(接続, [メンバー式1], [メンバー式2], ...)` | ❌
+| CUBERANKEDMEMBER | n番目のメンバーを返す | `=CUBERANKEDMEMBER(接続, セット式, ランク, [キャプション])` | ✅
+| CUBESET | セットを定義 | `=CUBESET(接続, セット式, [キャプション], [並べ替え順序], [並べ替え基準])` | ✅
+| CUBESETCOUNT | セット内のアイテム数 | `=CUBESETCOUNT(セット)` | ✅
+| CUBEVALUE | 集計値を返す | `=CUBEVALUE(接続, [メンバー式1], [メンバー式2], ...)` | ✅
 
 ## 12. Web関数 (Web Functions)
 
@@ -618,41 +619,41 @@ https://support.google.com/docs/table/25273?hl=ja
 |--------|------|----------|----------|----------|
 | BETADIST | ベータ分布 | BETA.DIST | ❌
 | BETAINV | ベータ分布の逆関数 | BETA.INV | ❌
-| BINOMDIST | 二項分布 | BINOM.DIST | ❌
+| BINOMDIST | 二項分布 | BINOM.DIST | ✅
 | CHIDIST | カイ二乗分布 | CHISQ.DIST.RT | ❌
 | CHIINV | カイ二乗分布の逆関数 | CHISQ.INV.RT | ❌
-| CHITEST | カイ二乗検定 | CHISQ.TEST | ❌
+| CHITEST | カイ二乗検定 | CHISQ.TEST | ✅
 | CONFIDENCE | 信頼区間 | CONFIDENCE.NORM | ❌
 | COVAR | 共分散 | COVARIANCE.P | ✅
 | CRITBINOM | 二項分布の臨界値 | BINOM.INV | ❌
-| EXPONDIST | 指数分布 | EXPON.DIST | ❌
-| FDIST | F分布 | F.DIST.RT | ❌
-| FINV | F分布の逆関数 | F.INV.RT | ❌
-| FTEST | F検定 | F.TEST | ❌
+| EXPONDIST | 指数分布 | EXPON.DIST | ✅
+| FDIST | F分布 | F.DIST.RT | ✅
+| FINV | F分布の逆関数 | F.INV.RT | ✅
+| FTEST | F検定 | F.TEST | ✅
 | GAMMADIST | ガンマ分布 | GAMMA.DIST | ❌
 | GAMMAINV | ガンマ分布の逆関数 | GAMMA.INV | ❌
 | HYPGEOMDIST | 超幾何分布 | HYPGEOM.DIST | ❌
-| LOGINV | 対数正規分布の逆関数 | LOGNORM.INV | ❌
-| LOGNORMDIST | 対数正規分布 | LOGNORM.DIST | ❌
+| LOGINV | 対数正規分布の逆関数 | LOGNORM.INV | ✅
+| LOGNORMDIST | 対数正規分布 | LOGNORM.DIST | ✅
 | MODE | 最頻値 | MODE.SNGL | ✅
-| NEGBINOMDIST | 負の二項分布 | NEGBINOM.DIST | ❌
-| NORMDIST | 正規分布 | NORM.DIST | ❌
-| NORMINV | 正規分布の逆関数 | NORM.INV | ❌
-| NORMSDIST | 標準正規分布 | NORM.S.DIST | ❌
-| NORMSINV | 標準正規分布の逆関数 | NORM.S.INV | ❌
+| NEGBINOMDIST | 負の二項分布 | NEGBINOM.DIST | ✅
+| NORMDIST | 正規分布 | NORM.DIST | ✅
+| NORMINV | 正規分布の逆関数 | NORM.INV | ✅
+| NORMSDIST | 標準正規分布 | NORM.S.DIST | ✅
+| NORMSINV | 標準正規分布の逆関数 | NORM.S.INV | ✅
 | PERCENTILE | パーセンタイル | PERCENTILE.INC | ✅
 | PERCENTRANK | パーセント順位 | PERCENTRANK.INC | ✅
-| POISSON | ポアソン分布 | POISSON.DIST | ❌
+| POISSON | ポアソン分布 | POISSON.DIST | ✅
 | QUARTILE | 四分位数 | QUARTILE.INC | ✅
 | RANK | 順位 | RANK.EQ | ✅
 | STDEV | 標準偏差 | STDEV.S | ✅
 | STDEVP | 標準偏差（母集団） | STDEV.P | ✅
-| TDIST | t分布 | T.DIST.2T | ❌
-| TINV | t分布の逆関数 | T.INV.2T | ❌
-| TTEST | t検定 | T.TEST | ❌
+| TDIST | t分布 | T.DIST.2T | ✅
+| TINV | t分布の逆関数 | T.INV.2T | ✅
+| TTEST | t検定 | T.TEST | ✅
 | VAR | 分散 | VAR.S | ✅
 | VARP | 分散（母集団） | VAR.P | ✅
-| WEIBULL | ワイブル分布 | WEIBULL.DIST | ❌
+| WEIBULL | ワイブル分布 | WEIBULL.DIST | ✅
 | ZTEST | z検定 | Z.TEST | ❌
 
 ## 14. Google Sheets専用関数 🔵
@@ -662,7 +663,7 @@ https://support.google.com/docs/table/25273?hl=ja
 |--------|------|----------|
 | ARRAYFORMULA | 配列数式を適用 | `=ARRAYFORMULA(配列数式)` | ✅ 📗 |
 | QUERY | SQLライクなクエリ実行 | `=QUERY(データ, クエリ, [ヘッダー])` | ✅ 📗 |
-| SORTN | 上位N件を並べ替えて返す | `=SORTN(範囲, [n], [表示タイ], [並べ替えインデックス], [昇順])` | ❌ 📗 |
+| SORTN | 上位N件を並べ替えて返す | `=SORTN(範囲, [n], [表示タイ], [並べ替えインデックス], [昇順])` | ✅ 📗 |
 | FLATTEN | 配列を1次元に変換 | `=FLATTEN(範囲1, [範囲2], ...)` | ✅ 📗 |
 
 ### データ取得関数
@@ -678,10 +679,10 @@ https://support.google.com/docs/table/25273?hl=ja
 ### Google固有の関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| GOOGLEFINANCE | 株価情報を取得 | `=GOOGLEFINANCE(銘柄, [属性], [開始日], [終了日], [間隔])` | ❌ 📗 |
-| GOOGLETRANSLATE | テキストを翻訳 | `=GOOGLETRANSLATE(テキスト, ソース言語, ターゲット言語)` | ❌ 📗 |
-| DETECTLANGUAGE | 言語を検出 | `=DETECTLANGUAGE(テキスト)` | ❌
-| SPARKLINE | スパークラインを作成 | `=SPARKLINE(データ, [オプション])` | ❌ 📗 |
+| GOOGLEFINANCE | 株価情報を取得 | `=GOOGLEFINANCE(銘柄, [属性], [開始日], [終了日], [間隔])` | ✅ 📗 |
+| GOOGLETRANSLATE | テキストを翻訳 | `=GOOGLETRANSLATE(テキスト, ソース言語, ターゲット言語)` | ✅ 📗 |
+| DETECTLANGUAGE | 言語を検出 | `=DETECTLANGUAGE(テキスト)` | ✅
+| SPARKLINE | スパークラインを作成 | `=SPARKLINE(データ, [オプション])` | ✅ 📗 |
 
 ### その他のGoogle Sheets関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -691,10 +692,10 @@ https://support.google.com/docs/table/25273?hl=ja
 | REGEXEXTRACT | 正規表現で抽出 | `=REGEXEXTRACT(テキスト, 正規表現)` | ✅ 📗 |
 | REGEXMATCH | 正規表現でマッチ判定 | `=REGEXMATCH(テキスト, 正規表現)` | ✅ 📗 |
 | REGEXREPLACE | 正規表現で置換 | `=REGEXREPLACE(テキスト, 正規表現, 置換テキスト)` | ✅ 📗 |
-| TO_DATE | 数値を日付に変換 | `=TO_DATE(値)` | ❌ 📗 |
-| TO_DOLLARS | 数値をドル表記に変換 | `=TO_DOLLARS(値)` | ❌ 📗 |
-| TO_PERCENT | 数値をパーセント表記に変換 | `=TO_PERCENT(値)` | ❌ 📗 |
-| TO_TEXT | 値をテキストに変換 | `=TO_TEXT(値)` | ❌ 📗 |
+| TO_DATE | 数値を日付に変換 | `=TO_DATE(値)` | ✅ 📗 |
+| TO_DOLLARS | 数値をドル表記に変換 | `=TO_DOLLARS(値)` | ✅ 📗 |
+| TO_PERCENT | 数値をパーセント表記に変換 | `=TO_PERCENT(値)` | ✅ 📗 |
+| TO_TEXT | 値をテキストに変換 | `=TO_TEXT(値)` | ✅ 📗 |
 | ISBETWEEN | 値が範囲内か判定 | `=ISBETWEEN(値, 下限, 上限, [下限含む], [上限含む])` | ❌ 📗 |
 
 ## 15. 新しい関数・その他
@@ -702,12 +703,12 @@ https://support.google.com/docs/table/25273?hl=ja
 ### 動的配列・LAMBDA関数（両プラットフォーム対応）
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| BYROW | 行ごとにLAMBDA適用 | `=BYROW(配列, LAMBDA)` | ❌  |
-| BYCOL | 列ごとにLAMBDA適用 | `=BYCOL(配列, LAMBDA)` | ❌  |
-| MAKEARRAY | 配列を生成 | `=MAKEARRAY(行, 列, LAMBDA)` | ❌  |
-| MAP | 配列の各要素にLAMBDA適用 | `=MAP(配列1, [配列2], ..., LAMBDA)` | ❌  |
-| REDUCE | 配列を累積処理 | `=REDUCE(初期値, 配列, LAMBDA)` | ❌  |
-| SCAN | 配列をスキャン | `=SCAN(初期値, 配列, LAMBDA)` | ❌  |
+| BYROW | 行ごとにLAMBDA適用 | `=BYROW(配列, LAMBDA)` | ✅  |
+| BYCOL | 列ごとにLAMBDA適用 | `=BYCOL(配列, LAMBDA)` | ✅  |
+| MAKEARRAY | 配列を生成 | `=MAKEARRAY(行, 列, LAMBDA)` | ✅  |
+| MAP | 配列の各要素にLAMBDA適用 | `=MAP(配列1, [配列2], ..., LAMBDA)` | ✅  |
+| REDUCE | 配列を累積処理 | `=REDUCE(初期値, 配列, LAMBDA)` | ✅  |
+| SCAN | 配列をスキャン | `=SCAN(初期値, 配列, LAMBDA)` | ✅  |
 
 ### Excel専用の新関数
 | 関数名 | 説明 | 構文 | 実装状況 |
