@@ -317,6 +317,38 @@
   justify-content: center;
 }
 
+/* 財務関数用スタイル（NPER, PMT, PV, FV等） */
+.Spreadsheet__cell.financial-formula-cell {
+  background-color: #FFE0B2 !important;
+  color: #D84315 !important;
+  font-weight: bold !important;
+  border: 2px solid #FF9800 !important;
+  position: relative;
+  cursor: pointer;
+}
+
+.Spreadsheet__cell.financial-formula-cell:hover {
+  background-color: #FFCC80 !important;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.Spreadsheet__cell.financial-formula-cell::before {
+  content: "💰";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  font-size: 10px;
+  background-color: #FF9800;
+  color: white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* その他・未分類の関数用スタイル */
 .Spreadsheet__cell.other-formula-cell {
   background-color: #F5F5F5 !important;
@@ -355,6 +387,7 @@
 .Spreadsheet__cell.logic-formula-cell::after,
 .Spreadsheet__cell.date-formula-cell::after,
 .Spreadsheet__cell.text-formula-cell::after,
+.Spreadsheet__cell.financial-formula-cell::after,
 .Spreadsheet__cell.other-formula-cell::after {
   content: attr(title);
   position: absolute;
@@ -381,6 +414,7 @@
 .Spreadsheet__cell.logic-formula-cell:hover::after,
 .Spreadsheet__cell.date-formula-cell:hover::after,
 .Spreadsheet__cell.text-formula-cell:hover::after,
+.Spreadsheet__cell.financial-formula-cell:hover::after,
 .Spreadsheet__cell.other-formula-cell:hover::after {
   opacity: 1;
   animation: tooltipFadeIn 0.3s ease-in-out;

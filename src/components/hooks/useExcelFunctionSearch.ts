@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { matchFormula, ALL_FUNCTIONS } from "../../utils/functions";
+import { matchFormula, ALL_FUNCTIONS, getFunctionType } from "../../utils/functions";
 import type { CellData, FormulaContext, FormulaResult } from "../../utils/functions";
 import type { SpreadsheetData, ExcelFunctionResponse } from '../../types/spreadsheet';
 import { fetchExcelFunction } from '../../services/openaiService';
@@ -111,7 +111,52 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
           
           // 背景色情報を className として設定
           if (originalCell && hasBackgroundProperty(originalCell) && originalCell.bg) {
-            result.className = `bg-[${originalCell.bg}]`;
+            // Tailwind CSSの動的クラスは機能しないので、特定の色に対してマッピング
+            if (originalCell.bg === '#FFE0B2') {
+              result.className = 'bg-orange-200';
+            } else if (originalCell.bg === '#E3F2FD') {
+              result.className = 'bg-blue-100';
+            } else {
+              result.className = `bg-[${originalCell.bg}]`;
+            }
+          }
+          
+          // 数式セルの場合、関数タイプに基づいてCSSクラスを設定
+          if (cell.formula) {
+            const formulaWithoutEquals = cell.formula.startsWith('=') ? cell.formula.substring(1) : cell.formula;
+            const functionMatch = formulaWithoutEquals.match(/^([A-Z_]+)\s*\(/);
+            
+            if (functionMatch) {
+              const functionName = functionMatch[1];
+              const functionType = getFunctionType(functionName);
+              
+              switch (functionType) {
+                case 'math':
+                  result.className = 'math-formula-cell';
+                  break;
+                case 'statistical':
+                  result.className = 'math-formula-cell'; // 統計関数も数学系として扱う
+                  break;
+                case 'financial':
+                  result.className = 'financial-formula-cell';
+                  break;
+                case 'text':
+                  result.className = 'text-formula-cell';
+                  break;
+                case 'datetime':
+                  result.className = 'date-formula-cell';
+                  break;
+                case 'logical':
+                  result.className = 'logic-formula-cell';
+                  break;
+                case 'lookup':
+                  result.className = 'lookup-formula-cell';
+                  break;
+                default:
+                  result.className = 'other-formula-cell';
+                  break;
+              }
+            }
           }
           
           return result;
