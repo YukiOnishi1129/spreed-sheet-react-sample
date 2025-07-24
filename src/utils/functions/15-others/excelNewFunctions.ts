@@ -29,10 +29,10 @@ export const STOCKHISTORY: CustomFormula = {
   name: 'STOCKHISTORY',
   pattern: /STOCKHISTORY\(([^,]+),\s*([^,]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, stockRef, startDateRef, endDateRef, intervalRef, columnsRef, propertiesRef] = matches;
+    const [, , startDateRef, endDateRef, intervalRef, , propertiesRef] = matches;
     
     try {
-      const stock = getCellValue(stockRef.trim(), context)?.toString() ?? stockRef.trim();
+      // const stock = getCellValue(stockRef.trim(), context)?.toString() ?? stockRef.trim();
       const startDate = parseDate(getCellValue(startDateRef.trim(), context)?.toString() ?? startDateRef.trim());
       const endDate = endDateRef ? parseDate(getCellValue(endDateRef.trim(), context)?.toString() ?? endDateRef.trim()) : new Date();
       const interval = intervalRef ? parseInt(getCellValue(intervalRef.trim(), context)?.toString() ?? intervalRef.trim()) : 0;
@@ -55,7 +55,7 @@ export const STOCKHISTORY: CustomFormula = {
         const currentDate = new Date(startDate);
         let basePrice = 100;
         
-        while (currentDate <= endDate) {
+        while (currentDate <= (endDate ?? new Date())) {
           // ランダムな株価変動を生成
           const change = (Math.random() - 0.5) * 5;
           basePrice += change;
@@ -86,7 +86,7 @@ export const STOCKHISTORY: CustomFormula = {
         }
       } else {
         // 週次または月次データ（簡易実装）
-        const periods = Math.floor((endDate.getTime() - startDate.getTime()) / (interval * 24 * 60 * 60 * 1000));
+        const periods = Math.floor(((endDate ?? new Date()).getTime() - startDate.getTime()) / (interval * 24 * 60 * 60 * 1000));
         let basePrice = 100;
         
         for (let i = 0; i < Math.min(periods, 100); i++) {

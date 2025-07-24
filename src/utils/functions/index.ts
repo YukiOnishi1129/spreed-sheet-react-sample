@@ -338,9 +338,9 @@ export const getFunctionType = (functionName: string): string => {
   if (FUNCTION_CATEGORIES.database.some(f => f.name === name)) return 'database';
   if (FUNCTION_CATEGORIES.financial.some(f => f.name === name)) return 'financial';
   if (FUNCTION_CATEGORIES.engineering.some(f => f.name === name)) return 'engineering';
-  if (FUNCTION_CATEGORIES.matrix.some(f => f.name === name)) return 'matrix';
   if (FUNCTION_CATEGORIES.web.some(f => f.name === name)) return 'web';
   if (FUNCTION_CATEGORIES.googleSheets.some(f => f.name === name)) return 'googleSheets';
+  if (FUNCTION_CATEGORIES.cube?.some(f => f.name === name)) return 'cube';
   if (FUNCTION_CATEGORIES.others?.some(f => f.name === name)) return 'others';
   
   return 'other';

@@ -40,11 +40,11 @@ export const IMPORTFEED: CustomFormula = {
   name: 'IMPORTFEED',
   pattern: /IMPORTFEED\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, urlRef, queryRef, headersRef, numItemsRef] = matches;
+    const [, urlRef, , headersRef, numItemsRef] = matches;
     
     try {
       const url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
-      const query = queryRef ? getCellValue(queryRef.trim(), context)?.toString() ?? queryRef.trim() : 'items';
+      // const query = queryRef ? getCellValue(queryRef.trim(), context)?.toString() ?? queryRef.trim() : 'items';
       const includeHeaders = headersRef ? getCellValue(headersRef.trim(), context)?.toString().toLowerCase() === 'true' : true;
       const numItems = numItemsRef ? parseInt(getCellValue(numItemsRef.trim(), context)?.toString() ?? numItemsRef.trim()) : 10;
       
@@ -242,14 +242,9 @@ export const IMAGE: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // 画像オブジェクトを返す（実際のレンダリングはUI側で処理）
-      return {
-        type: 'image',
-        url: url,
-        mode: mode,
-        height: height,
-        width: width
-      };
+      // 画像URLを返す（実際のレンダリングはUI側で処理）
+      // 今回の実装では単純にURLを返す
+      return url;
     } catch {
       return FormulaError.VALUE;
     }
