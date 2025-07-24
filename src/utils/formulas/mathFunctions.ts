@@ -695,28 +695,110 @@ export const ATAN2: CustomFormula = {
 export const ROUNDUP: CustomFormula = {
   name: 'ROUNDUP',
   pattern: /ROUNDUP\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, digitsRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const digits = Number(getCellValue(digitsRef, context) ?? digitsRef);
+    
+    if (isNaN(number) || isNaN(digits)) {
+      return FormulaError.VALUE;
+    }
+    
+    const factor = Math.pow(10, digits);
+    if (number >= 0) {
+      return Math.ceil(number * factor) / factor;
+    } else {
+      return Math.floor(number * factor) / factor;
+    }
+  }
 };
 
 // ROUNDDOWN関数の実装（切り下げ）
 export const ROUNDDOWN: CustomFormula = {
   name: 'ROUNDDOWN',
   pattern: /ROUNDDOWN\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, digitsRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const digits = Number(getCellValue(digitsRef, context) ?? digitsRef);
+    
+    if (isNaN(number) || isNaN(digits)) {
+      return FormulaError.VALUE;
+    }
+    
+    const factor = Math.pow(10, digits);
+    if (number >= 0) {
+      return Math.floor(number * factor) / factor;
+    } else {
+      return Math.ceil(number * factor) / factor;
+    }
+  }
 };
 
 // CEILING関数の実装（基準値の倍数に切り上げ）
 export const CEILING: CustomFormula = {
   name: 'CEILING',
   pattern: /CEILING\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, significanceRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const significance = Number(getCellValue(significanceRef, context) ?? significanceRef);
+    
+    if (isNaN(number) || isNaN(significance)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (significance === 0) {
+      return 0;
+    }
+    
+    if (number === 0) {
+      return 0;
+    }
+    
+    if (number > 0 && significance > 0) {
+      return Math.ceil(number / significance) * significance;
+    } else if (number < 0 && significance < 0) {
+      return Math.floor(number / significance) * significance;
+    } else {
+      return FormulaError.NUM;
+    }
+  }
 };
 
 // FLOOR関数の実装（基準値の倍数に切り下げ）
 export const FLOOR: CustomFormula = {
   name: 'FLOOR',
   pattern: /FLOOR\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, numberRef, significanceRef] = matches;
+    
+    const number = Number(getCellValue(numberRef, context) ?? numberRef);
+    const significance = Number(getCellValue(significanceRef, context) ?? significanceRef);
+    
+    if (isNaN(number) || isNaN(significance)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (significance === 0) {
+      return 0;
+    }
+    
+    if (number === 0) {
+      return 0;
+    }
+    
+    if (number > 0 && significance > 0) {
+      return Math.floor(number / significance) * significance;
+    } else if (number < 0 && significance < 0) {
+      return Math.ceil(number / significance) * significance;
+    } else {
+      return FormulaError.NUM;
+    }
+  }
 };
 
 // SIGN関数の実装（符号）
@@ -787,7 +869,16 @@ export const AVERAGEIFS: CustomFormula = {
 export const PRODUCT: CustomFormula = {
   name: 'PRODUCT',
   pattern: /PRODUCT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return 0;
+    }
+    
+    return numbers.reduce((product, num) => product * num, 1);
+  }
 };
 
 // MROUND関数の実装（倍数に丸める）
@@ -801,21 +892,117 @@ export const MROUND: CustomFormula = {
 export const COMBIN: CustomFormula = {
   name: 'COMBIN',
   pattern: /COMBIN\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, nRef, kRef] = matches;
+    
+    const n = Number(getCellValue(nRef, context) ?? nRef);
+    const k = Number(getCellValue(kRef, context) ?? kRef);
+    
+    if (isNaN(n) || isNaN(k)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (!Number.isInteger(n) || !Number.isInteger(k)) {
+      return FormulaError.NUM;
+    }
+    
+    if (n < 0 || k < 0 || k > n) {
+      return FormulaError.NUM;
+    }
+    
+    if (k === 0 || k === n) {
+      return 1;
+    }
+    
+    // 計算効率を上げるため、k > n/2の場合はn-kを使う
+    let k2 = k;
+    if (k2 > n / 2) {
+      k2 = n - k2;
+    }
+    
+    let result = 1;
+    for (let i = 0; i < k2; i++) {
+      result = result * (n - i) / (i + 1);
+    }
+    
+    return Math.round(result);
+  }
 };
 
 // GCD関数の実装（最大公約数）
 export const GCD: CustomFormula = {
   name: 'GCD',
   pattern: /GCD\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    // すべて整数である必要がある
+    const integers = numbers.map(n => {
+      if (!Number.isInteger(n)) {
+        return Math.floor(Math.abs(n));
+      }
+      return Math.abs(n);
+    });
+    
+    // ユークリッドの互除法
+    const gcd2 = (a: number, b: number): number => {
+      return b === 0 ? a : gcd2(b, a % b);
+    };
+    
+    let result = integers[0];
+    for (let i = 1; i < integers.length; i++) {
+      result = gcd2(result, integers[i]);
+      if (result === 1) break; // 1以下にはならない
+    }
+    
+    return result;
+  }
 };
 
 // LCM関数の実装（最小公倍数）
 export const LCM: CustomFormula = {
   name: 'LCM',
   pattern: /LCM\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, args] = matches;
+    const numbers = parseArgumentsToNumbers(args, context);
+    
+    if (numbers.length === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    // すべて整数である必要がある
+    const integers = numbers.map(n => {
+      if (!Number.isInteger(n)) {
+        return Math.floor(Math.abs(n));
+      }
+      return Math.abs(n);
+    });
+    
+    // GCDを使ってLCMを計算
+    const gcd2 = (a: number, b: number): number => {
+      return b === 0 ? a : gcd2(b, a % b);
+    };
+    
+    const lcm2 = (a: number, b: number): number => {
+      return (a * b) / gcd2(a, b);
+    };
+    
+    let result = integers[0];
+    for (let i = 1; i < integers.length; i++) {
+      result = lcm2(result, integers[i]);
+      if (!isFinite(result)) {
+        return FormulaError.NUM;
+      }
+    }
+    
+    return result;
+  }
 };
 
 // QUOTIENT関数の実装（商の整数部分）
@@ -968,7 +1155,35 @@ export const COMBINA: CustomFormula = {
 export const PERMUT: CustomFormula = {
   name: 'PERMUT',
   pattern: /PERMUT\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, nRef, kRef] = matches;
+    
+    const n = Number(getCellValue(nRef, context) ?? nRef);
+    const k = Number(getCellValue(kRef, context) ?? kRef);
+    
+    if (isNaN(n) || isNaN(k)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (!Number.isInteger(n) || !Number.isInteger(k)) {
+      return FormulaError.NUM;
+    }
+    
+    if (n < 0 || k < 0 || k > n) {
+      return FormulaError.NUM;
+    }
+    
+    if (k === 0) {
+      return 1;
+    }
+    
+    let result = 1;
+    for (let i = 0; i < k; i++) {
+      result *= (n - i);
+    }
+    
+    return result;
+  }
 };
 
 // PERMUTATIONA関数（重複順列）
@@ -1248,21 +1463,72 @@ export const ATANH: CustomFormula = {
 export const CSC: CustomFormula = {
   name: 'CSC',
   pattern: /CSC\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    const sinValue = Math.sin(angle);
+    
+    if (Math.abs(sinValue) < 1e-10) {
+      return FormulaError.DIV0;
+    }
+    
+    return 1 / sinValue;
+  }
 };
 
 // 正割（SEC）
 export const SEC: CustomFormula = {
   name: 'SEC',
   pattern: /SEC\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    const cosValue = Math.cos(angle);
+    
+    if (Math.abs(cosValue) < 1e-10) {
+      return FormulaError.DIV0;
+    }
+    
+    return 1 / cosValue;
+  }
 };
 
 // 余接（COT）
 export const COT: CustomFormula = {
   name: 'COT',
   pattern: /COT\(([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, angleRef] = matches;
+    
+    const angleValue = getCellValue(angleRef, context) ?? angleRef;
+    const angle = Number(angleValue);
+    
+    if (isNaN(angle)) {
+      return FormulaError.VALUE;
+    }
+    
+    const tanValue = Math.tan(angle);
+    
+    if (Math.abs(tanValue) < 1e-10) {
+      return FormulaError.DIV0;
+    }
+    
+    return 1 / tanValue;
+  }
 };
 
 // 逆余接（ACOT）
