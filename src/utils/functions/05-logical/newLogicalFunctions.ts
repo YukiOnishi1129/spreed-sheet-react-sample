@@ -4,6 +4,70 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 
+// 簡単な数式を安全に評価する関数
+function evaluateSimpleMath(expression: string): number {
+  // 空白を削除
+  const expr = expression.replace(/\s/g, '');
+  
+  // 単純な数値の場合
+  const num = parseFloat(expr);
+  if (!isNaN(num) && expr === String(num)) {
+    return num;
+  }
+  
+  // 再帰的に式を評価
+  function evaluate(expr: string): number {
+    // 括弧を処理
+    let parenMatch = expr.match(/\(([^()]+)\)/);
+    while (parenMatch) {
+      const innerResult = evaluate(parenMatch[1]);
+      expr = expr.replace(parenMatch[0], String(innerResult));
+      parenMatch = expr.match(/\(([^()]+)\)/);
+    }
+    
+    // 乗算と除算を処理
+    let match = expr.match(/(-?\d+\.?\d*)\s*([*/])\s*(-?\d+\.?\d*)/);
+    while (match) {
+      const left = parseFloat(match[1]);
+      const right = parseFloat(match[3]);
+      const op = match[2];
+      
+      let result: number;
+      if (op === '*') {
+        result = left * right;
+      } else {
+        if (right === 0) throw new Error('Division by zero');
+        result = left / right;
+      }
+      
+      expr = expr.replace(match[0], String(result));
+      match = expr.match(/(-?\d+\.?\d*)\s*([*/])\s*(-?\d+\.?\d*)/);
+    }
+    
+    // 加算と減算を処理
+    match = expr.match(/(-?\d+\.?\d*)\s*([+-])\s*(-?\d+\.?\d*)/);
+    while (match) {
+      const left = parseFloat(match[1]);
+      const right = parseFloat(match[3]);
+      const op = match[2];
+      
+      const result = op === '+' ? left + right : left - right;
+      expr = expr.replace(match[0], String(result));
+      match = expr.match(/(-?\d+\.?\d*)\s*([+-])\s*(-?\d+\.?\d*)/);
+    }
+    
+    // 最終的な結果
+    const finalResult = parseFloat(expr);
+    if (isNaN(finalResult)) {
+      throw new Error('Invalid expression');
+    }
+    
+    return finalResult;
+  }
+  
+  return evaluate(expr);
+}
+
 // SWITCH関数の実装（現代的なネストIFの代替）
 export const SWITCH: CustomFormula = {
   name: 'SWITCH',
@@ -198,14 +262,18 @@ export const LET: CustomFormula = {
     
     // 簡単な数式評価（基本的な算術演算のみ対応）
     try {
-      // セキュリティのため、eval は使わず簡単な演算のみ対応
-      // 加算、減算、乗算、除算のみサポート
+      // セキュリティのため、安全な数式パーサーを実装
       const mathExpression = processedFormula.replace(/[^0-9+\-*/().\s]/g, '');
       
       if (mathExpression === processedFormula) {
         // 安全な数式の場合のみ評価
-        const result = Function(`"use strict"; return (${mathExpression})`)();
-        return result;
+        try {
+          // 簡単な数式パーサーを実装
+          const result = evaluateSimpleMath(mathExpression);
+          return result;
+        } catch {
+          return FormulaError.VALUE;
+        }
       } else {
         // セル参照が含まれる場合
         if (processedFormula.match(/^[A-Z]+\d+$/)) {
