@@ -84,7 +84,7 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
 
 // 日付文字列をDateオブジェクトに変換（互換性のため）
 export const parseDate = (dateValue: unknown): Date | null => {
-  return parseDateNew(dateValue);
+  return parseDateNew(String(dateValue));
 };
 
 // Dateオブジェクトをそのまま返す（互換性のため）

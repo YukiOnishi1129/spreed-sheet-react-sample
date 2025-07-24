@@ -346,7 +346,7 @@ https://support.google.com/docs/table/25273?hl=ja
 | IFERROR | エラー時の値を指定 | `=IFERROR(値, エラーの場合の値)` | ✅
 | IFNA | #N/Aエラー時の値 | `=IFNA(値, #N/Aの場合の値)` | ✅
 | SWITCH | 値に応じて切り替え | `=SWITCH(式, 値1, 結果1, [値2, 結果2], ..., [既定])` | ✅
-| LAMBDA | カスタム関数を作成 | `=LAMBDA([パラメータ1, ...], 計算式)` | ❌
+| LAMBDA | カスタム関数を作成 | `=LAMBDA([パラメータ1, ...], 計算式)` | ✅
 | LET | 変数を定義して使用 | `=LET(名前1, 値1, 計算式)` | ✅
 
 ## 06. 検索・参照関数 (Lookup & Reference Functions)
@@ -360,25 +360,25 @@ https://support.google.com/docs/table/25273?hl=ja
 | LOOKUP | 検索（旧式） | `=LOOKUP(検索値, 検索範囲, [結果範囲])` | ✅
 | INDEX | 位置から値を取得 | `=INDEX(配列, 行番号, [列番号])` | ✅
 | MATCH | 値の位置を検索 | `=MATCH(検索値, 検索範囲, [照合の種類])` | ✅
-| XMATCH | 値の位置を検索（拡張版） | `=XMATCH(検索値, 検索配列, [一致モード], [検索モード])` | ❌  |
+| XMATCH | 値の位置を検索（拡張版） | `=XMATCH(検索値, 検索配列, [一致モード], [検索モード])` | ✅  |
 
 ### 参照関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
 | CHOOSE | リストから選択 | `=CHOOSE(インデックス番号, 値1, [値2], ...)` | ✅
-| CHOOSEROWS | 行を選択 | `=CHOOSEROWS(配列, 行番号1, [行番号2], ...)` | ❌  |
-| CHOOSECOLS | 列を選択 | `=CHOOSECOLS(配列, 列番号1, [列番号2], ...)` | ❌  |
+| CHOOSEROWS | 行を選択 | `=CHOOSEROWS(配列, 行番号1, [行番号2], ...)` | ✅  |
+| CHOOSECOLS | 列を選択 | `=CHOOSECOLS(配列, 列番号1, [列番号2], ...)` | ✅  |
 | OFFSET | オフセット参照 | `=OFFSET(参照, 行数, 列数, [高さ], [幅])` | ✅
 | INDIRECT | 文字列から参照を作成 | `=INDIRECT(参照文字列, [参照形式])` | ✅
-| ROW | 行番号を返す | `=ROW([参照])` | ❌
-| ROWS | 行数を返す | `=ROWS(配列)` | ❌
-| COLUMN | 列番号を返す | `=COLUMN([参照])` | ❌
-| COLUMNS | 列数を返す | `=COLUMNS(配列)` | ❌
-| ADDRESS | セルアドレスを作成 | `=ADDRESS(行番号, 列番号, [絶対参照], [参照形式], [シート名])` | ❌
-| AREAS | 領域数を返す | `=AREAS(参照)` | ❌
-| FORMULATEXT | 数式を文字列で返す | `=FORMULATEXT(参照)` | ❌
+| ROW | 行番号を返す | `=ROW([参照])` | ✅
+| ROWS | 行数を返す | `=ROWS(配列)` | ✅
+| COLUMN | 列番号を返す | `=COLUMN([参照])` | ✅
+| COLUMNS | 列数を返す | `=COLUMNS(配列)` | ✅
+| ADDRESS | セルアドレスを作成 | `=ADDRESS(行番号, 列番号, [絶対参照], [参照形式], [シート名])` | ✅
+| AREAS | 領域数を返す | `=AREAS(参照)` | ✅
+| FORMULATEXT | 数式を文字列で返す | `=FORMULATEXT(参照)` | ✅
 | GETPIVOTDATA | ピボットテーブルからデータ取得 | `=GETPIVOTDATA(データフィールド, ピボットテーブル, [フィールド1, アイテム1], ...)` | ❌
-| HYPERLINK | ハイパーリンクを作成 | `=HYPERLINK(リンク先, [表示文字列])` | ❌
+| HYPERLINK | ハイパーリンクを作成 | `=HYPERLINK(リンク先, [表示文字列])` | ✅
 | TRANSPOSE | 行列を入れ替え | `=TRANSPOSE(配列)` | ✅
 
 ### 動的配列関数
@@ -436,10 +436,10 @@ https://support.google.com/docs/table/25273?hl=ja
 | DMAX | 条件付き最大値 | `=DMAX(データベース, フィールド, 条件)` | ✅
 | DMIN | 条件付き最小値 | `=DMIN(データベース, フィールド, 条件)` | ✅
 | DPRODUCT | 条件付き積 | `=DPRODUCT(データベース, フィールド, 条件)` | ✅
-| DSTDEV | 条件付き標準偏差（標本） | `=DSTDEV(データベース, フィールド, 条件)` | ❌
-| DSTDEVP | 条件付き標準偏差（母集団） | `=DSTDEVP(データベース, フィールド, 条件)` | ❌
-| DVAR | 条件付き分散（標本） | `=DVAR(データベース, フィールド, 条件)` | ❌
-| DVARP | 条件付き分散（母集団） | `=DVARP(データベース, フィールド, 条件)` | ❌
+| DSTDEV | 条件付き標準偏差（標本） | `=DSTDEV(データベース, フィールド, 条件)` | ✅
+| DSTDEVP | 条件付き標準偏差（母集団） | `=DSTDEVP(データベース, フィールド, 条件)` | ✅
+| DVAR | 条件付き分散（標本） | `=DVAR(データベース, フィールド, 条件)` | ✅
+| DVARP | 条件付き分散（母集団） | `=DVARP(データベース, フィールド, 条件)` | ✅
 | DGET | 条件に一致する値を取得 | `=DGET(データベース, フィールド, 条件)` | ✅
 
 ## 09. 財務関数 (Financial Functions)
@@ -453,21 +453,21 @@ https://support.google.com/docs/table/25273?hl=ja
 | PPMT | 元金返済額 | `=PPMT(利率, 期, 期間, 現在価値, [将来価値], [支払期日])` | ✅
 | IPMT | 利息支払額 | `=IPMT(利率, 期, 期間, 現在価値, [将来価値], [支払期日])` | ✅
 | RATE | 利率 | `=RATE(期間, 定期支払額, 現在価値, [将来価値], [支払期日], [推定値])` | ✅
-| NPER | 支払回数 | `=NPER(利率, 定期支払額, 現在価値, [将来価値], [支払期日])` | ❌
+| NPER | 支払回数 | `=NPER(利率, 定期支払額, 現在価値, [将来価値], [支払期日])` | ✅
 | NPV | 正味現在価値 | `=NPV(割引率, 値1, [値2], ...)` | ✅
-| XNPV | 正味現在価値（日付指定） | `=XNPV(割引率, 値, 日付)` | ❌
+| XNPV | 正味現在価値（日付指定） | `=XNPV(割引率, 値, 日付)` | ✅
 | IRR | 内部収益率 | `=IRR(値, [推定値])` | ✅
-| XIRR | 内部収益率（日付指定） | `=XIRR(値, 日付, [推定値])` | ❌
-| MIRR | 修正内部収益率 | `=MIRR(値, 財務費用率, 再投資収益率)` | ❌
+| XIRR | 内部収益率（日付指定） | `=XIRR(値, 日付, [推定値])` | ✅
+| MIRR | 修正内部収益率 | `=MIRR(値, 財務費用率, 再投資収益率)` | ✅
 
 ### 減価償却関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| SLN | 定額法 | `=SLN(取得価額, 残存価額, 耐用年数)` | ❌
-| SYD | 級数法 | `=SYD(取得価額, 残存価額, 耐用年数, 期)` | ❌
-| DB | 定率法 | `=DB(取得価額, 残存価額, 耐用年数, 期, [月])` | ❌
-| DDB | 倍額定率法 | `=DDB(取得価額, 残存価額, 耐用年数, 期, [率])` | ❌
-| VDB | 可変減価償却 | `=VDB(取得価額, 残存価額, 耐用年数, 開始期, 終了期, [率], [切り替えなし])` | ❌
+| SLN | 定額法 | `=SLN(取得価額, 残存価額, 耐用年数)` | ✅
+| SYD | 級数法 | `=SYD(取得価額, 残存価額, 耐用年数, 期)` | ✅
+| DB | 定率法 | `=DB(取得価額, 残存価額, 耐用年数, 期, [月])` | ✅
+| DDB | 倍額定率法 | `=DDB(取得価額, 残存価額, 耐用年数, 期, [率])` | ✅
+| VDB | 可変減価償却 | `=VDB(取得価額, 残存価額, 耐用年数, 開始期, 終了期, [率], [切り替えなし])` | ✅
 | AMORDEGRC | フランス式減価償却 | `=AMORDEGRC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ❌
 | AMORLINC | フランス式定額償却 | `=AMORLINC(取得価額, 購入日, 第1期終了日, 残存価額, 期, 率, [基準])` | ❌
 
@@ -494,12 +494,12 @@ https://support.google.com/docs/table/25273?hl=ja
 | ODDFYIELD | 変則初回期の利回り | `=ODDFYIELD(受渡日, 満期日, 発行日, 初回利払日, 利率, 価格, 償還価額, 頻度, [基準])` | ❌
 | ODDLPRICE | 変則最終期の価格 | `=ODDLPRICE(受渡日, 満期日, 最終利払日, 利率, 利回り, 償還価額, 頻度, [基準])` | ❌
 | ODDLYIELD | 変則最終期の利回り | `=ODDLYIELD(受渡日, 満期日, 最終利払日, 利率, 価格, 償還価額, 頻度, [基準])` | ❌
-| PDURATION | 投資期間 | `=PDURATION(利率, 現在価値, 将来価値)` | ❌
+| PDURATION | 投資期間 | `=PDURATION(利率, 現在価値, 将来価値)` | ✅
 | PRICE | 定期利付証券の価格 | `=PRICE(受渡日, 満期日, 利率, 利回り, 償還価額, 頻度, [基準])` | ❌
 | PRICEDISC | 割引証券の価格 | `=PRICEDISC(受渡日, 満期日, 割引率, 償還価額, [基準])` | ❌
 | PRICEMAT | 満期利付証券の価格 | `=PRICEMAT(受渡日, 満期日, 発行日, 利率, 利回り, [基準])` | ❌
 | RECEIVED | 受取金額 | `=RECEIVED(受渡日, 満期日, 投資額, 割引率, [基準])` | ❌
-| RRI | 投資成長率 | `=RRI(期間, 現在価値, 将来価値)` | ❌
+| RRI | 投資成長率 | `=RRI(期間, 現在価値, 将来価値)` | ✅
 | TBILLEQ | 米国財務省短期証券の債券換算利回り | `=TBILLEQ(受渡日, 満期日, 割引率)` | ❌
 | TBILLPRICE | 米国財務省短期証券の価格 | `=TBILLPRICE(受渡日, 満期日, 割引率)` | ❌
 | TBILLYIELD | 米国財務省短期証券の利回り | `=TBILLYIELD(受渡日, 満期日, 価格)` | ❌
@@ -526,46 +526,46 @@ https://support.google.com/docs/table/25273?hl=ja
 |--------|------|----------|
 | BIN2DEC | 2進数→10進数 | `=BIN2DEC(数値)` | ✅
 | BIN2HEX | 2進数→16進数 | `=BIN2HEX(数値, [桁数])` | ✅
-| BIN2OCT | 2進数→8進数 | `=BIN2OCT(数値, [桁数])` | ❌
+| BIN2OCT | 2進数→8進数 | `=BIN2OCT(数値, [桁数])` | ✅
 | DEC2BIN | 10進数→2進数 | `=DEC2BIN(数値, [桁数])` | ✅
 | DEC2HEX | 10進数→16進数 | `=DEC2HEX(数値, [桁数])` | ✅
 | DEC2OCT | 10進数→8進数 | `=DEC2OCT(数値, [桁数])` | ✅
 | HEX2BIN | 16進数→2進数 | `=HEX2BIN(数値, [桁数])` | ✅
 | HEX2DEC | 16進数→10進数 | `=HEX2DEC(数値)` | ✅
-| HEX2OCT | 16進数→8進数 | `=HEX2OCT(数値, [桁数])` | ❌
-| OCT2BIN | 8進数→2進数 | `=OCT2BIN(数値, [桁数])` | ❌
+| HEX2OCT | 16進数→8進数 | `=HEX2OCT(数値, [桁数])` | ✅
+| OCT2BIN | 8進数→2進数 | `=OCT2BIN(数値, [桁数])` | ✅
 | OCT2DEC | 8進数→10進数 | `=OCT2DEC(数値)` | ✅
-| OCT2HEX | 8進数→16進数 | `=OCT2HEX(数値, [桁数])` | ❌
+| OCT2HEX | 8進数→16進数 | `=OCT2HEX(数値, [桁数])` | ✅
 
 ### 複素数関数
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| COMPLEX | 複素数を作成 | `=COMPLEX(実部, 虚部, [虚数単位])` | ❌
-| IMABS | 複素数の絶対値 | `=IMABS(複素数)` | ❌
-| IMAGINARY | 虚部を返す | `=IMAGINARY(複素数)` | ❌
-| IMARGUMENT | 偏角を返す | `=IMARGUMENT(複素数)` | ❌
-| IMCONJUGATE | 複素共役 | `=IMCONJUGATE(複素数)` | ❌
-| IMCOS | 複素数の余弦 | `=IMCOS(複素数)` | ❌
-| IMCOSH | 複素数の双曲線余弦 | `=IMCOSH(複素数)` | ❌
-| IMCOT | 複素数の余接 | `=IMCOT(複素数)` | ❌
-| IMCSC | 複素数の余割 | `=IMCSC(複素数)` | ❌
-| IMCSCH | 複素数の双曲線余割 | `=IMCSCH(複素数)` | ❌
-| IMDIV | 複素数の除算 | `=IMDIV(複素数1, 複素数2)` | ❌
-| IMEXP | 複素数の指数関数 | `=IMEXP(複素数)` | ❌
-| IMLN | 複素数の自然対数 | `=IMLN(複素数)` | ❌
-| IMLOG10 | 複素数の常用対数 | `=IMLOG10(複素数)` | ❌
-| IMLOG2 | 複素数の2を底とする対数 | `=IMLOG2(複素数)` | ❌
-| IMPOWER | 複素数のべき乗 | `=IMPOWER(複素数, 数値)` | ❌
-| IMPRODUCT | 複素数の積 | `=IMPRODUCT(複素数1, [複素数2], ...)` | ❌
-| IMREAL | 実部を返す | `=IMREAL(複素数)` | ❌
-| IMSEC | 複素数の正割 | `=IMSEC(複素数)` | ❌
-| IMSECH | 複素数の双曲線正割 | `=IMSECH(複素数)` | ❌
-| IMSIN | 複素数の正弦 | `=IMSIN(複素数)` | ❌
-| IMSINH | 複素数の双曲線正弦 | `=IMSINH(複素数)` | ❌
-| IMSQRT | 複素数の平方根 | `=IMSQRT(複素数)` | ❌
-| IMSUB | 複素数の減算 | `=IMSUB(複素数1, 複素数2)` | ❌
-| IMSUM | 複素数の和 | `=IMSUM(複素数1, [複素数2], ...)` | ❌
-| IMTAN | 複素数の正接 | `=IMTAN(複素数)` | ❌
+| COMPLEX | 複素数を作成 | `=COMPLEX(実部, 虚部, [虚数単位])` | ✅
+| IMABS | 複素数の絶対値 | `=IMABS(複素数)` | ✅
+| IMAGINARY | 虚部を返す | `=IMAGINARY(複素数)` | ✅
+| IMARGUMENT | 偏角を返す | `=IMARGUMENT(複素数)` | ✅
+| IMCONJUGATE | 複素共役 | `=IMCONJUGATE(複素数)` | ✅
+| IMCOS | 複素数の余弦 | `=IMCOS(複素数)` | ✅
+| IMCOSH | 複素数の双曲線余弦 | `=IMCOSH(複素数)` | ✅
+| IMCOT | 複素数の余接 | `=IMCOT(複素数)` | ✅
+| IMCSC | 複素数の余割 | `=IMCSC(複素数)` | ✅
+| IMCSCH | 複素数の双曲線余割 | `=IMCSCH(複素数)` | ✅
+| IMDIV | 複素数の除算 | `=IMDIV(複素数1, 複素数2)` | ✅
+| IMEXP | 複素数の指数関数 | `=IMEXP(複素数)` | ✅
+| IMLN | 複素数の自然対数 | `=IMLN(複素数)` | ✅
+| IMLOG10 | 複素数の常用対数 | `=IMLOG10(複素数)` | ✅
+| IMLOG2 | 複素数の2を底とする対数 | `=IMLOG2(複素数)` | ✅
+| IMPOWER | 複素数のべき乗 | `=IMPOWER(複素数, 数値)` | ✅
+| IMPRODUCT | 複素数の積 | `=IMPRODUCT(複素数1, [複素数2], ...)` | ✅
+| IMREAL | 実部を返す | `=IMREAL(複素数)` | ✅
+| IMSEC | 複素数の正割 | `=IMSEC(複素数)` | ✅
+| IMSECH | 複素数の双曲線正割 | `=IMSECH(複素数)` | ✅
+| IMSIN | 複素数の正弦 | `=IMSIN(複素数)` | ✅
+| IMSINH | 複素数の双曲線正弦 | `=IMSINH(複素数)` | ✅
+| IMSQRT | 複素数の平方根 | `=IMSQRT(複素数)` | ✅
+| IMSUB | 複素数の減算 | `=IMSUB(複素数1, 複素数2)` | ✅
+| IMSUM | 複素数の和 | `=IMSUM(複素数1, [複素数2], ...)` | ✅
+| IMTAN | 複素数の正接 | `=IMTAN(複素数)` | ✅
 
 ### ベッセル関数
 | 関数名 | 説明 | 構文 | 実装状況 |
@@ -606,9 +606,9 @@ https://support.google.com/docs/table/25273?hl=ja
 
 | 関数名 | 説明 | 構文 | 実装状況 |
 |--------|------|----------|
-| WEBSERVICE | Webサービスからデータ取得 🟠 | `=WEBSERVICE(URL)` | ❌
-| FILTERXML | XMLからデータ抽出 🟠 | `=FILTERXML(XML, XPath)` | ❌
-| ENCODEURL | URLエンコード 🟠 | `=ENCODEURL(文字列)` | ❌
+| WEBSERVICE | Webサービスからデータ取得 🟠 | `=WEBSERVICE(URL)` | ✅
+| FILTERXML | XMLからデータ抽出 🟠 | `=FILTERXML(XML, XPath)` | ✅
+| ENCODEURL | URLエンコード 🟠 | `=ENCODEURL(文字列)` | ✅
 
 ## 13. 互換性関数 (Compatibility Functions)
 
@@ -816,12 +816,12 @@ const usFormat = formatDate(date, 'MM/DD/YYYY', {
 ### 統計情報  
 - 総関数数: 約500+
 - カテゴリ数: 15
-- **実装済み: 142関数** ✅
-- 未実装: 400+関数
+- **実装済み: 202関数** ✅
+- 未実装: 340+関数
 
 ## 実装状況サマリー
 
-現在実装済みの関数数: **142関数** ✅
+現在実装済みの関数数: **202関数** ✅
 
 ### 実装別内訳
 - **📗 Google Sheets専用**: 1関数 (1%) - SPLIT関数
@@ -833,11 +833,14 @@ const usFormat = formatDate(date, 'MM/DD/YYYY', {
 - **テキスト関数** (25関数): 文字列操作、検索、置換、変換、文字コード変換など
 - **日付関数** (19関数): 日付計算、抽出、稼働日計算、時刻操作、年の割合など
 - **論理関数** (10関数): 条件分岐、論理演算、エラー処理など
-- **検索関数** (6関数): VLOOKUP、INDEX/MATCH、XLOOKUPなど
+- **検索・参照関数** (19関数): VLOOKUP、INDEX/MATCH、XLOOKUP、XMATCH、ROW/ROWS、COLUMN/COLUMNS、ADDRESS、HYPERLINK、LAMBDAなど
 - **情報関数** (10関数): データ型判定、値検証など
-- **財務関数** (7関数): 現在価値、将来価値、内部収益率、元金返済額など
+- **財務関数** (18関数): 現在価値、将来価値、内部収益率、元金返済額、減価償却関数(SLN、SYD、DB、DDB、VDB)、投資関連(NPER、XNPV、XIRR、MIRR、PDURATION、RRI)など
+- **エンジニアリング関数** (30関数): 数値システム変換(BIN2OCT、HEX2OCT、OCT2BIN、OCT2HEX)、複素数演算(COMPLEX、IMABS、IMAGINARY等)など
+- **データベース関数** (4関数): 条件付き標準偏差(DSTDEV、DSTDEVP)、条件付き分散(DVAR、DVARP)
+- **Web関数** (3関数): Webサービス連携(WEBSERVICE)、XML処理(FILTERXML)、URLエンコード(ENCODEURL)
 
-**注意**: 実装状況は2025年1月時点での /src/utils/formulas/ ディレクトリの内容に基づいて更新されています。
+**注意**: 実装状況は2025年7月時点での /src/utils/formulas/ ディレクトリの内容に基づいて更新されています。
 
 ### 次のステップ
 1. 各関数の手動計算ロジックの実装優先順位を決定
