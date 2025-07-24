@@ -87,7 +87,8 @@ export const useExcelFunctionSearch = ({ isSubmitting, setValue, setLoadingMessa
           } else {
             // 値セルの場合
             if (isFormulaResult(cell.value)) {
-              const converted = convertFormulaResult(cell.value);
+              // TypeScriptの型ガードが効くように型アサーションを使用
+              const converted = convertFormulaResult(cell.value as FormulaResult);
               if (typeof converted === 'string' || typeof converted === 'number' || converted === null) {
                 result.value = converted;
               } else {
