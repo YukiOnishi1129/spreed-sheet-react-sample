@@ -71,7 +71,7 @@ import { SWITCH, LET } from './05-logical/newLogicalFunctions';
 
 import { VLOOKUP, HLOOKUP, INDEX, MATCH, LOOKUP, XLOOKUP, OFFSET, INDIRECT, CHOOSE, TRANSPOSE, FILTER, SORT, UNIQUE } from './06-lookup-reference/lookupFunctions';
 
-import { JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN } from './14-google-sheets/googleSheetsFunctions';
+import { JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN } from './13-google-sheets/googleSheetsFunctions';
 
 import { 
   ISBLANK, ISERROR, ISNA, ISTEXT, ISNUMBER, ISLOGICAL, ISEVEN, ISODD, TYPE, N,
@@ -115,8 +115,8 @@ import { MDETERM, MINVERSE, MMULT, MUNIT } from './01-math-trigonometry/matrixFu
 import { WEBSERVICE, FILTERXML, ENCODEURL } from './12-web/webFunctions';
 import { IMPORTDATA, IMPORTFEED, IMPORTHTML, IMPORTXML, IMPORTRANGE, IMAGE } from './12-web/importFunctions';
 import { CUBEVALUE, CUBEMEMBER, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, CUBEMEMBERPROPERTY, CUBEKPIMEMBER } from './11-cube/cubeFunctions';
-import { ISOMITTED, STOCKHISTORY, GPT } from './15-others/excelNewFunctions';
-import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT } from './14-google-sheets/googleSheetsExtraFunctions';
+import { ISOMITTED, STOCKHISTORY, GPT } from './14-others/excelNewFunctions';
+import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DATE, TO_PERCENT, TO_DOLLARS, TO_TEXT } from './13-google-sheets/googleSheetsExtraFunctions';
 
 // すべての関数を配列にまとめる
 export const ALL_FUNCTIONS = [
@@ -389,6 +389,6 @@ export * from './08-database/statisticalDatabaseFunctions';
 export * from './12-web/webFunctions';
 export * from './01-math-trigonometry/matrixFunctions';
 export * from './11-cube/cubeFunctions';
-export * from './14-google-sheets/googleSheetsFunctions';
-export * from './14-google-sheets/googleSheetsExtraFunctions';
-export * from './15-others/excelNewFunctions';
+export * from './13-google-sheets/googleSheetsFunctions';
+export * from './13-google-sheets/googleSheetsExtraFunctions';
+export * from './14-others/excelNewFunctions';

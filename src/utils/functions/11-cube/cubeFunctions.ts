@@ -245,16 +245,16 @@ export const CUBEMEMBERPROPERTY: CustomFormula = {
       
       const cleanMember = memberExpr.replace(/^["']|["']$/g, '');
       
-      if (memberProperties[cleanMember] && memberProperties[cleanMember][cleanProperty]) {
+      if (memberProperties[cleanMember]?.[cleanProperty]) {
         return memberProperties[cleanMember][cleanProperty];
       }
       
       // デフォルトプロパティ
       switch (cleanProperty) {
         case 'MEMBER_CAPTION':
-          return cleanMember.split('.').pop()?.replace(/[\[\]]/g, '') || cleanMember;
+          return cleanMember.split('.').pop()?.replace(/\[|\]/g, '') ?? cleanMember;
         case 'MEMBER_NAME':
-          return cleanMember.split('.').pop()?.replace(/[\[\]]/g, '') || cleanMember;
+          return cleanMember.split('.').pop()?.replace(/\[|\]/g, '') ?? cleanMember;
         case 'MEMBER_UNIQUE_NAME':
           return cleanMember;
         case 'LEVEL_NUMBER':
@@ -309,7 +309,7 @@ export const CUBEKPIMEMBER: CustomFormula = {
         },
       };
       
-      if (kpiData[cleanKpiName] && kpiData[cleanKpiName][kpiProperty] !== undefined) {
+      if (kpiData[cleanKpiName]?.[kpiProperty] !== undefined) {
         return kpiData[cleanKpiName][kpiProperty];
       }
       

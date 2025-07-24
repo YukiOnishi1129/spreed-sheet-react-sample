@@ -13,7 +13,7 @@ export const SORTBY: CustomFormula = {
     
     try {
       // データ配列を取得
-      const data: any[][] = [];
+      const data: (number | string | boolean | null)[][] = [];
       const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!rangeMatch) {
@@ -27,16 +27,16 @@ export const SORTBY: CustomFormula = {
       const endColIndex = endCol.charCodeAt(0) - 65;
       
       for (let row = startRow; row <= endRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = startColIndex; col <= endColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         data.push(rowData);
       }
       
       // ソート配列を取得
-      const sortValues1: any[] = [];
+      const sortValues1: (number | string | boolean | null)[] = [];
       const sortRange1Match = sortArrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!sortRange1Match) {
@@ -50,7 +50,7 @@ export const SORTBY: CustomFormula = {
       
       for (let row = s1StartRow; row <= s1EndRow; row++) {
         const cell = context.data[row]?.[s1StartColIndex];
-        sortValues1.push(cell ? cell.value : null);
+        sortValues1.push(cell ? (cell.value as (number | string | boolean | null)) : null);
       }
       
       if (data.length !== sortValues1.length) {
@@ -97,7 +97,7 @@ export const TAKE: CustomFormula = {
     
     try {
       // データ配列を取得
-      const data: any[][] = [];
+      const data: (number | string | boolean | null)[][] = [];
       const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!rangeMatch) {
@@ -111,10 +111,10 @@ export const TAKE: CustomFormula = {
       const endColIndex = endCol.charCodeAt(0) - 65;
       
       for (let row = startRow; row <= endRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = startColIndex; col <= endColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         data.push(rowData);
       }
@@ -163,7 +163,7 @@ export const DROP: CustomFormula = {
     
     try {
       // データ配列を取得
-      const data: any[][] = [];
+      const data: (number | string | boolean | null)[][] = [];
       const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!rangeMatch) {
@@ -177,10 +177,10 @@ export const DROP: CustomFormula = {
       const endColIndex = endCol.charCodeAt(0) - 65;
       
       for (let row = startRow; row <= endRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = startColIndex; col <= endColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         data.push(rowData);
       }
@@ -227,7 +227,7 @@ export const EXPAND: CustomFormula = {
     
     try {
       // データ配列を取得
-      const data: any[][] = [];
+      const data: (number | string | boolean | null)[][] = [];
       const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!rangeMatch) {
@@ -241,10 +241,10 @@ export const EXPAND: CustomFormula = {
       const endColIndex = endCol.charCodeAt(0) - 65;
       
       for (let row = startRow; row <= endRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = startColIndex; col <= endColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         data.push(rowData);
       }
@@ -262,15 +262,15 @@ export const EXPAND: CustomFormula = {
       }
       
       // 結果配列を作成
-      const result: any[][] = [];
+      const result: (number | string | boolean | null)[][] = [];
       
       for (let row = 0; row < newRows; row++) {
-        const resultRow: any[] = [];
+        const resultRow: (number | string | boolean | null)[] = [];
         for (let col = 0; col < newCols; col++) {
           if (row < data.length && col < data[row].length) {
             resultRow.push(data[row][col]);
           } else {
-            resultRow.push(padValue);
+            resultRow.push(padValue as (number | string | boolean | null));
           }
         }
         result.push(resultRow);
@@ -292,7 +292,7 @@ export const HSTACK: CustomFormula = {
     
     try {
       const args = argsStr.split(',').map(arg => arg.trim());
-      const arrays: any[][][] = [];
+      const arrays: (number | string | boolean | null)[][][] = [];
       let maxRows = 0;
       
       // 各配列を取得
@@ -309,12 +309,12 @@ export const HSTACK: CustomFormula = {
           const startColIndex = startCol.charCodeAt(0) - 65;
           const endColIndex = endCol.charCodeAt(0) - 65;
           
-          const array: any[][] = [];
+          const array: (number | string | boolean | null)[][] = [];
           for (let row = startRow; row <= endRow; row++) {
-            const rowData: any[] = [];
+            const rowData: (number | string | boolean | null)[] = [];
             for (let col = startColIndex; col <= endColIndex; col++) {
               const cell = context.data[row]?.[col];
-              rowData.push(cell ? cell.value : null);
+              rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
             }
             array.push(rowData);
           }
@@ -323,22 +323,23 @@ export const HSTACK: CustomFormula = {
           maxRows = Math.max(maxRows, array.length);
         } else {
           // 単一セルの場合
-          const value = getCellValue(arg, context);
+          const value = getCellValue(arg, context) as (number | string | boolean | null);
           arrays.push([[value]]);
           maxRows = Math.max(maxRows, 1);
         }
       }
       
       // 水平結合
-      const result: any[][] = [];
+      const result: (number | string | boolean | null)[][] = [];
       for (let row = 0; row < maxRows; row++) {
-        const resultRow: any[] = [];
+        const resultRow: (number | string | boolean | null)[] = [];
         for (const array of arrays) {
           if (row < array.length) {
             resultRow.push(...array[row]);
           } else {
             // 短い配列の場合、#N/Aで埋める
-            resultRow.push(...Array(array[0].length).fill(FormulaError.NA));
+            const fillerArray = Array(array[0].length).fill(FormulaError.NA) as string[];
+            resultRow.push(...fillerArray);
           }
         }
         result.push(resultRow);
@@ -360,7 +361,7 @@ export const VSTACK: CustomFormula = {
     
     try {
       const args = argsStr.split(',').map(arg => arg.trim());
-      const arrays: any[][][] = [];
+      const arrays: (number | string | boolean | null)[][][] = [];
       let maxCols = 0;
       
       // 各配列を取得
@@ -377,12 +378,12 @@ export const VSTACK: CustomFormula = {
           const startColIndex = startCol.charCodeAt(0) - 65;
           const endColIndex = endCol.charCodeAt(0) - 65;
           
-          const array: any[][] = [];
+          const array: (number | string | boolean | null)[][] = [];
           for (let row = startRow; row <= endRow; row++) {
-            const rowData: any[] = [];
+            const rowData: (number | string | boolean | null)[] = [];
             for (let col = startColIndex; col <= endColIndex; col++) {
               const cell = context.data[row]?.[col];
-              rowData.push(cell ? cell.value : null);
+              rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
             }
             array.push(rowData);
           }
@@ -391,14 +392,14 @@ export const VSTACK: CustomFormula = {
           maxCols = Math.max(maxCols, array[0]?.length ?? 0);
         } else {
           // 単一セルの場合
-          const value = getCellValue(arg, context);
+          const value = getCellValue(arg, context) as (number | string | boolean | null);
           arrays.push([[value]]);
           maxCols = Math.max(maxCols, 1);
         }
       }
       
       // 垂直結合
-      const result: any[][] = [];
+      const result: (number | string | boolean | null)[][] = [];
       for (const array of arrays) {
         for (const row of array) {
           const resultRow = [...row];
@@ -426,7 +427,7 @@ export const TOCOL: CustomFormula = {
     
     try {
       // データ配列を取得
-      const data: any[][] = [];
+      const data: (number | string | boolean | null)[][] = [];
       const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!rangeMatch) {
@@ -440,10 +441,10 @@ export const TOCOL: CustomFormula = {
       const endColIndex = endCol.charCodeAt(0) - 65;
       
       for (let row = startRow; row <= endRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = startColIndex; col <= endColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         data.push(rowData);
       }
@@ -451,7 +452,7 @@ export const TOCOL: CustomFormula = {
       const ignore = ignoreRef ? parseInt(getCellValue(ignoreRef.trim(), context)?.toString() ?? ignoreRef.trim()) : 0;
       const scanByCol = scanByColRef ? getCellValue(scanByColRef.trim(), context)?.toString().toLowerCase() === 'true' : false;
       
-      const result: any[] = [];
+      const result: (number | string | boolean | null)[] = [];
       
       // スキャン方向に応じて要素を収集
       if (scanByCol) {
@@ -492,7 +493,7 @@ export const TOROW: CustomFormula = {
     
     try {
       // データ配列を取得
-      const data: any[][] = [];
+      const data: (number | string | boolean | null)[][] = [];
       const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!rangeMatch) {
@@ -506,10 +507,10 @@ export const TOROW: CustomFormula = {
       const endColIndex = endCol.charCodeAt(0) - 65;
       
       for (let row = startRow; row <= endRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = startColIndex; col <= endColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         data.push(rowData);
       }
@@ -517,7 +518,7 @@ export const TOROW: CustomFormula = {
       const ignore = ignoreRef ? parseInt(getCellValue(ignoreRef.trim(), context)?.toString() ?? ignoreRef.trim()) : 0;
       const scanByCol = scanByColRef ? getCellValue(scanByColRef.trim(), context)?.toString().toLowerCase() === 'true' : false;
       
-      const result: any[] = [];
+      const result: (number | string | boolean | null)[] = [];
       
       // スキャン方向に応じて要素を収集
       if (scanByCol) {
@@ -558,7 +559,7 @@ export const WRAPROWS: CustomFormula = {
     
     try {
       // ベクトルデータを取得
-      const values: any[] = [];
+      const values: (number | string | boolean | null)[] = [];
       
       if (vectorRef.includes(':')) {
         const rangeMatch = vectorRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
@@ -576,11 +577,11 @@ export const WRAPROWS: CustomFormula = {
         for (let row = startRow; row <= endRow; row++) {
           for (let col = startColIndex; col <= endColIndex; col++) {
             const cell = context.data[row]?.[col];
-            values.push(cell ? cell.value : null);
+            values.push(cell ? (cell.value as (number | string | boolean | null)) : null);
           }
         }
       } else {
-        values.push(getCellValue(vectorRef.trim(), context));
+        values.push(getCellValue(vectorRef.trim(), context) as (number | string | boolean | null));
       }
       
       const wrapCount = parseInt(getCellValue(wrapCountRef.trim(), context)?.toString() ?? wrapCountRef.trim());
@@ -591,14 +592,14 @@ export const WRAPROWS: CustomFormula = {
       }
       
       // 行で折り返し
-      const result: any[][] = [];
+      const result: (number | string | boolean | null)[][] = [];
       for (let i = 0; i < values.length; i += wrapCount) {
-        const row: any[] = [];
+        const row: (number | string | boolean | null)[] = [];
         for (let j = 0; j < wrapCount; j++) {
           if (i + j < values.length) {
             row.push(values[i + j]);
           } else {
-            row.push(padValue);
+            row.push(padValue as (number | string | boolean | null));
           }
         }
         result.push(row);
@@ -620,7 +621,7 @@ export const WRAPCOLS: CustomFormula = {
     
     try {
       // ベクトルデータを取得
-      const values: any[] = [];
+      const values: (number | string | boolean | null)[] = [];
       
       if (vectorRef.includes(':')) {
         const rangeMatch = vectorRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
@@ -638,11 +639,11 @@ export const WRAPCOLS: CustomFormula = {
         for (let row = startRow; row <= endRow; row++) {
           for (let col = startColIndex; col <= endColIndex; col++) {
             const cell = context.data[row]?.[col];
-            values.push(cell ? cell.value : null);
+            values.push(cell ? (cell.value as (number | string | boolean | null)) : null);
           }
         }
       } else {
-        values.push(getCellValue(vectorRef.trim(), context));
+        values.push(getCellValue(vectorRef.trim(), context) as (number | string | boolean | null));
       }
       
       const wrapCount = parseInt(getCellValue(wrapCountRef.trim(), context)?.toString() ?? wrapCountRef.trim());
@@ -654,7 +655,7 @@ export const WRAPCOLS: CustomFormula = {
       
       // 列で折り返し（転置が必要）
       const numCols = Math.ceil(values.length / wrapCount);
-      const result: any[][] = Array(wrapCount).fill(null).map(() => []);
+      const result: (number | string | boolean | null)[][] = Array(wrapCount).fill(null).map(() => []);
       
       for (let i = 0; i < values.length; i++) {
         const row = i % wrapCount;
@@ -664,7 +665,7 @@ export const WRAPCOLS: CustomFormula = {
       // パディング
       for (let row = 0; row < wrapCount; row++) {
         while (result[row].length < numCols) {
-          result[row].push(padValue);
+          result[row].push(padValue as (number | string | boolean | null));
         }
       }
       
@@ -676,7 +677,7 @@ export const WRAPCOLS: CustomFormula = {
 };
 
 // ヘルパー関数：値を含めるかどうかを判定
-function shouldIncludeValue(value: any, ignore: number): boolean {
+function shouldIncludeValue(value: (number | string | boolean | null), ignore: number): boolean {
   switch (ignore) {
     case 0: // すべて含む
       return true;

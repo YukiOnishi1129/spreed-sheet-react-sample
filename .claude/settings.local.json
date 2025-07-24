@@ -35,7 +35,10 @@
       "Bash(python3:*)",
       "WebFetch(domain:github.com)",
       "Bash(awk:*)",
-      "Bash(comm:*)"
+      "Bash(comm:*)",
+      "Bash(# ドキュメントのバックアップを作成\ncp /Users/yuki/created-system/spreed-sheet-react-sample/docs/spreadsheet-functions-reference.md /Users/yuki/created-system/spreed-sheet-react-sample/docs/spreadsheet-functions-reference.md.bak\n\n# 13. 互換性関数セクションを削除（614行目から658行目まで）\nsed -i '' '614,658d' /Users/yuki/created-system/spreed-sheet-react-sample/docs/spreadsheet-functions-reference.md\n\n# 14を13に、15を14に変更\nsed -i '' 's/## 14\\. Google Sheets専用関数/## 13. Google Sheets専用関数/g' /Users/yuki/created-system/spreed-sheet-react-sample/docs/spreadsheet-functions-reference.md\nsed -i '' 's/## 15\\. 新しい関数・その他/## 14. 新しい関数・その他/g' /Users/yuki/created-system/spreed-sheet-react-sample/docs/spreadsheet-functions-reference.md)",
+      "Bash(# 統計関数セクションの最後にレガシー関数を追加\ngrep -n \"^## 03\\. 文字列操作関数\" /Users/yuki/created-system/spreed-sheet-react-sample/docs/spreadsheet-functions-reference.md)",
+      "Bash(# 13-compatibilityディレクトリを削除\nrm -rf /Users/yuki/created-system/spreed-sheet-react-sample/src/utils/functions/13-compatibility\n\n# ディレクトリ名を変更（14→13、15→14）\nmv /Users/yuki/created-system/spreed-sheet-react-sample/src/utils/functions/14-google-sheets /Users/yuki/created-system/spreed-sheet-react-sample/src/utils/functions/13-google-sheets\nmv /Users/yuki/created-system/spreed-sheet-react-sample/src/utils/functions/15-others /Users/yuki/created-system/spreed-sheet-react-sample/src/utils/functions/14-others)"
     ],
     "deny": []
   }

@@ -40,7 +40,7 @@ export const ROW: CustomFormula = {
 export const ROWS: CustomFormula = {
   name: 'ROWS',
   pattern: /ROWS\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, _context: FormulaContext): FormulaResult => {
+  calculate: (matches: RegExpMatchArray): FormulaResult => {
     const [, rangeRef] = matches;
     
     try {
@@ -113,7 +113,7 @@ export const COLUMN: CustomFormula = {
 export const COLUMNS: CustomFormula = {
   name: 'COLUMNS',
   pattern: /COLUMNS\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, _context: FormulaContext): FormulaResult => {
+  calculate: (matches: RegExpMatchArray): FormulaResult => {
     const [, rangeRef] = matches;
     
     try {
@@ -241,7 +241,7 @@ export const ADDRESS: CustomFormula = {
 export const AREAS: CustomFormula = {
   name: 'AREAS',
   pattern: /AREAS\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, _context: FormulaContext): FormulaResult => {
+  calculate: (matches: RegExpMatchArray): FormulaResult => {
     const [, reference] = matches;
     
     try {
@@ -286,7 +286,7 @@ export const FORMULATEXT: CustomFormula = {
       
       const cell = context.data[row]?.[col];
       
-      if (!cell || !cell.formula) {
+      if (!cell?.formula) {
         return FormulaError.NA;
       }
       
@@ -395,7 +395,7 @@ export const XMATCH: CustomFormula = {
           }
           break;
           
-        case 2: // ワイルドカード一致
+        case 2: { // ワイルドカード一致
           const pattern = String(lookupValue)
             .replace(/\*/g, '.*')
             .replace(/\?/g, '.')
@@ -409,6 +409,7 @@ export const XMATCH: CustomFormula = {
             }
           }
           break;
+        }
           
         default:
           return FormulaError.VALUE;
@@ -436,7 +437,7 @@ export const XMATCH: CustomFormula = {
 export const LAMBDA: CustomFormula = {
   name: 'LAMBDA',
   pattern: /LAMBDA\((.+)\)/i,
-  calculate: (_matches: RegExpMatchArray, _context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // LAMBDAは通常、名前定義で使用され、直接セルで使用されることは少ない
     // ここでは簡易的にエラーを返す
     return FormulaError.VALUE;

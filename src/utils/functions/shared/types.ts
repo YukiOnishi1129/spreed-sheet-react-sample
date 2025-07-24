@@ -6,7 +6,7 @@ export interface CellData {
   [key: string]: unknown;
 }
 
-export type FormulaResult = number | string | boolean | Date | null | number[][] | string[][] | (number | string)[][];
+export type FormulaResult = number | string | boolean | Date | null | FormulaErrorType | (number | string | boolean | null | FormulaErrorType)[][] | (number | string | boolean | null | FormulaErrorType)[];
 
 export interface FormulaContext {
   data: CellData[][];

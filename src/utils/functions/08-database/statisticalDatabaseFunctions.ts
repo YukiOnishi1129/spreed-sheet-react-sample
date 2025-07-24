@@ -5,9 +5,9 @@ import { FormulaError } from '../shared/types';
 
 // データベース関数用のヘルパー：条件に一致する行を取得
 function getMatchingRows(
-  database: any[][],
+  database: (number | string | boolean | null)[][],
   field: string | number,
-  criteria: any[][]
+  criteria: (number | string | boolean | null)[][]
 ): { values: number[], fieldIndex: number } {
   if (database.length < 2 || criteria.length < 2) {
     return { values: [], fieldIndex: -1 };
@@ -51,7 +51,7 @@ function getMatchingRows(
             const criteriaStr = String(criteriaValue);
             if (criteriaStr.startsWith('>') || criteriaStr.startsWith('<') || criteriaStr.startsWith('=') || criteriaStr.startsWith('!')) {
               // 比較演算子を含む条件
-              const operator = criteriaStr.match(/^([><=!]+)/)?.[1] || '';
+              const operator = criteriaStr.match(/^([><=!]+)/)?.[1] ?? '';
               const compareValue = criteriaStr.substring(operator.length);
               const dbNum = parseFloat(String(dbValue));
               const compareNum = parseFloat(compareValue);
@@ -123,7 +123,7 @@ export const DSTDEV: CustomFormula = {
       }
       
       // データベース配列を構築
-      const database: any[][] = [];
+      const database: (number | string | boolean | null)[][] = [];
       const [, dbStartCol, dbStartRowStr, dbEndCol, dbEndRowStr] = dbRange;
       const dbStartRow = parseInt(dbStartRowStr) - 1;
       const dbEndRow = parseInt(dbEndRowStr) - 1;
@@ -131,16 +131,16 @@ export const DSTDEV: CustomFormula = {
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
       for (let row = dbStartRow; row <= dbEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         database.push(rowData);
       }
       
       // 条件配列を構築
-      const criteria: any[][] = [];
+      const criteria: (number | string | boolean | null)[][] = [];
       const [, critStartCol, critStartRowStr, critEndCol, critEndRowStr] = critRange;
       const critStartRow = parseInt(critStartRowStr) - 1;
       const critEndRow = parseInt(critEndRowStr) - 1;
@@ -148,10 +148,10 @@ export const DSTDEV: CustomFormula = {
       const critEndColIndex = critEndCol.charCodeAt(0) - 65;
       
       for (let row = critStartRow; row <= critEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = critStartColIndex; col <= critEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         criteria.push(rowData);
       }
@@ -192,7 +192,7 @@ export const DSTDEVP: CustomFormula = {
       }
       
       // データベース配列を構築
-      const database: any[][] = [];
+      const database: (number | string | boolean | null)[][] = [];
       const [, dbStartCol, dbStartRowStr, dbEndCol, dbEndRowStr] = dbRange;
       const dbStartRow = parseInt(dbStartRowStr) - 1;
       const dbEndRow = parseInt(dbEndRowStr) - 1;
@@ -200,16 +200,16 @@ export const DSTDEVP: CustomFormula = {
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
       for (let row = dbStartRow; row <= dbEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         database.push(rowData);
       }
       
       // 条件配列を構築
-      const criteria: any[][] = [];
+      const criteria: (number | string | boolean | null)[][] = [];
       const [, critStartCol, critStartRowStr, critEndCol, critEndRowStr] = critRange;
       const critStartRow = parseInt(critStartRowStr) - 1;
       const critEndRow = parseInt(critEndRowStr) - 1;
@@ -217,10 +217,10 @@ export const DSTDEVP: CustomFormula = {
       const critEndColIndex = critEndCol.charCodeAt(0) - 65;
       
       for (let row = critStartRow; row <= critEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = critStartColIndex; col <= critEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         criteria.push(rowData);
       }
@@ -261,7 +261,7 @@ export const DVAR: CustomFormula = {
       }
       
       // データベース配列を構築
-      const database: any[][] = [];
+      const database: (number | string | boolean | null)[][] = [];
       const [, dbStartCol, dbStartRowStr, dbEndCol, dbEndRowStr] = dbRange;
       const dbStartRow = parseInt(dbStartRowStr) - 1;
       const dbEndRow = parseInt(dbEndRowStr) - 1;
@@ -269,16 +269,16 @@ export const DVAR: CustomFormula = {
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
       for (let row = dbStartRow; row <= dbEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         database.push(rowData);
       }
       
       // 条件配列を構築
-      const criteria: any[][] = [];
+      const criteria: (number | string | boolean | null)[][] = [];
       const [, critStartCol, critStartRowStr, critEndCol, critEndRowStr] = critRange;
       const critStartRow = parseInt(critStartRowStr) - 1;
       const critEndRow = parseInt(critEndRowStr) - 1;
@@ -286,10 +286,10 @@ export const DVAR: CustomFormula = {
       const critEndColIndex = critEndCol.charCodeAt(0) - 65;
       
       for (let row = critStartRow; row <= critEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = critStartColIndex; col <= critEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         criteria.push(rowData);
       }
@@ -330,7 +330,7 @@ export const DVARP: CustomFormula = {
       }
       
       // データベース配列を構築
-      const database: any[][] = [];
+      const database: (number | string | boolean | null)[][] = [];
       const [, dbStartCol, dbStartRowStr, dbEndCol, dbEndRowStr] = dbRange;
       const dbStartRow = parseInt(dbStartRowStr) - 1;
       const dbEndRow = parseInt(dbEndRowStr) - 1;
@@ -338,16 +338,16 @@ export const DVARP: CustomFormula = {
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
       for (let row = dbStartRow; row <= dbEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         database.push(rowData);
       }
       
       // 条件配列を構築
-      const criteria: any[][] = [];
+      const criteria: (number | string | boolean | null)[][] = [];
       const [, critStartCol, critStartRowStr, critEndCol, critEndRowStr] = critRange;
       const critStartRow = parseInt(critStartRowStr) - 1;
       const critEndRow = parseInt(critEndRowStr) - 1;
@@ -355,10 +355,10 @@ export const DVARP: CustomFormula = {
       const critEndColIndex = critEndCol.charCodeAt(0) - 65;
       
       for (let row = critStartRow; row <= critEndRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = critStartColIndex; col <= critEndColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         criteria.push(rowData);
       }

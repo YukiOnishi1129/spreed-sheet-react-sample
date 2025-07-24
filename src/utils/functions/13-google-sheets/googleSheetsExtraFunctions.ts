@@ -13,7 +13,7 @@ export const SORTN: CustomFormula = {
     
     try {
       // データ配列を取得
-      const data: any[][] = [];
+      const data: (number | string | boolean | null)[][] = [];
       const rangeMatch = rangeRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
       
       if (!rangeMatch) {
@@ -27,10 +27,10 @@ export const SORTN: CustomFormula = {
       const endColIndex = endCol.charCodeAt(0) - 65;
       
       for (let row = startRow; row <= endRow; row++) {
-        const rowData: any[] = [];
+        const rowData: (number | string | boolean | null)[] = [];
         for (let col = startColIndex; col <= endColIndex; col++) {
           const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value : null);
+          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
         }
         data.push(rowData);
       }
@@ -63,7 +63,7 @@ export const SORTN: CustomFormula = {
       });
       
       // 上位N件を取得
-      let result = sortedData.slice(0, n);
+      const result = sortedData.slice(0, n);
       
       // タイの処理
       if (displayTies === 1 && n < sortedData.length) {
@@ -129,7 +129,7 @@ export const SPARKLINE: CustomFormula = {
       
       // オプションの解析（簡易実装）
       let chartType = 'line';
-      if (optionsRef && optionsRef.includes('charttype')) {
+      if (optionsRef?.includes('charttype')) {
         if (optionsRef.includes('bar')) chartType = 'bar';
         else if (optionsRef.includes('column')) chartType = 'column';
         else if (optionsRef.includes('winloss')) chartType = 'winloss';
@@ -204,7 +204,7 @@ export const GOOGLETRANSLATE: CustomFormula = {
       };
       
       const lowerText = cleanText.toLowerCase();
-      if (translations[lowerText] && translations[lowerText][cleanTargetLang]) {
+      if (translations[lowerText]?.[cleanTargetLang]) {
         return translations[lowerText][cleanTargetLang];
       }
       
@@ -310,7 +310,7 @@ export const GOOGLEFINANCE: CustomFormula = {
       // 日付範囲が指定されている場合は配列を返す（簡易実装）
       if (startDateRef && endDateRef) {
         // ヘッダー行と数日分のダミーデータを返す
-        const result: any[][] = [['Date', attribute.charAt(0).toUpperCase() + attribute.slice(1)]];
+        const result: (number | string | boolean | null)[][] = [['Date', attribute.charAt(0).toUpperCase() + attribute.slice(1)]];
         const baseValue = dummyData[upperTicker][attribute] || dummyData[upperTicker].price;
         
         for (let i = 0; i < 5; i++) {

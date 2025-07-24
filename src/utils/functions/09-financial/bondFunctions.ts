@@ -1,5 +1,5 @@
 // 債券関連の財務関数
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';

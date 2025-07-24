@@ -64,7 +64,7 @@ export const FILTERXML: CustomFormula = {
       const tagMatch = xpath.match(/\/\/(\w+)(?:\[(\d+)\])?$/);
       if (tagMatch) {
         const [, tagName, index] = tagMatch;
-        const regex = new RegExp(`<${tagName}[^>]*>([^<]*)<\/${tagName}>`, 'gi');
+        const regex = new RegExp(`<${tagName}[^>]*>([^<]*)</${tagName}>`, 'gi');
         const matches = Array.from(xml.matchAll(regex));
         
         if (matches.length === 0) {
