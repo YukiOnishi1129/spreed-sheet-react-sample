@@ -273,12 +273,103 @@ export const MIN: CustomFormula = {
 // ROUND関数の実装
 export const ROUND: CustomFormula = {
   name: 'ROUND',
-  pattern: /ROUND\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /ROUND\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, numberRef, digitsRef] = matches;
+    const [, argsString] = matches;
     
-    const number = Number(getCellValue(numberRef, context) ?? numberRef);
-    const digits = Number(getCellValue(digitsRef, context) ?? digitsRef);
+    // 引数を正しく分割（括弧内のカンマは無視）
+    const args: string[] = [];
+    let currentArg = '';
+    let parenDepth = 0;
+    
+    for (let i = 0; i < argsString.length; i++) {
+      const char = argsString[i];
+      
+      if (char === '(') parenDepth++;
+      else if (char === ')') parenDepth--;
+      else if (char === ',' && parenDepth === 0) {
+        args.push(currentArg.trim());
+        currentArg = '';
+        continue;
+      }
+      
+      currentArg += char;
+    }
+    
+    if (currentArg.trim()) {
+      args.push(currentArg.trim());
+    }
+    
+    
+    const numberRef = args[0];
+    const digitsRef = args[1];
+    
+    let number: number;
+    let digits: number;
+    
+    // 数値の取得（演算式の場合も考慮）
+    if (numberRef.includes('/') || numberRef.includes('*') || numberRef.includes('+') || numberRef.includes('-')) {
+      // 簡単な演算を処理
+      const parts = numberRef.split(/([+\-*/])/);
+      
+      if (parts.length === 3) {
+        const [leftPart, operator, rightPart] = parts;
+        let leftValue: number;
+        let rightValue: number;
+        
+        // 左辺の値を取得
+        if (leftPart.trim().match(/^[A-Z]+\d+$/)) {
+          const cellValue = getCellValue(leftPart.trim(), context);
+          // オブジェクトの場合、valueプロパティを取得
+          if (cellValue && typeof cellValue === 'object' && 'value' in cellValue) {
+            leftValue = Number(cellValue.value);
+          } else {
+            leftValue = Number(cellValue);
+          }
+        } else {
+          leftValue = Number(leftPart.trim());
+        }
+        
+        // 右辺の値を取得
+        if (rightPart.trim().match(/^[A-Z]+\d+$/)) {
+          const cellValue = getCellValue(rightPart.trim(), context);
+          // オブジェクトの場合、valueプロパティを取得
+          if (cellValue && typeof cellValue === 'object' && 'value' in cellValue) {
+            rightValue = Number(cellValue.value);
+          } else {
+            rightValue = Number(cellValue);
+          }
+        } else {
+          rightValue = Number(rightPart.trim());
+        }
+        
+        // 演算を実行
+        switch (operator) {
+          case '+': number = leftValue + rightValue; break;
+          case '-': number = leftValue - rightValue; break;
+          case '*': number = leftValue * rightValue; break;
+          case '/': number = leftValue / rightValue; break;
+          default: number = NaN;
+        }
+      } else {
+        number = Number(getCellValue(numberRef, context) ?? numberRef);
+      }
+    } else {
+      const value = getCellValue(numberRef, context);
+      if (value && typeof value === 'object' && 'value' in value) {
+        number = Number(value.value);
+      } else if (value !== null && value !== undefined && value !== FormulaError.REF) {
+        number = Number(value);
+      } else {
+        number = Number(numberRef);
+      }
+    }
+    
+    // 桁数の取得
+    const digitsValue = getCellValue(digitsRef, context);
+    digits = digitsValue !== null && digitsValue !== undefined && digitsValue !== FormulaError.REF
+      ? Number(digitsValue)
+      : Number(digitsRef);
     
     if (isNaN(number) || isNaN(digits)) {
       return FormulaError.VALUE;
@@ -330,8 +421,24 @@ export const POWER: CustomFormula = {
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, baseRef, exponentRef] = matches;
     
-    const base = Number(getCellValue(baseRef, context) ?? baseRef);
-    const exponent = Number(getCellValue(exponentRef, context) ?? exponentRef);
+    let base: number;
+    let exponent: number;
+    
+    // ベース値の取得
+    const baseValue = getCellValue(baseRef.trim(), context);
+    if (baseValue !== null && baseValue !== undefined && baseValue !== FormulaError.REF) {
+      base = Number(baseValue);
+    } else {
+      base = Number(baseRef.trim());
+    }
+    
+    // 指数値の取得
+    const expValue = getCellValue(exponentRef.trim(), context);
+    if (expValue !== null && expValue !== undefined && expValue !== FormulaError.REF) {
+      exponent = Number(expValue);
+    } else {
+      exponent = Number(exponentRef.trim());
+    }
     
     if (isNaN(base) || isNaN(exponent)) {
       return FormulaError.VALUE;
