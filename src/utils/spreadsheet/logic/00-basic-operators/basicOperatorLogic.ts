@@ -88,11 +88,123 @@ export const SUBTRACT_OPERATOR: CustomFormula = {
   }
 };
 
+// 比較演算子
+export const GREATER_THAN_OR_EQUAL: CustomFormula = {
+  name: '>=',
+  pattern: /^(.+)>=(.+)$/,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, left, right] = matches;
+    
+    const leftValue = evaluateExpression(left.trim(), context);
+    const leftNum = Number(leftValue);
+    
+    const rightValue = evaluateExpression(right.trim(), context);
+    const rightNum = Number(rightValue);
+    
+    if (isNaN(leftNum) || isNaN(rightNum)) {
+      return false;
+    }
+    
+    return leftNum >= rightNum;
+  }
+};
+
+export const LESS_THAN_OR_EQUAL: CustomFormula = {
+  name: '<=',
+  pattern: /^(.+)<=(.+)$/,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, left, right] = matches;
+    
+    const leftValue = evaluateExpression(left.trim(), context);
+    const leftNum = Number(leftValue);
+    
+    const rightValue = evaluateExpression(right.trim(), context);
+    const rightNum = Number(rightValue);
+    
+    if (isNaN(leftNum) || isNaN(rightNum)) {
+      return false;
+    }
+    
+    return leftNum <= rightNum;
+  }
+};
+
+export const GREATER_THAN: CustomFormula = {
+  name: '>',
+  pattern: /^(.+)>(.+)$/,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, left, right] = matches;
+    
+    const leftValue = evaluateExpression(left.trim(), context);
+    const leftNum = Number(leftValue);
+    
+    const rightValue = evaluateExpression(right.trim(), context);
+    const rightNum = Number(rightValue);
+    
+    if (isNaN(leftNum) || isNaN(rightNum)) {
+      return false;
+    }
+    
+    return leftNum > rightNum;
+  }
+};
+
+export const LESS_THAN: CustomFormula = {
+  name: '<',
+  pattern: /^(.+)<(.+)$/,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, left, right] = matches;
+    
+    const leftValue = evaluateExpression(left.trim(), context);
+    const leftNum = Number(leftValue);
+    
+    const rightValue = evaluateExpression(right.trim(), context);
+    const rightNum = Number(rightValue);
+    
+    if (isNaN(leftNum) || isNaN(rightNum)) {
+      return false;
+    }
+    
+    return leftNum < rightNum;
+  }
+};
+
+export const EQUAL: CustomFormula = {
+  name: '=',
+  pattern: /^(.+)=(.+)$/,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, left, right] = matches;
+    
+    const leftValue = evaluateExpression(left.trim(), context);
+    const rightValue = evaluateExpression(right.trim(), context);
+    
+    return leftValue === rightValue;
+  }
+};
+
+export const NOT_EQUAL: CustomFormula = {
+  name: '<>',
+  pattern: /^(.+)<>(.+)$/,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, left, right] = matches;
+    
+    const leftValue = evaluateExpression(left.trim(), context);
+    const rightValue = evaluateExpression(right.trim(), context);
+    
+    return leftValue !== rightValue;
+  }
+};
+
 // 式を評価する補助関数
 function evaluateExpression(expression: string, context: FormulaContext): string | number {
   // セル参照の場合
   if (/^[A-Z]+\d+$/.test(expression)) {
-    return getCellValue(expression, context);
+    const value = getCellValue(expression, context);
+    // FormulaErrorの場合はそのまま返す
+    if (typeof value === 'object' && value !== null) {
+      return String(value);
+    }
+    return value as string | number;
   }
   
   // 数値の場合
