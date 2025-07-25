@@ -24,18 +24,27 @@ export const recalculateFormulas = (
       row.map((cell) => {
         if (!cell) return { value: '' };
         
-        // スプレッドシートの値を持つセル
-        if (hasSpreadsheetValue(cell)) {
-          return { value: cell.value ?? '' };
-        }
         
-        // 数式を持つセル
-        if (isFormulaCell(cell)) {
-          const formula = hasDataFormula(cell) ? cell['data-formula'] : undefined;
+        // data-formulaプロパティがある場合を優先
+        if (hasDataFormula(cell)) {
+          const formula = cell['data-formula'];
           return { 
             value: hasSpreadsheetValue(cell) ? (cell.value ?? '') : '',
             formula: typeof formula === 'string' ? formula : undefined
           };
+        }
+        
+        // formulaプロパティを直接持つ場合
+        if (typeof cell === 'object' && 'formula' in cell && cell.formula) {
+          return {
+            value: hasSpreadsheetValue(cell) ? (cell.value ?? '') : '',
+            formula: typeof cell.formula === 'string' ? cell.formula : undefined
+          };
+        }
+        
+        // スプレッドシートの値を持つセル
+        if (hasSpreadsheetValue(cell)) {
+          return { value: cell.value ?? '' };
         }
         
         // 通常の値

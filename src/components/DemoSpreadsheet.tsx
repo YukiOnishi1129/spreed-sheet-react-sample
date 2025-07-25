@@ -74,44 +74,40 @@ function DemoSpreadsheet() {
   };
 
   const calculateFormulas = (data: Matrix<CellBase>) => {
-    // ExcelFunctionResponse形式にデータを変換
-    const mockFunction: ExcelFunctionResponse = {
-      spreadsheet_data: data.map((row) => 
-        row.map((cell) => {
+    // 直接データ形式で処理
+    try {
+      const processedData: SpreadsheetData = data.map(row => 
+        row.map(cell => {
           if (typeof cell === 'object' && cell !== null && 'value' in cell) {
             const cellWithFormula = cell as { value?: string | number | null; formula?: string; 'data-formula'?: string };
             return {
-              v: cellWithFormula.value ?? null,
-              f: cellWithFormula.formula,
-              bg: undefined
+              value: cellWithFormula.value ?? null,
+              formula: cellWithFormula.formula,
+              'data-formula': cellWithFormula['data-formula'],
+              className: undefined,
+              title: cellWithFormula.formula ? `数式: ${cellWithFormula.formula}` : undefined,
+              DataEditor: undefined
             };
           }
-          return { v: cell !== null && cell !== undefined ? String(cell) : null };
-        })
-      ),
-      function_name: 'DEMO'
-    };
-    
-    // ChatGPTSpreadsheetと同じ方法でデータを処理
-    try {
-      // APIのデータ構造をSpreadsheetData形式に変換
-      const convertedData: SpreadsheetData = mockFunction.spreadsheet_data.map(row => 
-        row.map(cell => {
-          if (!cell) return null;
-          return {
-            value: cell.v ?? null,
-            formula: cell.f,
-            className: cell.bg ? 'colored-cell' : undefined,
-            title: cell.f ? `数式: ${cell.f}` : undefined,
-            'data-formula': cell.f,
-            DataEditor: undefined
-          };
+          return { value: cell ?? '' };
         })
       );
       
+      // mock functionを作成（recalculateFormulasが期待する形式）
+      const mockFunction: ExcelFunctionResponse = {
+        spreadsheet_data: processedData.map(row => 
+          row.map(cell => ({
+            v: cell ? (cell.value ?? null) : null,
+            f: cell ? cell.formula : undefined,
+            bg: undefined
+          }))
+        ),
+        function_name: 'DEMO'
+      };
+      
       // 数式を計算
       recalculateFormulas(
-        convertedData,
+        processedData,
         mockFunction,
         (name: string, value: SpreadsheetData) => {
           if (name === 'spreadsheetData') {
