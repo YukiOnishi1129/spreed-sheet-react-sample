@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import TestSpreadsheet from '../TestSpreadsheet';
+import DemoSpreadsheet from '../DemoSpreadsheet';
 import { allIndividualFunctionTests } from '../../data/individualFunctionTests';
 
 // react-spreadsheetのモック
@@ -51,54 +51,56 @@ vi.mock('../utils/customFormulaCalculations', () => ({
   }
 }));
 
-describe('TestSpreadsheet', () => {
+describe('DemoSpreadsheet', () => {
   const renderComponent = () => {
     return render(
       <BrowserRouter>
-        <TestSpreadsheet />
+        <DemoSpreadsheet />
       </BrowserRouter>
     );
   };
 
   test('コンポーネントが正しくレンダリングされること', () => {
     renderComponent();
-    expect(screen.getByText('Excel関数テストモード')).toBeInTheDocument();
+    expect(screen.getByText('Excel関数デモモード')).toBeInTheDocument();
     expect(screen.getByText('← ChatGPTモードに戻る')).toBeInTheDocument();
   });
 
-  test('テストモードの切り替えが機能すること', () => {
+  test('デモモードの切り替えが機能すること', () => {
     renderComponent();
     
-    // デフォルトはグループテストモード
-    expect(screen.getByText('グループテスト')).toHaveClass('bg-blue-500');
-    expect(screen.getByText('個別関数テスト')).toHaveClass('bg-gray-200');
+    // デフォルトはグループデモモード
+    expect(screen.getByText('グループデモ')).toHaveClass('bg-blue-500');
+    expect(screen.getByText('個別関数デモ')).toHaveClass('bg-gray-200');
     
-    // 個別関数テストモードに切り替え
-    fireEvent.click(screen.getByText('個別関数テスト'));
-    expect(screen.getByText('個別関数テスト')).toHaveClass('bg-blue-500');
-    expect(screen.getByText('グループテスト')).toHaveClass('bg-gray-200');
+    // 個別関数デモモードに切り替え
+    fireEvent.click(screen.getByText('個別関数デモ'));
+    expect(screen.getByText('個別関数デモ')).toHaveClass('bg-blue-500');
+    expect(screen.getByText('グループデモ')).toHaveClass('bg-gray-200');
   });
 
-  test('グループテストモードでカテゴリ選択が機能すること', () => {
+  test('グループデモモードでカテゴリ選択が機能すること', () => {
     renderComponent();
     
-    // カテゴリボタンが表示されている
-    expect(screen.getByText('基本関数')).toBeInTheDocument();
-    expect(screen.getByText('数学関数')).toBeInTheDocument();
+    // カテゴリボタンが表示されている（複数の要素がある場合はgetAllByTextを使用）
+    const basicButtons = screen.getAllByText('基本関数');
+    expect(basicButtons.length).toBeGreaterThan(0);
+    const mathButtons = screen.getAllByText('数学・三角関数');
+    expect(mathButtons.length).toBeGreaterThan(0);
     
-    // カテゴリを選択
-    fireEvent.click(screen.getByText('数学関数'));
+    // カテゴリボタンをクリック（最初の要素をクリック）
+    fireEvent.click(mathButtons[0]);
     
     // 選択されたカテゴリがハイライトされる
-    const mathButton = screen.getByText('数学関数').parentElement;
-    expect(mathButton).toHaveClass('border-blue-500');
+    const selectedButton = mathButtons[0].parentElement;
+    expect(selectedButton).toHaveClass('border-blue-500');
   });
 
-  test('個別関数テストモードで関数選択が機能すること', () => {
+  test('個別関数デモモードで関数選択が機能すること', () => {
     renderComponent();
     
-    // 個別関数テストモードに切り替え
-    fireEvent.click(screen.getByText('個別関数テスト'));
+    // 個別関数デモモードに切り替え
+    fireEvent.click(screen.getByText('個別関数デモ'));
     
     // セレクトボックスが表示される
     const selectElement = screen.getByRole('combobox');
@@ -322,7 +324,7 @@ describe('スプレッドシート計算機能のテスト', () => {
   test('複数の数式が正しく計算されること', async () => {
     const { container } = render(
       <BrowserRouter>
-        <TestSpreadsheet />
+        <DemoSpreadsheet />
       </BrowserRouter>
     );
     
@@ -339,7 +341,7 @@ describe('スプレッドシート計算機能のテスト', () => {
   test('セル参照が正しく解決されること', async () => {
     const { container } = render(
       <BrowserRouter>
-        <TestSpreadsheet />
+        <DemoSpreadsheet />
       </BrowserRouter>
     );
     

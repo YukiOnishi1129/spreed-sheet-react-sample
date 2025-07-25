@@ -1,51 +1,44 @@
 import { useState, useEffect } from 'react';
 import Spreadsheet, { type Matrix, type CellBase, type Selection } from 'react-spreadsheet';
-import { testCategories, type TestCategory } from '../data/testData';
+import { demoSpreadsheetData, type DemoCategory } from '../data/demoSpreadsheetData';
 import { allIndividualFunctionTests, type IndividualFunctionTest } from '../data/individualFunctionTests';
 import { Link } from 'react-router-dom';
 import { recalculateFormulas } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
 
-function TestSpreadsheet() {
-  const [selectedCategory, setSelectedCategory] = useState<TestCategory>(testCategories[0]);
+function DemoSpreadsheet() {
+  const [selectedCategory, setSelectedCategory] = useState<DemoCategory>(demoSpreadsheetData[0]);
   const [spreadsheetData, setSpreadsheetData] = useState<Matrix<CellBase>>([]);
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string; value?: string | number | null } | null>(null);
-  const [testMode, setTestMode] = useState<'grouped' | 'individual'>('grouped');
+  const [demoMode, setDemoMode] = useState<'grouped' | 'individual'>('grouped');
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
 
   // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
-    if (testMode === 'grouped') {
+    if (demoMode === 'grouped') {
       initializeAndCalculate();
     }
-  }, [selectedCategory, testMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedCategory, demoMode]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // 個別関数選択時の初期化
   useEffect(() => {
-    if (testMode === 'individual' && selectedFunction) {
+    if (demoMode === 'individual' && selectedFunction) {
       initializeIndividualFunction();
     }
-  }, [selectedFunction, testMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedFunction, demoMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initializeAndCalculate = () => {
-    const initialData: Matrix<CellBase> = selectedCategory.data.map((row, rowIndex) => 
-      row.map((cellValue, colIndex) => {
-        // 数式がある場所を探す
-        const formula = selectedCategory.formulas.find(
-          f => f.row === rowIndex && f.col === colIndex
-        );
-        
-        if (formula) {
-          const cell = {
+    const initialData: Matrix<CellBase> = selectedCategory.data.map((row) => 
+      row.map((cellValue) => {
+        // 数式が直接入っている場合
+        if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
+          return {
             value: '',
-            formula: formula.formula,
-            'data-formula': formula.formula
+            formula: cellValue,
+            'data-formula': cellValue
           };
-          return cell;
         }
-        
-        const cell = { value: cellValue ?? '' };
-        return cell;
+        return { value: cellValue ?? '' };
       })
     );
     
@@ -137,7 +130,7 @@ function TestSpreadsheet() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <h1 className="text-xl font-semibold text-gray-900">
-              Excel関数テストモード
+              Excel関数デモモード
             </h1>
             <Link 
               to="/" 
@@ -150,38 +143,38 @@ function TestSpreadsheet() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        {/* テストモード選択 */}
+        {/* デモモード選択 */}
         <div className="mb-6">
           <div className="flex gap-4 mb-4">
             <button
-              onClick={() => setTestMode('grouped')}
+              onClick={() => setDemoMode('grouped')}
               className={`px-4 py-2 rounded-lg font-medium ${
-                testMode === 'grouped'
+                demoMode === 'grouped'
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
-              グループテスト
+              グループデモ
             </button>
             <button
-              onClick={() => setTestMode('individual')}
+              onClick={() => setDemoMode('individual')}
               className={`px-4 py-2 rounded-lg font-medium ${
-                testMode === 'individual'
+                demoMode === 'individual'
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
-              個別関数テスト
+              個別関数デモ
             </button>
           </div>
           
-          {testMode === 'grouped' ? (
+          {demoMode === 'grouped' ? (
             <>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                テストカテゴリを選択
+                デモカテゴリを選択
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-                {testCategories.map(category => (
+                {demoSpreadsheetData.map(category => (
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category)}
@@ -224,7 +217,7 @@ function TestSpreadsheet() {
 
         {/* カテゴリ/関数説明 */}
         <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-          {testMode === 'grouped' ? (
+          {demoMode === 'grouped' ? (
             <>
               <h3 className="font-medium text-blue-900 mb-1">{selectedCategory.name}</h3>
               <p className="text-sm text-blue-700">{selectedCategory.description}</p>
@@ -298,4 +291,4 @@ function TestSpreadsheet() {
   );
 }
 
-export default TestSpreadsheet;
+export default DemoSpreadsheet;

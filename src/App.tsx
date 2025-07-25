@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import ChatGPTSpreadsheet from './components/ChatGPTSpreadsheet';
-import TestSpreadsheet from './components/TestSpreadsheet';
+import DemoSpreadsheet from './components/DemoSpreadsheet';
 
 function HomePage() {
   return (
@@ -33,10 +33,10 @@ function HomePage() {
             {/* Navigation */}
             <div className="mt-8 flex gap-4 justify-center">
               <Link 
-                to="/test" 
+                to="/demo" 
                 className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
               >
-                関数テストモード
+                関数デモモード
               </Link>
             </div>
           </div>
@@ -52,7 +52,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/test" element={<TestSpreadsheet />} />
+      <Route path="/demo" element={<DemoSpreadsheet />} />
     </Routes>
   );
 }
