@@ -2,6 +2,9 @@
 
 import type { CustomFormula } from './shared/types';
 
+// 基本演算子のインポート
+import { MULTIPLY_OPERATOR, DIVIDE_OPERATOR, ADD_OPERATOR, SUBTRACT_OPERATOR } from './00-basic-operators/basicOperatorLogic';
+
 // 各カテゴリから関数をインポート
 import { DATEDIF, TODAY, NOW, DATE, YEAR, MONTH, DAY, WEEKDAY, DAYS, EDATE, EOMONTH, TIME, HOUR, MINUTE, SECOND, WEEKNUM, DAYS360, YEARFRAC, DATEVALUE, TIMEVALUE, ISOWEEKNUM } from './04-datetime/dateLogic';
 import { NETWORKDAYS, NETWORKDAYS_INTL, WORKDAY, WORKDAY_INTL } from './04-datetime/workdayLogic';
@@ -121,6 +124,9 @@ import { SORTN, SPARKLINE, GOOGLETRANSLATE, DETECTLANGUAGE, GOOGLEFINANCE, TO_DA
 
 // すべての関数を配列にまとめる
 export const ALL_FUNCTIONS = [
+  // 00. 基本演算子
+  MULTIPLY_OPERATOR, DIVIDE_OPERATOR, ADD_OPERATOR, SUBTRACT_OPERATOR,
+  
   // 01. 数学・三角関数
   ...Object.values({
     SUMIF, COUNTIF, AVERAGEIF, SUM, AVERAGE, COUNT, MAX, MIN, ROUND,
