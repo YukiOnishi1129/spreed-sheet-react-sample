@@ -12,6 +12,7 @@ function DemoSpreadsheet() {
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string; value?: string | number | null } | null>(null);
   const [demoMode, setDemoMode] = useState<'grouped' | 'individual'>('grouped');
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
@@ -28,6 +29,8 @@ function DemoSpreadsheet() {
   }, [selectedFunction, demoMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initializeAndCalculate = () => {
+    setIsCalculating(true);
+    
     const initialData: Matrix<CellBase> = selectedCategory.data.map((row) => 
       row.map((cellValue) => {
         // 数式が直接入っている場合
@@ -42,13 +45,15 @@ function DemoSpreadsheet() {
       })
     );
     
-    // 自動的に計算を実行
+    // 直接計算を実行
     calculateFormulas(initialData);
     setSelectedCell(null);
   };
   
   const initializeIndividualFunction = () => {
     if (!selectedFunction) return;
+    
+    setIsCalculating(true);
     
     const initialData: Matrix<CellBase> = selectedFunction.data.map((row) => 
       row.map((cellValue) => {
@@ -63,38 +68,63 @@ function DemoSpreadsheet() {
       })
     );
     
-    // 自動的に計算を実行
+    // 直接計算を実行
     calculateFormulas(initialData);
     setSelectedCell(null);
   };
 
   const calculateFormulas = (data: Matrix<CellBase>) => {
-    // カスタム関数システムで計算
+    // ExcelFunctionResponse形式にデータを変換
     const mockFunction: ExcelFunctionResponse = {
-      spreadsheet_data: data.map(row => 
-        row.map(cell => {
+      spreadsheet_data: data.map((row) => 
+        row.map((cell) => {
           if (typeof cell === 'object' && cell !== null && 'value' in cell) {
-            const cellWithFormula = cell as { value?: string | number | null; formula?: string };
+            const cellWithFormula = cell as { value?: string | number | null; formula?: string; 'data-formula'?: string };
             return {
               v: cellWithFormula.value ?? null,
-              f: cellWithFormula.formula
+              f: cellWithFormula.formula,
+              bg: undefined
             };
           }
-          return { v: String(cell) };
+          return { v: cell !== null && cell !== undefined ? String(cell) : null };
         })
       ),
-      function_name: 'TEST'
+      function_name: 'DEMO'
     };
     
-    recalculateFormulas(
-      data,
-      mockFunction,
-      (name: string, value: SpreadsheetData) => {
-        if (name === 'spreadsheetData') {
-          setSpreadsheetData(value as Matrix<CellBase>);
+    // ChatGPTSpreadsheetと同じ方法でデータを処理
+    try {
+      // APIのデータ構造をSpreadsheetData形式に変換
+      const convertedData: SpreadsheetData = mockFunction.spreadsheet_data.map(row => 
+        row.map(cell => {
+          if (!cell) return null;
+          return {
+            value: cell.v ?? null,
+            formula: cell.f,
+            className: cell.bg ? 'colored-cell' : undefined,
+            title: cell.f ? `数式: ${cell.f}` : undefined,
+            'data-formula': cell.f,
+            DataEditor: undefined
+          };
+        })
+      );
+      
+      // 数式を計算
+      recalculateFormulas(
+        convertedData,
+        mockFunction,
+        (name: string, value: SpreadsheetData) => {
+          if (name === 'spreadsheetData') {
+            console.log('計算結果を設定:', value);
+            setSpreadsheetData(value as Matrix<CellBase>);
+            setIsCalculating(false);
+          }
         }
-      }
-    );
+      );
+    } catch (error) {
+      console.error('スプレッドシートデータ処理エラー:', error);
+      setIsCalculating(false);
+    }
   };
 
   const handleCellClick = (row: number, col: number) => {
@@ -265,7 +295,15 @@ function DemoSpreadsheet() {
         </div>
 
         {/* スプレッドシート */}
-        <div className="mb-6 border rounded-lg overflow-hidden bg-white">
+        <div className="mb-6 border rounded-lg overflow-hidden bg-white relative">
+          {isCalculating ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 z-10">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+                <p className="text-sm text-gray-600">数式を計算中...</p>
+              </div>
+            </div>
+          ) : null}
           <Spreadsheet
             data={spreadsheetData}
             onChange={setSpreadsheetData}
@@ -277,8 +315,9 @@ function DemoSpreadsheet() {
               
               // RangeSelectionの場合（ChatGPTSpreadsheetと同じ実装）
               if (selection && 'range' in selection && selection.range) {
-                const row = selection.range.start.row;
-                const column = selection.range.start.column;
+                const range = selection.range as { start: { row: number; column: number }; end: { row: number; column: number } };
+                const row = range.start.row;
+                const column = range.start.column;
                 handleCellClick(row, column);
               }
             }}
