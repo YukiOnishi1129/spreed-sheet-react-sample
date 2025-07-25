@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import Spreadsheet, { type Matrix, type CellBase } from 'react-spreadsheet';
+import Spreadsheet, { type Matrix, type CellBase, type Selection } from 'react-spreadsheet';
 import { testCategories, type TestCategory } from '../data/testData';
+import { allIndividualFunctionTests, type IndividualFunctionTest } from '../data/individualFunctionTests';
 import { Link } from 'react-router-dom';
 import { recalculateFormulas } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
@@ -9,11 +10,22 @@ function TestSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<TestCategory>(testCategories[0]);
   const [spreadsheetData, setSpreadsheetData] = useState<Matrix<CellBase>>([]);
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string; value?: string | number | null } | null>(null);
+  const [testMode, setTestMode] = useState<'grouped' | 'individual'>('grouped');
+  const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
 
   // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
-    initializeAndCalculate();
-  }, [selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (testMode === 'grouped') {
+      initializeAndCalculate();
+    }
+  }, [selectedCategory, testMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  // 個別関数選択時の初期化
+  useEffect(() => {
+    if (testMode === 'individual' && selectedFunction) {
+      initializeIndividualFunction();
+    }
+  }, [selectedFunction, testMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initializeAndCalculate = () => {
     const initialData: Matrix<CellBase> = selectedCategory.data.map((row, rowIndex) => 
@@ -34,6 +46,27 @@ function TestSpreadsheet() {
         
         const cell = { value: cellValue ?? '' };
         return cell;
+      })
+    );
+    
+    // 自動的に計算を実行
+    calculateFormulas(initialData);
+    setSelectedCell(null);
+  };
+  
+  const initializeIndividualFunction = () => {
+    if (!selectedFunction) return;
+    
+    const initialData: Matrix<CellBase> = selectedFunction.data.map((row) => 
+      row.map((cellValue) => {
+        if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
+          return {
+            value: '',
+            formula: cellValue,
+            'data-formula': cellValue
+          };
+        }
+        return { value: cellValue ?? '' };
       })
     );
     
@@ -73,6 +106,8 @@ function TestSpreadsheet() {
 
   const handleCellClick = (row: number, col: number) => {
     const cell = spreadsheetData[row]?.[col];
+    console.log('Cell clicked:', { row, col, cell }); // デバッグ用
+    
     if (cell && typeof cell === 'object') {
       const cellData = cell as { formula?: string; value?: string | number | null };
       setSelectedCell({ 
@@ -115,34 +150,102 @@ function TestSpreadsheet() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        {/* カテゴリ選択 */}
+        {/* テストモード選択 */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            テストカテゴリを選択
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {testCategories.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category)}
-                className={`p-3 rounded-lg border-2 transition-all ${
-                  selectedCategory.id === category.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className={`text-sm font-medium text-${category.color}-600`}>
-                  {category.name}
-                </div>
-              </button>
-            ))}
+          <div className="flex gap-4 mb-4">
+            <button
+              onClick={() => setTestMode('grouped')}
+              className={`px-4 py-2 rounded-lg font-medium ${
+                testMode === 'grouped'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              グループテスト
+            </button>
+            <button
+              onClick={() => setTestMode('individual')}
+              className={`px-4 py-2 rounded-lg font-medium ${
+                testMode === 'individual'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              個別関数テスト
+            </button>
           </div>
+          
+          {testMode === 'grouped' ? (
+            <>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                テストカテゴリを選択
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                {testCategories.map(category => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      selectedCategory.id === category.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className={`text-sm font-medium text-${category.color}-600`}>
+                      {category.name}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                関数を選択
+              </label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                value={selectedFunction?.name || ''}
+                onChange={(e) => {
+                  const func = allIndividualFunctionTests.find(f => f.name === e.target.value);
+                  setSelectedFunction(func || null);
+                }}
+              >
+                <option value="">関数を選択してください</option>
+                {allIndividualFunctionTests.map(func => (
+                  <option key={func.name} value={func.name}>
+                    {func.name} - {func.description}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
         </div>
 
-        {/* カテゴリ説明 */}
+        {/* カテゴリ/関数説明 */}
         <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-          <h3 className="font-medium text-blue-900 mb-1">{selectedCategory.name}</h3>
-          <p className="text-sm text-blue-700">{selectedCategory.description}</p>
+          {testMode === 'grouped' ? (
+            <>
+              <h3 className="font-medium text-blue-900 mb-1">{selectedCategory.name}</h3>
+              <p className="text-sm text-blue-700">{selectedCategory.description}</p>
+            </>
+          ) : selectedFunction ? (
+            <>
+              <h3 className="font-medium text-blue-900 mb-1">{selectedFunction.name}</h3>
+              <p className="text-sm text-blue-700">{selectedFunction.description}</p>
+              {selectedFunction.expectedValues && (
+                <div className="mt-2 text-xs text-blue-600">
+                  期待値: {Object.entries(selectedFunction.expectedValues).map(([cell, value]) => (
+                    <span key={cell} className="mr-2">
+                      {cell}={String(value)}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-blue-700">関数を選択してください</p>
+          )}
         </div>
 
         {/* 数式バー */}
@@ -173,10 +276,17 @@ function TestSpreadsheet() {
           <Spreadsheet
             data={spreadsheetData}
             onChange={setSpreadsheetData}
-            onSelect={(selection) => {
-              if (selection && 'row' in selection && 'column' in selection) {
-                const sel = selection as { row: number; column: number };
-                handleCellClick(sel.row, sel.column);
+            onSelect={(selection: Selection) => {
+              console.log('onSelect called:', selection); // デバッグ用
+              
+              // selection が null または undefined の場合は何もしない
+              if (!selection) return;
+              
+              // RangeSelectionの場合（ChatGPTSpreadsheetと同じ実装）
+              if (selection && 'range' in selection && selection.range) {
+                const row = selection.range.start.row;
+                const column = selection.range.start.column;
+                handleCellClick(row, column);
               }
             }}
             darkMode={false}
