@@ -1,9 +1,64 @@
 // テキスト関数の実装
 
-import type { CustomFormula, FormulaContext } from '../shared/types';
+import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue, getCellRangeValues } from '../shared/utils';
-import { matchFormula } from '../index';
+
+// 式を評価するヘルパー関数（循環参照を避けるため）
+const evaluateExpression = (expression: string, context: FormulaContext): FormulaResult => {
+  // セル参照の場合
+  if (expression.match(/^[A-Z]+\d+$/)) {
+    return getCellValue(expression, context) ?? '';
+  }
+  
+  // 文字列リテラルの場合
+  if (expression.startsWith('"') && expression.endsWith('"')) {
+    return expression.slice(1, -1);
+  }
+  
+  // 数値の場合
+  const num = parseFloat(expression);
+  if (!isNaN(num)) {
+    return num;
+  }
+  
+  // LEFT関数の場合
+  if (expression.match(/^LEFT\(/i)) {
+    const leftMatch = expression.match(/LEFT\(([^,]+)(?:,\s*([^)]+))?\)/i);
+    if (leftMatch) {
+      let text = leftMatch[1];
+      const numChars = leftMatch[2] ? parseInt(leftMatch[2]) : 1;
+      
+      if (text.match(/^[A-Z]+\d+$/)) {
+        text = String(getCellValue(text, context) ?? '');
+      } else if (text.startsWith('"') && text.endsWith('"')) {
+        text = text.slice(1, -1);
+      }
+      
+      return text.substring(0, numChars);
+    }
+  }
+  
+  // RIGHT関数の場合
+  if (expression.match(/^RIGHT\(/i)) {
+    const rightMatch = expression.match(/RIGHT\(([^,]+)(?:,\s*([^)]+))?\)/i);
+    if (rightMatch) {
+      let text = rightMatch[1];
+      const numChars = rightMatch[2] ? parseInt(rightMatch[2]) : 1;
+      
+      if (text.match(/^[A-Z]+\d+$/)) {
+        text = String(getCellValue(text, context) ?? '');
+      } else if (text.startsWith('"') && text.endsWith('"')) {
+        text = text.slice(1, -1);
+      }
+      
+      return text.substring(Math.max(0, text.length - numChars));
+    }
+  }
+  
+  // 関数呼び出しの場合、#VALUE!を返す
+  return FormulaError.VALUE;
+};
 
 // CONCATENATE関数の実装
 export const CONCATENATE: CustomFormula = {
@@ -57,15 +112,8 @@ export const CONCATENATE: CustomFormula = {
       }
       // 関数呼び出しの場合（LEFT、RIGHTなど）
       else if (part.match(/^[A-Z]+\(/i)) {
-        // matchFormulaを使用してネストした関数を計算
-        const matchResult = matchFormula(part);
-        
-        if (matchResult) {
-          const nestedResult = matchResult.function.calculate(matchResult.matches, context);
-          value = String(nestedResult);
-        } else {
-          value = '#VALUE!';
-        }
+        // 簡単な実装：ネストした関数は現在サポートしていない
+        value = evaluateExpression(part, context) as string;
       }
       // その他
       else {
@@ -115,9 +163,43 @@ export const CONCAT: CustomFormula = {
 // LEFT関数の実装
 export const LEFT: CustomFormula = {
   name: 'LEFT',
-  pattern: /LEFT\(([^,]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /LEFT\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, textRef, numCharsRef] = matches;
+    const [, argsString] = matches;
+    
+    // 引数を正しく分割（括弧内のカンマは無視）
+    const args: string[] = [];
+    let currentArg = '';
+    let parenDepth = 0;
+    let inQuotes = false;
+    
+    for (let i = 0; i < argsString.length; i++) {
+      const char = argsString[i];
+      
+      if (char === '"' && argsString[i - 1] !== '\\') {
+        inQuotes = !inQuotes;
+      }
+      
+      if (!inQuotes) {
+        if (char === '(') parenDepth++;
+        else if (char === ')') parenDepth--;
+        else if (char === ',' && parenDepth === 0) {
+          args.push(currentArg.trim());
+          currentArg = '';
+          continue;
+        }
+      }
+      
+      currentArg += char;
+    }
+    
+    if (currentArg.trim()) {
+      args.push(currentArg.trim());
+    }
+    
+    const textRef = args[0];
+    const numCharsRef = args[1];
+    
     
     let text: string;
     if (textRef.match(/^[A-Z]+\d+$/)) {
@@ -140,10 +222,27 @@ export const LEFT: CustomFormula = {
           
           // 左辺が関数呼び出しの場合
           if (leftPart.trim().match(/^[A-Z]+\(/i)) {
-            const matchResult = matchFormula(leftPart.trim());
-            if (matchResult) {
-              const findResult = matchResult.function.calculate(matchResult.matches, context);
-              leftValue = parseInt(String(findResult));
+            // FIND関数の場合、直接評価
+            if (leftPart.trim().match(/^FIND\(/i)) {
+              // FIND関数を直接評価する簡易実装
+              const findMatch = leftPart.trim().match(/FIND\(([^,]+),\s*([^)]+)\)/i);
+              if (findMatch) {
+                let findText = findMatch[1];
+                let withinText = findMatch[2];
+                
+                if (findText.startsWith('"') && findText.endsWith('"')) {
+                  findText = findText.slice(1, -1);
+                }
+                
+                if (withinText.match(/^[A-Z]+\d+$/)) {
+                  withinText = String(getCellValue(withinText, context) ?? '');
+                }
+                
+                const index = withinText.indexOf(findText);
+                leftValue = index !== -1 ? index + 1 : 0;
+              } else {
+                leftValue = 0;
+              }
             } else {
               leftValue = parseInt(leftPart.trim());
             }
@@ -239,7 +338,20 @@ export const MID: CustomFormula = {
     }
     
     let numChars: number;
-    if (numCharsRef.match(/^[A-Z]+\d+$/)) {
+    // LEN関数の場合
+    if (numCharsRef.match(/^LEN\(/i)) {
+      // LEN関数を直接評価
+      const lenMatch = numCharsRef.match(/LEN\(([^)]+)\)/i);
+      if (lenMatch) {
+        let textArg = lenMatch[1];
+        if (textArg.match(/^[A-Z]+\d+$/)) {
+          textArg = String(getCellValue(textArg, context) ?? '');
+        }
+        numChars = textArg.length;
+      } else {
+        numChars = parseInt(numCharsRef);
+      }
+    } else if (numCharsRef.match(/^[A-Z]+\d+$/)) {
       const cellValue = getCellValue(numCharsRef, context);
       numChars = parseInt(String(cellValue ?? '0'));
     } else {
@@ -406,9 +518,37 @@ export const SUBSTITUTE: CustomFormula = {
 // FIND関数の実装
 export const FIND: CustomFormula = {
   name: 'FIND',
-  pattern: /FIND\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /FIND\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, findTextRef, withinTextRef, startNumRef] = matches;
+    const [, argsString] = matches;
+    
+    // 引数を正しく分割（引用符内のカンマは無視）
+    const args: string[] = [];
+    let currentArg = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < argsString.length; i++) {
+      const char = argsString[i];
+      
+      if (char === '"' && argsString[i - 1] !== '\\') {
+        inQuotes = !inQuotes;
+      }
+      
+      if (!inQuotes && char === ',') {
+        args.push(currentArg.trim());
+        currentArg = '';
+      } else {
+        currentArg += char;
+      }
+    }
+    
+    if (currentArg.trim()) {
+      args.push(currentArg.trim());
+    }
+    
+    const findTextRef = args[0];
+    const withinTextRef = args[1];
+    const startNumRef = args[2];
     
     let findText: string;
     if (findTextRef.startsWith('"') && findTextRef.endsWith('"')) {
