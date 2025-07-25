@@ -37,14 +37,10 @@ export const parseCellRange = (range: string): { start: { col: number; row: numb
 // セル参照から値を取得
 export const getCellValue = (cellRef: string, context: FormulaContext): unknown => {
   const coords = parseCellReference(cellRef);
-  if (!coords) {
-    console.log(`getCellValue: Failed to parse cell reference "${cellRef}"`);
-    return FormulaError.REF;
-  }
+  if (!coords) return FormulaError.REF;
   
   const { col, row } = coords;
   if (row < 0 || row >= context.data.length || col < 0 || col >= context.data[0]?.length) {
-    console.log(`getCellValue: Cell reference out of bounds "${cellRef}" (row: ${row}, col: ${col})`);
     return FormulaError.REF;
   }
   

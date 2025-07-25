@@ -3,25 +3,75 @@
 import type { CustomFormula, FormulaContext } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue, getCellRangeValues } from '../shared/utils';
+import { matchFormula } from '../index';
 
 // CONCATENATE関数の実装
 export const CONCATENATE: CustomFormula = {
   name: 'CONCATENATE',
-  pattern: /CONCATENATE\(([^)]+)\)/i,
+  pattern: /CONCATENATE\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, args] = matches;
-    const parts = args.split(',').map(part => part.trim());
-    let result = '';
+    const [, argsString] = matches;
     
+    // 引数を正しく分割（括弧内のカンマは無視）
+    const parts: string[] = [];
+    let currentPart = '';
+    let parenDepth = 0;
+    let inQuotes = false;
+    
+    for (let i = 0; i < argsString.length; i++) {
+      const char = argsString[i];
+      
+      if (char === '"' && argsString[i - 1] !== '\\') {
+        inQuotes = !inQuotes;
+      }
+      
+      if (!inQuotes) {
+        if (char === '(') parenDepth++;
+        else if (char === ')') parenDepth--;
+        else if (char === ',' && parenDepth === 0) {
+          parts.push(currentPart.trim());
+          currentPart = '';
+          continue;
+        }
+      }
+      
+      currentPart += char;
+    }
+    
+    if (currentPart.trim()) {
+      parts.push(currentPart.trim());
+    }
+    
+    // 各部分を評価して結合
+    let result = '';
     for (const part of parts) {
       let value: string;
+      
+      // セル参照の場合
       if (part.match(/^[A-Z]+\d+$/)) {
         value = String(getCellValue(part, context) ?? '');
-      } else if (part.startsWith('"') && part.endsWith('"')) {
+      }
+      // 文字列リテラルの場合
+      else if (part.startsWith('"') && part.endsWith('"')) {
         value = part.slice(1, -1);
-      } else {
+      }
+      // 関数呼び出しの場合（LEFT、RIGHTなど）
+      else if (part.match(/^[A-Z]+\(/i)) {
+        // matchFormulaを使用してネストした関数を計算
+        const matchResult = matchFormula(part);
+        
+        if (matchResult) {
+          const nestedResult = matchResult.function.calculate(matchResult.matches, context);
+          value = String(nestedResult);
+        } else {
+          value = '#VALUE!';
+        }
+      }
+      // その他
+      else {
         value = String(part);
       }
+      
       result += value;
     }
     
@@ -80,7 +130,41 @@ export const LEFT: CustomFormula = {
     
     let numChars = 1; // デフォルト値
     if (numCharsRef) {
-      if (numCharsRef.match(/^[A-Z]+\d+$/)) {
+      // 演算式の場合（FIND("@",A7)-1など）
+      if (numCharsRef.includes('-') || numCharsRef.includes('+') || numCharsRef.includes('*') || numCharsRef.includes('/')) {
+        // 簡単な演算を処理（FIND("@",A7)-1のような形式）
+        const parts = numCharsRef.split(/([+\-*/])/);
+        if (parts.length === 3) {
+          const [leftPart, operator, rightPart] = parts;
+          let leftValue: number;
+          
+          // 左辺が関数呼び出しの場合
+          if (leftPart.trim().match(/^[A-Z]+\(/i)) {
+            const matchResult = matchFormula(leftPart.trim());
+            if (matchResult) {
+              const findResult = matchResult.function.calculate(matchResult.matches, context);
+              leftValue = parseInt(String(findResult));
+            } else {
+              leftValue = parseInt(leftPart.trim());
+            }
+          } else {
+            leftValue = parseInt(leftPart.trim());
+          }
+          
+          const rightValue = parseInt(rightPart.trim());
+          
+          if (!isNaN(leftValue) && !isNaN(rightValue)) {
+            switch (operator) {
+              case '+': numChars = leftValue + rightValue; break;
+              case '-': numChars = leftValue - rightValue; break;
+              case '*': numChars = leftValue * rightValue; break;
+              case '/': numChars = Math.floor(leftValue / rightValue); break;
+            }
+          }
+        }
+      }
+      // セル参照の場合
+      else if (numCharsRef.match(/^[A-Z]+\d+$/)) {
         const cellValue = getCellValue(numCharsRef, context);
         numChars = parseInt(String(cellValue ?? '1'));
       } else {
