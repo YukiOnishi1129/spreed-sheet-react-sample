@@ -316,7 +316,7 @@ export const RIGHT: CustomFormula = {
 // MID関数の実装
 export const MID: CustomFormula = {
   name: 'MID',
-  pattern: /MID\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /MID\(((?:[^(),]|\([^)]*\))+),\s*((?:[^(),]|\([^)]*\))+),\s*((?:[^(),]|\([^)]*\))+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, textRef, startNumRef, numCharsRef] = matches;
     
@@ -330,7 +330,48 @@ export const MID: CustomFormula = {
     }
     
     let startNum: number;
-    if (startNumRef.match(/^[A-Z]+\d+$/)) {
+    
+    // FIND関数 + 演算の場合
+    if (startNumRef.includes('FIND') && (startNumRef.includes('+') || startNumRef.includes('-'))) {
+      // FIND("@",A7)+1 のような式を処理
+      const parts = startNumRef.split(/([+\-])/);
+      if (parts.length >= 3) {
+        let baseValue = 0;
+        
+        // FIND関数を評価
+        const findMatch = parts[0].match(/FIND\(([^,]+),\s*([^)]+)\)/i);
+        if (findMatch) {
+          let findText = findMatch[1];
+          let withinText = findMatch[2];
+          
+          if (findText.startsWith('"') && findText.endsWith('"')) {
+            findText = findText.slice(1, -1);
+          }
+          
+          if (withinText.match(/^[A-Z]+\d+$/)) {
+            withinText = String(getCellValue(withinText, context) ?? '');
+          }
+          
+          const index = withinText.indexOf(findText);
+          baseValue = index !== -1 ? index + 1 : 0;
+        }
+        
+        // 演算を適用
+        for (let i = 1; i < parts.length; i += 2) {
+          const operator = parts[i];
+          const operand = parseInt(parts[i + 1]);
+          if (operator === '+') {
+            baseValue += operand;
+          } else if (operator === '-') {
+            baseValue -= operand;
+          }
+        }
+        
+        startNum = baseValue;
+      } else {
+        startNum = parseInt(startNumRef);
+      }
+    } else if (startNumRef.match(/^[A-Z]+\d+$/)) {
       const cellValue = getCellValue(startNumRef, context);
       startNum = parseInt(String(cellValue ?? '1'));
     } else {
