@@ -1,7 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Spreadsheet, { type Matrix, type CellBase, type Selection } from 'react-spreadsheet';
 import { demoSpreadsheetData, type DemoCategory } from '../data/demoSpreadsheetData';
-import { allIndividualFunctionTests, type IndividualFunctionTest } from '../data/individualFunctionTests';
+import { 
+  allIndividualFunctionTests, 
+  type IndividualFunctionTest,
+  mathFunctionTests,
+  statisticalFunctionTests,
+  textFunctionTests,
+  dateFunctionTests,
+  logicalFunctionTests,
+  lookupFunctionTests,
+  financialFunctionTests
+} from '../data/individualFunctionTests';
 import { Link } from 'react-router-dom';
 import { recalculateFormulas } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
@@ -12,7 +22,27 @@ function DemoSpreadsheet() {
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string; value?: string | number | null } | null>(null);
   const [demoMode, setDemoMode] = useState<'grouped' | 'individual'>('grouped');
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
+  const [selectedFunctionCategory, setSelectedFunctionCategory] = useState<string>('');
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
+
+  // カテゴリー別の関数マップ
+  const functionCategories = useMemo(() => ({
+    '数学・三角関数': mathFunctionTests,
+    '統計関数': statisticalFunctionTests,
+    'テキスト関数': textFunctionTests,
+    '日付・時刻関数': dateFunctionTests,
+    '論理関数': logicalFunctionTests,
+    '検索・参照関数': lookupFunctionTests,
+    '財務関数': financialFunctionTests
+  }), []);
+
+  // 選択されたカテゴリーの関数リスト
+  const categoryFunctions = useMemo(() => {
+    if (!selectedFunctionCategory || !(selectedFunctionCategory in functionCategories)) {
+      return [];
+    }
+    return functionCategories[selectedFunctionCategory as keyof typeof functionCategories];
+  }, [selectedFunctionCategory, functionCategories]);
 
   // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
@@ -220,26 +250,53 @@ function DemoSpreadsheet() {
               </div>
             </>
           ) : (
-            <>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                関数を選択
-              </label>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-lg"
-                value={selectedFunction?.name || ''}
-                onChange={(e) => {
-                  const func = allIndividualFunctionTests.find(f => f.name === e.target.value);
-                  setSelectedFunction(func || null);
-                }}
-              >
-                <option value="">関数を選択してください</option>
-                {allIndividualFunctionTests.map(func => (
-                  <option key={func.name} value={func.name}>
-                    {func.name} - {func.description}
-                  </option>
-                ))}
-              </select>
-            </>
+            <div className="space-y-4">
+              {/* カテゴリー選択 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  カテゴリーを選択
+                </label>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={selectedFunctionCategory}
+                  onChange={(e) => {
+                    setSelectedFunctionCategory(e.target.value);
+                    setSelectedFunction(null); // カテゴリー変更時に関数選択をリセット
+                  }}
+                >
+                  <option value="">カテゴリーを選択してください</option>
+                  {Object.keys(functionCategories).map(category => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* 関数選択（カテゴリー選択後に表示） */}
+              {selectedFunctionCategory && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    関数を選択
+                  </label>
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    value={selectedFunction?.name || ''}
+                    onChange={(e) => {
+                      const func = categoryFunctions.find(f => f.name === e.target.value);
+                      setSelectedFunction(func || null);
+                    }}
+                  >
+                    <option value="">関数を選択してください</option>
+                    {categoryFunctions.map(func => (
+                      <option key={func.name} value={func.name}>
+                        {func.name} - {func.description}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
