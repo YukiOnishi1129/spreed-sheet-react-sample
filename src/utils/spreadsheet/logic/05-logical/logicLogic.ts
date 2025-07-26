@@ -170,21 +170,33 @@ export const IF: CustomFormula = {
     
     // 結果の値を取得
     const resultStr = condition ? trueValueStr : falseValueStr;
-    const resultValue = getCellValue(resultStr, context) ?? resultStr;
     
-    // 文字列の引用符を除去（通常の引用符とエスケープされた引用符の両方を処理）
-    if (typeof resultValue === 'string') {
-      // エスケープされた引用符 \" を処理
-      if (resultValue.startsWith('\\"') && resultValue.endsWith('\\"')) {
-        return resultValue.slice(2, -2);
-      }
-      // 通常の引用符を処理
-      else if (resultValue.startsWith('"') && resultValue.endsWith('"')) {
-        return resultValue.slice(1, -1);
-      }
+    // 引用符付き文字列の場合は直接処理
+    if (resultStr.startsWith('"') && resultStr.endsWith('"')) {
+      return resultStr.slice(1, -1);
     }
     
-    return resultValue as FormulaResult;
+    // エスケープされた引用符の場合
+    if (resultStr.startsWith('\\"') && resultStr.endsWith('\\"')) {
+      return resultStr.slice(2, -2);
+    }
+    
+    // セル参照の場合
+    if (resultStr.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(resultStr, context);
+      if (cellValue === FormulaError.REF) {
+        return FormulaError.REF;
+      }
+      return cellValue as FormulaResult;
+    }
+    
+    // その他の場合（数値など）
+    const num = parseFloat(resultStr);
+    if (!isNaN(num)) {
+      return num;
+    }
+    
+    return resultStr as FormulaResult;
   }
 };
 
