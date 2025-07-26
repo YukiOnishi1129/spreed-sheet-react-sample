@@ -499,6 +499,45 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
     expectedValues: { 'B2': 2, 'B3': 3 }
   },
   {
+    name: 'SUMX2MY2',
+    category: '数学',
+    description: 'x^2-y^2の和を計算',
+    data: [
+      ['X値', 'Y値'],
+      [3, 2],
+      [4, 3],
+      [5, 4],
+      ['結果', '=SUMX2MY2(A2:A4,B2:B4)']
+    ],
+    expectedValues: { 'B5': 21 }
+  },
+  {
+    name: 'SUMX2PY2',
+    category: '数学',
+    description: 'x^2+y^2の和を計算',
+    data: [
+      ['X値', 'Y値'],
+      [3, 4],
+      [0, 1],
+      [1, 0],
+      ['結果', '=SUMX2PY2(A2:A4,B2:B4)']
+    ],
+    expectedValues: { 'B5': 27 }
+  },
+  {
+    name: 'SUMXMY2',
+    category: '数学',
+    description: '(x-y)^2の和を計算',
+    data: [
+      ['X値', 'Y値'],
+      [5, 3],
+      [7, 4],
+      [2, 1],
+      ['結果', '=SUMXMY2(A2:A4,B2:B4)']
+    ],
+    expectedValues: { 'B5': 14 }
+  },
+  {
     name: 'CEILING.MATH',
     category: '数学',
     description: '数学的な切り上げ',
@@ -884,6 +923,90 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
     data: [
       ['値1', '値2', '値3', '値4', '値5', '歪度'],
       [3, 4, 5, 2, 1, '=SKEW(A2:E2)']
+    ]
+  },
+  {
+    name: 'SKEW.P',
+    category: '統計',
+    description: '歪度（母集団）',
+    data: [
+      ['値1', '値2', '値3', '値4', '値5', '歪度'],
+      [3, 4, 5, 2, 1, '=SKEW.P(A2:E2)']
+    ]
+  },
+  {
+    name: 'STDEV.S',
+    category: '統計',
+    description: '標準偏差（標本）',
+    data: [
+      ['値1', '値2', '値3', '値4', '標準偏差'],
+      [10, 20, 30, 40, '=STDEV.S(A2:D2)']
+    ]
+  },
+  {
+    name: 'STDEV.P',
+    category: '統計',
+    description: '標準偏差（母集団）',
+    data: [
+      ['値1', '値2', '値3', '値4', '標準偏差'],
+      [10, 20, 30, 40, '=STDEV.P(A2:D2)']
+    ]
+  },
+  {
+    name: 'VAR.S',
+    category: '統計',
+    description: '分散（標本）',
+    data: [
+      ['値1', '値2', '値3', '値4', '分散'],
+      [10, 20, 30, 40, '=VAR.S(A2:D2)']
+    ]
+  },
+  {
+    name: 'VAR.P',
+    category: '統計',
+    description: '分散（母集団）',
+    data: [
+      ['値1', '値2', '値3', '値4', '分散'],
+      [10, 20, 30, 40, '=VAR.P(A2:D2)']
+    ]
+  },
+  {
+    name: 'MODE.SNGL',
+    category: '統計',
+    description: '最頻値（単一）',
+    data: [
+      ['値1', '値2', '値3', '値4', '値5', '最頻値'],
+      [1, 2, 2, 3, 3, '=MODE.SNGL(A2:E2)']
+    ]
+  },
+  {
+    name: 'QUARTILE.INC',
+    category: '統計',
+    description: '四分位数（境界値含む）',
+    data: [
+      ['値1', '値2', '値3', '値4', '第1四分位'],
+      [1, 2, 3, 4, '=QUARTILE.INC(A2:D2,1)']
+    ]
+  },
+  {
+    name: 'PERCENTILE.INC',
+    category: '統計',
+    description: 'パーセンタイル（境界値含む）',
+    data: [
+      ['値1', '値2', '値3', '値4', '50%タイル'],
+      [1, 2, 3, 4, '=PERCENTILE.INC(A2:D2,0.5)']
+    ]
+  },
+  {
+    name: 'RANK.EQ',
+    category: '統計',
+    description: '順位（同順位は最小）',
+    data: [
+      ['値', '順位'],
+      [85, '=RANK.EQ(A2,$A$2:$A$5)'],
+      [92, '=RANK.EQ(A3,$A$2:$A$5)'],
+      [78, '=RANK.EQ(A4,$A$2:$A$5)'],
+      [92, '=RANK.EQ(A5,$A$2:$A$5)']
     ]
   },
   {
@@ -1875,6 +1998,84 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
       ['2', 4, 5, 6],
       ['', '', '', ''],
       ['転置', '=TRANSPOSE(B2:D3)', '', '']
+    ]
+  },
+  {
+    name: 'SEQUENCE',
+    category: '動的配列',
+    description: '連続値を生成',
+    data: [
+      ['行数', '列数', '開始', 'ステップ', '連続値'],
+      [5, 1, 1, 2, '=SEQUENCE(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'RANDARRAY',
+    category: '動的配列',
+    description: 'ランダム配列を生成',
+    data: [
+      ['行数', '列数', '最小', '最大', '整数', 'ランダム配列'],
+      [3, 3, 1, 10, 'TRUE', '=RANDARRAY(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'XLOOKUP',
+    category: '動的配列',
+    description: '柔軟な検索',
+    data: [
+      ['商品名', '価格'],
+      ['りんご', 100],
+      ['バナナ', 150],
+      ['オレンジ', 200],
+      ['', ''],
+      ['検索値', '結果'],
+      ['バナナ', '=XLOOKUP(A7,A2:A4,B2:B4)']
+    ],
+    expectedValues: { 'B7': 150 }
+  },
+  {
+    name: 'LAMBDA',
+    category: '動的配列',
+    description: 'カスタム関数を作成',
+    data: [
+      ['値', '二乗'],
+      [5, '=LAMBDA(x,x*x)(A2)'],
+      [7, '=LAMBDA(x,x*x)(A3)']
+    ],
+    expectedValues: { 'B2': 25, 'B3': 49 }
+  },
+  {
+    name: 'LET',
+    category: '動的配列',
+    description: '変数を定義して使用',
+    data: [
+      ['長さ', '幅', '面積'],
+      [10, 5, '=LET(l,A2,w,B2,l*w)'],
+      [7, 3, '=LET(l,A3,w,B3,l*w)']
+    ],
+    expectedValues: { 'C2': 50, 'C3': 21 }
+  },
+  {
+    name: 'HSTACK',
+    category: '動的配列',
+    description: '水平方向に結合',
+    data: [
+      ['配列1', '', '配列2', '', '結合結果'],
+      [1, 2, 'A', 'B', '=HSTACK(A2:B3,C2:D3)'],
+      [3, 4, 'C', 'D', '']
+    ]
+  },
+  {
+    name: 'VSTACK',
+    category: '動的配列',
+    description: '垂直方向に結合',
+    data: [
+      ['配列1', '配列2', '結合結果'],
+      [1, 2, '=VSTACK(A2:B3,A5:B6)'],
+      [3, 4, ''],
+      ['', '', ''],
+      [5, 6, ''],
+      [7, 8, '']
     ]
   }
 ];
