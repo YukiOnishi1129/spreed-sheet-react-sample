@@ -118,3 +118,37 @@ export const unquoteString = (str: string): string => {
   }
   return str;
 };
+
+// 簡単な算術式を評価する関数
+export const evaluateExpression = (expression: string, context: FormulaContext): number | string => {
+  try {
+    // セル参照を値に置換
+    const cellRefPattern = /[A-Z]+\d+/g;
+    let evaluatedExpr = expression;
+    
+    const cellRefs = expression.match(cellRefPattern);
+    if (cellRefs) {
+      for (const cellRef of cellRefs) {
+        const value = getCellValue(cellRef, context);
+        if (typeof value === 'number') {
+          evaluatedExpr = evaluatedExpr.replace(cellRef, value.toString());
+        } else if (value !== null && value !== undefined && value !== '') {
+          // 数値でない場合は文字列として扱う
+          return expression; // 元の式を返す
+        }
+      }
+    }
+    
+    // 基本的な算術演算子のみを許可（セキュリティのため）
+    if (!/^[\d\s+\-*/().,]+$/.test(evaluatedExpr)) {
+      return expression; // 安全でない文字が含まれている場合は元の式を返す
+    }
+    
+    // 算術式を評価
+    const result = Function('"use strict"; return (' + evaluatedExpr + ')')();
+    return typeof result === 'number' ? result : expression;
+  } catch (error) {
+    // エラーの場合は元の式を返す
+    return expression;
+  }
+};

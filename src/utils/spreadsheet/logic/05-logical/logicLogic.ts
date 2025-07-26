@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue } from '../shared/utils';
+import { getCellValue, evaluateExpression } from '../shared/utils';
 
 // 引数を論理値に変換するユーティリティ関数
 function parseArgumentsToLogical(args: string, context: FormulaContext): boolean[] {
@@ -190,10 +190,16 @@ export const IF: CustomFormula = {
       return cellValue as FormulaResult;
     }
     
-    // その他の場合（数値など）
+    // その他の場合（数値または式）
     const num = parseFloat(resultStr);
     if (!isNaN(num)) {
       return num;
+    }
+    
+    // 算術式の可能性をチェック
+    if (resultStr.includes('*') || resultStr.includes('/') || resultStr.includes('+') || resultStr.includes('-')) {
+      const evaluated = evaluateExpression(resultStr, context);
+      return evaluated;
     }
     
     return resultStr as FormulaResult;
