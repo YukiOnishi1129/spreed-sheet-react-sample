@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { 
   type IndividualFunctionTest,
   allIndividualFunctionTests,
+  basicOperatorTests,
   mathFunctionTests,
   statisticalFunctionTests,
   textFunctionTests,
@@ -14,7 +15,10 @@ import {
   databaseFunctionTests,
   engineeringFunctionTests,
   dynamicArrayFunctionTests,
-  webFunctionTests
+  cubeFunctionTests,
+  webFunctionTests,
+  googleSheetsFunctionTests,
+  otherFunctionTests
 } from '../data/individualFunctionTests';
 
 interface FunctionSelectorModalProps {
@@ -35,6 +39,7 @@ export function FunctionSelectorModal({
 
   // カテゴリー別の関数マップ
   const functionCategories = useMemo(() => ({
+    '基本演算子': basicOperatorTests,
     '数学・三角関数': mathFunctionTests,
     '統計関数': statisticalFunctionTests,
     'テキスト関数': textFunctionTests,
@@ -47,7 +52,10 @@ export function FunctionSelectorModal({
     'データベース関数': databaseFunctionTests,
     'エンジニアリング関数': engineeringFunctionTests,
     '動的配列関数': dynamicArrayFunctionTests,
-    'Web関数': webFunctionTests
+    'キューブ関数': cubeFunctionTests,
+    'Web関数': webFunctionTests,
+    'Google Sheets関数': googleSheetsFunctionTests,
+    'その他の関数': otherFunctionTests
   }), []);
 
   // フィルター済み関数リスト

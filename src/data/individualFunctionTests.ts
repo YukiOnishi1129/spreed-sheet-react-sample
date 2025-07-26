@@ -6,6 +6,130 @@ export interface IndividualFunctionTest {
   expectedValues?: { [key: string]: string | number | boolean };
 }
 
+// 基本演算子の個別テスト
+export const basicOperatorTests: IndividualFunctionTest[] = [
+  {
+    name: 'ADD_OPERATOR',
+    category: '基本演算子',
+    description: '加算演算子（+）',
+    data: [
+      ['値1', '値2', '結果'],
+      [10, 20, '=A2+B2'],
+      [5.5, 4.5, '=A3+B3'],
+      [-10, 5, '=A4+B4']
+    ],
+    expectedValues: { 'C2': 30, 'C3': 10, 'C4': -5 }
+  },
+  {
+    name: 'SUBTRACT_OPERATOR',
+    category: '基本演算子',
+    description: '減算演算子（-）',
+    data: [
+      ['値1', '値2', '結果'],
+      [30, 10, '=A2-B2'],
+      [5.5, 4.5, '=A3-B3'],
+      [-10, 5, '=A4-B4']
+    ],
+    expectedValues: { 'C2': 20, 'C3': 1, 'C4': -15 }
+  },
+  {
+    name: 'MULTIPLY_OPERATOR',
+    category: '基本演算子',
+    description: '乗算演算子（*）',
+    data: [
+      ['値1', '値2', '結果'],
+      [10, 3, '=A2*B2'],
+      [2.5, 4, '=A3*B3'],
+      [-5, 3, '=A4*B4']
+    ],
+    expectedValues: { 'C2': 30, 'C3': 10, 'C4': -15 }
+  },
+  {
+    name: 'DIVIDE_OPERATOR',
+    category: '基本演算子',
+    description: '除算演算子（/）',
+    data: [
+      ['値1', '値2', '結果'],
+      [20, 4, '=A2/B2'],
+      [15, 3, '=A3/B3'],
+      [-10, 2, '=A4/B4']
+    ],
+    expectedValues: { 'C2': 5, 'C3': 5, 'C4': -5 }
+  },
+  {
+    name: 'GREATER_THAN',
+    category: '基本演算子',
+    description: '大なり演算子（>）',
+    data: [
+      ['値1', '値2', '結果'],
+      [10, 5, '=A2>B2'],
+      [5, 10, '=A3>B3'],
+      [5, 5, '=A4>B4']
+    ],
+    expectedValues: { 'C2': true, 'C3': false, 'C4': false }
+  },
+  {
+    name: 'LESS_THAN',
+    category: '基本演算子',
+    description: '小なり演算子（<）',
+    data: [
+      ['値1', '値2', '結果'],
+      [5, 10, '=A2<B2'],
+      [10, 5, '=A3<B3'],
+      [5, 5, '=A4<B4']
+    ],
+    expectedValues: { 'C2': true, 'C3': false, 'C4': false }
+  },
+  {
+    name: 'GREATER_THAN_OR_EQUAL',
+    category: '基本演算子',
+    description: '以上演算子（>=）',
+    data: [
+      ['値1', '値2', '結果'],
+      [10, 5, '=A2>=B2'],
+      [5, 10, '=A3>=B3'],
+      [5, 5, '=A4>=B4']
+    ],
+    expectedValues: { 'C2': true, 'C3': false, 'C4': true }
+  },
+  {
+    name: 'LESS_THAN_OR_EQUAL',
+    category: '基本演算子',
+    description: '以下演算子（<=）',
+    data: [
+      ['値1', '値2', '結果'],
+      [5, 10, '=A2<=B2'],
+      [10, 5, '=A3<=B3'],
+      [5, 5, '=A4<=B4']
+    ],
+    expectedValues: { 'C2': true, 'C3': false, 'C4': true }
+  },
+  {
+    name: 'EQUAL',
+    category: '基本演算子',
+    description: '等価演算子（=）',
+    data: [
+      ['値1', '値2', '結果'],
+      [10, 10, '=A2=B2'],
+      [5, 10, '=A3=B3'],
+      ['ABC', 'ABC', '=A4=B4']
+    ],
+    expectedValues: { 'C2': true, 'C3': false, 'C4': true }
+  },
+  {
+    name: 'NOT_EQUAL',
+    category: '基本演算子',
+    description: '不等価演算子（<>）',
+    data: [
+      ['値1', '値2', '結果'],
+      [10, 5, '=A2<>B2'],
+      [10, 10, '=A3<>B3'],
+      ['ABC', 'DEF', '=A4<>B4']
+    ],
+    expectedValues: { 'C2': true, 'C3': false, 'C4': true }
+  }
+];
+
 // 数学・三角関数の個別テスト
 export const mathFunctionTests: IndividualFunctionTest[] = [
   // 基本的な数学関数
@@ -3004,6 +3128,324 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
       ['取得価額', '残存価額', '耐用年数', '開始期', '終了期', '倍率', '切替なし', '償却費'],
       [100000, 10000, 5, 0, 1, 2, 'FALSE', '=VDB(A2,B2,C2,D2,E2,F2,G2)']
     ]
+  },
+  // 債券関連関数
+  {
+    name: 'ACCRINT',
+    category: '財務',
+    description: '定期利息証券の未収利息額',
+    data: [
+      ['発行日', '初回利払日', '決済日', '利率', '額面', '頻度', '基準', '未収利息'],
+      ['2024/1/1', '2024/7/1', '2024/4/1', 0.05, 1000, 2, 0, '=ACCRINT(A2,B2,C2,D2,E2,F2,G2)']
+    ]
+  },
+  {
+    name: 'ACCRINTM',
+    category: '財務',
+    description: '満期一括払い証券の未収利息額',
+    data: [
+      ['発行日', '満期日', '利率', '額面', '基準', '未収利息'],
+      ['2024/1/1', '2024/12/31', 0.05, 1000, 0, '=ACCRINTM(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'DISC',
+    category: '財務',
+    description: '証券の割引率',
+    data: [
+      ['決済日', '満期日', '価格', '償還価格', '基準', '割引率'],
+      ['2024/1/1', '2024/12/31', 95, 100, 0, '=DISC(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'DURATION',
+    category: '財務',
+    description: '定期利息証券の年間マコーレー・デュレーション',
+    data: [
+      ['決済日', '満期日', '利率', '利回り', '頻度', '基準', 'デュレーション'],
+      ['2024/1/1', '2029/1/1', 0.05, 0.06, 2, 0, '=DURATION(A2,B2,C2,D2,E2,F2)']
+    ]
+  },
+  {
+    name: 'MDURATION',
+    category: '財務',
+    description: '修正マコーレー・デュレーション',
+    data: [
+      ['決済日', '満期日', '利率', '利回り', '頻度', '基準', '修正デュレーション'],
+      ['2024/1/1', '2029/1/1', 0.05, 0.06, 2, 0, '=MDURATION(A2,B2,C2,D2,E2,F2)']
+    ]
+  },
+  {
+    name: 'PRICE',
+    category: '財務',
+    description: '定期利息証券の価格',
+    data: [
+      ['決済日', '満期日', '利率', '利回り', '償還価格', '頻度', '基準', '価格'],
+      ['2024/1/1', '2029/1/1', 0.05, 0.06, 100, 2, 0, '=PRICE(A2,B2,C2,D2,E2,F2,G2)']
+    ]
+  },
+  {
+    name: 'YIELD',
+    category: '財務',
+    description: '定期利息証券の利回り',
+    data: [
+      ['決済日', '満期日', '利率', '価格', '償還価格', '頻度', '基準', '利回り'],
+      ['2024/1/1', '2029/1/1', 0.05, 95, 100, 2, 0, '=YIELD(A2,B2,C2,D2,E2,F2,G2)']
+    ]
+  },
+  // クーポン関連関数
+  {
+    name: 'COUPDAYBS',
+    category: '財務',
+    description: '利払期の開始日から決済日までの日数',
+    data: [
+      ['決済日', '満期日', '頻度', '基準', '日数'],
+      ['2024/4/15', '2029/1/1', 2, 0, '=COUPDAYBS(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'COUPDAYS',
+    category: '財務',
+    description: '決済日を含む利払期の日数',
+    data: [
+      ['決済日', '満期日', '頻度', '基準', '日数'],
+      ['2024/4/15', '2029/1/1', 2, 0, '=COUPDAYS(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'COUPDAYSNC',
+    category: '財務',
+    description: '決済日から次回利払日までの日数',
+    data: [
+      ['決済日', '満期日', '頻度', '基準', '日数'],
+      ['2024/4/15', '2029/1/1', 2, 0, '=COUPDAYSNC(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'COUPNCD',
+    category: '財務',
+    description: '決済日後の次回利払日',
+    data: [
+      ['決済日', '満期日', '頻度', '基準', '次回利払日'],
+      ['2024/4/15', '2029/1/1', 2, 0, '=COUPNCD(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'COUPNUM',
+    category: '財務',
+    description: '決済日から満期日までの利払回数',
+    data: [
+      ['決済日', '満期日', '頻度', '基準', '利払回数'],
+      ['2024/4/15', '2029/1/1', 2, 0, '=COUPNUM(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'COUPPCD',
+    category: '財務',
+    description: '決済日直前の利払日',
+    data: [
+      ['決済日', '満期日', '頻度', '基準', '前回利払日'],
+      ['2024/4/15', '2029/1/1', 2, 0, '=COUPPCD(A2,B2,C2,D2)']
+    ]
+  },
+  // 減価償却関連関数
+  {
+    name: 'AMORDEGRC',
+    category: '財務',
+    description: '減価償却費（フランス会計システム）',
+    data: [
+      ['取得価額', '購入日', '最初の期末', '残存価額', '期', '率', '基準', '減価償却費'],
+      [10000, '2024/1/1', '2024/12/31', 1000, 1, 0.15, 1, '=AMORDEGRC(A2,B2,C2,D2,E2,F2,G2)']
+    ]
+  },
+  {
+    name: 'AMORLINC',
+    category: '財務',
+    description: '減価償却費（フランス会計システム、線形）',
+    data: [
+      ['取得価額', '購入日', '最初の期末', '残存価額', '期', '率', '基準', '減価償却費'],
+      [10000, '2024/1/1', '2024/12/31', 1000, 1, 0.15, 1, '=AMORLINC(A2,B2,C2,D2,E2,F2,G2)']
+    ]
+  },
+  {
+    name: 'CUMIPMT',
+    category: '財務',
+    description: '累計利息支払額',
+    data: [
+      ['利率', '期間', '現在価値', '開始期', '終了期', 'タイプ', '累計利息'],
+      [0.06, 36, 100000, 1, 12, 0, '=CUMIPMT(A2/12,B2,C2,D2,E2,F2)']
+    ]
+  },
+  {
+    name: 'CUMPRINC',
+    category: '財務',
+    description: '累計元本支払額',
+    data: [
+      ['利率', '期間', '現在価値', '開始期', '終了期', 'タイプ', '累計元本'],
+      [0.06, 36, 100000, 1, 12, 0, '=CUMPRINC(A2/12,B2,C2,D2,E2,F2)']
+    ]
+  },
+  // 特殊債券関連関数
+  {
+    name: 'ODDFPRICE',
+    category: '財務',
+    description: '期間が半端な最初の期の証券価格',
+    data: [
+      ['決済日', '満期日', '発行日', '初回利払日', '利率', '利回り', '償還価格', '頻度', '基準', '価格'],
+      ['2024/2/15', '2029/1/1', '2024/1/1', '2024/7/1', 0.05, 0.06, 100, 2, 0, '=ODDFPRICE(A2,B2,C2,D2,E2,F2,G2,H2,I2)']
+    ]
+  },
+  {
+    name: 'ODDFYIELD',
+    category: '財務',
+    description: '期間が半端な最初の期の証券利回り',
+    data: [
+      ['決済日', '満期日', '発行日', '初回利払日', '利率', '価格', '償還価格', '頻度', '基準', '利回り'],
+      ['2024/2/15', '2029/1/1', '2024/1/1', '2024/7/1', 0.05, 95, 100, 2, 0, '=ODDFYIELD(A2,B2,C2,D2,E2,F2,G2,H2,I2)']
+    ]
+  },
+  {
+    name: 'ODDLPRICE',
+    category: '財務',
+    description: '期間が半端な最後の期の証券価格',
+    data: [
+      ['決済日', '満期日', '最終利払日', '利率', '利回り', '償還価格', '頻度', '基準', '価格'],
+      ['2024/1/1', '2024/10/15', '2024/7/1', 0.05, 0.06, 100, 2, 0, '=ODDLPRICE(A2,B2,C2,D2,E2,F2,G2,H2)']
+    ]
+  },
+  {
+    name: 'ODDLYIELD',
+    category: '財務',
+    description: '期間が半端な最後の期の証券利回り',
+    data: [
+      ['決済日', '満期日', '最終利払日', '利率', '価格', '償還価格', '頻度', '基準', '利回り'],
+      ['2024/1/1', '2024/10/15', '2024/7/1', 0.05, 95, 100, 2, 0, '=ODDLYIELD(A2,B2,C2,D2,E2,F2,G2,H2)']
+    ]
+  },
+  // 財務省証券関連関数
+  {
+    name: 'TBILLEQ',
+    category: '財務',
+    description: '財務省短期証券の債券換算利回り',
+    data: [
+      ['決済日', '満期日', '割引率', '債券換算利回り'],
+      ['2024/1/1', '2024/6/30', 0.045, '=TBILLEQ(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'TBILLPRICE',
+    category: '財務',
+    description: '財務省短期証券の価格',
+    data: [
+      ['決済日', '満期日', '割引率', '価格'],
+      ['2024/1/1', '2024/6/30', 0.045, '=TBILLPRICE(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'TBILLYIELD',
+    category: '財務',
+    description: '財務省短期証券の利回り',
+    data: [
+      ['決済日', '満期日', '価格', '利回り'],
+      ['2024/1/1', '2024/6/30', 97.75, '=TBILLYIELD(A2,B2,C2)']
+    ]
+  },
+  // 通貨変換関連関数
+  {
+    name: 'DOLLARDE',
+    category: '財務',
+    description: '分数表記のドル価格を小数表記に変換',
+    data: [
+      ['分数価格', '分母', '小数価格'],
+      [1.02, 16, '=DOLLARDE(A2,B2)'],
+      [1.1, 32, '=DOLLARDE(A3,B3)']
+    ]
+  },
+  {
+    name: 'DOLLARFR',
+    category: '財務',
+    description: '小数表記のドル価格を分数表記に変換',
+    data: [
+      ['小数価格', '分母', '分数価格'],
+      [1.125, 16, '=DOLLARFR(A2,B2)'],
+      [1.3125, 32, '=DOLLARFR(A3,B3)']
+    ]
+  },
+  // 利率変換関連関数
+  {
+    name: 'EFFECT',
+    category: '財務',
+    description: '実効年利率',
+    data: [
+      ['名目利率', '年間複利回数', '実効利率'],
+      [0.06, 4, '=EFFECT(A2,B2)'],
+      [0.06, 12, '=EFFECT(A3,B3)']
+    ]
+  },
+  {
+    name: 'NOMINAL',
+    category: '財務',
+    description: '名目年利率',
+    data: [
+      ['実効利率', '年間複利回数', '名目利率'],
+      [0.0614, 4, '=NOMINAL(A2,B2)'],
+      [0.0618, 12, '=NOMINAL(A3,B3)']
+    ]
+  },
+  // その他の証券関連関数
+  {
+    name: 'PRICEDISC',
+    category: '財務',
+    description: '割引証券の価格',
+    data: [
+      ['決済日', '満期日', '割引率', '償還価格', '基準', '価格'],
+      ['2024/1/1', '2024/12/31', 0.05, 100, 0, '=PRICEDISC(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'RECEIVED',
+    category: '財務',
+    description: '満期保有証券の受取額',
+    data: [
+      ['決済日', '満期日', '投資額', '割引率', '基準', '受取額'],
+      ['2024/1/1', '2024/12/31', 95, 0.05, 0, '=RECEIVED(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'INTRATE',
+    category: '財務',
+    description: '満期保有証券の利率',
+    data: [
+      ['決済日', '満期日', '投資額', '償還価格', '基準', '利率'],
+      ['2024/1/1', '2024/12/31', 95, 100, 0, '=INTRATE(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'PRICEMAT',
+    category: '財務',
+    description: '満期利息付証券の価格',
+    data: [
+      ['決済日', '満期日', '発行日', '利率', '利回り', '基準', '価格'],
+      ['2024/1/1', '2024/12/31', '2023/1/1', 0.05, 0.06, 0, '=PRICEMAT(A2,B2,C2,D2,E2,F2)']
+    ]
+  },
+  {
+    name: 'YIELDDISC',
+    category: '財務',
+    description: '割引証券の年利回り',
+    data: [
+      ['決済日', '満期日', '価格', '償還価格', '基準', '利回り'],
+      ['2024/1/1', '2024/12/31', 95, 100, 0, '=YIELDDISC(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'YIELDMAT',
+    category: '財務',
+    description: '満期利息付証券の年利回り',
+    data: [
+      ['決済日', '満期日', '発行日', '利率', '価格', '基準', '利回り'],
+      ['2024/1/1', '2024/12/31', '2023/1/1', 0.05, 95, 0, '=YIELDMAT(A2,B2,C2,D2,E2,F2)']
+    ]
   }
 ];
 
@@ -3214,6 +3656,18 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
       ['numfile', '=INFO(A2)'],
       ['osversion', '=INFO(A3)']
     ]
+  },
+  {
+    name: 'ISBETWEEN',
+    category: '情報',
+    description: '値が範囲内か判定',
+    data: [
+      ['値', '下限', '上限', '範囲内判定'],
+      [5, 1, 10, '=ISBETWEEN(A2,B2,C2)'],
+      [15, 1, 10, '=ISBETWEEN(A3,B3,C3)'],
+      [10, 1, 10, '=ISBETWEEN(A4,B4,C4)']
+    ],
+    expectedValues: { 'D2': true, 'D3': false, 'D4': true }
   }
 ];
 
@@ -3806,6 +4260,122 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
       ['1+i', '=IMTAN(A2)'],
       ['π/4', '=IMTAN(A3)']
     ]
+  },
+  // ベッセル関数
+  {
+    name: 'BESSELJ',
+    category: 'エンジニアリング',
+    description: 'ベッセル関数Jn(x)',
+    data: [
+      ['X', 'N', 'ベッセルJ'],
+      [1.9, 2, '=BESSELJ(A2,B2)']
+    ]
+  },
+  {
+    name: 'BESSELY',
+    category: 'エンジニアリング',
+    description: 'ベッセル関数Yn(x)',
+    data: [
+      ['X', 'N', 'ベッセルY'],
+      [2.5, 1, '=BESSELY(A2,B2)']
+    ]
+  },
+  {
+    name: 'BESSELI',
+    category: 'エンジニアリング',
+    description: '修正ベッセル関数In(x)',
+    data: [
+      ['X', 'N', '修正ベッセルI'],
+      [1.5, 1, '=BESSELI(A2,B2)']
+    ]
+  },
+  {
+    name: 'BESSELK',
+    category: 'エンジニアリング',
+    description: '修正ベッセル関数Kn(x)',
+    data: [
+      ['X', 'N', '修正ベッセルK'],
+      [1.5, 1, '=BESSELK(A2,B2)']
+    ]
+  },
+  // ビット演算関数
+  {
+    name: 'BITAND',
+    category: 'エンジニアリング',
+    description: 'ビット単位AND',
+    data: [
+      ['値1', '値2', 'AND結果'],
+      [5, 3, '=BITAND(A2,B2)'],
+      [23, 10, '=BITAND(A3,B3)']
+    ],
+    expectedValues: { 'C2': 1, 'C3': 2 }
+  },
+  {
+    name: 'BITOR',
+    category: 'エンジニアリング',
+    description: 'ビット単位OR',
+    data: [
+      ['値1', '値2', 'OR結果'],
+      [5, 3, '=BITOR(A2,B2)'],
+      [23, 10, '=BITOR(A3,B3)']
+    ],
+    expectedValues: { 'C2': 7, 'C3': 31 }
+  },
+  {
+    name: 'BITXOR',
+    category: 'エンジニアリング',
+    description: 'ビット単位XOR',
+    data: [
+      ['値1', '値2', 'XOR結果'],
+      [5, 3, '=BITXOR(A2,B2)'],
+      [23, 10, '=BITXOR(A3,B3)']
+    ],
+    expectedValues: { 'C2': 6, 'C3': 29 }
+  },
+  {
+    name: 'BITLSHIFT',
+    category: 'エンジニアリング',
+    description: 'ビット左シフト',
+    data: [
+      ['値', 'シフト量', '結果'],
+      [4, 2, '=BITLSHIFT(A2,B2)'],
+      [3, 3, '=BITLSHIFT(A3,B3)']
+    ],
+    expectedValues: { 'C2': 16, 'C3': 24 }
+  },
+  {
+    name: 'BITRSHIFT',
+    category: 'エンジニアリング',
+    description: 'ビット右シフト',
+    data: [
+      ['値', 'シフト量', '結果'],
+      [13, 2, '=BITRSHIFT(A2,B2)'],
+      [64, 3, '=BITRSHIFT(A3,B3)']
+    ],
+    expectedValues: { 'C2': 3, 'C3': 8 }
+  },
+  // エラー関数
+  {
+    name: 'DELTA',
+    category: 'エンジニアリング',
+    description: 'クロネッカーのデルタ関数',
+    data: [
+      ['値1', '値2', 'デルタ'],
+      [5, 5, '=DELTA(A2,B2)'],
+      [5, 4, '=DELTA(A3,B3)']
+    ],
+    expectedValues: { 'C2': 1, 'C3': 0 }
+  },
+  {
+    name: 'GESTEP',
+    category: 'エンジニアリング',
+    description: 'ステップ関数',
+    data: [
+      ['値', 'ステップ', '結果'],
+      [5, 4, '=GESTEP(A2,B2)'],
+      [3, 5, '=GESTEP(A3,B3)']
+    ],
+    expectedValues: { 'C2': 1, 'C3': 0 }
   }
 ];
 
@@ -4128,6 +4698,73 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   }
 ];
 
+// キューブ関数の個別テスト
+export const cubeFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'CUBEVALUE',
+    category: 'キューブ',
+    description: 'キューブから集計値を返す',
+    data: [
+      ['接続', 'メンバー1', 'メンバー2', '値'],
+      ['Sales', '[Products].[All]', '[Time].[2024]', '=CUBEVALUE(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'CUBEMEMBER',
+    category: 'キューブ',
+    description: 'キューブのメンバーを返す',
+    data: [
+      ['接続', 'メンバー式', 'キャプション', 'メンバー'],
+      ['Sales', '[Products].[Bikes]', 'Bikes', '=CUBEMEMBER(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'CUBESET',
+    category: 'キューブ',
+    description: 'キューブからセットを定義',
+    data: [
+      ['接続', 'セット式', 'キャプション', 'セット'],
+      ['Sales', '{[Products].[Bikes],[Products].[Cars]}', 'Vehicles', '=CUBESET(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'CUBESETCOUNT',
+    category: 'キューブ',
+    description: 'セット内のアイテム数',
+    data: [
+      ['セット', 'カウント'],
+      ['=CUBESET("Sales","{[Products].[Bikes],[Products].[Cars]}")','=CUBESETCOUNT(A2)']
+    ]
+  },
+  {
+    name: 'CUBERANKEDMEMBER',
+    category: 'キューブ',
+    description: 'セット内のn番目のメンバー',
+    data: [
+      ['接続', 'セット式', 'ランク', 'メンバー'],
+      ['Sales', '[Products].Children', 1, '=CUBERANKEDMEMBER(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'CUBEMEMBERPROPERTY',
+    category: 'キューブ',
+    description: 'メンバーのプロパティ値',
+    data: [
+      ['接続', 'メンバー', 'プロパティ', '値'],
+      ['Sales', '[Products].[Bikes]', 'Caption', '=CUBEMEMBERPROPERTY(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'CUBEKPIMEMBER',
+    category: 'キューブ',
+    description: 'KPIメンバーを返す',
+    data: [
+      ['接続', 'KPI名', 'KPIプロパティ', 'メンバー'],
+      ['Sales', 'SalesAmount', 'Goal', '=CUBEKPIMEMBER(A2,B2,C2)']
+    ]
+  }
+];
+
 // Web関数の個別テスト
 export const webFunctionTests: IndividualFunctionTest[] = [
   {
@@ -4270,11 +4907,178 @@ export const webFunctionTests: IndividualFunctionTest[] = [
       [1, 3, 2, 5, '=SPARKLINE(A2:D2)'],
       [4, 2, 6, 3, '=SPARKLINE(A3:D3,{"charttype","column"})']
     ]
+  },
+  // インポート関数
+  {
+    name: 'IMPORTDATA',
+    category: 'Web',
+    description: 'URLからデータをインポート',
+    data: [
+      ['URL', 'インポート結果'],
+      ['https://example.com/data.csv', '=IMPORTDATA(A2)']
+    ]
+  },
+  {
+    name: 'IMPORTFEED',
+    category: 'Web',
+    description: 'RSSやAtomフィードをインポート',
+    data: [
+      ['フィードURL', 'クエリ', 'ヘッダー', 'アイテム数', 'インポート結果'],
+      ['https://example.com/feed.rss', 'items title', true, 5, '=IMPORTFEED(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'IMPORTHTML',
+    category: 'Web',
+    description: 'HTMLテーブルやリストをインポート',
+    data: [
+      ['URL', 'クエリ', 'インデックス', 'インポート結果'],
+      ['https://example.com/page.html', 'table', 1, '=IMPORTHTML(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'IMPORTXML',
+    category: 'Web',
+    description: 'XMLデータをインポート',
+    data: [
+      ['URL', 'XPathクエリ', 'インポート結果'],
+      ['https://example.com/data.xml', '//item/title', '=IMPORTXML(A2,B2)']
+    ]
+  },
+  {
+    name: 'IMPORTRANGE',
+    category: 'Web',
+    description: '他のスプレッドシートから範囲をインポート',
+    data: [
+      ['スプレッドシートURL', '範囲', 'インポート結果'],
+      ['https://docs.google.com/spreadsheets/d/abc123', 'Sheet1!A1:C10', '=IMPORTRANGE(A2,B2)']
+    ]
+  },
+  {
+    name: 'IMAGE',
+    category: 'Web',
+    description: '画像を挿入',
+    data: [
+      ['画像URL', 'モード', '高さ', '幅', '画像'],
+      ['https://example.com/image.png', 1, 100, 100, '=IMAGE(A2,B2,C2,D2)']
+    ]
+  }
+];
+
+// Google Sheets専用関数の個別テスト
+export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'GOOGLEFINANCE',
+    category: 'Google Sheets',
+    description: '金融情報を取得',
+    data: [
+      ['銘柄', '属性', '開始日', '終了日', '間隔', '結果'],
+      ['GOOG', 'price', '', '', '', '=GOOGLEFINANCE(A2,B2)'],
+      ['AAPL', 'volume', '2024/1/1', '2024/1/31', 'DAILY', '=GOOGLEFINANCE(A3,B3,C3,D3,E3)']
+    ]
+  },
+  {
+    name: 'GOOGLETRANSLATE',
+    category: 'Google Sheets',
+    description: 'テキストを翻訳',
+    data: [
+      ['テキスト', '元言語', '翻訳先言語', '翻訳結果'],
+      ['Hello', 'en', 'ja', '=GOOGLETRANSLATE(A2,B2,C2)'],
+      ['こんにちは', 'ja', 'en', '=GOOGLETRANSLATE(A3,B3,C3)']
+    ]
+  },
+  {
+    name: 'DETECTLANGUAGE',
+    category: 'Google Sheets',
+    description: '言語を検出',
+    data: [
+      ['テキスト', '検出言語'],
+      ['Hello World', '=DETECTLANGUAGE(A2)'],
+      ['こんにちは世界', '=DETECTLANGUAGE(A3)'],
+      ['Bonjour le monde', '=DETECTLANGUAGE(A4)']
+    ],
+    expectedValues: { 'B2': 'en', 'B3': 'ja', 'B4': 'fr' }
+  },
+  {
+    name: 'TO_DATE',
+    category: 'Google Sheets',
+    description: '値を日付に変換',
+    data: [
+      ['値', '日付'],
+      [44926, '=TO_DATE(A2)'],
+      ['2023/1/1', '=TO_DATE(A3)']
+    ]
+  },
+  {
+    name: 'TO_PERCENT',
+    category: 'Google Sheets',
+    description: '値をパーセントに変換',
+    data: [
+      ['値', 'パーセント'],
+      [0.25, '=TO_PERCENT(A2)'],
+      [0.5, '=TO_PERCENT(A3)']
+    ],
+    expectedValues: { 'B2': '25%', 'B3': '50%' }
+  },
+  {
+    name: 'TO_DOLLARS',
+    category: 'Google Sheets',
+    description: '値をドル表記に変換',
+    data: [
+      ['値', 'ドル表記'],
+      [1234.56, '=TO_DOLLARS(A2)'],
+      [9876.54, '=TO_DOLLARS(A3)']
+    ],
+    expectedValues: { 'B2': '$1,234.56', 'B3': '$9,876.54' }
+  },
+  {
+    name: 'TO_TEXT',
+    category: 'Google Sheets',
+    description: '値をテキストに変換',
+    data: [
+      ['値', 'テキスト'],
+      [123, '=TO_TEXT(A2)'],
+      ['=TRUE()', '=TO_TEXT(A3)']
+    ],
+    expectedValues: { 'B2': '123', 'B3': 'TRUE' }
+  }
+];
+
+// その他の関数の個別テスト
+export const otherFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'ISOMITTED',
+    category: 'その他',
+    description: '引数が省略されているか判定',
+    data: [
+      ['値', '省略判定'],
+      ['=LAMBDA(x,y,ISOMITTED(y))(A2)', '=A2'],
+      ['=LAMBDA(x,y,ISOMITTED(y))(A3,B3)', '=A3']
+    ]
+  },
+  {
+    name: 'STOCKHISTORY',
+    category: 'その他',
+    description: '株価履歴を取得',
+    data: [
+      ['銘柄', '開始日', '終了日', '間隔', 'ヘッダー', 'プロパティ', '履歴'],
+      ['MSFT', '2024/1/1', '2024/1/31', 0, 1, 0, '=STOCKHISTORY(A2,B2,C2,D2,E2,F2)']
+    ]
+  },
+  {
+    name: 'GPT',
+    category: 'その他',
+    description: 'GPTによるテキスト生成',
+    data: [
+      ['プロンプト', '生成結果'],
+      ['Excelの便利な使い方を教えて', '=GPT(A2)']
+    ]
   }
 ];
 
 // すべての個別テストを結合
 export const allIndividualFunctionTests: IndividualFunctionTest[] = [
+  ...basicOperatorTests,
   ...mathFunctionTests,
   ...statisticalFunctionTests,
   ...textFunctionTests,
@@ -4287,7 +5091,10 @@ export const allIndividualFunctionTests: IndividualFunctionTest[] = [
   ...databaseFunctionTests,
   ...engineeringFunctionTests,
   ...dynamicArrayFunctionTests,
-  ...webFunctionTests
+  ...cubeFunctionTests,
+  ...webFunctionTests,
+  ...googleSheetsFunctionTests,
+  ...otherFunctionTests
 ];
 
 // カテゴリ別にテストを取得
