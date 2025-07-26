@@ -24,6 +24,7 @@ function DemoSpreadsheet() {
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
   const [selectedFunctionCategory, setSelectedFunctionCategory] = useState<string>('');
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [functionSearchQuery, setFunctionSearchQuery] = useState<string>('');
 
   // カテゴリー別の関数マップ
   const functionCategories = useMemo(() => ({
@@ -36,13 +37,27 @@ function DemoSpreadsheet() {
     '財務関数': financialFunctionTests
   }), []);
 
-  // 選択されたカテゴリーの関数リスト
+  // 選択されたカテゴリーの関数リスト（検索フィルター付き）
   const categoryFunctions = useMemo(() => {
-    if (!selectedFunctionCategory || !(selectedFunctionCategory in functionCategories)) {
-      return [];
+    let functions: IndividualFunctionTest[] = [];
+    
+    if (!selectedFunctionCategory || selectedFunctionCategory === 'all') {
+      functions = allIndividualFunctionTests;
+    } else if (selectedFunctionCategory in functionCategories) {
+      functions = functionCategories[selectedFunctionCategory as keyof typeof functionCategories];
     }
-    return functionCategories[selectedFunctionCategory as keyof typeof functionCategories];
-  }, [selectedFunctionCategory, functionCategories]);
+    
+    // 検索フィルター
+    if (functionSearchQuery) {
+      const query = functionSearchQuery.toLowerCase();
+      functions = functions.filter(func => 
+        func.name.toLowerCase().includes(query) || 
+        func.description.toLowerCase().includes(query)
+      );
+    }
+    
+    return functions;
+  }, [selectedFunctionCategory, functionCategories, functionSearchQuery, allIndividualFunctionTests]);
 
   // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
@@ -251,51 +266,75 @@ function DemoSpreadsheet() {
             </>
           ) : (
             <div className="space-y-4">
-              {/* カテゴリー選択 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  カテゴリーを選択
-                </label>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                  value={selectedFunctionCategory}
-                  onChange={(e) => {
-                    setSelectedFunctionCategory(e.target.value);
-                    setSelectedFunction(null); // カテゴリー変更時に関数選択をリセット
-                  }}
-                >
-                  <option value="">カテゴリーを選択してください</option>
-                  {Object.keys(functionCategories).map(category => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+              {/* 検索バー */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="関数名または説明で検索..."
+                  value={functionSearchQuery}
+                  onChange={(e) => setFunctionSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </div>
-              
-              {/* 関数選択（カテゴリー選択後に表示） */}
-              {selectedFunctionCategory && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    関数を選択
-                  </label>
-                  <select
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                    value={selectedFunction?.name || ''}
-                    onChange={(e) => {
-                      const func = categoryFunctions.find(f => f.name === e.target.value);
-                      setSelectedFunction(func || null);
-                    }}
+
+              {/* カテゴリータブ */}
+              <div className="flex flex-wrap gap-2 pb-2 border-b">
+                <button
+                  onClick={() => setSelectedFunctionCategory('all')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
+                    selectedFunctionCategory === 'all' || !selectedFunctionCategory
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  すべて
+                </button>
+                {Object.keys(functionCategories).map(category => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedFunctionCategory(category)}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
+                      selectedFunctionCategory === category
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                   >
-                    <option value="">関数を選択してください</option>
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              {/* 関数グリッド */}
+              <div className="max-h-96 overflow-y-auto pr-2">
+                {categoryFunctions.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {categoryFunctions.map(func => (
-                      <option key={func.name} value={func.name}>
-                        {func.name} - {func.description}
-                      </option>
+                      <button
+                        key={func.name}
+                        onClick={() => setSelectedFunction(func)}
+                        className={`p-3 text-left rounded-lg border-2 transition-all hover:shadow-md ${
+                          selectedFunction?.name === func.name
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        <div className="font-medium text-gray-900">{func.name}</div>
+                        <div className="text-xs text-gray-600 mt-1 line-clamp-2">{func.description}</div>
+                      </button>
                     ))}
-                  </select>
-                </div>
-              )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    {functionSearchQuery 
+                      ? `"${functionSearchQuery}" に一致する関数が見つかりません`
+                      : 'カテゴリーを選択してください'
+                    }
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
