@@ -626,6 +626,257 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
       [0, 1, '=ATAN2(A3,B3)']
     ],
     expectedValues: { 'C2': 0.785398, 'C3': 1.570796 }
+  },
+  {
+    name: 'SINH',
+    category: '三角',
+    description: '双曲線正弦',
+    data: [
+      ['値', '双曲線正弦'],
+      [0, '=SINH(A2)'],
+      [1, '=SINH(A3)'],
+      [-1, '=SINH(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 1.175201, 'B4': -1.175201 }
+  },
+  {
+    name: 'COSH',
+    category: '三角',
+    description: '双曲線余弦',
+    data: [
+      ['値', '双曲線余弦'],
+      [0, '=COSH(A2)'],
+      [1, '=COSH(A3)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 1.543081 }
+  },
+  {
+    name: 'TANH',
+    category: '三角',
+    description: '双曲線正接',
+    data: [
+      ['値', '双曲線正接'],
+      [0, '=TANH(A2)'],
+      [1, '=TANH(A3)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.761594 }
+  },
+  {
+    name: 'ASINH',
+    category: '三角',
+    description: '逆双曲線正弦',
+    data: [
+      ['値', '逆双曲線正弦'],
+      [0, '=ASINH(A2)'],
+      [1, '=ASINH(A3)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.881374 }
+  },
+  {
+    name: 'ACOSH',
+    category: '三角',
+    description: '逆双曲線余弦',
+    data: [
+      ['値', '逆双曲線余弦'],
+      [1, '=ACOSH(A2)'],
+      [2, '=ACOSH(A3)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 1.316958 }
+  },
+  {
+    name: 'ATANH',
+    category: '三角',
+    description: '逆双曲線正接',
+    data: [
+      ['値', '逆双曲線正接'],
+      [0, '=ATANH(A2)'],
+      [0.5, '=ATANH(A3)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.549306 }
+  },
+  {
+    name: 'SEC',
+    category: '三角',
+    description: '正割',
+    data: [
+      ['角度(ラジアン)', '正割'],
+      [0, '=SEC(A2)'],
+      [1, '=SEC(A3)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 1.850816 }
+  },
+  {
+    name: 'CSC',
+    category: '三角',
+    description: '余割',
+    data: [
+      ['角度(ラジアン)', '余割'],
+      [1, '=CSC(A2)'],
+      [2, '=CSC(A3)']
+    ],
+    expectedValues: { 'B2': 1.188395, 'B3': 1.099750 }
+  },
+  {
+    name: 'COT',
+    category: '三角',
+    description: '余接',
+    data: [
+      ['角度(ラジアン)', '余接'],
+      [1, '=COT(A2)'],
+      [2, '=COT(A3)']
+    ],
+    expectedValues: { 'B2': 0.642093, 'B3': -0.457658 }
+  },
+  {
+    name: 'ACOT',
+    category: '三角',
+    description: '逆余接',
+    data: [
+      ['値', '逆余接'],
+      [1, '=ACOT(A2)'],
+      [0, '=ACOT(A3)']
+    ],
+    expectedValues: { 'B2': 0.785398, 'B3': 1.570796 }
+  },
+  {
+    name: 'ARABIC',
+    category: '数学',
+    description: 'ローマ数字をアラビア数字に',
+    data: [
+      ['ローマ数字', 'アラビア数字'],
+      ['XVI', '=ARABIC(A2)'],
+      ['MCMXII', '=ARABIC(A3)']
+    ],
+    expectedValues: { 'B2': 16, 'B3': 1912 }
+  },
+  {
+    name: 'ROMAN',
+    category: '数学',
+    description: 'アラビア数字をローマ数字に',
+    data: [
+      ['アラビア数字', 'ローマ数字'],
+      [16, '=ROMAN(A2)'],
+      [1912, '=ROMAN(A3)']
+    ],
+    expectedValues: { 'B2': 'XVI', 'B3': 'MCMXII' }
+  },
+  {
+    name: 'BASE',
+    category: '数学',
+    description: '基数変換',
+    data: [
+      ['数値', '基数', '最小桁数', '結果'],
+      [15, 2, 8, '=BASE(A2,B2,C2)'],
+      [255, 16, 4, '=BASE(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': '00001111', 'D3': '00FF' }
+  },
+  {
+    name: 'DECIMAL',
+    category: '数学',
+    description: '基数から10進数に変換',
+    data: [
+      ['テキスト', '基数', '10進数'],
+      ['FF', 16, '=DECIMAL(A2,B2)'],
+      ['1111', 2, '=DECIMAL(A3,B3)']
+    ],
+    expectedValues: { 'C2': 255, 'C3': 15 }
+  },
+  {
+    name: 'SQRTPI',
+    category: '数学',
+    description: '数値×πの平方根',
+    data: [
+      ['数値', '√(数値×π)'],
+      [1, '=SQRTPI(A2)'],
+      [2, '=SQRTPI(A3)']
+    ],
+    expectedValues: { 'B2': 1.772454, 'B3': 2.506628 }
+  },
+  {
+    name: 'FACTDOUBLE',
+    category: '数学',
+    description: '二重階乗',
+    data: [
+      ['数値', '二重階乗'],
+      [5, '=FACTDOUBLE(A2)'],
+      [6, '=FACTDOUBLE(A3)']
+    ],
+    expectedValues: { 'B2': 15, 'B3': 48 }
+  },
+  {
+    name: 'MULTINOMIAL',
+    category: '数学',
+    description: '多項係数',
+    data: [
+      ['値1', '値2', '値3', '多項係数'],
+      [2, 3, 4, '=MULTINOMIAL(A2:C2)']
+    ],
+    expectedValues: { 'D2': 1260 }
+  },
+  {
+    name: 'COMBINA',
+    category: '数学',
+    description: '重複組み合わせ',
+    data: [
+      ['要素数', '選択数', '重複組み合わせ'],
+      [4, 3, '=COMBINA(A2,B2)'],
+      [10, 3, '=COMBINA(A3,B3)']
+    ],
+    expectedValues: { 'C2': 20, 'C3': 220 }
+  },
+  {
+    name: 'PERMUTATIONA',
+    category: '数学',
+    description: '重複順列',
+    data: [
+      ['要素数', '選択数', '重複順列'],
+      [4, 2, '=PERMUTATIONA(A2,B2)'],
+      [3, 3, '=PERMUTATIONA(A3,B3)']
+    ],
+    expectedValues: { 'C2': 16, 'C3': 27 }
+  },
+  {
+    name: 'SERIESSUM',
+    category: '数学',
+    description: 'べき級数の和',
+    data: [
+      ['x', 'n', 'm', '係数', '', '', 'べき級数'],
+      [2, 1, 1, 1, 2, 3, '=SERIESSUM(A2,B2,C2,D2:F2)']
+    ]
+  },
+  {
+    name: 'CEILING.PRECISE',
+    category: '数学',
+    description: '正確な切り上げ',
+    data: [
+      ['数値', '基準値', '切り上げ'],
+      [4.3, 1, '=CEILING.PRECISE(A2,B2)'],
+      [-4.3, 1, '=CEILING.PRECISE(A3,B3)']
+    ],
+    expectedValues: { 'C2': 5, 'C3': -4 }
+  },
+  {
+    name: 'FLOOR.PRECISE',
+    category: '数学',
+    description: '正確な切り捨て',
+    data: [
+      ['数値', '基準値', '切り捨て'],
+      [4.3, 1, '=FLOOR.PRECISE(A2)'],
+      [-4.3, 1, '=FLOOR.PRECISE(A3,B3)']
+    ],
+    expectedValues: { 'C2': 4, 'C3': -5 }
+  },
+  {
+    name: 'ISO.CEILING',
+    category: '数学',
+    description: 'ISO規格の切り上げ',
+    data: [
+      ['数値', '基準値', '切り上げ'],
+      [4.3, 1, '=ISO.CEILING(A2,B2)'],
+      [-4.3, 1, '=ISO.CEILING(A3,B3)']
+    ],
+    expectedValues: { 'C2': 5, 'C3': -4 }
   }
 ];
 
@@ -1064,6 +1315,521 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
       ['値1', '値2', '値3', '値4', '値5', '値6', '除外率', 'トリム平均'],
       [1, 2, 3, 4, 5, 100, 0.2, '=TRIMMEAN(A2:F2,G2)']
     ]
+  },
+  // 統計分布関数（高優先度）
+  {
+    name: 'NORM.DIST',
+    category: '統計',
+    description: '正規分布',
+    data: [
+      ['値', '平均', '標準偏差', '累積', '確率密度'],
+      [42, 40, 1.5, 'FALSE', '=NORM.DIST(A2,B2,C2,D2)'],
+      [42, 40, 1.5, 'TRUE', '=NORM.DIST(A3,B3,C3,D3)']
+    ]
+  },
+  {
+    name: 'NORM.INV',
+    category: '統計',
+    description: '正規分布の逆関数',
+    data: [
+      ['確率', '平均', '標準偏差', '値'],
+      [0.908789, 40, 1.5, '=NORM.INV(A2,B2,C2)']
+    ],
+    expectedValues: { 'D2': 42 }
+  },
+  {
+    name: 'NORM.S.DIST',
+    category: '統計',
+    description: '標準正規分布',
+    data: [
+      ['z値', '累積', '確率'],
+      [1.333333, 'TRUE', '=NORM.S.DIST(A2,B2)'],
+      [1.333333, 'FALSE', '=NORM.S.DIST(A3,B3)']
+    ]
+  },
+  {
+    name: 'NORM.S.INV',
+    category: '統計',
+    description: '標準正規分布の逆関数',
+    data: [
+      ['確率', 'z値'],
+      [0.908789, '=NORM.S.INV(A2)']
+    ],
+    expectedValues: { 'B2': 1.333333 }
+  },
+  {
+    name: 'T.DIST',
+    category: '統計',
+    description: 't分布（左側）',
+    data: [
+      ['値', '自由度', '累積', '確率'],
+      [1.96, 60, 'TRUE', '=T.DIST(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'T.DIST.2T',
+    category: '統計',
+    description: 't分布（両側）',
+    data: [
+      ['値', '自由度', '確率'],
+      [1.96, 60, '=T.DIST.2T(A2,B2)']
+    ]
+  },
+  {
+    name: 'T.INV',
+    category: '統計',
+    description: 't分布の逆関数（左側）',
+    data: [
+      ['確率', '自由度', '値'],
+      [0.975, 60, '=T.INV(A2,B2)']
+    ],
+    expectedValues: { 'C2': 2.000298 }
+  },
+  {
+    name: 'T.INV.2T',
+    category: '統計',
+    description: 't分布の逆関数（両側）',
+    data: [
+      ['確率', '自由度', '値'],
+      [0.05, 60, '=T.INV.2T(A2,B2)']
+    ],
+    expectedValues: { 'C2': 2.000298 }
+  },
+  {
+    name: 'CHISQ.DIST',
+    category: '統計',
+    description: 'カイ二乗分布',
+    data: [
+      ['値', '自由度', '累積', '確率'],
+      [18.307, 10, 'TRUE', '=CHISQ.DIST(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'CHISQ.INV',
+    category: '統計',
+    description: 'カイ二乗分布の逆関数',
+    data: [
+      ['確率', '自由度', '値'],
+      [0.95, 10, '=CHISQ.INV(A2,B2)']
+    ],
+    expectedValues: { 'C2': 18.307 }
+  },
+  {
+    name: 'F.DIST',
+    category: '統計',
+    description: 'F分布',
+    data: [
+      ['値', '自由度1', '自由度2', '累積', '確率'],
+      [2.5, 5, 10, 'TRUE', '=F.DIST(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'F.INV',
+    category: '統計',
+    description: 'F分布の逆関数',
+    data: [
+      ['確率', '自由度1', '自由度2', '値'],
+      [0.95, 5, 10, '=F.INV(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'EXPON.DIST',
+    category: '統計',
+    description: '指数分布',
+    data: [
+      ['値', 'λ', '累積', '確率'],
+      [0.2, 10, 'TRUE', '=EXPON.DIST(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'NORM.DIST',
+    category: '統計',
+    description: '正規分布',
+    data: [
+      ['値', '平均', '標準偏差', '累積', '確率'],
+      [100, 100, 15, 'TRUE', '=NORM.DIST(A2,B2,C2,D2)'],
+      [110, 100, 15, 'FALSE', '=NORM.DIST(A3,B3,C3,D3)']
+    ]
+  },
+  {
+    name: 'NORM.INV',
+    category: '統計',
+    description: '正規分布の逆関数',
+    data: [
+      ['確率', '平均', '標準偏差', '値'],
+      [0.5, 100, 15, '=NORM.INV(A2,B2,C2)'],
+      [0.95, 100, 15, '=NORM.INV(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 100, 'D3': 124.67 }
+  },
+  {
+    name: 'NORM.S.DIST',
+    category: '統計',
+    description: '標準正規分布',
+    data: [
+      ['値', '累積', '確率'],
+      [0, 'TRUE', '=NORM.S.DIST(A2,B2)'],
+      [1.96, 'TRUE', '=NORM.S.DIST(A3,B3)']
+    ],
+    expectedValues: { 'C2': 0.5, 'C3': 0.975 }
+  },
+  {
+    name: 'NORM.S.INV',
+    category: '統計',
+    description: '標準正規分布の逆関数',
+    data: [
+      ['確率', '値'],
+      [0.5, '=NORM.S.INV(A2)'],
+      [0.975, '=NORM.S.INV(A3)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 1.96 }
+  },
+  {
+    name: 'T.DIST',
+    category: '統計',
+    description: 'T分布（左側）',
+    data: [
+      ['値', '自由度', '確率'],
+      [2, 10, '=T.DIST(A2,B2,TRUE)']
+    ]
+  },
+  {
+    name: 'T.DIST.2T',
+    category: '統計',
+    description: 'T分布（両側）',
+    data: [
+      ['値', '自由度', '確率'],
+      [2, 10, '=T.DIST.2T(A2,B2)']
+    ]
+  },
+  {
+    name: 'T.INV',
+    category: '統計',
+    description: 'T分布の逆関数（左側）',
+    data: [
+      ['確率', '自由度', '値'],
+      [0.95, 10, '=T.INV(A2,B2)']
+    ],
+    expectedValues: { 'C2': 1.812 }
+  },
+  {
+    name: 'T.INV.2T',
+    category: '統計',
+    description: 'T分布の逆関数（両側）',
+    data: [
+      ['確率', '自由度', '値'],
+      [0.05, 10, '=T.INV.2T(A2,B2)']
+    ],
+    expectedValues: { 'C2': 2.228 }
+  },
+  {
+    name: 'CHISQ.DIST',
+    category: '統計',
+    description: 'カイ二乗分布',
+    data: [
+      ['値', '自由度', '累積', '確率'],
+      [10, 5, 'TRUE', '=CHISQ.DIST(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'CHISQ.INV',
+    category: '統計',
+    description: 'カイ二乗分布の逆関数',
+    data: [
+      ['確率', '自由度', '値'],
+      [0.95, 5, '=CHISQ.INV(A2,B2)']
+    ],
+    expectedValues: { 'C2': 11.07 }
+  },
+  {
+    name: 'F.DIST',
+    category: '統計',
+    description: 'F分布',
+    data: [
+      ['値', '自由度1', '自由度2', '累積', '確率'],
+      [2, 5, 10, 'TRUE', '=F.DIST(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'F.INV',
+    category: '統計',
+    description: 'F分布の逆関数',
+    data: [
+      ['確率', '自由度1', '自由度2', '値'],
+      [0.95, 5, 10, '=F.INV(A2,B2,C2)']
+    ],
+    expectedValues: { 'D2': 3.326 }
+  },
+  {
+    name: 'COVARIANCE.P',
+    category: '統計',
+    description: '母共分散',
+    data: [
+      ['データ1', 'データ2', '', '共分散'],
+      [1, 10, '', '=COVARIANCE.P(A2:A5,B2:B5)'],
+      [2, 15, '', ''],
+      [3, 20, '', ''],
+      [4, 25, '', '']
+    ],
+    expectedValues: { 'D2': 6.25 }
+  },
+  {
+    name: 'COVARIANCE.S',
+    category: '統計',
+    description: '標本共分散',
+    data: [
+      ['データ1', 'データ2', '', '共分散'],
+      [1, 10, '', '=COVARIANCE.S(A2:A5,B2:B5)'],
+      [2, 15, '', ''],
+      [3, 20, '', ''],
+      [4, 25, '', '']
+    ]
+  },
+  {
+    name: 'MODE.MULT',
+    category: '統計',
+    description: '最頻値（複数）',
+    data: [
+      ['データ', '最頻値'],
+      [1, '=MODE.MULT(A2:A8)'],
+      [2, ''],
+      [2, ''],
+      [3, ''],
+      [3, ''],
+      [3, ''],
+      [4, '']
+    ]
+  },
+  {
+    name: 'RANK.AVG',
+    category: '統計',
+    description: '順位（平均）',
+    data: [
+      ['データ', '順位'],
+      [89, '=RANK.AVG(A2,$A$2:$A$6)'],
+      [92, '=RANK.AVG(A3,$A$2:$A$6)'],
+      [85, '=RANK.AVG(A4,$A$2:$A$6)'],
+      [92, '=RANK.AVG(A5,$A$2:$A$6)'],
+      [88, '=RANK.AVG(A6,$A$2:$A$6)']
+    ],
+    expectedValues: { 'B2': 3, 'B3': 1.5, 'B4': 5, 'B5': 1.5, 'B6': 4 }
+  },
+  {
+    name: 'LOGNORM.DIST',
+    category: '統計',
+    description: '対数正規分布',
+    data: [
+      ['値', '平均', '標準偏差', '累積', '確率'],
+      [4, 3.5, 1.2, 'TRUE', '=LOGNORM.DIST(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'LOGNORM.INV',
+    category: '統計',
+    description: '対数正規分布の逆関数',
+    data: [
+      ['確率', '平均', '標準偏差', '値'],
+      [0.5, 3.5, 1.2, '=LOGNORM.INV(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'T.DIST.RT',
+    category: '統計',
+    description: 'T分布（右側）',
+    data: [
+      ['値', '自由度', '確率'],
+      [2, 10, '=T.DIST.RT(A2,B2)']
+    ]
+  },
+  {
+    name: 'CHISQ.DIST.RT',
+    category: '統計',
+    description: 'カイ二乗分布（右側）',
+    data: [
+      ['値', '自由度', '確率'],
+      [10, 5, '=CHISQ.DIST.RT(A2,B2)']
+    ]
+  },
+  {
+    name: 'CHISQ.INV.RT',
+    category: '統計',
+    description: 'カイ二乗分布の逆関数（右側）',
+    data: [
+      ['確率', '自由度', '値'],
+      [0.05, 5, '=CHISQ.INV.RT(A2,B2)']
+    ]
+  },
+  {
+    name: 'F.DIST.RT',
+    category: '統計',
+    description: 'F分布（右側）',
+    data: [
+      ['値', '自由度1', '自由度2', '確率'],
+      [2, 5, 10, '=F.DIST.RT(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'F.INV.RT',
+    category: '統計',
+    description: 'F分布の逆関数（右側）',
+    data: [
+      ['確率', '自由度1', '自由度2', '値'],
+      [0.05, 5, 10, '=F.INV.RT(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'BETA.DIST',
+    category: '統計',
+    description: 'ベータ分布',
+    data: [
+      ['値', 'α', 'β', '下限', '上限', '累積', '確率'],
+      [0.5, 2, 5, 0, 1, 'TRUE', '=BETA.DIST(A2,B2,C2,D2,E2,F2)']
+    ]
+  },
+  {
+    name: 'BETA.INV',
+    category: '統計',
+    description: 'ベータ分布の逆関数',
+    data: [
+      ['確率', 'α', 'β', '下限', '上限', '値'],
+      [0.5, 2, 5, 0, 1, '=BETA.INV(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'GAMMA.DIST',
+    category: '統計',
+    description: 'ガンマ分布',
+    data: [
+      ['値', 'α', 'β', '累積', '確率'],
+      [10, 9, 2, 'TRUE', '=GAMMA.DIST(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'GAMMA.INV',
+    category: '統計',
+    description: 'ガンマ分布の逆関数',
+    data: [
+      ['確率', 'α', 'β', '値'],
+      [0.5, 9, 2, '=GAMMA.INV(A2,B2,C2)']
+    ]
+  },
+  {
+    name: 'WEIBULL.DIST',
+    category: '統計',
+    description: 'ワイブル分布',
+    data: [
+      ['値', 'α', 'β', '累積', '確率'],
+      [100, 20, 100, 'TRUE', '=WEIBULL.DIST(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'PERCENTILE.EXC',
+    category: '統計',
+    description: 'パーセンタイル（除外）',
+    data: [
+      ['データ', '', 'パーセンタイル'],
+      [1, '', ''],
+      [2, '', ''],
+      [3, '', ''],
+      [4, '', ''],
+      [5, 0.25, '=PERCENTILE.EXC(A2:A6,B6)']
+    ],
+    expectedValues: { 'C6': 1.75 }
+  },
+  {
+    name: 'PERCENTRANK.INC',
+    category: '統計',
+    description: 'パーセントランク（含む）',
+    data: [
+      ['データ', '値', 'ランク'],
+      [1, 3, '=PERCENTRANK.INC(A2:A6,B2)'],
+      [2, '', ''],
+      [3, '', ''],
+      [4, '', ''],
+      [5, '', '']
+    ],
+    expectedValues: { 'C2': 0.5 }
+  },
+  {
+    name: 'PERCENTRANK.EXC',
+    category: '統計',
+    description: 'パーセントランク（除外）',
+    data: [
+      ['データ', '値', 'ランク'],
+      [1, 3, '=PERCENTRANK.EXC(A2:A6,B2)'],
+      [2, '', ''],
+      [3, '', ''],
+      [4, '', ''],
+      [5, '', '']
+    ]
+  },
+  {
+    name: 'QUARTILE.EXC',
+    category: '統計',
+    description: '四分位数（除外）',
+    data: [
+      ['データ', '四分位', '値'],
+      [1, 1, '=QUARTILE.EXC(A2:A9,B2)'],
+      [2, 2, '=QUARTILE.EXC(A2:A9,B3)'],
+      [3, 3, '=QUARTILE.EXC(A2:A9,B4)'],
+      [4, '', ''],
+      [5, '', ''],
+      [6, '', ''],
+      [7, '', ''],
+      [8, '', '']
+    ]
+  },
+  {
+    name: 'STDEVA',
+    category: '統計',
+    description: '標準偏差（テキスト含む）',
+    data: [
+      ['データ', '標準偏差'],
+      [10, '=STDEVA(A2:A6)'],
+      [20, ''],
+      ['テキスト', ''],
+      [30, ''],
+      [40, '']
+    ]
+  },
+  {
+    name: 'STDEVPA',
+    category: '統計',
+    description: '母標準偏差（テキスト含む）',
+    data: [
+      ['データ', '母標準偏差'],
+      [10, '=STDEVPA(A2:A6)'],
+      [20, ''],
+      ['テキスト', ''],
+      [30, ''],
+      [40, '']
+    ]
+  },
+  {
+    name: 'VARA',
+    category: '統計',
+    description: '分散（テキスト含む）',
+    data: [
+      ['データ', '分散'],
+      [10, '=VARA(A2:A6)'],
+      [20, ''],
+      ['テキスト', ''],
+      [30, ''],
+      [40, '']
+    ]
+  },
+  {
+    name: 'VARPA',
+    category: '統計',
+    description: '母分散（テキスト含む）',
+    data: [
+      ['データ', '母分散'],
+      [10, '=VARPA(A2:A6)'],
+      [20, ''],
+      ['テキスト', ''],
+      [30, ''],
+      [40, '']
+    ]
   }
 ];
 
@@ -1282,6 +2048,198 @@ export const textFunctionTests: IndividualFunctionTest[] = [
       ['Hello', 'hello', '=EXACT(A3,B3)']
     ],
     expectedValues: { 'C2': true, 'C3': false }
+  },
+  {
+    name: 'CLEAN',
+    category: '文字列',
+    description: '印刷できない文字を削除',
+    data: [
+      ['テキスト', 'クリーン後'],
+      ['Hello\x00World', '=CLEAN(A2)'],
+      ['Test\x07String', '=CLEAN(A3)']
+    ],
+    expectedValues: { 'B2': 'HelloWorld', 'B3': 'TestString' }
+  },
+  {
+    name: 'DOLLAR',
+    category: '文字列',
+    description: '通貨形式に変換',
+    data: [
+      ['数値', '小数桁', '結果'],
+      [1234.567, 2, '=DOLLAR(A2,B2)'],
+      [1234.567, 0, '=DOLLAR(A3,B3)']
+    ],
+    expectedValues: { 'C2': '$1,234.57', 'C3': '$1,235' }
+  },
+  {
+    name: 'FIXED',
+    category: '文字列',
+    description: '小数点以下の桁数を固定',
+    data: [
+      ['数値', '小数桁', 'カンマなし', '結果'],
+      [1234.567, 2, 'FALSE', '=FIXED(A2,B2,C2)'],
+      [1234.567, 1, 'TRUE', '=FIXED(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': '1,234.57', 'D3': '1234.6' }
+  },
+  {
+    name: 'NUMBERVALUE',
+    category: '文字列',
+    description: 'テキストを数値に変換',
+    data: [
+      ['テキスト', '小数点', '桁区切り', '結果'],
+      ['1,234.56', '.', ',', '=NUMBERVALUE(A2,B2,C2)'],
+      ['1.234,56', ',', '.', '=NUMBERVALUE(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 1234.56, 'D3': 1234.56 }
+  },
+  {
+    name: 'TEXTBEFORE',
+    category: '文字列',
+    description: '指定文字の前のテキストを抽出',
+    data: [
+      ['テキスト', '区切り文字', '結果'],
+      ['hello@example.com', '@', '=TEXTBEFORE(A2,B2)'],
+      ['2024-01-15', '-', '=TEXTBEFORE(A3,B3)'],
+      ['first,second,third', ',', '=TEXTBEFORE(A4,B4)']
+    ],
+    expectedValues: { 'C2': 'hello', 'C3': '2024', 'C4': 'first' }
+  },
+  {
+    name: 'TEXTAFTER',
+    category: '文字列',
+    description: '指定文字の後のテキストを抽出',
+    data: [
+      ['テキスト', '区切り文字', '結果'],
+      ['hello@example.com', '@', '=TEXTAFTER(A2,B2)'],
+      ['2024-01-15', '-', '=TEXTAFTER(A3,B3)'],
+      ['first,second,third', ',', '=TEXTAFTER(A4,B4)']
+    ],
+    expectedValues: { 'C2': 'example.com', 'C3': '01-15', 'C4': 'second,third' }
+  },
+  {
+    name: 'TEXTSPLIT',
+    category: '文字列',
+    description: 'テキストを分割',
+    data: [
+      ['テキスト', '区切り文字', '分割結果'],
+      ['apple,banana,orange', ',', '=TEXTSPLIT(A2,B2)'],
+      ['2024-01-15', '-', '=TEXTSPLIT(A3,B3)'],
+      ['one two three', ' ', '=TEXTSPLIT(A4,B4)']
+    ]
+  },
+  {
+    name: 'UNICHAR',
+    category: '文字列',
+    description: 'Unicode番号から文字を返す',
+    data: [
+      ['Unicode番号', '文字'],
+      [65, '=UNICHAR(A2)'],
+      [8364, '=UNICHAR(A3)'],
+      [12354, '=UNICHAR(A4)']
+    ],
+    expectedValues: { 'B2': 'A', 'B3': '€', 'B4': 'あ' }
+  },
+  {
+    name: 'UNICODE',
+    category: '文字列',
+    description: '文字からUnicode番号を返す',
+    data: [
+      ['文字', 'Unicode番号'],
+      ['A', '=UNICODE(A2)'],
+      ['€', '=UNICODE(A3)'],
+      ['あ', '=UNICODE(A4)']
+    ],
+    expectedValues: { 'B2': 65, 'B3': 8364, 'B4': 12354 }
+  },
+  {
+    name: 'T',
+    category: '文字列',
+    description: 'テキストのみを返す',
+    data: [
+      ['値', 'テキスト'],
+      ['Hello', '=T(A2)'],
+      [123, '=T(A3)'],
+      ['=TRUE()', '=T(A4)']
+    ],
+    expectedValues: { 'B2': 'Hello', 'B3': '', 'B4': '' }
+  },
+  {
+    name: 'ASC',
+    category: '文字列',
+    description: '全角を半角に変換',
+    data: [
+      ['全角文字', '半角文字'],
+      ['ＨＥＬＬＯ', '=ASC(A2)'],
+      ['１２３４５', '=ASC(A3)'],
+      ['アイウエオ', '=ASC(A4)']
+    ],
+    expectedValues: { 'B2': 'HELLO', 'B3': '12345', 'B4': 'ｱｲｳｴｵ' }
+  },
+  {
+    name: 'JIS',
+    category: '文字列',
+    description: '半角を全角に変換',
+    data: [
+      ['半角文字', '全角文字'],
+      ['HELLO', '=JIS(A2)'],
+      ['12345', '=JIS(A3)'],
+      ['ｱｲｳｴｵ', '=JIS(A4)']
+    ],
+    expectedValues: { 'B2': 'ＨＥＬＬＯ', 'B3': '１２３４５', 'B4': 'アイウエオ' }
+  },
+  {
+    name: 'DBCS',
+    category: '文字列',
+    description: '半角を全角に変換（DBCS）',
+    data: [
+      ['半角文字', '全角文字'],
+      ['abc123', '=DBCS(A2)'],
+      ['ｶﾀｶﾅ', '=DBCS(A3)']
+    ],
+    expectedValues: { 'B2': 'ａｂｃ１２３', 'B3': 'カタカナ' }
+  },
+  {
+    name: 'LENB',
+    category: '文字列',
+    description: 'バイト数を返す',
+    data: [
+      ['文字列', 'バイト数'],
+      ['Hello', '=LENB(A2)'],
+      ['こんにちは', '=LENB(A3)']
+    ],
+    expectedValues: { 'B2': 5, 'B3': 10 }
+  },
+  {
+    name: 'FINDB',
+    category: '文字列',
+    description: 'バイト位置を検索',
+    data: [
+      ['検索文字', '対象文字列', 'バイト位置'],
+      ['o', 'Hello', '=FINDB(A2,B2)'],
+      ['に', 'こんにちは', '=FINDB(A3,B3)']
+    ],
+    expectedValues: { 'C2': 5 }
+  },
+  {
+    name: 'SEARCHB',
+    category: '文字列',
+    description: 'バイト位置を検索（大小区別なし）',
+    data: [
+      ['検索文字', '対象文字列', 'バイト位置'],
+      ['LO', 'Hello', '=SEARCHB(A2,B2)'],
+      ['に', 'こんにちは', '=SEARCHB(A3,B3)']
+    ]
+  },
+  {
+    name: 'REPLACEB',
+    category: '文字列',
+    description: 'バイト位置で置換',
+    data: [
+      ['文字列', '開始位置', 'バイト数', '新文字列', '結果'],
+      ['Hello', 3, 2, 'XX', '=REPLACEB(A2,B2,C2,D2)']
+    ],
+    expectedValues: { 'E2': 'HeXXo' }
   }
 ];
 
@@ -1431,6 +2389,110 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
     data: [
       ['開始日', '月数', '月末日'],
       ['2024/2/15', 0, '=EOMONTH(A2,B2)']
+    ]
+  },
+  {
+    name: 'NETWORKDAYS',
+    category: '日付',
+    description: '営業日数を計算',
+    data: [
+      ['開始日', '終了日', '営業日数'],
+      ['2024/1/1', '2024/1/31', '=NETWORKDAYS(A2,B2)'],
+      ['2024/1/15', '2024/1/19', '=NETWORKDAYS(A3,B3)']
+    ],
+    expectedValues: { 'C2': 23, 'C3': 5 }
+  },
+  {
+    name: 'WORKDAY',
+    category: '日付',
+    description: '営業日後の日付を計算',
+    data: [
+      ['開始日', '営業日数', '結果日'],
+      ['2024/1/1', 10, '=WORKDAY(A2,B2)'],
+      ['2024/1/15', 5, '=WORKDAY(A3,B3)']
+    ]
+  },
+  {
+    name: 'DATEVALUE',
+    category: '日付',
+    description: '日付文字列を日付値に変換',
+    data: [
+      ['日付文字列', '日付値'],
+      ['2024/12/25', '=DATEVALUE(A2)'],
+      ['2024-01-15', '=DATEVALUE(A3)']
+    ]
+  },
+  {
+    name: 'TIMEVALUE',
+    category: '日付',
+    description: '時刻文字列を時刻値に変換',
+    data: [
+      ['時刻文字列', '時刻値'],
+      ['13:30:45', '=TIMEVALUE(A2)'],
+      ['9:15 AM', '=TIMEVALUE(A3)']
+    ]
+  },
+  {
+    name: 'WEEKNUM',
+    category: '日付',
+    description: '週番号を返す',
+    data: [
+      ['日付', '週番号'],
+      ['2024/1/15', '=WEEKNUM(A2)'],
+      ['2024/7/1', '=WEEKNUM(A3)']
+    ],
+    expectedValues: { 'B2': 3, 'B3': 27 }
+  },
+  {
+    name: 'ISOWEEKNUM',
+    category: '日付',
+    description: 'ISO週番号を返す',
+    data: [
+      ['日付', 'ISO週番号'],
+      ['2024/1/1', '=ISOWEEKNUM(A2)'],
+      ['2024/12/31', '=ISOWEEKNUM(A3)']
+    ]
+  },
+  {
+    name: 'YEARFRAC',
+    category: '日付',
+    description: '年の端数を計算',
+    data: [
+      ['開始日', '終了日', '基準', '年の端数'],
+      ['2024/1/1', '2024/7/1', 0, '=YEARFRAC(A2,B2,C2)'],
+      ['2024/1/1', '2025/1/1', 1, '=YEARFRAC(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 0.5, 'D3': 1 }
+  },
+  {
+    name: 'DAYS360',
+    category: '日付',
+    description: '360日基準の日数',
+    data: [
+      ['開始日', '終了日', '方式', '日数'],
+      ['2024/1/1', '2024/7/1', 'FALSE', '=DAYS360(A2,B2,C2)'],
+      ['2024/1/31', '2024/3/1', 'TRUE', '=DAYS360(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 180 }
+  },
+  {
+    name: 'NETWORKDAYS.INTL',
+    category: '日付',
+    description: '営業日数（国際版）',
+    data: [
+      ['開始日', '終了日', '週末', '営業日数'],
+      ['2024/1/1', '2024/1/31', 1, '=NETWORKDAYS.INTL(A2,B2,C2)'],
+      ['2024/1/1', '2024/1/15', '"0000011"', '=NETWORKDAYS.INTL(A3,B3,C3)']
+    ]
+  },
+  {
+    name: 'WORKDAY.INTL',
+    category: '日付',
+    description: '営業日後の日付（国際版）',
+    data: [
+      ['開始日', '営業日数', '週末', '結果日'],
+      ['2024/1/1', 10, 1, '=WORKDAY.INTL(A2,B2,C2)'],
+      ['2024/1/1', 5, '"0000011"', '=WORKDAY.INTL(A3,B3,C3)']
     ]
   }
 ];
@@ -1674,6 +2736,109 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
       ['=COLUMN()', '=COLUMN()', '=COLUMN()']
     ],
     expectedValues: { 'A2': 1, 'B2': 2, 'C2': 3 }
+  },
+  {
+    name: 'XMATCH',
+    category: '検索',
+    description: '配列内の項目の位置を返す',
+    data: [
+      ['データ', '検索値', '位置'],
+      ['りんご', 'オレンジ', '=XMATCH(B2,A2:A5)'],
+      ['バナナ', '', ''],
+      ['オレンジ', '', ''],
+      ['ぶどう', '', '']
+    ],
+    expectedValues: { 'C2': 3 }
+  },
+  {
+    name: 'ROWS',
+    category: '検索',
+    description: '範囲の行数を返す',
+    data: [
+      ['データ', '', '行数'],
+      [1, 2, '=ROWS(A2:B5)'],
+      [3, 4, ''],
+      [5, 6, ''],
+      [7, 8, '']
+    ],
+    expectedValues: { 'C2': 4 }
+  },
+  {
+    name: 'COLUMNS',
+    category: '検索',
+    description: '範囲の列数を返す',
+    data: [
+      ['データ', '', '', '', '列数'],
+      [1, 2, 3, 4, '=COLUMNS(A2:D2)']
+    ],
+    expectedValues: { 'E2': 4 }
+  },
+  {
+    name: 'ADDRESS',
+    category: '検索',
+    description: 'セルアドレスを文字列で返す',
+    data: [
+      ['行番号', '列番号', '絶対参照', 'アドレス'],
+      [2, 3, 1, '=ADDRESS(A2,B2,C2)'],
+      [5, 1, 4, '=ADDRESS(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': '$C$2', 'D3': 'A5' }
+  },
+  {
+    name: 'HYPERLINK',
+    category: '検索',
+    description: 'ハイパーリンクを作成',
+    data: [
+      ['URL', '表示テキスト', 'リンク'],
+      ['https://example.com', 'Example', '=HYPERLINK(A2,B2)']
+    ]
+  },
+  {
+    name: 'LOOKUP',
+    category: '検索',
+    description: 'ベクトル検索',
+    data: [
+      ['検索値', '検索範囲', '', '結果範囲', '', '結果'],
+      [4.5, 1, 3, 'A', 'B', '=LOOKUP(A2,B2:C2,D2:E2)'],
+      ['', 4.5, 6, 'C', 'D', '']
+    ],
+    expectedValues: { 'F2': 'B' }
+  },
+  {
+    name: 'AREAS',
+    category: '検索',
+    description: '参照の領域数',
+    data: [
+      ['数式', '領域数'],
+      ['=A1:B2', '=AREAS(A2)'],
+      ['=(A1:B2,D1:E2)', '=AREAS((A1:B2,D1:E2))']
+    ],
+    expectedValues: { 'B2': 1 }
+  },
+  {
+    name: 'FORMULATEXT',
+    category: '検索',
+    description: '数式を文字列として返す',
+    data: [
+      ['値', '数式テキスト'],
+      ['=SUM(1,2,3)', '=FORMULATEXT(A2)'],
+      [100, '=FORMULATEXT(A3)']
+    ],
+    expectedValues: { 'B2': '=SUM(1,2,3)' }
+  },
+  {
+    name: 'GETPIVOTDATA',
+    category: '検索',
+    description: 'ピボットテーブルからデータ取得',
+    data: [
+      ['製品', '地域', '売上'],
+      ['A', '東', 100],
+      ['A', '西', 150],
+      ['B', '東', 200],
+      ['', '', ''],
+      ['取得値', '=GETPIVOTDATA("売上",A1,"製品","A","地域","東")', '']
+    ],
+    expectedValues: { 'B6': 100 }
   }
 ];
 
@@ -1740,6 +2905,148 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
     data: [
       ['初期投資', 'CF1', 'CF2', 'CF3', 'IRR'],
       [-10000, 3000, 4200, 6800, '=IRR(A2:D2)']
+    ]
+  },
+  {
+    name: 'XNPV',
+    category: '財務',
+    description: '不定期のキャッシュフローの正味現在価値',
+    data: [
+      ['割引率', 0.1, '', ''],
+      ['日付', 'キャッシュフロー', '', 'XNPV'],
+      ['2024/1/1', -10000, '', '=XNPV(B1,B3:B6,A3:A6)'],
+      ['2024/4/1', 3000, '', ''],
+      ['2024/7/1', 4200, '', ''],
+      ['2024/10/1', 6800, '', '']
+    ]
+  },
+  {
+    name: 'XIRR',
+    category: '財務',
+    description: '不定期のキャッシュフローの内部収益率',
+    data: [
+      ['日付', 'キャッシュフロー', 'XIRR'],
+      ['2024/1/1', -10000, '=XIRR(B2:B5,A2:A5)'],
+      ['2024/4/1', 3000, ''],
+      ['2024/7/1', 4200, ''],
+      ['2024/10/1', 6800, '']
+    ]
+  },
+  {
+    name: 'IPMT',
+    category: '財務',
+    description: '利息部分の支払額',
+    data: [
+      ['利率', '期', '期間', '現在価値', '利息支払額'],
+      [0.06, 1, 12, -100000, '=IPMT(A2/12,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'PPMT',
+    category: '財務',
+    description: '元本部分の支払額',
+    data: [
+      ['利率', '期', '期間', '現在価値', '元本支払額'],
+      [0.06, 1, 12, -100000, '=PPMT(A2/12,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'MIRR',
+    category: '財務',
+    description: '修正内部収益率',
+    data: [
+      ['CF0', 'CF1', 'CF2', 'CF3', '投資利率', '再投資利率', 'MIRR'],
+      [-10000, 3000, 4200, 6800, 0.1, 0.12, '=MIRR(A2:D2,E2,F2)']
+    ]
+  },
+  {
+    name: 'SLN',
+    category: '財務',
+    description: '定額法による減価償却',
+    data: [
+      ['取得価額', '残存価額', '耐用年数', '減価償却費'],
+      [100000, 10000, 5, '=SLN(A2,B2,C2)']
+    ],
+    expectedValues: { 'D2': 18000 }
+  },
+  {
+    name: 'SYD',
+    category: '財務',
+    description: '級数法による減価償却',
+    data: [
+      ['取得価額', '残存価額', '耐用年数', '期', '減価償却費'],
+      [100000, 10000, 5, 1, '=SYD(A2,B2,C2,D2)']
+    ]
+  },
+  {
+    name: 'DDB',
+    category: '財務',
+    description: '倍率法による減価償却',
+    data: [
+      ['取得価額', '残存価額', '耐用年数', '期', '倍率', '減価償却費'],
+      [100000, 10000, 5, 1, 2, '=DDB(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'DB',
+    category: '財務',
+    description: '定率法による減価償却',
+    data: [
+      ['取得価額', '残存価額', '耐用年数', '期', '月', '減価償却費'],
+      [100000, 10000, 5, 1, 12, '=DB(A2,B2,C2,D2,E2)']
+    ]
+  },
+  {
+    name: 'VDB',
+    category: '財務',
+    description: '倍率法減価償却（期間指定）',
+    data: [
+      ['取得価額', '残存価額', '耐用年数', '開始期', '終了期', '倍率', '切替なし', '償却費'],
+      [100000, 10000, 5, 0, 1, 2, 'FALSE', '=VDB(A2,B2,C2,D2,E2,F2,G2)']
+    ]
+  }
+];
+
+// 行列関数の個別テスト
+export const matrixFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'MMULT',
+    category: '行列',
+    description: '行列の積',
+    data: [
+      ['行列A', '', '行列B', '', '積'],
+      [1, 2, 5, 6, '=MMULT(A2:B3,C2:D3)'],
+      [3, 4, 7, 8, '']
+    ]
+  },
+  {
+    name: 'MDETERM',
+    category: '行列',
+    description: '行列式',
+    data: [
+      ['行列', '', '行列式'],
+      [3, 2, '=MDETERM(A2:B3)'],
+      [1, 4, '']
+    ],
+    expectedValues: { 'C2': 10 }
+  },
+  {
+    name: 'MINVERSE',
+    category: '行列',
+    description: '逆行列',
+    data: [
+      ['行列', '', '逆行列'],
+      [3, 2, '=MINVERSE(A2:B3)'],
+      [1, 4, '']
+    ]
+  },
+  {
+    name: 'MUNIT',
+    category: '行列',
+    description: '単位行列',
+    data: [
+      ['サイズ', '単位行列'],
+      [3, '=MUNIT(A2)']
     ]
   }
 ];
@@ -1836,6 +3143,77 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
       ['=TRUE()', '=N(A4)']
     ],
     expectedValues: { 'B2': 7, 'B3': 0, 'B4': 1 }
+  },
+  {
+    name: 'ERROR.TYPE',
+    category: '情報',
+    description: 'エラーの種類',
+    data: [
+      ['エラー', 'エラー番号'],
+      ['=1/0', '=ERROR.TYPE(A2)'],
+      ['=NA()', '=ERROR.TYPE(A3)']
+    ],
+    expectedValues: { 'B2': 2, 'B3': 7 }
+  },
+  {
+    name: 'SHEET',
+    category: '情報',
+    description: 'シート番号を返す',
+    data: [
+      ['シート番号'],
+      ['=SHEET()']
+    ]
+  },
+  {
+    name: 'SHEETS',
+    category: '情報',
+    description: 'シート数を返す',
+    data: [
+      ['シート数'],
+      ['=SHEETS()']
+    ]
+  },
+  {
+    name: 'ISFORMULA',
+    category: '情報',
+    description: '数式か判定',
+    data: [
+      ['値', '数式判定'],
+      ['=A1+1', '=ISFORMULA(A2)'],
+      [100, '=ISFORMULA(A3)']
+    ],
+    expectedValues: { 'B2': true, 'B3': false }
+  },
+  {
+    name: 'ISREF',
+    category: '情報',
+    description: '参照か判定',
+    data: [
+      ['値', '参照判定'],
+      ['A1', '=ISREF(A1)'],
+      ['テキスト', '=ISREF("テキスト")']
+    ],
+    expectedValues: { 'B2': true, 'B3': false }
+  },
+  {
+    name: 'CELL',
+    category: '情報',
+    description: 'セル情報を取得',
+    data: [
+      ['情報タイプ', '参照', '結果'],
+      ['type', 'A2', '=CELL(A2,B2)'],
+      ['address', 'B3', '=CELL(A3,B3)']
+    ]
+  },
+  {
+    name: 'INFO',
+    category: '情報',
+    description: 'システム情報',
+    data: [
+      ['情報タイプ', '結果'],
+      ['numfile', '=INFO(A2)'],
+      ['osversion', '=INFO(A3)']
+    ]
   }
 ];
 
@@ -1888,6 +3266,146 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
       ['営業', '', '=DCOUNT(A1:C4,C1,A6:A7)']
     ],
     expectedValues: { 'C7': 2 }
+  },
+  {
+    name: 'DCOUNTA',
+    category: 'データベース',
+    description: '条件付き非空白カウント',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', ''],
+      ['鈴木', '開発', 120],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DCOUNTA(A1:C4,A1,A6:A7)']
+    ],
+    expectedValues: { 'C7': 2 }
+  },
+  {
+    name: 'DMAX',
+    category: 'データベース',
+    description: '条件付き最大値',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '開発', 120],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DMAX(A1:C4,C1,A6:A7)']
+    ],
+    expectedValues: { 'C7': 150 }
+  },
+  {
+    name: 'DMIN',
+    category: 'データベース',
+    description: '条件付き最小値',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '開発', 120],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DMIN(A1:C4,C1,A6:A7)']
+    ],
+    expectedValues: { 'C7': 100 }
+  },
+  {
+    name: 'DPRODUCT',
+    category: 'データベース',
+    description: '条件付き積',
+    data: [
+      ['商品', 'カテゴリ', '数量'],
+      ['A', '文具', 2],
+      ['B', '文具', 3],
+      ['C', '家電', 4],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['カテゴリ', '', ''],
+      ['文具', '', '=DPRODUCT(A1:C4,C1,A6:A7)']
+    ],
+    expectedValues: { 'C7': 6 }
+  },
+  {
+    name: 'DSTDEV',
+    category: 'データベース',
+    description: '条件付き標準偏差',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '営業', 200],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DSTDEV(A1:C4,C1,A6:A7)']
+    ]
+  },
+  {
+    name: 'DSTDEVP',
+    category: 'データベース',
+    description: '条件付き母標準偏差',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '営業', 200],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DSTDEVP(A1:C4,C1,A6:A7)']
+    ]
+  },
+  {
+    name: 'DVAR',
+    category: 'データベース',
+    description: '条件付き分散',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '営業', 200],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DVAR(A1:C4,C1,A6:A7)']
+    ]
+  },
+  {
+    name: 'DVARP',
+    category: 'データベース',
+    description: '条件付き母分散',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '営業', 200],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DVARP(A1:C4,C1,A6:A7)']
+    ]
+  },
+  {
+    name: 'DGET',
+    category: 'データベース',
+    description: '条件に一致する単一値',
+    data: [
+      ['ID', '名前', '部署'],
+      [101, '田中', '営業'],
+      [102, '佐藤', '技術'],
+      [103, '鈴木', '人事'],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['ID', '', ''],
+      [102, '', '=DGET(A1:C4,B1,A6:A7)']
+    ],
+    expectedValues: { 'C7': '佐藤' }
   }
 ];
 
@@ -1948,6 +3466,346 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
       [0, 1, '=COMPLEX(A3,B3)']
     ],
     expectedValues: { 'C2': '3+4i', 'C3': 'i' }
+  },
+  {
+    name: 'BIN2HEX',
+    category: 'エンジニアリング',
+    description: '2進数→16進数',
+    data: [
+      ['2進数', '桁数', '16進数'],
+      ['1100100', 4, '=BIN2HEX(A2,B2)'],
+      ['1111', '', '=BIN2HEX(A3)']
+    ],
+    expectedValues: { 'C2': '0064', 'C3': 'F' }
+  },
+  {
+    name: 'BIN2OCT',
+    category: 'エンジニアリング',
+    description: '2進数→8進数',
+    data: [
+      ['2進数', '桁数', '8進数'],
+      ['1100100', 4, '=BIN2OCT(A2,B2)'],
+      ['111', '', '=BIN2OCT(A3)']
+    ],
+    expectedValues: { 'C2': '0144', 'C3': '7' }
+  },
+  {
+    name: 'DEC2HEX',
+    category: 'エンジニアリング',
+    description: '10進数→16進数',
+    data: [
+      ['10進数', '桁数', '16進数'],
+      [255, 4, '=DEC2HEX(A2,B2)'],
+      [1000, '', '=DEC2HEX(A3)']
+    ],
+    expectedValues: { 'C2': '00FF', 'C3': '3E8' }
+  },
+  {
+    name: 'DEC2OCT',
+    category: 'エンジニアリング',
+    description: '10進数→8進数',
+    data: [
+      ['10進数', '桁数', '8進数'],
+      [100, 4, '=DEC2OCT(A2,B2)'],
+      [8, '', '=DEC2OCT(A3)']
+    ],
+    expectedValues: { 'C2': '0144', 'C3': '10' }
+  },
+  {
+    name: 'HEX2BIN',
+    category: 'エンジニアリング',
+    description: '16進数→2進数',
+    data: [
+      ['16進数', '桁数', '2進数'],
+      ['F', 8, '=HEX2BIN(A2,B2)'],
+      ['3E8', '', '=HEX2BIN(A3)']
+    ],
+    expectedValues: { 'C2': '00001111' }
+  },
+  {
+    name: 'HEX2OCT',
+    category: 'エンジニアリング',
+    description: '16進数→8進数',
+    data: [
+      ['16進数', '桁数', '8進数'],
+      ['FF', 4, '=HEX2OCT(A2,B2)'],
+      ['3E8', '', '=HEX2OCT(A3)']
+    ],
+    expectedValues: { 'C2': '0377', 'C3': '1750' }
+  },
+  {
+    name: 'OCT2BIN',
+    category: 'エンジニアリング',
+    description: '8進数→2進数',
+    data: [
+      ['8進数', '桁数', '2進数'],
+      ['7', 3, '=OCT2BIN(A2,B2)'],
+      ['144', '', '=OCT2BIN(A3)']
+    ],
+    expectedValues: { 'C2': '111', 'C3': '1100100' }
+  },
+  {
+    name: 'OCT2DEC',
+    category: 'エンジニアリング',
+    description: '8進数→10進数',
+    data: [
+      ['8進数', '10進数'],
+      ['144', '=OCT2DEC(A2)'],
+      ['377', '=OCT2DEC(A3)']
+    ],
+    expectedValues: { 'B2': 100, 'B3': 255 }
+  },
+  {
+    name: 'OCT2HEX',
+    category: 'エンジニアリング',
+    description: '8進数→16進数',
+    data: [
+      ['8進数', '桁数', '16進数'],
+      ['144', 4, '=OCT2HEX(A2,B2)'],
+      ['377', '', '=OCT2HEX(A3)']
+    ],
+    expectedValues: { 'C2': '0064', 'C3': 'FF' }
+  },
+  {
+    name: 'IMABS',
+    category: 'エンジニアリング',
+    description: '複素数の絶対値',
+    data: [
+      ['複素数', '絶対値'],
+      ['3+4i', '=IMABS(A2)'],
+      ['5-12i', '=IMABS(A3)']
+    ],
+    expectedValues: { 'B2': 5, 'B3': 13 }
+  },
+  {
+    name: 'IMAGINARY',
+    category: 'エンジニアリング',
+    description: '複素数の虚部',
+    data: [
+      ['複素数', '虚部'],
+      ['3+4i', '=IMAGINARY(A2)'],
+      ['5-12i', '=IMAGINARY(A3)']
+    ],
+    expectedValues: { 'B2': 4, 'B3': -12 }
+  },
+  {
+    name: 'IMREAL',
+    category: 'エンジニアリング',
+    description: '複素数の実部',
+    data: [
+      ['複素数', '実部'],
+      ['3+4i', '=IMREAL(A2)'],
+      ['5-12i', '=IMREAL(A3)']
+    ],
+    expectedValues: { 'B2': 3, 'B3': 5 }
+  },
+  {
+    name: 'IMCONJUGATE',
+    category: 'エンジニアリング',
+    description: '複素共役',
+    data: [
+      ['複素数', '共役'],
+      ['3+4i', '=IMCONJUGATE(A2)'],
+      ['5-12i', '=IMCONJUGATE(A3)']
+    ],
+    expectedValues: { 'B2': '3-4i', 'B3': '5+12i' }
+  },
+  {
+    name: 'IMARGUMENT',
+    category: 'エンジニアリング',
+    description: '複素数の偏角',
+    data: [
+      ['複素数', '偏角'],
+      ['1+i', '=IMARGUMENT(A2)'],
+      ['-1+i', '=IMARGUMENT(A3)']
+    ],
+    expectedValues: { 'B2': 0.785398, 'B3': 2.356194 }
+  },
+  {
+    name: 'IMSUM',
+    category: 'エンジニアリング',
+    description: '複素数の和',
+    data: [
+      ['複素数1', '複素数2', '和'],
+      ['3+4i', '1+2i', '=IMSUM(A2,B2)'],
+      ['5-3i', '2+7i', '=IMSUM(A3,B3)']
+    ],
+    expectedValues: { 'C2': '4+6i', 'C3': '7+4i' }
+  },
+  {
+    name: 'IMSUB',
+    category: 'エンジニアリング',
+    description: '複素数の差',
+    data: [
+      ['複素数1', '複素数2', '差'],
+      ['3+4i', '1+2i', '=IMSUB(A2,B2)'],
+      ['5-3i', '2+7i', '=IMSUB(A3,B3)']
+    ],
+    expectedValues: { 'C2': '2+2i', 'C3': '3-10i' }
+  },
+  {
+    name: 'IMPRODUCT',
+    category: 'エンジニアリング',
+    description: '複素数の積',
+    data: [
+      ['複素数1', '複素数2', '積'],
+      ['3+4i', '1+2i', '=IMPRODUCT(A2,B2)'],
+      ['2+3i', '4-5i', '=IMPRODUCT(A3,B3)']
+    ],
+    expectedValues: { 'C2': '-5+10i', 'C3': '23+2i' }
+  },
+  {
+    name: 'IMDIV',
+    category: 'エンジニアリング',
+    description: '複素数の商',
+    data: [
+      ['複素数1', '複素数2', '商'],
+      ['1+2i', '3+4i', '=IMDIV(A2,B2)'],
+      ['5', '1+i', '=IMDIV(A3,B3)']
+    ]
+  },
+  {
+    name: 'IMPOWER',
+    category: 'エンジニアリング',
+    description: '複素数のべき乗',
+    data: [
+      ['複素数', 'べき指数', 'べき乗'],
+      ['2+2i', 2, '=IMPOWER(A2,B2)'],
+      ['1+i', 3, '=IMPOWER(A3,B3)']
+    ],
+    expectedValues: { 'C2': '0+8i' }
+  },
+  {
+    name: 'IMLOG10',
+    category: 'エンジニアリング',
+    description: '複素数の常用対数',
+    data: [
+      ['複素数', '常用対数'],
+      ['10+10i', '=IMLOG10(A2)'],
+      ['100', '=IMLOG10(A3)']
+    ]
+  },
+  {
+    name: 'IMLOG2',
+    category: 'エンジニアリング',
+    description: '複素数の2を底とする対数',
+    data: [
+      ['複素数', '対数'],
+      ['8+8i', '=IMLOG2(A2)'],
+      ['16', '=IMLOG2(A3)']
+    ]
+  },
+  {
+    name: 'ERF.PRECISE',
+    category: 'エンジニアリング',
+    description: '誤差関数（精密）',
+    data: [
+      ['値', '誤差関数'],
+      [1, '=ERF.PRECISE(A2)'],
+      [0.5, '=ERF.PRECISE(A3)']
+    ],
+    expectedValues: { 'B2': 0.84270079, 'B3': 0.52049988 }
+  },
+  {
+    name: 'ERFC.PRECISE',
+    category: 'エンジニアリング',
+    description: '相補誤差関数（精密）',
+    data: [
+      ['値', '相補誤差関数'],
+      [1, '=ERFC.PRECISE(A2)'],
+      [0.5, '=ERFC.PRECISE(A3)']
+    ],
+    expectedValues: { 'B2': 0.15729921, 'B3': 0.47950012 }
+  },
+  {
+    name: 'PHONETIC',
+    category: 'エンジニアリング',
+    description: 'ふりがなを抽出',
+    data: [
+      ['テキスト', 'ふりがな'],
+      ['漢字', '=PHONETIC(A2)'],
+      ['日本', '=PHONETIC(A3)']
+    ]
+  },
+  {
+    name: 'IMSQRT',
+    category: 'エンジニアリング',
+    description: '複素数の平方根',
+    data: [
+      ['複素数', '平方根'],
+      ['3+4i', '=IMSQRT(A2)'],
+      ['8+6i', '=IMSQRT(A3)']
+    ]
+  },
+  {
+    name: 'IMEXP',
+    category: 'エンジニアリング',
+    description: '複素数の指数',
+    data: [
+      ['複素数', '指数'],
+      ['1+i', '=IMEXP(A2)'],
+      ['2+3i', '=IMEXP(A3)']
+    ]
+  },
+  {
+    name: 'IMLN',
+    category: 'エンジニアリング',
+    description: '複素数の自然対数',
+    data: [
+      ['複素数', '自然対数'],
+      ['1+i', '=IMLN(A2)'],
+      ['2+3i', '=IMLN(A3)']
+    ]
+  },
+  {
+    name: 'IMLOG10',
+    category: 'エンジニアリング',
+    description: '複素数の常用対数',
+    data: [
+      ['複素数', '常用対数'],
+      ['10+10i', '=IMLOG10(A2)'],
+      ['100', '=IMLOG10(A3)']
+    ]
+  },
+  {
+    name: 'IMLOG2',
+    category: 'エンジニアリング',
+    description: '複素数の2を底とする対数',
+    data: [
+      ['複素数', '対数'],
+      ['8+8i', '=IMLOG2(A2)'],
+      ['16', '=IMLOG2(A3)']
+    ]
+  },
+  {
+    name: 'IMSIN',
+    category: 'エンジニアリング',
+    description: '複素数の正弦',
+    data: [
+      ['複素数', '正弦'],
+      ['1+i', '=IMSIN(A2)'],
+      ['π/2', '=IMSIN(A3)']
+    ]
+  },
+  {
+    name: 'IMCOS',
+    category: 'エンジニアリング',
+    description: '複素数の余弦',
+    data: [
+      ['複素数', '余弦'],
+      ['1+i', '=IMCOS(A2)'],
+      ['π', '=IMCOS(A3)']
+    ]
+  },
+  {
+    name: 'IMTAN',
+    category: 'エンジニアリング',
+    description: '複素数の正接',
+    data: [
+      ['複素数', '正接'],
+      ['1+i', '=IMTAN(A2)'],
+      ['π/4', '=IMTAN(A3)']
+    ]
   }
 ];
 
@@ -2077,6 +3935,196 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
       [5, 6, ''],
       [7, 8, '']
     ]
+  },
+  {
+    name: 'BYROW',
+    category: '動的配列',
+    description: '各行に関数を適用',
+    data: [
+      ['値1', '値2', '値3', '行の合計'],
+      [1, 2, 3, '=BYROW(A2:C4,LAMBDA(row,SUM(row)))'],
+      [4, 5, 6, ''],
+      [7, 8, 9, '']
+    ],
+    expectedValues: { 'D2': 6, 'D3': 15, 'D4': 24 }
+  },
+  {
+    name: 'BYCOL',
+    category: '動的配列',
+    description: '各列に関数を適用',
+    data: [
+      ['値1', '値2', '値3'],
+      [1, 4, 7],
+      [2, 5, 8],
+      [3, 6, 9],
+      ['列の合計', '', ''],
+      ['=BYCOL(A2:C4,LAMBDA(col,SUM(col)))', '', '']
+    ],
+    expectedValues: { 'A6': 6, 'B6': 15, 'C6': 24 }
+  },
+  {
+    name: 'MAKEARRAY',
+    category: '動的配列',
+    description: '配列を生成',
+    data: [
+      ['行数', '列数', '配列'],
+      [3, 4, '=MAKEARRAY(A2,B2,LAMBDA(r,c,r*c))']
+    ]
+  },
+  {
+    name: 'MAP',
+    category: '動的配列',
+    description: '配列の各要素に関数を適用',
+    data: [
+      ['値', '二乗'],
+      [1, '=MAP(A2:A5,LAMBDA(x,x^2))'],
+      [2, ''],
+      [3, ''],
+      [4, '']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 4, 'B4': 9, 'B5': 16 }
+  },
+  {
+    name: 'REDUCE',
+    category: '動的配列',
+    description: '配列を集約',
+    data: [
+      ['値', '累積合計'],
+      [1, ''],
+      [2, ''],
+      [3, ''],
+      [4, '=REDUCE(0,A2:A5,LAMBDA(acc,val,acc+val))']
+    ],
+    expectedValues: { 'B5': 10 }
+  },
+  {
+    name: 'SCAN',
+    category: '動的配列',
+    description: '配列を累積的に処理',
+    data: [
+      ['値', '累積合計'],
+      [1, '=SCAN(0,A2:A5,LAMBDA(acc,val,acc+val))'],
+      [2, ''],
+      [3, ''],
+      [4, '']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 3, 'B4': 6, 'B5': 10 }
+  },
+  {
+    name: 'SORTBY',
+    category: '動的配列',
+    description: '別の配列でソート',
+    data: [
+      ['商品', '売上', 'ソート結果'],
+      ['りんご', 300, '=SORTBY(A2:A5,B2:B5)'],
+      ['バナナ', 100, ''],
+      ['オレンジ', 400, ''],
+      ['ぶどう', 200, '']
+    ]
+  },
+  {
+    name: 'TAKE',
+    category: '動的配列',
+    description: '配列の一部を取得',
+    data: [
+      ['データ', '上位3つ'],
+      [100, '=TAKE(A2:A7,3)'],
+      [200, ''],
+      [300, ''],
+      [400, ''],
+      [500, ''],
+      [600, '']
+    ]
+  },
+  {
+    name: 'DROP',
+    category: '動的配列',
+    description: '配列の一部を削除',
+    data: [
+      ['データ', '最初の2つを削除'],
+      [100, '=DROP(A2:A7,2)'],
+      [200, ''],
+      [300, ''],
+      [400, ''],
+      [500, ''],
+      [600, '']
+    ]
+  },
+  {
+    name: 'EXPAND',
+    category: '動的配列',
+    description: '配列を拡張',
+    data: [
+      ['元データ', '', '拡張結果'],
+      [1, 2, '=EXPAND(A2:B3,4,3,"-")'],
+      [3, 4, ''],
+      ['', '', ''],
+      ['', '', '']
+    ]
+  },
+  {
+    name: 'TOCOL',
+    category: '動的配列',
+    description: '配列を1列に変換',
+    data: [
+      ['配列', '', '1列変換'],
+      [1, 2, '=TOCOL(A2:B3)'],
+      [3, 4, '']
+    ]
+  },
+  {
+    name: 'TOROW',
+    category: '動的配列',
+    description: '配列を1行に変換',
+    data: [
+      ['配列', '', '', '1行変換'],
+      [1, 2, '', '=TOROW(A2:B3)'],
+      [3, 4, '', '']
+    ]
+  },
+  {
+    name: 'CHOOSEROWS',
+    category: '動的配列',
+    description: '指定した行を選択',
+    data: [
+      ['データ', '列2', '選択結果'],
+      ['A', 1, '=CHOOSEROWS(A2:B5,1,3)'],
+      ['B', 2, ''],
+      ['C', 3, ''],
+      ['D', 4, '']
+    ]
+  },
+  {
+    name: 'CHOOSECOLS',
+    category: '動的配列',
+    description: '指定した列を選択',
+    data: [
+      ['データ', '列2', '列3', '選択結果'],
+      [1, 2, 3, '=CHOOSECOLS(A2:C4,1,3)'],
+      [4, 5, 6, ''],
+      [7, 8, 9, '']
+    ]
+  },
+  {
+    name: 'WRAPROWS',
+    category: '動的配列',
+    description: '配列を行で折り返し',
+    data: [
+      ['データ', '', '', '折り返し結果'],
+      [1, 2, 3, '=WRAPROWS(A2:C3,3)'],
+      [4, 5, 6, '']
+    ]
+  },
+  {
+    name: 'WRAPCOLS',
+    category: '動的配列',
+    description: '配列を列で折り返し',
+    data: [
+      ['データ', '', '折り返し結果'],
+      [1, 2, '=WRAPCOLS(A2:B4,2)'],
+      [3, 4, ''],
+      [5, 6, '']
+    ]
   }
 ];
 
@@ -2092,6 +4140,136 @@ export const webFunctionTests: IndividualFunctionTest[] = [
       ['こんにちは', '=ENCODEURL(A3)']
     ],
     expectedValues: { 'B2': 'Hello%20World' }
+  },
+  {
+    name: 'SPLIT',
+    category: 'Web',
+    description: 'テキストを分割',
+    data: [
+      ['テキスト', '区切り文字', '分割結果'],
+      ['apple,banana,orange', ',', '=SPLIT(A2,B2)'],
+      ['one-two-three', '-', '=SPLIT(A3,B3)']
+    ]
+  },
+  {
+    name: 'JOIN',
+    category: 'Web',
+    description: 'テキストを結合',
+    data: [
+      ['区切り文字', '値1', '値2', '値3', '結合結果'],
+      [',', 'apple', 'banana', 'orange', '=JOIN(A2,B2:D2)'],
+      ['-', 'one', 'two', 'three', '=JOIN(A3,B3:D3)']
+    ],
+    expectedValues: { 'E2': 'apple,banana,orange', 'E3': 'one-two-three' }
+  },
+  {
+    name: 'QUERY',
+    category: 'Web',
+    description: 'データのクエリ',
+    data: [
+      ['名前', '年齢', '部署', '', 'クエリ結果'],
+      ['田中', 25, '営業', '', '=QUERY(A2:C4,"SELECT A, B WHERE B > 25")'],
+      ['佐藤', 30, '技術', '', ''],
+      ['鈴木', 28, '人事', '', '']
+    ]
+  },
+  {
+    name: 'FLATTEN',
+    category: 'Web',
+    description: '多次元配列を1次元に',
+    data: [
+      ['配列1', '', '配列2', '', 'フラット化'],
+      [1, 2, 5, 6, '=FLATTEN(A2:D3)'],
+      [3, 4, 7, 8, '']
+    ]
+  },
+  {
+    name: 'ARRAYFORMULA',
+    category: 'Web',
+    description: '配列数式',
+    data: [
+      ['値', '結果'],
+      [1, '=ARRAYFORMULA(A2:A5*2)'],
+      [2, ''],
+      [3, ''],
+      [4, '']
+    ],
+    expectedValues: { 'B2': 2, 'B3': 4, 'B4': 6, 'B5': 8 }
+  },
+  {
+    name: 'REGEXEXTRACT',
+    category: 'Web',
+    description: '正規表現で抽出',
+    data: [
+      ['テキスト', 'パターン', '抽出結果'],
+      ['abc123def', '[0-9]+', '=REGEXEXTRACT(A2,B2)'],
+      ['test@example.com', '[^@]+', '=REGEXEXTRACT(A3,B3)']
+    ],
+    expectedValues: { 'C2': '123', 'C3': 'test' }
+  },
+  {
+    name: 'REGEXMATCH',
+    category: 'Web',
+    description: '正規表現でマッチ',
+    data: [
+      ['テキスト', 'パターン', 'マッチ'],
+      ['abc123', '[0-9]+', '=REGEXMATCH(A2,B2)'],
+      ['abcdef', '[0-9]+', '=REGEXMATCH(A3,B3)']
+    ],
+    expectedValues: { 'C2': true, 'C3': false }
+  },
+  {
+    name: 'REGEXREPLACE',
+    category: 'Web',
+    description: '正規表現で置換',
+    data: [
+      ['テキスト', 'パターン', '置換文字', '結果'],
+      ['abc123def', '[0-9]+', 'XXX', '=REGEXREPLACE(A2,B2,C2)'],
+      ['hello world', ' ', '_', '=REGEXREPLACE(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 'abcXXXdef', 'D3': 'hello_world' }
+  },
+  {
+    name: 'SORTN',
+    category: 'Web',
+    description: '上位N件をソート',
+    data: [
+      ['値', 'ソート結果'],
+      [85, '=SORTN(A2:A6,3)'],
+      [92, ''],
+      [78, ''],
+      [95, ''],
+      [88, '']
+    ]
+  },
+  {
+    name: 'WEBSERVICE',
+    category: 'Web',
+    description: 'Webサービスからデータ取得',
+    data: [
+      ['URL', '取得結果'],
+      ['https://api.example.com/data', '=WEBSERVICE(A2)']
+    ]
+  },
+  {
+    name: 'FILTERXML',
+    category: 'Web',
+    description: 'XMLからデータ抽出',
+    data: [
+      ['XMLデータ', 'XPath', '抽出結果'],
+      ['<root><item>Value1</item><item>Value2</item></root>', '//item[1]', '=FILTERXML(A2,B2)']
+    ],
+    expectedValues: { 'C2': 'Value1' }
+  },
+  {
+    name: 'SPARKLINE',
+    category: 'Web',
+    description: 'ミニグラフを作成',
+    data: [
+      ['データ', '', '', '', 'スパークライン'],
+      [1, 3, 2, 5, '=SPARKLINE(A2:D2)'],
+      [4, 2, 6, 3, '=SPARKLINE(A3:D3,{"charttype","column"})']
+    ]
   }
 ];
 
@@ -2104,6 +4282,7 @@ export const allIndividualFunctionTests: IndividualFunctionTest[] = [
   ...logicalFunctionTests,
   ...lookupFunctionTests,
   ...financialFunctionTests,
+  ...matrixFunctionTests,
   ...informationFunctionTests,
   ...databaseFunctionTests,
   ...engineeringFunctionTests,
