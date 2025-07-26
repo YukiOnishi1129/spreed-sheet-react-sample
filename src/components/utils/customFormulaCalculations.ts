@@ -48,9 +48,14 @@ export const recalculateFormulas = (
           return { value: cell.value ?? '' };
         }
         
-        // 通常の値
+        // 通常の値（数値はそのまま保持）
         if (typeof cell === 'string' || typeof cell === 'number' || cell === null) {
           return { value: cell };
+        }
+        
+        // オブジェクトの場合、valueプロパティを探す
+        if (cell && typeof cell === 'object' && 'value' in cell) {
+          return { value: cell.value };
         }
         
         return { value: String(cell) };
@@ -78,6 +83,15 @@ export const recalculateFormulas = (
           result.formula = cell.formula;
           result['data-formula'] = cell.formula;
           
+          // Row 12のデバッグ
+          if (rowIndex === 12 && cell.formula.includes('INDEX')) {
+            console.log(`Processing cell [${rowIndex}][${colIndex}]:`, {
+              formula: cell.formula,
+              value: cell.value,
+              formattedValue: formatCellValue(cell.value, cell.formula)
+            });
+          }
+          
           // 日付のフォーマットを適用
           const formattedValue = formatCellValue(cell.value, cell.formula);
           if (typeof formattedValue === 'string' || typeof formattedValue === 'number' || formattedValue === null) {
@@ -104,6 +118,11 @@ export const recalculateFormulas = (
       })
     );
     
+    // Row 12（商品名）の結果を確認
+    if (processedData[12]) {
+      console.log('Row 12 (商品名) results:', processedData[12].map((cell, idx) => `[${idx}]=${cell.value}`));
+    }
+    
     console.log('再計算完了:', processedData);
     setValue('spreadsheetData', processedData);
     
@@ -127,6 +146,11 @@ function calculateAllFormulas(data: CellData[][]): CellData[][] {
         if (cell.formula && (cell.value === undefined || cell.value === '' || typeof cell.value === 'string')) {
           const calculatedValue = calculateSingleFormula(cell.formula, result, rowIndex, colIndex);
           
+          // Row 12のINDEX式の結果を確認
+          if (rowIndex === 12 && cell.formula.includes('INDEX')) {
+            console.log(`Cell [${rowIndex}][${colIndex}] formula result:`, calculatedValue);
+          }
+          
           if (calculatedValue !== cell.value) {
             cell.value = calculatedValue;
             hasChanges = true;
@@ -143,33 +167,122 @@ function calculateAllFormulas(data: CellData[][]): CellData[][] {
   return result;
 }
 
+// ネストされた関数を評価する
+function evaluateNestedFormula(formula: string, context: FormulaContext): string {
+  let evaluatedFormula = formula;
+  let hasChanges = true;
+  let iterations = 0;
+  const maxIterations = 10;
+  
+  // INDEX式の評価をトレース
+  if (formula.includes('INDEX') && context.row === 12) {
+    console.log(`Evaluating nested formula at row ${context.row}:`, formula);
+  }
+  
+  while (hasChanges && iterations < maxIterations) {
+    hasChanges = false;
+    iterations++;
+    
+    // 最も内側の関数から評価する - より正確なパターンマッチング
+    const innerFunctionRegex = /([A-Z]+(?:\.[A-Z]+)?)\(([^()]*)\)/;
+    const matches = [...evaluatedFormula.matchAll(new RegExp(innerFunctionRegex, 'g'))];
+    
+    // 最も深い（最後の）マッチから処理
+    for (let i = matches.length - 1; i >= 0; i--) {
+      const match = matches[i];
+      const fullMatch = match[0];
+      const functionName = match[1];
+      
+      // この関数を評価
+      const matchResult = matchFormula(fullMatch);
+      if (matchResult) {
+        try {
+          const result = matchResult.function.calculate(matchResult.matches, context);
+          
+          // 結果を文字列に変換して置換
+          let resultStr: string;
+          if (result === null || result === undefined) {
+            resultStr = '0';
+          } else if (typeof result === 'number') {
+            resultStr = result.toString();
+          } else if (typeof result === 'string') {
+            // エラー値の場合はそのまま、通常の文字列は引用符で囲む
+            if (result.startsWith('#')) {
+              resultStr = result;
+            } else {
+              resultStr = `"${result}"`;
+            }
+          } else {
+            resultStr = String(result);
+          }
+          evaluatedFormula = evaluatedFormula.replace(fullMatch, resultStr);
+          hasChanges = true;
+        } catch (error) {
+          console.error(`Error evaluating ${functionName}:`, error);
+          return formula; // Return original formula on error
+        }
+      }
+    }
+  }
+  
+  // INDEX式の最終結果をトレース
+  if (formula.includes('INDEX') && context.row === 12) {
+    console.log(`Nested formula evaluation completed:`, evaluatedFormula);
+  }
+  
+  return evaluatedFormula;
+}
+
 // 単一の数式を計算する関数
 function calculateSingleFormula(formula: string, data: CellData[][], currentRow: number, currentCol: number): FormulaResult {
   try {
     // 先頭の = を除去
     const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;
     
+    // FormulaContextを作成
+    const context: FormulaContext = {
+      data,
+      row: currentRow,
+      col: currentCol
+    };
+    
+    // ネストされた関数を評価
+    const evaluatedFormula = evaluateNestedFormula(cleanFormula, context);
+    
     // カスタム関数のマッチングを試行
-    console.log(`Attempting to match formula: ${cleanFormula}`);
-    const matchResult = matchFormula(cleanFormula);
+    let matchResult = matchFormula(evaluatedFormula);
+    
+    // もし関数が見つからなかった場合
+    if (!matchResult && evaluatedFormula !== cleanFormula) {
+      // 引用符で囲まれた文字列の場合は、その値を返す
+      if (evaluatedFormula.startsWith('"') && evaluatedFormula.endsWith('"')) {
+        return evaluatedFormula.slice(1, -1);
+      }
+      
+      // それ以外の場合のみ、元の式でも試す
+      matchResult = matchFormula(cleanFormula);
+    }
     
     if (matchResult) {
-      console.log(`数式 ${cleanFormula} を関数 ${matchResult.function.name} で計算中`);
-      
-      // FormulaContextを作成
-      const context: FormulaContext = {
-        data,
-        row: currentRow,
-        col: currentCol
-      };
-      
       // 関数を実行
       const result = matchResult.function.calculate(matchResult.matches, context);
-      console.log(`計算結果:`, result);
-      
       return result;
     } else {
-      console.warn(`未対応の数式: ${cleanFormula}`);
+      // 評価済みの式が単純な値の場合
+      const num = parseFloat(evaluatedFormula);
+      if (!isNaN(num)) {
+        return num;
+      }
+      if (evaluatedFormula.startsWith('"') && evaluatedFormula.endsWith('"')) {
+        return evaluatedFormula.slice(1, -1);
+      }
+      
+      // エラー値の場合はそのまま返す
+      if (evaluatedFormula.startsWith('#')) {
+        return evaluatedFormula as FormulaResult;
+      }
+      
+      console.warn(`未対応の数式: ${evaluatedFormula} (original: ${cleanFormula})`);
       return `#NAME?`; // 未対応の関数エラー
     }
   } catch (error) {

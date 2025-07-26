@@ -256,6 +256,8 @@ export const demoSpreadsheetData: DemoCategory[] = [
       ['', '', '', ''],
       ['順位', '1位', '2位', '3位'],
       ['商品名', '=INDEX($B$2:$B$5,MATCH(LARGE($C$2:$C$5,1),$C$2:$C$5,0))', '=INDEX($B$2:$B$5,MATCH(LARGE($C$2:$C$5,2),$C$2:$C$5,0))', '=INDEX($B$2:$B$5,MATCH(LARGE($C$2:$C$5,3),$C$2:$C$5,0))'],
+      ['最高単価', '=LARGE($C$2:$C$5,1)', '=LARGE($C$2:$C$5,2)', '=LARGE($C$2:$C$5,3)'],
+      ['MATCH結果', '=MATCH(120000,$C$2:$C$5,0)', '=MATCH(45000,$C$2:$C$5,0)', '=MATCH(8000,$C$2:$C$5,0)'],
     ],
     expectedResults: {
       'B8': 'マウス',
@@ -269,7 +271,10 @@ export const demoSpreadsheetData: DemoCategory[] = [
       'D10': 5,
       'B13': 'ノートPC',
       'C13': 'モニター',
-      'D13': 'キーボード'
+      'D13': 'キーボード',
+      'B14': 120000,
+      'C14': 45000,
+      'D14': 8000
     }
   }
 ];

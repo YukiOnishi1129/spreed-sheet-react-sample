@@ -2,7 +2,8 @@
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue, getCellRangeValues } from '../shared/utils';
+import { getCellValue, getCellRangeValues, parseCellRange } from '../shared/utils';
+import { matchFormula } from '../index';
 
 // VLOOKUP関数の実装
 export const VLOOKUP: CustomFormula = {
@@ -21,83 +22,72 @@ export const VLOOKUP: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      // テーブル配列から値を取得
-      const tableValues = getCellRangeValues(tableArray.trim(), context);
+      // 範囲を解析
+      const rangeCoords = parseCellRange(tableArray.trim());
+      if (!rangeCoords) {
+        return FormulaError.REF;
+      }
+      
+      const { start, end } = rangeCoords;
+      const numCols = end.col - start.col + 1;
+      
+      if (columnIndex > numCols) {
+        return FormulaError.REF;
+      }
       
       // 範囲検索の設定（デフォルトはTRUE）
       const exactMatch = rangeLookup && (rangeLookup.toUpperCase() === 'FALSE' || rangeLookup === '0');
       
-      // テーブルが2次元配列になっているかチェック
-      if (!Array.isArray(tableValues) || tableValues.length === 0) {
-        return FormulaError.REF;
-      }
-      
-      // 行数と列数を計算（範囲から推定）
-      const rangeParts = tableArray.trim().split(':');
-      if (rangeParts.length !== 2) {
-        return FormulaError.REF;
-      }
-      
-      // セル範囲から行数と列数を計算
-      const [startCell, endCell] = rangeParts;
-      const startMatch = startCell.match(/([A-Z]+)(\d+)/);
-      const endMatch = endCell.match(/([A-Z]+)(\d+)/);
-      
-      if (!startMatch || !endMatch) {
-        return FormulaError.REF;
-      }
-      
-      const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const cols = endCol - startCol + 1;
-      
-      if (columnIndex > cols) {
-        return FormulaError.REF;
-      }
-      
-      const rows = Math.ceil(tableValues.length / cols);
-      
-      // 2次元配列に変換
-      const table: unknown[][] = [];
-      for (let i = 0; i < rows; i++) {
-        const row: unknown[] = [];
-        for (let j = 0; j < cols; j++) {
-          const index = i * cols + j;
-          row.push(index < tableValues.length ? tableValues[index] : null);
+      // 各行を検索
+      for (let row = start.row; row <= end.row; row++) {
+        // 最初の列の値を取得
+        const firstColValue = context.data[row]?.[start.col];
+        let compareValue: unknown;
+        
+        // Handle both direct values and object values
+        if (typeof firstColValue === 'string' || typeof firstColValue === 'number' || firstColValue === null || firstColValue === undefined) {
+          compareValue = firstColValue;
+        } else if (firstColValue && typeof firstColValue === 'object') {
+          compareValue = firstColValue.value ?? firstColValue.v ?? firstColValue._ ?? firstColValue;
+        } else {
+          compareValue = firstColValue;
         }
-        table.push(row);
-      }
-      
-      // 検索実行
-      for (let i = 0; i < table.length; i++) {
-        const firstColumnValue = table[i][0];
         
         if (exactMatch) {
           // 完全一致検索
-          if (String(firstColumnValue) === String(searchValue)) {
-            const result = table[i][columnIndex - 1];
-            return result === undefined ? null : result as FormulaResult;
+          if (String(compareValue) === String(searchValue)) {
+            // 指定された列の値を返す
+            const targetCol = start.col + columnIndex - 1;
+            const resultCell = context.data[row]?.[targetCol];
+            
+            // Handle both direct values and object values
+            if (typeof resultCell === 'string' || typeof resultCell === 'number' || resultCell === null || resultCell === undefined) {
+              return resultCell as FormulaResult;
+            } else if (resultCell && typeof resultCell === 'object') {
+              return (resultCell.value ?? resultCell.v ?? resultCell._ ?? resultCell) as FormulaResult;
+            } else {
+              return resultCell as FormulaResult;
+            }
           }
         } else {
-          // 範囲検索（近似一致）
-          const numericSearch = Number(searchValue);
-          const numericFirst = Number(firstColumnValue);
-          
-          if (!isNaN(numericSearch) && !isNaN(numericFirst)) {
-            if (numericFirst <= numericSearch) {
-              // 次の行をチェック
-              if (i === table.length - 1 || Number(table[i + 1][0]) > numericSearch) {
-                const result = table[i][columnIndex - 1];
-                return result === undefined ? null : result as FormulaResult;
-              }
+          // 近似一致検索（簡略化版）
+          if (compareValue !== null && compareValue !== undefined && compareValue !== '' && compareValue <= searchValue) {
+            const targetCol = start.col + columnIndex - 1;
+            const resultCell = context.data[row]?.[targetCol];
+            
+            // Handle both direct values and object values
+            if (typeof resultCell === 'string' || typeof resultCell === 'number' || resultCell === null || resultCell === undefined) {
+              return resultCell as FormulaResult;
+            } else if (resultCell && typeof resultCell === 'object') {
+              return (resultCell.value ?? resultCell.v ?? resultCell._ ?? resultCell) as FormulaResult;
+            } else {
+              return resultCell as FormulaResult;
             }
-          } else if (String(firstColumnValue) === String(searchValue)) {
-            const result = table[i][columnIndex - 1];
-            return result === undefined ? null : result as FormulaResult;
           }
         }
       }
       
+      // 値が見つからない場合
       return FormulaError.NA;
     } catch {
       return FormulaError.VALUE;
@@ -217,54 +207,89 @@ export const INDEX: CustomFormula = {
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, arrayRange, rowNum, colNum] = matches;
     
+    
     try {
-      // 配列の値を取得
-      const arrayValues = getCellRangeValues(arrayRange.trim(), context);
+      // 範囲を解析
+      const rangeCoords = parseCellRange(arrayRange.trim());
+      if (!rangeCoords) {
+        return FormulaError.REF;
+      }
       
-      // 行番号を取得
-      const rowIndex = parseInt(getCellValue(rowNum.trim(), context)?.toString() ?? rowNum.trim()) - 1;
+      const { start, end } = rangeCoords;
       
-      // 列番号を取得（省略可能）
-      const colIndex = colNum 
-        ? parseInt(getCellValue(colNum.trim(), context)?.toString() ?? colNum.trim()) - 1
-        : 0;
+      // 行番号を取得（1ベース）
+      // MATCH関数の結果など、ネストされた関数の評価結果を処理
+      let rowValue;
+      const trimmedRowNum = rowNum.trim();
       
-      if (rowIndex < 0 || colIndex < 0) {
+      // 数値の場合
+      if (!isNaN(Number(trimmedRowNum))) {
+        rowValue = Number(trimmedRowNum);
+      } 
+      // セル参照の場合
+      else if (trimmedRowNum.match(/^[A-Z]+\d+$/)) {
+        rowValue = getCellValue(trimmedRowNum, context);
+      }
+      // MATCH関数などの結果の場合
+      else {
+        // ネストされた関数の評価結果として数値が来ることを想定
+        const nestedMatch = matchFormula(trimmedRowNum);
+        if (nestedMatch) {
+          rowValue = nestedMatch.function.calculate(nestedMatch.matches, context);
+        } else {
+          rowValue = trimmedRowNum;
+        }
+      }
+      
+      const rowIndex = parseInt(String(rowValue)) - 1;
+      
+      // 列番号を取得（省略可能、1ベース）
+      let colIndex = 0;
+      if (colNum) {
+        const colValue = getCellValue(colNum.trim(), context) ?? colNum.trim();
+        colIndex = parseInt(String(colValue)) - 1;
+      }
+      
+      if (isNaN(rowIndex) || rowIndex < 0) {
         return FormulaError.VALUE;
       }
       
-      // 範囲から行数と列数を計算
-      const rangeParts = arrayRange.trim().split(':');
-      if (rangeParts.length !== 2) {
+      if (isNaN(colIndex) || colIndex < 0) {
+        return FormulaError.VALUE;
+      }
+      
+      // 実際のセル位置を計算
+      const targetRow = start.row + rowIndex;
+      const targetCol = start.col + colIndex;
+      
+      // 範囲チェック
+      if (targetRow > end.row || targetCol > end.col) {
         return FormulaError.REF;
       }
       
-      const [startCell, endCell] = rangeParts;
-      const startMatch = startCell.match(/([A-Z]+)(\d+)/);
-      const endMatch = endCell.match(/([A-Z]+)(\d+)/);
-      
-      if (!startMatch || !endMatch) {
-        return FormulaError.REF;
+      // データを直接取得
+      if (targetRow >= 0 && targetRow < context.data.length && 
+          targetCol >= 0 && targetCol < context.data[0]?.length) {
+        const cellData = context.data[targetRow][targetCol];
+        
+        // INDEXの結果だけログ出力
+        if (context.row === 12) {
+          console.log(`INDEX(${arrayRange},${rowNum}) => row=${targetRow}, col=${targetCol}, data=${JSON.stringify(cellData)}`);
+        }
+        
+        // Handle both direct values and object values
+        let result: FormulaResult;
+        if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {
+          result = cellData as FormulaResult;
+        } else if (cellData && typeof cellData === 'object') {
+          result = (cellData.value ?? cellData.v ?? cellData._ ?? cellData) as FormulaResult;
+        } else {
+          result = cellData as FormulaResult;
+        }
+        return result;
       }
       
-      const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const cols = endCol - startCol + 1;
-      const rows = Math.ceil(arrayValues.length / cols);
-      
-      if (rowIndex >= rows || colIndex >= cols) {
-        return FormulaError.REF;
-      }
-      
-      // 2次元配列のインデックスを1次元配列のインデックスに変換
-      const flatIndex = rowIndex * cols + colIndex;
-      
-      if (flatIndex >= arrayValues.length) {
-        return FormulaError.REF;
-      }
-      
-      const result = arrayValues[flatIndex];
-      return result === undefined ? null : result as FormulaResult;
+      return FormulaError.REF;
     } catch {
       return FormulaError.VALUE;
     }
@@ -280,10 +305,22 @@ export const MATCH: CustomFormula = {
     
     try {
       // 検索値を取得
-      const searchValue = getCellValue(lookupValue.trim(), context) ?? lookupValue.trim().replace(/^["']|["']$/g, '');
+      let searchValue;
+      // 数値の直接入力の場合
+      const numValue = parseFloat(lookupValue.trim());
+      if (!isNaN(numValue)) {
+        searchValue = numValue;
+      } else {
+        // セル参照または文字列の場合
+        searchValue = getCellValue(lookupValue.trim(), context);
+        if (searchValue === FormulaError.REF || searchValue === null || searchValue === undefined) {
+          searchValue = lookupValue.trim().replace(/^["']|["']$/g, '');
+        }
+      }
       
       // 配列の値を取得
       const arrayValues = getCellRangeValues(lookupArray.trim(), context);
+      
       
       // 一致タイプを取得（デフォルトは1）
       const matchTypeNum = matchType ? parseInt(matchType) : 1;

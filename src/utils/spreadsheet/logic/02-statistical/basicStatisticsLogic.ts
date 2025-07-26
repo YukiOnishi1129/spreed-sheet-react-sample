@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue, getCellRangeValues } from '../shared/utils';
+import { getCellValue, getCellRangeValues, parseCellRange } from '../shared/utils';
 
 // セル範囲から数値のみを抽出するヘルパー関数
 function extractNumbersFromRange(rangeRef: string, context: FormulaContext): number[] {
@@ -11,16 +11,28 @@ function extractNumbersFromRange(rangeRef: string, context: FormulaContext): num
   if (rangeRef.includes(':')) {
     // セル範囲の場合
     const values = getCellRangeValues(rangeRef, context);
-    values.forEach(value => {
-      const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+    
+    values.forEach((value) => {
+      // Handle object wrapped values
+      let actualValue = value;
+      if (value && typeof value === 'object' && 'value' in value) {
+        actualValue = value.value;
+      }
+      
+      const num = typeof actualValue === 'string' ? parseFloat(actualValue) : Number(actualValue);
       if (!isNaN(num) && isFinite(num)) {
         numbers.push(num);
       }
     });
-  } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
-    // 単一セル参照の場合
+  } else if (rangeRef.match(/^\$?[A-Z]+\$?\d+$/)) {
+    // 単一セル参照の場合（絶対参照も含む）
     const cellValue = getCellValue(rangeRef, context);
-    const num = typeof cellValue === 'string' ? parseFloat(cellValue) : Number(cellValue);
+    let actualValue = cellValue;
+    if (cellValue && typeof cellValue === 'object' && 'value' in cellValue) {
+      actualValue = cellValue.value;
+    }
+    
+    const num = typeof actualValue === 'string' ? parseFloat(actualValue) : Number(actualValue);
     if (!isNaN(num) && isFinite(num)) {
       numbers.push(num);
     }
@@ -414,9 +426,27 @@ export const LARGE: CustomFormula = {
     const [, arrayRef, kRef] = matches;
     
     const numbers = extractNumbersFromRange(arrayRef.trim(), context);
-    const k = Number(getCellValue(kRef.trim(), context) ?? kRef);
     
-    if (numbers.length === 0 || isNaN(k) || k <= 0 || k > numbers.length || !Number.isInteger(k)) {
+    // k値を取得（数値の直接入力も考慮）
+    let k;
+    const kTrimmed = kRef.trim();
+    const directK = parseFloat(kTrimmed);
+    if (!isNaN(directK)) {
+      k = directK;
+    } else {
+      const kValue = getCellValue(kTrimmed, context);
+      k = Number(kValue);
+      if (isNaN(k)) {
+        k = Number(kTrimmed);
+      }
+    }
+    
+    
+    if (numbers.length === 0) {
+      return FormulaError.NUM;
+    }
+    
+    if (isNaN(k) || k <= 0 || k > numbers.length || !Number.isInteger(k)) {
       return FormulaError.NUM;
     }
     

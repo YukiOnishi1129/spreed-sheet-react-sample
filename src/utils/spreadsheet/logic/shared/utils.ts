@@ -58,7 +58,16 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
   
   // セルデータがオブジェクトの場合のみプロパティを探す
   if (cellData && typeof cellData === 'object') {
-    return cellData.value ?? cellData.v ?? cellData._ ?? cellData;
+    // If the object itself has a numeric or string representation, return it
+    const value = cellData.value ?? cellData.v ?? cellData._ ?? null;
+    if (value !== null && value !== undefined) {
+      return value;
+    }
+    // If we have a formula cell that hasn't been calculated yet, return empty
+    if ('formula' in cellData || 'f' in cellData) {
+      return '';
+    }
+    return cellData;
   }
   
   return cellData;
@@ -67,7 +76,10 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
 // セル範囲から値の配列を取得
 export const getCellRangeValues = (range: string, context: FormulaContext): unknown[] => {
   const rangeCoords = parseCellRange(range);
-  if (!rangeCoords) return [];
+  if (!rangeCoords) {
+    console.log(`getCellRangeValues: Failed to parse range ${range}`);
+    return [];
+  }
   
   const { start, end } = rangeCoords;
   const values: unknown[] = [];
@@ -82,7 +94,14 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
         if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {
           value = cellData;
         } else if (cellData && typeof cellData === 'object') {
-          value = cellData.value ?? cellData.v ?? cellData._ ?? cellData;
+          value = cellData.value ?? cellData.v ?? cellData._ ?? null;
+          // Skip formula cells that haven't been calculated yet
+          if (value === null && ('formula' in cellData || 'f' in cellData)) {
+            continue;
+          }
+          if (value === null) {
+            value = cellData;
+          }
         } else {
           value = cellData;
         }

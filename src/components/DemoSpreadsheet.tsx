@@ -31,6 +31,8 @@ function DemoSpreadsheet() {
   const initializeAndCalculate = () => {
     setIsCalculating(true);
     
+    console.log('Selected category:', selectedCategory.name, selectedCategory.id);
+    
     const initialData: Matrix<CellBase> = selectedCategory.data.map((row) => 
       row.map((cellValue) => {
         // 数式が直接入っている場合
