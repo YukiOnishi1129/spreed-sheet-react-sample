@@ -485,6 +485,108 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
       ['=PI()']
     ],
     expectedValues: { 'A2': 3.141592654 }
+  },
+  // 追加の数学関数
+  {
+    name: 'LOG10',
+    category: '数学',
+    description: '常用対数を計算',
+    data: [
+      ['値', '常用対数'],
+      [100, '=LOG10(A2)'],
+      [1000, '=LOG10(A3)']
+    ],
+    expectedValues: { 'B2': 2, 'B3': 3 }
+  },
+  {
+    name: 'CEILING.MATH',
+    category: '数学',
+    description: '数学的な切り上げ',
+    data: [
+      ['値', '基準値', '結果'],
+      [4.3, 1, '=CEILING.MATH(A2,B2)'],
+      [-4.3, 1, '=CEILING.MATH(A3,B3)']
+    ],
+    expectedValues: { 'C2': 5, 'C3': -4 }
+  },
+  {
+    name: 'FLOOR.MATH',
+    category: '数学',
+    description: '数学的な切り下げ',
+    data: [
+      ['値', '基準値', '結果'],
+      [4.7, 1, '=FLOOR.MATH(A2,B2)'],
+      [-4.7, 1, '=FLOOR.MATH(A3,B3)']
+    ],
+    expectedValues: { 'C2': 4, 'C3': -5 }
+  },
+  {
+    name: 'EVEN',
+    category: '数学',
+    description: '最も近い偶数に切り上げ',
+    data: [
+      ['値', '偶数'],
+      [3, '=EVEN(A2)'],
+      [4, '=EVEN(A3)'],
+      [5.1, '=EVEN(A4)']
+    ],
+    expectedValues: { 'B2': 4, 'B3': 4, 'B4': 6 }
+  },
+  {
+    name: 'ODD',
+    category: '数学',
+    description: '最も近い奇数に切り上げ',
+    data: [
+      ['値', '奇数'],
+      [2, '=ODD(A2)'],
+      [3, '=ODD(A3)'],
+      [4.1, '=ODD(A4)']
+    ],
+    expectedValues: { 'B2': 3, 'B3': 3, 'B4': 5 }
+  },
+  {
+    name: 'SINH',
+    category: '三角',
+    description: '双曲線正弦を計算',
+    data: [
+      ['値', '双曲線正弦'],
+      [0, '=SINH(A2)'],
+      [1, '=SINH(A3)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 1.175201 }
+  },
+  {
+    name: 'COSH',
+    category: '三角',
+    description: '双曲線余弦を計算',
+    data: [
+      ['値', '双曲線余弦'],
+      [0, '=COSH(A2)'],
+      [1, '=COSH(A3)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 1.543081 }
+  },
+  {
+    name: 'TANH',
+    category: '三角',
+    description: '双曲線正接を計算',
+    data: [
+      ['値', '双曲線正接'],
+      [0, '=TANH(A2)'],
+      [0.5, '=TANH(A3)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.462117 }
+  },
+  {
+    name: 'ATAN2',
+    category: '三角',
+    description: 'x,y座標から角度を計算',
+    data: [
+      ['X座標', 'Y座標', '角度(ラジアン)'],
+      [1, 1, '=ATAN2(A2,B2)'],
+      [0, 1, '=ATAN2(A3,B3)']
+    ],
+    expectedValues: { 'C2': 0.785398, 'C3': 1.570796 }
   }
 ];
 
@@ -773,6 +875,72 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
       [1, 2, 3, 4, 1, '=QUARTILE(A2:D2,E2)']
     ],
     expectedValues: { 'F2': 1.75 }
+  },
+  // 追加の統計関数
+  {
+    name: 'SKEW',
+    category: '統計',
+    description: '歪度を計算',
+    data: [
+      ['値1', '値2', '値3', '値4', '値5', '歪度'],
+      [3, 4, 5, 2, 1, '=SKEW(A2:E2)']
+    ]
+  },
+  {
+    name: 'KURT',
+    category: '統計',
+    description: '尖度を計算',
+    data: [
+      ['値1', '値2', '値3', '値4', '値5', '尖度'],
+      [3, 4, 5, 2, 1, '=KURT(A2:E2)']
+    ]
+  },
+  {
+    name: 'STANDARDIZE',
+    category: '統計',
+    description: '標準化する',
+    data: [
+      ['値', '平均', '標準偏差', '標準化値'],
+      [42, 40, 1.5, '=STANDARDIZE(A2,B2,C2)']
+    ],
+    expectedValues: { 'D2': 1.333333 }
+  },
+  {
+    name: 'DEVSQ',
+    category: '統計',
+    description: '偏差平方和を計算',
+    data: [
+      ['値1', '値2', '値3', '値4', '偏差平方和'],
+      [4, 5, 8, 7, '=DEVSQ(A2:D2)']
+    ],
+    expectedValues: { 'E2': 10 }
+  },
+  {
+    name: 'GEOMEAN',
+    category: '統計',
+    description: '幾何平均を計算',
+    data: [
+      ['値1', '値2', '値3', '値4', '幾何平均'],
+      [4, 5, 8, 7, '=GEOMEAN(A2:D2)']
+    ]
+  },
+  {
+    name: 'HARMEAN',
+    category: '統計',
+    description: '調和平均を計算',
+    data: [
+      ['値1', '値2', '値3', '値4', '調和平均'],
+      [4, 5, 8, 7, '=HARMEAN(A2:D2)']
+    ]
+  },
+  {
+    name: 'TRIMMEAN',
+    category: '統計',
+    description: 'トリム平均を計算',
+    data: [
+      ['値1', '値2', '値3', '値4', '値5', '値6', '除外率', 'トリム平均'],
+      [1, 2, 3, 4, 5, 100, 0.2, '=TRIMMEAN(A2:F2,G2)']
+    ]
   }
 ];
 
@@ -1453,6 +1621,279 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   }
 ];
 
+// 情報関数の個別テスト
+export const informationFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'ISBLANK',
+    category: '情報',
+    description: '空白セルか判定',
+    data: [
+      ['値', '空白判定'],
+      ['テキスト', '=ISBLANK(A2)'],
+      ['', '=ISBLANK(A3)'],
+      [0, '=ISBLANK(A4)']
+    ],
+    expectedValues: { 'B2': false, 'B3': true, 'B4': false }
+  },
+  {
+    name: 'ISERROR',
+    category: '情報',
+    description: 'エラー値か判定',
+    data: [
+      ['値', 'エラー判定'],
+      ['=1/0', '=ISERROR(A2)'],
+      [100, '=ISERROR(A3)']
+    ],
+    expectedValues: { 'B2': true, 'B3': false }
+  },
+  {
+    name: 'ISNA',
+    category: '情報',
+    description: '#N/Aエラーか判定',
+    data: [
+      ['値', '#N/A判定'],
+      ['=NA()', '=ISNA(A2)'],
+      ['#DIV/0!', '=ISNA(A3)']
+    ],
+    expectedValues: { 'B2': true, 'B3': false }
+  },
+  {
+    name: 'ISTEXT',
+    category: '情報',
+    description: '文字列か判定',
+    data: [
+      ['値', '文字列判定'],
+      ['テキスト', '=ISTEXT(A2)'],
+      [123, '=ISTEXT(A3)']
+    ],
+    expectedValues: { 'B2': true, 'B3': false }
+  },
+  {
+    name: 'ISNUMBER',
+    category: '情報',
+    description: '数値か判定',
+    data: [
+      ['値', '数値判定'],
+      [123, '=ISNUMBER(A2)'],
+      ['123', '=ISNUMBER(A3)']
+    ],
+    expectedValues: { 'B2': true, 'B3': false }
+  },
+  {
+    name: 'ISLOGICAL',
+    category: '情報',
+    description: '論理値か判定',
+    data: [
+      ['値', '論理値判定'],
+      ['=TRUE()', '=ISLOGICAL(A2)'],
+      [1, '=ISLOGICAL(A3)']
+    ],
+    expectedValues: { 'B2': true, 'B3': false }
+  },
+  {
+    name: 'TYPE',
+    category: '情報',
+    description: 'データ型を返す',
+    data: [
+      ['値', 'データ型'],
+      [123, '=TYPE(A2)'],
+      ['テキスト', '=TYPE(A3)'],
+      ['=TRUE()', '=TYPE(A4)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 2, 'B4': 4 }
+  },
+  {
+    name: 'N',
+    category: '情報',
+    description: '数値に変換',
+    data: [
+      ['値', '数値変換'],
+      [7, '=N(A2)'],
+      ['7', '=N(A3)'],
+      ['=TRUE()', '=N(A4)']
+    ],
+    expectedValues: { 'B2': 7, 'B3': 0, 'B4': 1 }
+  }
+];
+
+// データベース関数の個別テスト
+export const databaseFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'DSUM',
+    category: 'データベース',
+    description: '条件付き合計',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '開発', 120],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DSUM(A1:C4,C1,A6:A7)']
+    ],
+    expectedValues: { 'C7': 250 }
+  },
+  {
+    name: 'DAVERAGE',
+    category: 'データベース',
+    description: '条件付き平均',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '開発', 120],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DAVERAGE(A1:C4,C1,A6:A7)']
+    ],
+    expectedValues: { 'C7': 125 }
+  },
+  {
+    name: 'DCOUNT',
+    category: 'データベース',
+    description: '条件付きカウント',
+    data: [
+      ['名前', '部署', '売上'],
+      ['田中', '営業', 100],
+      ['佐藤', '営業', 150],
+      ['鈴木', '開発', 120],
+      ['', '', ''],
+      ['条件', '', ''],
+      ['部署', '', ''],
+      ['営業', '', '=DCOUNT(A1:C4,C1,A6:A7)']
+    ],
+    expectedValues: { 'C7': 2 }
+  }
+];
+
+// エンジニアリング関数の個別テスト
+export const engineeringFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'CONVERT',
+    category: 'エンジニアリング',
+    description: '単位変換',
+    data: [
+      ['値', '変換元', '変換先', '結果'],
+      [1, 'lbm', 'kg', '=CONVERT(A2,B2,C2)'],
+      [100, 'cm', 'm', '=CONVERT(A3,B3,C3)'],
+      [32, 'F', 'C', '=CONVERT(A4,B4,C4)']
+    ],
+    expectedValues: { 'D2': 0.453592, 'D3': 1, 'D4': 0 }
+  },
+  {
+    name: 'BIN2DEC',
+    category: 'エンジニアリング',
+    description: '2進数→10進数',
+    data: [
+      ['2進数', '10進数'],
+      ['1100100', '=BIN2DEC(A2)'],
+      ['1111111111', '=BIN2DEC(A3)']
+    ],
+    expectedValues: { 'B2': 100, 'B3': -1 }
+  },
+  {
+    name: 'DEC2BIN',
+    category: 'エンジニアリング',
+    description: '10進数→2進数',
+    data: [
+      ['10進数', '桁数', '2進数'],
+      [9, 4, '=DEC2BIN(A2,B2)'],
+      [100, '', '=DEC2BIN(A3)']
+    ],
+    expectedValues: { 'C2': '1001', 'C3': '1100100' }
+  },
+  {
+    name: 'HEX2DEC',
+    category: 'エンジニアリング',
+    description: '16進数→10進数',
+    data: [
+      ['16進数', '10進数'],
+      ['FF', '=HEX2DEC(A2)'],
+      ['3E8', '=HEX2DEC(A3)']
+    ],
+    expectedValues: { 'B2': 255, 'B3': 1000 }
+  },
+  {
+    name: 'COMPLEX',
+    category: 'エンジニアリング',
+    description: '複素数を作成',
+    data: [
+      ['実部', '虚部', '複素数'],
+      [3, 4, '=COMPLEX(A2,B2)'],
+      [0, 1, '=COMPLEX(A3,B3)']
+    ],
+    expectedValues: { 'C2': '3+4i', 'C3': 'i' }
+  }
+];
+
+// 動的配列関数の個別テスト
+export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'FILTER',
+    category: '動的配列',
+    description: '条件でフィルタ',
+    data: [
+      ['名前', '年齢', 'フィルタ結果'],
+      ['田中', 25, '=FILTER(A2:B4,B2:B4>25)'],
+      ['佐藤', 30, ''],
+      ['鈴木', 28, '']
+    ]
+  },
+  {
+    name: 'SORT',
+    category: '動的配列',
+    description: '並べ替え',
+    data: [
+      ['名前', '点数', 'ソート結果'],
+      ['田中', 85, '=SORT(A2:B4,2,-1)'],
+      ['佐藤', 92, ''],
+      ['鈴木', 78, '']
+    ]
+  },
+  {
+    name: 'UNIQUE',
+    category: '動的配列',
+    description: '一意の値を抽出',
+    data: [
+      ['値', '一意の値'],
+      ['A', '=UNIQUE(A2:A6)'],
+      ['B', ''],
+      ['A', ''],
+      ['C', ''],
+      ['B', '']
+    ]
+  },
+  {
+    name: 'TRANSPOSE',
+    category: '動的配列',
+    description: '行列を入れ替え',
+    data: [
+      ['', 'A', 'B', 'C'],
+      ['1', 1, 2, 3],
+      ['2', 4, 5, 6],
+      ['', '', '', ''],
+      ['転置', '=TRANSPOSE(B2:D3)', '', '']
+    ]
+  }
+];
+
+// Web関数の個別テスト
+export const webFunctionTests: IndividualFunctionTest[] = [
+  {
+    name: 'ENCODEURL',
+    category: 'Web',
+    description: 'URLエンコード',
+    data: [
+      ['テキスト', 'エンコード結果'],
+      ['Hello World', '=ENCODEURL(A2)'],
+      ['こんにちは', '=ENCODEURL(A3)']
+    ],
+    expectedValues: { 'B2': 'Hello%20World' }
+  }
+];
+
 // すべての個別テストを結合
 export const allIndividualFunctionTests: IndividualFunctionTest[] = [
   ...mathFunctionTests,
@@ -1461,7 +1902,12 @@ export const allIndividualFunctionTests: IndividualFunctionTest[] = [
   ...dateFunctionTests,
   ...logicalFunctionTests,
   ...lookupFunctionTests,
-  ...financialFunctionTests
+  ...financialFunctionTests,
+  ...informationFunctionTests,
+  ...databaseFunctionTests,
+  ...engineeringFunctionTests,
+  ...dynamicArrayFunctionTests,
+  ...webFunctionTests
 ];
 
 // カテゴリ別にテストを取得

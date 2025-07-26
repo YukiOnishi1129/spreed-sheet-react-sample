@@ -8,7 +8,12 @@ import {
   dateFunctionTests,
   logicalFunctionTests,
   lookupFunctionTests,
-  financialFunctionTests
+  financialFunctionTests,
+  informationFunctionTests,
+  databaseFunctionTests,
+  engineeringFunctionTests,
+  dynamicArrayFunctionTests,
+  webFunctionTests
 } from '../data/individualFunctionTests';
 
 interface FunctionSelectorModalProps {
@@ -35,7 +40,12 @@ export function FunctionSelectorModal({
     '日付・時刻関数': dateFunctionTests,
     '論理関数': logicalFunctionTests,
     '検索・参照関数': lookupFunctionTests,
-    '財務関数': financialFunctionTests
+    '財務関数': financialFunctionTests,
+    '情報関数': informationFunctionTests,
+    'データベース関数': databaseFunctionTests,
+    'エンジニアリング関数': engineeringFunctionTests,
+    '動的配列関数': dynamicArrayFunctionTests,
+    'Web関数': webFunctionTests
   }), []);
 
   // フィルター済み関数リスト
