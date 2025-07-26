@@ -7,6 +7,7 @@ import {
   hasDataFormula, 
   isFormulaCell,
 } from './typeGuards';
+import { formatCellValue } from '../../utils/spreadsheet/formatting';
 
 // カスタム関数システムで再計算する関数
 export const recalculateFormulas = (
@@ -77,16 +78,20 @@ export const recalculateFormulas = (
           result.formula = cell.formula;
           result['data-formula'] = cell.formula;
           
-          if (typeof cell.value === 'string' || typeof cell.value === 'number' || cell.value === null) {
-            result.value = cell.value;
+          // 日付のフォーマットを適用
+          const formattedValue = formatCellValue(cell.value, cell.formula);
+          if (typeof formattedValue === 'string' || typeof formattedValue === 'number' || formattedValue === null) {
+            result.value = formattedValue;
           } else {
-            result.value = String(cell.value);
+            result.value = String(formattedValue);
           }
         } else {
-          if (typeof cell.value === 'string' || typeof cell.value === 'number' || cell.value === null) {
-            result.value = cell.value;
+          // 非数式セルでも日付フォーマットを適用
+          const formattedValue = formatCellValue(cell.value);
+          if (typeof formattedValue === 'string' || typeof formattedValue === 'number' || formattedValue === null) {
+            result.value = formattedValue;
           } else {
-            result.value = String(cell.value);
+            result.value = String(formattedValue);
           }
         }
         
