@@ -77,7 +77,6 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
 export const getCellRangeValues = (range: string, context: FormulaContext): unknown[] => {
   const rangeCoords = parseCellRange(range);
   if (!rangeCoords) {
-    console.log(`getCellRangeValues: Failed to parse range ${range}`);
     return [];
   }
   

@@ -291,7 +291,6 @@ export const IFS: CustomFormula = {
       args.push(currentArg.trim());
     }
     
-    console.log('IFS args:', args);
     
     // 条件と値のペアを評価
     for (let i = 0; i < args.length; i += 2) {
@@ -324,7 +323,6 @@ export const IFS: CustomFormula = {
           // セル参照の場合は値を取得
           if (left.match(/^[A-Z]+\d+$/)) {
             const cellVal = getCellValue(left, context);
-            console.log(`IFS: Cell ${left} value:`, cellVal);
             left = cellVal !== null && cellVal !== undefined ? String(cellVal) : '0';
           } else if (left.startsWith('"') && left.endsWith('"')) {
             left = left.slice(1, -1);
@@ -375,7 +373,6 @@ export const IFS: CustomFormula = {
       }
     }
     
-    console.log('IFS: No condition matched, returning #N/A');
     return FormulaError.NA;
   }
 };

@@ -36,7 +36,6 @@ function DemoSpreadsheet() {
   const initializeAndCalculate = () => {
     setIsCalculating(true);
     
-    console.log('Selected category:', selectedCategory.name, selectedCategory.id);
     
     const initialData: Matrix<CellBase> = selectedCategory.data.map((row) => 
       row.map((cellValue) => {
@@ -118,7 +117,6 @@ function DemoSpreadsheet() {
         mockFunction,
         (name: string, value: SpreadsheetData) => {
           if (name === 'spreadsheetData') {
-            console.log('計算結果を設定:', value);
             setSpreadsheetData(value as Matrix<CellBase>);
             setIsCalculating(false);
           }
@@ -132,7 +130,6 @@ function DemoSpreadsheet() {
 
   const handleCellClick = (row: number, col: number) => {
     const cell = spreadsheetData[row]?.[col];
-    console.log('Cell clicked:', { row, col, cell }); // デバッグ用
     
     if (cell && typeof cell === 'object') {
       const cellData = cell as { formula?: string; value?: string | number | null };
@@ -325,7 +322,6 @@ function DemoSpreadsheet() {
             data={spreadsheetData}
             onChange={setSpreadsheetData}
             onSelect={(selection: Selection) => {
-              console.log('onSelect called:', selection); // デバッグ用
               
               // selection が null または undefined の場合は何もしない
               if (!selection) return;

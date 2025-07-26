@@ -697,7 +697,6 @@ export const TEXTJOIN: CustomFormula = {
     const [, delimiter, ignoreEmpty, rangeOrValues] = matches;
     const shouldIgnoreEmpty = ignoreEmpty.toUpperCase() === 'TRUE';
     
-    console.log('TEXTJOIN計算:', { delimiter, ignoreEmpty, rangeOrValues });
     
     let values: unknown[] = [];
     

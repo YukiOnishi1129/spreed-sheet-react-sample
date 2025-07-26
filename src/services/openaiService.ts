@@ -919,7 +919,6 @@ const retryWithBackoff = async <T>(
       
       // 指数バックオフ（100ms, 200ms, 400ms）
       const delay = baseDelay * Math.pow(2, i);
-      console.log(`リトライ ${i + 1}/${maxRetries} - ${delay}ms待機中...`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
@@ -940,7 +939,6 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
     const supportsStructuredOutputs = false;
     const isLegacyModel = false;
     
-    console.log(`使用モデル: ${model}, Structured Outputs対応: ${supportsStructuredOutputs}`);
     
     // Structured Outputsでretryロジックを使用
     const response = await retryWithBackoff(async () => {
@@ -991,11 +989,9 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
       
       if (supportsStructuredOutputs && !isLegacyModel) {
         // Structured OutputsでJSONが保証されているので直接パース
-        console.log('Structured Output レスポンス:', content);
         rawData = JSON.parse(content) as Record<string, unknown>;
       } else {
         // 従来の方法：JSONを抽出してパース
-        console.log('従来のJSONパース レスポンス:', content);
         
         // JSONの抽出を試行
         let jsonData: string;
@@ -1018,7 +1014,6 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
         jsonData = jsonData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
         
         // 事前処理：明らかな問題を修正
-        console.log('修正前のJSON:', jsonData.substring(0, 300) + '...');
         
         // 全関数タイプの二重引用符を事前に修正（包括的アプローチ）
         jsonData = jsonData
@@ -1055,7 +1050,6 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
             break; // パースに成功したら終了
           } catch (error) {
             attempts++;
-            console.log(`JSON修正試行 ${attempts}:`, error);
             
             // 数式内の引用符を段階的に修正
             if (attempts === 1) {
@@ -1081,11 +1075,9 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
               jsonData = jsonData.replace(/^""/g, '\\"');
             }
             
-            console.log(`修正後のJSON試行 ${attempts}:`, jsonData.substring(0, 200) + '...');
           }
         }
         
-        console.log('修正後のJSON:', jsonData);
         
         // 最終的なJSONパースを試行
         try {
@@ -1122,18 +1114,15 @@ export const fetchExcelFunction = async (query: string): Promise<ExcelFunctionRe
       
       // 関数名から使用されている関数を抽出し、詳細な説明を自動生成
       const usedFunctions = extractFunctionsFromName(functionData.function_name ?? '');
-      console.log('使用されている関数:', usedFunctions);
       
       if (usedFunctions.length > 0) {
         const generatedDetails = generateFunctionDetails(usedFunctions);
         if (generatedDetails) {
           // 生成された詳細説明でsyntax_detailを置き換え
           functionData.syntax_detail = generatedDetails;
-          console.log('自動生成された関数詳細:', generatedDetails);
         }
       }
       
-      console.log('バリデーション済みデータ:', functionData);
       return functionData;
       
     } catch (parseError) {

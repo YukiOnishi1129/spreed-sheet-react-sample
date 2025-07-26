@@ -89,7 +89,6 @@ const ChatGPTSpreadsheet: React.FC = () => {
   const processSpreadsheetData = useCallback((response: ProcessSpreadsheetDataInput) => {
     try {
       // HyperFormulaにデータを設定して計算 - 実装は将来追加
-      console.log('processSpreadsheetData called with:', response);
       // APIのデータ構造をSpreadsheetData形式に変換
       const convertedData: SpreadsheetData = response.spreadsheet_data.map(row => 
         row.map(cell => {

@@ -15,8 +15,6 @@ export const recalculateFormulas = (
   currentFunction: ExcelFunctionResponse | null,
   setValue: (name: 'spreadsheetData', value: SpreadsheetData) => void
 ) => {
-  console.log('カスタム関数システムで再計算開始:', data);
-  
   if (!currentFunction?.spreadsheet_data) return;
   
   try {
@@ -83,14 +81,6 @@ export const recalculateFormulas = (
           result.formula = cell.formula;
           result['data-formula'] = cell.formula;
           
-          // Row 12のデバッグ
-          if (rowIndex === 12 && cell.formula.includes('INDEX')) {
-            console.log(`Processing cell [${rowIndex}][${colIndex}]:`, {
-              formula: cell.formula,
-              value: cell.value,
-              formattedValue: formatCellValue(cell.value, cell.formula)
-            });
-          }
           
           // 日付のフォーマットを適用
           const formattedValue = formatCellValue(cell.value, cell.formula);
@@ -118,12 +108,6 @@ export const recalculateFormulas = (
       })
     );
     
-    // Row 12（商品名）の結果を確認
-    if (processedData[12]) {
-      console.log('Row 12 (商品名) results:', processedData[12].map((cell, idx) => `[${idx}]=${cell.value}`));
-    }
-    
-    console.log('再計算完了:', processedData);
     setValue('spreadsheetData', processedData);
     
   } catch (error) {
@@ -146,10 +130,6 @@ function calculateAllFormulas(data: CellData[][]): CellData[][] {
         if (cell.formula && (cell.value === undefined || cell.value === '' || typeof cell.value === 'string')) {
           const calculatedValue = calculateSingleFormula(cell.formula, result, rowIndex, colIndex);
           
-          // Row 12のINDEX式の結果を確認
-          if (rowIndex === 12 && cell.formula.includes('INDEX')) {
-            console.log(`Cell [${rowIndex}][${colIndex}] formula result:`, calculatedValue);
-          }
           
           if (calculatedValue !== cell.value) {
             cell.value = calculatedValue;
@@ -174,10 +154,6 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
   let iterations = 0;
   const maxIterations = 10;
   
-  // INDEX式の評価をトレース
-  if (formula.includes('INDEX') && context.row === 12) {
-    console.log(`Evaluating nested formula at row ${context.row}:`, formula);
-  }
   
   while (hasChanges && iterations < maxIterations) {
     hasChanges = false;
@@ -226,9 +202,6 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
   }
   
   // INDEX式の最終結果をトレース
-  if (formula.includes('INDEX') && context.row === 12) {
-    console.log(`Nested formula evaluation completed:`, evaluatedFormula);
-  }
   
   return evaluatedFormula;
 }

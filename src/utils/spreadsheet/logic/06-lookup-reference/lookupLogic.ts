@@ -274,7 +274,6 @@ export const INDEX: CustomFormula = {
         
         // INDEXの結果だけログ出力
         if (context.row === 12) {
-          console.log(`INDEX(${arrayRange},${rowNum}) => row=${targetRow}, col=${targetCol}, data=${JSON.stringify(cellData)}`);
         }
         
         // Handle both direct values and object values
