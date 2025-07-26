@@ -251,7 +251,7 @@ export const NOT: CustomFormula = {
 // IFS関数の実装（手動実装が必要）
 export const IFS: CustomFormula = {
   name: 'IFS',
-  pattern: /IFS\(([^)]+)\)/i,
+  pattern: /IFS\(((?:[^()]|\([^)]*\))*)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const argsString = matches[1];
     
@@ -285,6 +285,8 @@ export const IFS: CustomFormula = {
       args.push(currentArg.trim());
     }
     
+    console.log('IFS args:', args);
+    
     // 条件と値のペアを評価
     for (let i = 0; i < args.length; i += 2) {
       if (i + 1 >= args.length) break;
@@ -295,13 +297,19 @@ export const IFS: CustomFormula = {
       // 条件を評価（簡単な実装）
       let conditionResult = false;
       
+      // TRUEやFALSEの場合
+      if (conditionArg.toUpperCase() === 'TRUE') {
+        conditionResult = true;
+      } else if (conditionArg.toUpperCase() === 'FALSE') {
+        conditionResult = false;
+      }
       // セル参照の場合
-      if (conditionArg.match(/^[A-Z]+\d+$/)) {
+      else if (conditionArg.match(/^[A-Z]+\d+$/)) {
         const cellValue = getCellValue(conditionArg, context);
         conditionResult = Boolean(cellValue);
       } else {
         // 簡単な比較演算子の処理
-        const comparisonMatch = conditionArg.match(/([A-Z]+\d+|"[^"]*"|\d+)\s*([><=!]+)\s*([A-Z]+\d+|"[^"]*"|\d+)/);
+        const comparisonMatch = conditionArg.match(/([A-Z]+\d+|"[^"]*"|\d+(?:\.\d+)?)\s*([><=!]+)\s*([A-Z]+\d+|"[^"]*"|\d+(?:\.\d+)?)/);
         if (comparisonMatch) {
           const [, leftParam, operator, rightParam] = comparisonMatch;
           let left = leftParam;
@@ -309,13 +317,16 @@ export const IFS: CustomFormula = {
           
           // セル参照の場合は値を取得
           if (left.match(/^[A-Z]+\d+$/)) {
-            left = String(getCellValue(left, context));
+            const cellVal = getCellValue(left, context);
+            console.log(`IFS: Cell ${left} value:`, cellVal);
+            left = cellVal !== null && cellVal !== undefined ? String(cellVal) : '0';
           } else if (left.startsWith('"') && left.endsWith('"')) {
             left = left.slice(1, -1);
           }
           
           if (right.match(/^[A-Z]+\d+$/)) {
-            right = String(getCellValue(right, context));
+            const cellVal = getCellValue(right, context);
+            right = cellVal !== null && cellVal !== undefined ? String(cellVal) : '0';
           } else if (right.startsWith('"') && right.endsWith('"')) {
             right = right.slice(1, -1);
           }
@@ -358,6 +369,7 @@ export const IFS: CustomFormula = {
       }
     }
     
+    console.log('IFS: No condition matched, returning #N/A');
     return FormulaError.NA;
   }
 };
