@@ -6,7 +6,9 @@ import { parseDate as parseDateNew } from './dateUtils';
 
 // セル参照（A1形式）から座標を取得
 export const parseCellReference = (cellRef: string): { col: number; row: number } | null => {
-  const match = cellRef.match(/^([A-Z]+)(\d+)$/);
+  // Remove $ signs for absolute references
+  const cleanRef = cellRef.replace(/\$/g, '');
+  const match = cleanRef.match(/^([A-Z]+)(\d+)$/);
   if (!match) return null;
   
   // 列番号を計算（A=0, B=1, ..., Z=25, AA=26, ...）
@@ -23,7 +25,9 @@ export const parseCellReference = (cellRef: string): { col: number; row: number 
 
 // セル範囲（A1:B2形式）から座標範囲を取得
 export const parseCellRange = (range: string): { start: { col: number; row: number }; end: { col: number; row: number } } | null => {
-  const match = range.match(/^([A-Z]+\d+):([A-Z]+\d+)$/);
+  // Remove $ signs for absolute references
+  const cleanRange = range.replace(/\$/g, '');
+  const match = cleanRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/);
   if (!match) return null;
   
   const start = parseCellReference(match[1]);
@@ -71,7 +75,18 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
   for (let row = start.row; row <= end.row; row++) {
     for (let col = start.col; col <= end.col; col++) {
       if (row >= 0 && row < context.data.length && col >= 0 && col < context.data[0]?.length) {
-        const value = context.data[row][col]?.value;
+        const cellData = context.data[row][col];
+        let value: unknown;
+        
+        // Handle both direct values and object values
+        if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {
+          value = cellData;
+        } else if (cellData && typeof cellData === 'object') {
+          value = cellData.value ?? cellData.v ?? cellData._ ?? cellData;
+        } else {
+          value = cellData;
+        }
+        
         if (value !== null && value !== undefined && value !== '') {
           values.push(value);
         }

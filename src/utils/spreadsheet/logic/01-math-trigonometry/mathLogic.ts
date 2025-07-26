@@ -176,7 +176,13 @@ export const AVERAGEIF: CustomFormula = {
       
       let sum = 0;
       let count = 0;
+      
       for (let i = 0; i < rangeValues.length; i++) {
+        // Skip empty cells in the range
+        if (rangeValues[i] === null || rangeValues[i] === undefined || rangeValues[i] === '') {
+          continue;
+        }
+        
         if (evaluateCondition(rangeValues[i], cleanCriteria)) {
           const value = Number(avgRangeValues[i]);
           if (!isNaN(value)) {
@@ -186,7 +192,7 @@ export const AVERAGEIF: CustomFormula = {
         }
       }
       
-      return count > 0 ? sum / count : FormulaError.DIV0;
+      return count > 0 ? sum / count : 0; // Return 0 instead of #DIV/0! for no matches
     } catch {
       return FormulaError.VALUE;
     }
@@ -247,7 +253,7 @@ export const MAX: CustomFormula = {
     const numbers = parseArgumentsToNumbers(args, context);
     
     if (numbers.length === 0) {
-      return FormulaError.VALUE;
+      return 0; // Excel returns 0 for MAX of empty range
     }
     
     return Math.max(...numbers);
@@ -263,7 +269,7 @@ export const MIN: CustomFormula = {
     const numbers = parseArgumentsToNumbers(args, context);
     
     if (numbers.length === 0) {
-      return FormulaError.VALUE;
+      return 0; // Excel returns 0 for MIN of empty range
     }
     
     return Math.min(...numbers);
