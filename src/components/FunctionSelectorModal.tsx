@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { IndividualFunctionTest } from '../data/individualFunctionTests';
-import {
+import { 
+  type IndividualFunctionTest,
+  allIndividualFunctionTests,
   mathFunctionTests,
   statisticalFunctionTests,
   textFunctionTests,
   dateFunctionTests,
   logicalFunctionTests,
   lookupFunctionTests,
-  financialFunctionTests,
-  allIndividualFunctionTests
+  financialFunctionTests
 } from '../data/individualFunctionTests';
 
 interface FunctionSelectorModalProps {
@@ -91,11 +91,11 @@ export function FunctionSelectorModal({
       {/* モーダル本体 */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div 
-          className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col"
+          className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] h-[80vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* ヘッダー */}
-          <div className="p-6 border-b">
+          <div className="flex-shrink-0 p-6 border-b">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">関数を選択</h2>
               <button
@@ -125,31 +125,34 @@ export function FunctionSelectorModal({
           </div>
           
           {/* カテゴリータブ */}
-          <div className="px-6 pt-4 border-b overflow-x-auto">
-            <div className="flex gap-2 pb-3">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-colors ${
-                  selectedCategory === 'all'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                すべて
-              </button>
-              {Object.keys(functionCategories).map(category => (
+          <div className="flex-shrink-0 border-b bg-gray-50">
+            <div className="px-6 py-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">カテゴリーを選択:</h3>
+              <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-colors ${
-                    selectedCategory === category
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  onClick={() => setSelectedCategory('all')}
+                  className={`flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-all ${
+                    selectedCategory === 'all'
+                      ? 'bg-blue-500 text-white shadow-sm'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                   }`}
                 >
-                  {category}
+                  すべて
                 </button>
-              ))}
+                {Object.keys(functionCategories).map(category => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-all ${
+                      selectedCategory === category
+                        ? 'bg-blue-500 text-white shadow-sm'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           
@@ -191,7 +194,7 @@ export function FunctionSelectorModal({
           </div>
           
           {/* フッター */}
-          <div className="p-4 border-t bg-gray-50 rounded-b-xl">
+          <div className="flex-shrink-0 p-4 border-t bg-gray-50 rounded-b-xl">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-600">
                 {filteredFunctions.length} 個の関数
