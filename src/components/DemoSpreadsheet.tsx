@@ -2,19 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import Spreadsheet, { type Matrix, type CellBase, type Selection } from 'react-spreadsheet';
 import { demoSpreadsheetData, type DemoCategory } from '../data/demoSpreadsheetData';
 import { 
-  allIndividualFunctionTests, 
-  type IndividualFunctionTest,
-  mathFunctionTests,
-  statisticalFunctionTests,
-  textFunctionTests,
-  dateFunctionTests,
-  logicalFunctionTests,
-  lookupFunctionTests,
-  financialFunctionTests
+  type IndividualFunctionTest
 } from '../data/individualFunctionTests';
 import { Link } from 'react-router-dom';
 import { recalculateFormulas } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
+import { FunctionSelectorModal } from './FunctionSelectorModal';
 
 function DemoSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<DemoCategory>(demoSpreadsheetData[0]);
@@ -22,42 +15,9 @@ function DemoSpreadsheet() {
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string; value?: string | number | null } | null>(null);
   const [demoMode, setDemoMode] = useState<'grouped' | 'individual'>('grouped');
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
-  const [selectedFunctionCategory, setSelectedFunctionCategory] = useState<string>('');
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
-  const [functionSearchQuery, setFunctionSearchQuery] = useState<string>('');
+  const [isFunctionModalOpen, setIsFunctionModalOpen] = useState<boolean>(false);
 
-  // カテゴリー別の関数マップ
-  const functionCategories = useMemo(() => ({
-    '数学・三角関数': mathFunctionTests,
-    '統計関数': statisticalFunctionTests,
-    'テキスト関数': textFunctionTests,
-    '日付・時刻関数': dateFunctionTests,
-    '論理関数': logicalFunctionTests,
-    '検索・参照関数': lookupFunctionTests,
-    '財務関数': financialFunctionTests
-  }), []);
-
-  // 選択されたカテゴリーの関数リスト（検索フィルター付き）
-  const categoryFunctions = useMemo(() => {
-    let functions: IndividualFunctionTest[] = [];
-    
-    if (!selectedFunctionCategory || selectedFunctionCategory === 'all') {
-      functions = allIndividualFunctionTests;
-    } else if (selectedFunctionCategory in functionCategories) {
-      functions = functionCategories[selectedFunctionCategory as keyof typeof functionCategories];
-    }
-    
-    // 検索フィルター
-    if (functionSearchQuery) {
-      const query = functionSearchQuery.toLowerCase();
-      functions = functions.filter(func => 
-        func.name.toLowerCase().includes(query) || 
-        func.description.toLowerCase().includes(query)
-      );
-    }
-    
-    return functions;
-  }, [selectedFunctionCategory, functionCategories, functionSearchQuery, allIndividualFunctionTests]);
 
   // カテゴリ選択時にデータを初期化と自動計算
   useEffect(() => {
@@ -265,76 +225,39 @@ function DemoSpreadsheet() {
               </div>
             </>
           ) : (
-            <div className="space-y-4">
-              {/* 検索バー */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="関数名または説明で検索..."
-                  value={functionSearchQuery}
-                  onChange={(e) => setFunctionSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <div className="space-y-3">
+              {/* 関数選択ボタン */}
+              <button
+                onClick={() => setIsFunctionModalOpen(true)}
+                className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center space-x-2"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-              </div>
-
-              {/* カテゴリータブ */}
-              <div className="flex flex-wrap gap-2 pb-2 border-b">
-                <button
-                  onClick={() => setSelectedFunctionCategory('all')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
-                    selectedFunctionCategory === 'all' || !selectedFunctionCategory
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  すべて
-                </button>
-                {Object.keys(functionCategories).map(category => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedFunctionCategory(category)}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
-                      selectedFunctionCategory === category
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-
-              {/* 関数グリッド */}
-              <div className="max-h-96 overflow-y-auto pr-2">
-                {categoryFunctions.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {categoryFunctions.map(func => (
-                      <button
-                        key={func.name}
-                        onClick={() => setSelectedFunction(func)}
-                        className={`p-3 text-left rounded-lg border-2 transition-all hover:shadow-md ${
-                          selectedFunction?.name === func.name
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                        }`}
-                      >
-                        <div className="font-medium text-gray-900">{func.name}</div>
-                        <div className="text-xs text-gray-600 mt-1 line-clamp-2">{func.description}</div>
-                      </button>
-                    ))}
+                <span className="text-gray-700 font-medium">
+                  {selectedFunction ? `選択中: ${selectedFunction.name}` : '関数を選択'}
+                </span>
+              </button>
+              
+              {/* 選択された関数の情報 */}
+              {selectedFunction && (
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">{selectedFunction.name}</h4>
+                      <p className="text-sm text-gray-600 mt-1">{selectedFunction.description}</p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedFunction(null)}
+                      className="ml-4 p-1 hover:bg-gray-200 rounded transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    {functionSearchQuery 
-                      ? `"${functionSearchQuery}" に一致する関数が見つかりません`
-                      : 'カテゴリーを選択してください'
-                    }
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -420,6 +343,17 @@ function DemoSpreadsheet() {
         </div>
 
       </div>
+
+      {/* 関数選択モーダル */}
+      <FunctionSelectorModal
+        isOpen={isFunctionModalOpen}
+        onClose={() => setIsFunctionModalOpen(false)}
+        onSelect={(func) => {
+          setSelectedFunction(func);
+          setIsFunctionModalOpen(false);
+        }}
+        selectedFunction={selectedFunction}
+      />
     </div>
   );
 }
