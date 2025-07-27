@@ -8,6 +8,9 @@ import { Link } from 'react-router-dom';
 import { recalculateFormulas } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
 import { FunctionSelectorModal } from './FunctionSelectorModal';
+import { matchFormula } from "../utils/spreadsheet/logic";
+import type { CellData, FormulaContext } from "../utils/spreadsheet/logic";
+type FormulaResult = string | number | boolean | null;
 
 function DemoSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<DemoCategory>(demoSpreadsheetData[0]);
@@ -17,6 +20,7 @@ function DemoSpreadsheet() {
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [isFunctionModalOpen, setIsFunctionModalOpen] = useState<boolean>(false);
+  const [originalFormulas, setOriginalFormulas] = useState<Matrix<string | undefined>>([]);
 
 
   // カテゴリ選択時にデータを初期化と自動計算
@@ -36,6 +40,16 @@ function DemoSpreadsheet() {
   const initializeAndCalculate = () => {
     setIsCalculating(true);
     
+    // 数式を別途保存
+    const formulas: Matrix<string | undefined> = selectedCategory.data.map((row) => 
+      row.map((cellValue) => {
+        if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
+          return cellValue;
+        }
+        return undefined;
+      })
+    );
+    setOriginalFormulas(formulas);
     
     const initialData: Matrix<CellBase> = selectedCategory.data.map((row) => 
       row.map((cellValue) => {
@@ -61,6 +75,17 @@ function DemoSpreadsheet() {
     
     setIsCalculating(true);
     
+    // 数式を別途保存
+    const formulas: Matrix<string | undefined> = selectedFunction.data.map((row) => 
+      row.map((cellValue) => {
+        if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
+          return cellValue;
+        }
+        return undefined;
+      })
+    );
+    setOriginalFormulas(formulas);
+    
     const initialData: Matrix<CellBase> = selectedFunction.data.map((row) => 
       row.map((cellValue) => {
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
@@ -79,49 +104,111 @@ function DemoSpreadsheet() {
     setSelectedCell(null);
   };
 
+  // 単一の数式を計算する関数
+  const calculateSingleFormula = (formula: string, data: CellData[][], currentRow: number, currentCol: number): FormulaResult => {
+    try {
+      // 先頭の = を除去
+      const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;
+      
+      // FormulaContextを作成
+      const context: FormulaContext = {
+        data,
+        row: currentRow,
+        col: currentCol
+      };
+      
+      // カスタム関数のマッチングを試行
+      const matchResult = matchFormula(cleanFormula);
+      
+      if (matchResult) {
+        // 関数を実行
+        const result = matchResult.function.calculate(matchResult.matches, context);
+        return result;
+      }
+      
+      // 単純な値の場合
+      return cleanFormula;
+    } catch (error) {
+      console.error('Formula calculation error:', error);
+      return '#ERROR';
+    }
+  };
+
+  // 全ての数式を計算する関数
+  const calculateAllFormulas = (data: CellData[][]): CellData[][] => {
+    const result: CellData[][] = data.map(row => row.map(cell => ({ ...cell })));
+    const maxIterations = 10; // 循環参照を防ぐための最大反復回数
+    
+    for (let iteration = 0; iteration < maxIterations; iteration++) {
+      let hasChanges = false;
+      
+      for (let rowIndex = 0; rowIndex < result.length; rowIndex++) {
+        for (let colIndex = 0; colIndex < result[rowIndex].length; colIndex++) {
+          const cell = result[rowIndex][colIndex];
+          
+          if (cell.formula) {
+            const newValue = calculateSingleFormula(cell.formula, result, rowIndex, colIndex);
+            
+            if (newValue !== cell.value) {
+              cell.value = newValue;
+              hasChanges = true;
+            }
+          }
+        }
+      }
+      
+      if (!hasChanges) {
+        break;
+      }
+    }
+    
+    return result;
+  };
+
   const calculateFormulas = (data: Matrix<CellBase>) => {
     // 直接データ形式で処理
     try {
-      const processedData: SpreadsheetData = data.map(row => 
-        row.map(cell => {
-          if (typeof cell === 'object' && cell !== null && 'value' in cell) {
-            const cellWithFormula = cell as { value?: string | number | null; formula?: string; 'data-formula'?: string };
+      setIsCalculating(true);
+      
+      // CellData形式に変換（数式計算用）
+      const cellData: CellData[][] = data.map((row) =>
+        row.map((cell) => {
+          if (!cell) return { value: '' };
+          
+          if (typeof cell === 'object' && 'value' in cell) {
             return {
-              value: cellWithFormula.value ?? null,
-              formula: cellWithFormula.formula,
-              'data-formula': cellWithFormula['data-formula'],
-              className: undefined,
-              title: cellWithFormula.formula ? `数式: ${cellWithFormula.formula}` : undefined,
-              DataEditor: undefined
+              value: cell.value ?? '',
+              formula: cell.formula || cell['data-formula']
             };
           }
-          return { value: cell ?? '' };
+          
+          return { value: cell };
         })
       );
       
-      // mock functionを作成（recalculateFormulasが期待する形式）
-      const mockFunction: ExcelFunctionResponse = {
-        spreadsheet_data: processedData.map(row => 
-          row.map(cell => ({
-            v: cell ? (cell.value ?? null) : null,
-            f: cell ? cell.formula : undefined,
-            bg: undefined
-          }))
-        ),
-        function_name: 'DEMO'
-      };
-      
       // 数式を計算
-      recalculateFormulas(
-        processedData,
-        mockFunction,
-        (name: string, value: SpreadsheetData) => {
-          if (name === 'spreadsheetData') {
-            setSpreadsheetData(value as Matrix<CellBase>);
-            setIsCalculating(false);
+      const calculatedData = calculateAllFormulas(cellData);
+      
+      // 結果をSpreadsheet形式に変換
+      const resultData: Matrix<CellBase> = calculatedData.map((row) =>
+        row.map((cell) => {
+          if (cell.formula) {
+            return {
+              value: cell.value,
+              formula: cell.formula,
+              'data-formula': cell.formula,
+              title: `数式: ${cell.formula}`
+            };
           }
-        }
+          
+          return {
+            value: cell.value
+          };
+        })
       );
+      
+      setSpreadsheetData(resultData);
+      setIsCalculating(false);
     } catch (error) {
       console.error('スプレッドシートデータ処理エラー:', error);
       setIsCalculating(false);
@@ -320,7 +407,28 @@ function DemoSpreadsheet() {
           ) : null}
           <Spreadsheet
             data={spreadsheetData}
-            onChange={setSpreadsheetData}
+            onChange={(newData) => {
+              // 数式情報を保持しながらデータを更新
+              const updatedData = newData.map((row, rowIndex) =>
+                row.map((cell, colIndex) => {
+                  const formula = originalFormulas[rowIndex]?.[colIndex];
+                  
+                  // 数式があるセルの場合
+                  if (formula) {
+                    return {
+                      value: cell?.value ?? '',
+                      formula: formula,
+                      'data-formula': formula
+                    };
+                  }
+                  return cell;
+                })
+              );
+              
+              setSpreadsheetData(updatedData);
+              // セル値が変更されたら数式を再計算
+              calculateFormulas(updatedData);
+            }}
             onSelect={(selection: Selection) => {
               
               // selection が null または undefined の場合は何もしない
