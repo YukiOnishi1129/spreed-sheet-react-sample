@@ -43,7 +43,7 @@ export async function changeCellValue(page: any, row: number, col: number, value
 export async function getCellValue(page: any, row: number, col: number): Promise<string> {
   // スプレッドシートの構造:
   // - Row 0: ヘッダー行（空th、A、B、C）
-  // - Row 1: データヘッダー（1、値、倍数、結果）
+  // - Row 1: データヘッダー（1、値、倍数、結果）  
   // - Row 2以降: 実際のデータ
   // - 各行の最初のセルは<th>（行番号）、残りは<td>
   const actualRow = row + 1; // Row 0はヘッダーなのでスキップ
@@ -53,6 +53,17 @@ export async function getCellValue(page: any, row: number, col: number): Promise
   // デバッグ用ログ
   const cellAddress = `${String.fromCharCode(65 + col)}${row + 1}`;
   console.log(`Getting cell ${cellAddress}: "${value}"`);
+  
+  // SUMPRODUCTの場合、数式も取得
+  if (cellAddress === 'G2') {
+    const formulaInput = await cell.getAttribute('data-formula');
+    if (formulaInput) {
+      console.log(`Cell ${cellAddress} formula: "${formulaInput}"`);
+    }
+    
+    // 実際の行番号も確認
+    console.log(`Actual row index in DOM: ${actualRow}`);
+  }
   
   return value;
 }
@@ -72,6 +83,12 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
     // 各関数のテストを生成
     for (const testData of categoryTests) {
       test(`${testData.name} - ${testData.description}`, async ({ page }) => {
+        // コンソールログを取得
+        page.on('console', msg => {
+          if (testData.name === 'SUMPRODUCT') {
+            console.log('Browser console:', msg.text());
+          }
+        });
         
         await selectFunction(page, testData.category, testData.name, testData.description);
         
@@ -79,6 +96,31 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
         if (!testData.expectedValues) {
           console.log(`Skipping test for ${testData.name} - no expectedValues defined`);
           return;
+        }
+        
+        // SUMPRODUCTの場合、スクリーンショットを取る
+        if (testData.name === 'SUMPRODUCT') {
+          await page.screenshot({ path: 'sumproduct-test.png', fullPage: true });
+          
+          // 各セルの値を確認
+          console.log('=== SUMPRODUCT Debug ===');
+          for (let col = 0; col < 7; col++) {
+            const cellAddress = `${String.fromCharCode(65 + col)}2`;
+            const value = await getCellValue(page, 1, col);
+            console.log(`Cell ${cellAddress}: ${value}`);
+          }
+          
+          // G2セルをクリックして数式を確認
+          const g2Cell = page.locator('table tbody tr').nth(2).locator('td').nth(6);
+          await g2Cell.click();
+          await page.waitForTimeout(500);
+          
+          // 数式入力欄の値を取得
+          const formulaInput = page.locator('input[type="text"]').first();
+          const formulaValue = await formulaInput.inputValue();
+          console.log(`Formula in G2: ${formulaValue}`);
+          
+          console.log('======================');
         }
         
         // expectedValuesと実際の計算結果を比較

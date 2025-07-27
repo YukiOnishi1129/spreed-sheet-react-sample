@@ -1157,6 +1157,15 @@ export const SUMPRODUCT: CustomFormula = {
       // 各範囲の値を取得
       const rangeValues = ranges.map(range => getCellRangeValues(range, context));
       
+      
+      // 範囲が1つの場合は、その値の合計を返す
+      if (rangeValues.length === 1) {
+        return rangeValues[0].reduce((sum, val) => {
+          const num = Number(val);
+          return sum + (isNaN(num) ? 0 : num);
+        }, 0);
+      }
+      
       // すべての範囲が同じ長さか確認
       const length = rangeValues[0].length;
       if (!rangeValues.every(values => values.length === length)) {
