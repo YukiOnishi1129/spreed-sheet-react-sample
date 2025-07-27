@@ -4,6 +4,7 @@ import type { CustomFormula, FormulaContext } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue, getCellRangeValues } from '../shared/utils';
 
+
 // 引数を数値の配列に変換するユーティリティ関数
 function parseArgumentsToNumbers(args: string, context: FormulaContext): number[] {
   const values: number[] = [];
@@ -604,6 +605,8 @@ export const RADIANS: CustomFormula = {
 
 // SIN関数の実装（正弦）
 
+
+
 // LOG関数の実装（対数）
 export const LOG: CustomFormula = {
   name: 'LOG',
@@ -680,6 +683,62 @@ export const EXP: CustomFormula = {
 };
 
 // ASIN関数の実装（逆正弦）
+
+// ACOS関数の実装（逆余弦）
+export const ACOS: CustomFormula = {
+  name: 'ACOS',
+  pattern: /ACOS\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value) || value < -1 || value > 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.acos(value);
+  }
+};
+
+// ATAN関数の実装（逆正接）
+export const ATAN: CustomFormula = {
+  name: 'ATAN',
+  pattern: /ATAN\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.atan(value);
+  }
+};
+
+// ATAN2関数の実装（x,y座標から角度）
+export const ATAN2: CustomFormula = {
+  name: 'ATAN2',
+  pattern: /ATAN2\(([^,]+),\s*([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, xRef, yRef] = matches;
+    
+    const x = Number(getCellValue(xRef, context) ?? xRef);
+    const y = Number(getCellValue(yRef, context) ?? yRef);
+    
+    if (isNaN(x) || isNaN(y)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (x === 0 && y === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    return Math.atan2(x, y);
+  }
+};
 
 // ROUNDUP関数の実装（切り上げ）
 export const ROUNDUP: CustomFormula = {
@@ -1116,6 +1175,40 @@ export const QUOTIENT: CustomFormula = {
 
 // 双曲線関数の実装
 // SINH関数（双曲線正弦）
+
+// COSH関数（双曲線余弦）
+export const COSH: CustomFormula = {
+  name: 'COSH',
+  pattern: /COSH\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.cosh(value);
+  }
+};
+
+// TANH関数（双曲線正接）
+export const TANH: CustomFormula = {
+  name: 'TANH',
+  pattern: /TANH\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value)) {
+      return FormulaError.VALUE;
+    }
+    
+    return Math.tanh(value);
+  }
+};
 
 // HyperFormulaでサポートされている未実装関数を追加
 
@@ -1647,6 +1740,7 @@ export const MULTINOMIAL: CustomFormula = {
   }
 };
 
+
 // BASE関数（数値を指定した基数に変換）
 export const BASE: CustomFormula = {
   name: 'BASE',
@@ -1726,6 +1820,7 @@ export const DECIMAL: CustomFormula = {
     return result;
   }
 };
+
 
 // CEILING.MATH関数（数学的な切り上げ）
 export const CEILING_MATH: CustomFormula = {
@@ -2140,8 +2235,38 @@ export const SEQUENCE: CustomFormula = {
 // 双曲線逆正弦（ASINH）
 
 // 双曲線逆余弦（ACOSH）
+export const ACOSH: CustomFormula = {
+  name: 'ACOSH',
+  pattern: /ACOSH\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value) || value < 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.acosh(value);
+  }
+};
 
 // 双曲線逆正接（ATANH）
+export const ATANH: CustomFormula = {
+  name: 'ATANH',
+  pattern: /ATANH\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, valueRef] = matches;
+    
+    const value = Number(getCellValue(valueRef, context) ?? valueRef);
+    
+    if (isNaN(value) || value <= -1 || value >= 1) {
+      return FormulaError.NUM;
+    }
+    
+    return Math.atanh(value);
+  }
+};
 
 // 余割（CSC）
 export const CSC: CustomFormula = {

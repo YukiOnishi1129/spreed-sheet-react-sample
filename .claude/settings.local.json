@@ -57,7 +57,8 @@
       "Bash(do sed -i '' 's/import { IndividualFunctionTest }/import type { IndividualFunctionTest }/' \"$file\")",
       "Bash(done)",
       "Bash(touch:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }

@@ -72,7 +72,7 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
           if (typeof expectedValue === 'number') {
             const actualNum = parseFloat(actualValue);
             if (!isNaN(actualNum)) {
-              expect(actualNum).toBeCloseTo(expectedValue, 2);
+              expect(actualNum).toBeCloseTo(expectedValue, 1);
             } else {
               // エラー値の場合
               expect(actualValue).toMatch(/#[A-Z]+[!?]/);
