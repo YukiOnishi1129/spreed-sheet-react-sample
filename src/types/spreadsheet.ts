@@ -150,3 +150,12 @@ export type SpreadsheetForm = z.infer<typeof SpreadsheetFormSchema>;
 
 // processSpreadsheetData関数用の型（ExcelFunctionResponseと同じ構造）
 export type ProcessSpreadsheetDataInput = ExcelFunctionResponse;
+
+// 個別関数テスト用の型定義
+export interface IndividualFunctionTest {
+  name: string;
+  category: string;
+  description: string;
+  data: (string | number | boolean | null)[][];
+  expectedValues?: { [key: string]: string | number | boolean };
+}

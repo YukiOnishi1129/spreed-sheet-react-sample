@@ -52,7 +52,10 @@
       "Bash(npm start)",
       "Bash(open http://localhost:5174/)",
       "Bash(open http://localhost:5173/demo)",
-      "Bash(npx esbuild:*)"
+      "Bash(npx esbuild:*)",
+      "Bash(for file in src/data/individualTests/*.ts)",
+      "Bash(do sed -i '' 's/import { IndividualFunctionTest }/import type { IndividualFunctionTest }/' \"$file\")",
+      "Bash(done)"
     ],
     "deny": []
   }

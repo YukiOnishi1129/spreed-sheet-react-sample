@@ -1,0 +1,44 @@
+import { IndividualFunctionTest } from '../types/spreadsheet';
+
+// Import all test categories
+import { 00_basic_operatorsTests } from './individualTests/00-basic-operators';
+import { 01_math_trigonometryTests } from './individualTests/01-math-trigonometry';
+import { 02_statisticsTests } from './individualTests/02-statistics';
+import { 03_textTests } from './individualTests/03-text';
+import { 04_date_timeTests } from './individualTests/04-date-time';
+import { 05_logicalTests } from './individualTests/05-logical';
+import { 06_lookup_referenceTests } from './individualTests/06-lookup-reference';
+import { 07_financialTests } from './individualTests/07-financial';
+import { 08_matrixTests } from './individualTests/08-matrix';
+import { 09_informationTests } from './individualTests/09-information';
+import { 10_databaseTests } from './individualTests/10-database';
+import { 11_engineeringTests } from './individualTests/11-engineering';
+import { 12_dynamic_arraysTests } from './individualTests/12-dynamic-arrays';
+import { 13_cubeTests } from './individualTests/13-cube';
+import { 14_web_importTests } from './individualTests/14-web-import';
+import { 15_othersTests } from './individualTests/15-others';
+
+// Combine all tests
+export const allIndividualFunctionTests: IndividualFunctionTest[] = [
+  ...00_basic_operatorsTests,
+  ...01_math_trigonometryTests,
+  ...02_statisticsTests,
+  ...03_textTests,
+  ...04_date_timeTests,
+  ...05_logicalTests,
+  ...06_lookup_referenceTests,
+  ...07_financialTests,
+  ...08_matrixTests,
+  ...09_informationTests,
+  ...10_databaseTests,
+  ...11_engineeringTests,
+  ...12_dynamic_arraysTests,
+  ...13_cubeTests,
+  ...14_web_importTests,
+  ...15_othersTests,
+];
+
+// Helper function to get test by name
+export function getIndividualTestByName(name: string): IndividualFunctionTest | undefined {
+  return allIndividualFunctionTests.find(test => test.name === name);
+}
