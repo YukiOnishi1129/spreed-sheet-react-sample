@@ -1144,7 +1144,7 @@ export const SUMPRODUCT: CustomFormula = {
   name: 'SUMPRODUCT',
   pattern: /SUMPRODUCT\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, argsStr] = matches;
+    const [fullMatch, argsStr] = matches;
     
     try {
       // 引数を解析（範囲を分割）
@@ -1189,7 +1189,7 @@ export const SUMPRODUCT: CustomFormula = {
       }
       
       return sum;
-    } catch {
+    } catch (error) {
       return FormulaError.VALUE;
     }
   }

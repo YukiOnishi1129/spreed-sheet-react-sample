@@ -692,9 +692,57 @@ export const SEARCH: CustomFormula = {
 // TEXTJOIN関数の実装（手動実装が必要）
 export const TEXTJOIN: CustomFormula = {
   name: 'TEXTJOIN',
-  pattern: /TEXTJOIN\("([^"]*)",\s*(TRUE|FALSE),\s*([^)]+)\)/i,
+  pattern: /TEXTJOIN\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, delimiter, ignoreEmpty, rangeOrValues] = matches;
+    const [fullMatch, args] = matches;
+    
+    // 引数を手動で解析
+    let argIndex = 0;
+    let currentArg = '';
+    let inQuotes = false;
+    let parenDepth = 0;
+    const parsedArgs: string[] = [];
+    
+    for (let i = 0; i < args.length; i++) {
+      const char = args[i];
+      
+      if (char === '"' && (i === 0 || args[i-1] !== '\\')) {
+        inQuotes = !inQuotes;
+        currentArg += char;
+      } else if (!inQuotes) {
+        if (char === '(') {
+          parenDepth++;
+          currentArg += char;
+        } else if (char === ')') {
+          parenDepth--;
+          currentArg += char;
+        } else if (char === ',' && parenDepth === 0) {
+          parsedArgs.push(currentArg.trim());
+          currentArg = '';
+        } else {
+          currentArg += char;
+        }
+      } else {
+        currentArg += char;
+      }
+    }
+    
+    if (currentArg) {
+      parsedArgs.push(currentArg.trim());
+    }
+    
+    if (parsedArgs.length < 3) {
+      return FormulaError.VALUE;
+    }
+    
+    const [delimiterArg, ignoreEmpty, rangeOrValues] = parsedArgs;
+    
+    // 区切り文字を取得（引用符がある場合は除去）
+    let delimiter = delimiterArg;
+    if (delimiter.startsWith('"') && delimiter.endsWith('"')) {
+      delimiter = delimiter.slice(1, -1);
+    }
+    
     const shouldIgnoreEmpty = ignoreEmpty.toUpperCase() === 'TRUE';
     
     
@@ -1277,9 +1325,14 @@ export const LENB: CustomFormula = {
       text = text.slice(1, -1);
     }
     
-    // UTF-8でのバイト数を計算
-    const encoder = new TextEncoder();
-    return encoder.encode(text).length;
+    // Excelの仕様に合わせて、ASCII文字は1バイト、その他は2バイトとして計算
+    let byteLength = 0;
+    for (let i = 0; i < text.length; i++) {
+      const charCode = text.charCodeAt(i);
+      // ASCII範囲内（0-127）なら1バイト、それ以外は2バイト
+      byteLength += charCode <= 127 ? 1 : 2;
+    }
+    return byteLength;
   }
 };
 

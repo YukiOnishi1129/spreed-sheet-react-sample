@@ -120,6 +120,10 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
           const formulaValue = await formulaInput.inputValue();
           console.log(`Formula in G2: ${formulaValue}`);
           
+          // スプレッドシート全体のHTMLを取得して確認
+          const tableHTML = await page.locator('table').innerHTML();
+          console.log('Table structure:', tableHTML.substring(0, 500) + '...');
+          
           console.log('======================');
         }
         
