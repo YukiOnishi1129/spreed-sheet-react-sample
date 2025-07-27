@@ -9,8 +9,7 @@ import { recalculateFormulas } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
 import { FunctionSelectorModal } from './FunctionSelectorModal';
 import { matchFormula } from "../utils/spreadsheet/logic";
-import type { CellData, FormulaContext } from "../utils/spreadsheet/logic";
-type FormulaResult = string | number | boolean | null;
+import type { CellData, FormulaContext, FormulaResult as LogicFormulaResult } from "../utils/spreadsheet/logic";
 
 function DemoSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<DemoCategory>(demoSpreadsheetData[0]);
@@ -105,7 +104,7 @@ function DemoSpreadsheet() {
   };
 
   // 単一の数式を計算する関数
-  const calculateSingleFormula = (formula: string, data: CellData[][], currentRow: number, currentCol: number): FormulaResult => {
+  const calculateSingleFormula = (formula: string, data: CellData[][], currentRow: number, currentCol: number): string | number | boolean | null => {
     try {
       // 先頭の = を除去
       const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;
@@ -123,6 +122,22 @@ function DemoSpreadsheet() {
       if (matchResult) {
         // 関数を実行
         const result = matchResult.function.calculate(matchResult.matches, context);
+        
+        // Date型の結果を文字列に変換
+        if (result instanceof Date) {
+          return result.toISOString().split('T')[0]; // YYYY-MM-DD形式
+        }
+        
+        // 配列の結果を処理（配列式の場合）
+        if (Array.isArray(result)) {
+          // 2次元配列の場合
+          if (Array.isArray(result[0])) {
+            return JSON.stringify(result); // または適切な文字列表現
+          }
+          // 1次元配列の場合
+          return result.join(', ');
+        }
+        
         return result;
       }
       
@@ -176,9 +191,10 @@ function DemoSpreadsheet() {
           if (!cell) return { value: '' };
           
           if (typeof cell === 'object' && 'value' in cell) {
+            const cellObj = cell as any;
             return {
-              value: cell.value ?? '',
-              formula: cell.formula || cell['data-formula']
+              value: cellObj.value ?? '',
+              formula: cellObj.formula || cellObj['data-formula']
             };
           }
           
