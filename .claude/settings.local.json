@@ -58,7 +58,10 @@
       "Bash(done)",
       "Bash(touch:*)",
       "Bash(npx:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(timeout 10 npx playwright test:*)",
+      "Bash(gtimeout:*)",
+      "Bash(true)"
     ],
     "deny": []
   }

@@ -56,7 +56,8 @@ function DemoSpreadsheet() {
             'data-formula': cellValue
           };
         }
-        return { value: cellValue ?? '' };
+        // 空文字列の場合はそのまま保持（COUNTBLANKが正しく動作するように）
+        return { value: cellValue === null || cellValue === undefined ? '' : cellValue };
       })
     );
     
@@ -90,9 +91,15 @@ function DemoSpreadsheet() {
             'data-formula': cellValue
           };
         }
-        return { value: cellValue ?? '' };
+        // 空文字列の場合はそのまま保持（COUNTBLANKが正しく動作するように）
+        return { value: cellValue === null || cellValue === undefined ? '' : cellValue };
       })
     );
+    
+    // デバッグ：MROUND関数の初期データを確認
+    if (selectedFunction.name === 'MROUND') {
+      console.log('MROUND initial data:', initialData);
+    }
     
     // 直接計算を実行
     calculateFormulas(initialData);
@@ -113,7 +120,16 @@ function DemoSpreadsheet() {
           const cell = result[rowIndex][colIndex];
           
           if (cell.formula) {
+            // デバッグ用ログ
+            if (cell.formula.includes('MROUND') || cell.formula.includes('COUNTBLANK')) {
+              console.log('DemoSpreadsheet: Calculating', cell.formula, 'at', rowIndex, colIndex);
+            }
+            
             const newValue = calculateFormula(cell.formula, result, rowIndex, colIndex);
+            
+            if (cell.formula.includes('MROUND') || cell.formula.includes('COUNTBLANK')) {
+              console.log('DemoSpreadsheet: Result', newValue);
+            }
             
             if (newValue !== cell.value) {
               cell.value = newValue;

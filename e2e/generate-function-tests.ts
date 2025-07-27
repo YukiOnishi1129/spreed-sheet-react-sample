@@ -36,7 +36,13 @@ export async function changeCellValue(page: any, row: number, col: number, value
 
 export async function getCellValue(page: any, row: number, col: number): Promise<string> {
   const cell = page.locator('table tbody tr').nth(row).locator('td').nth(col);
-  return await cell.textContent() || '';
+  const value = await cell.textContent() || '';
+  
+  // デバッグ用ログ（0ベースのrowを1ベースに変換して表示）
+  const cellAddress = `${String.fromCharCode(65 + col)}${row + 1}`;
+  console.log(`Getting cell ${cellAddress}: "${value}"`);
+  
+  return value;
 }
 
 // 各テストデータに対してテストを生成
@@ -65,7 +71,7 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
         // expectedValuesと実際の計算結果を比較
         for (const [cell, expectedValue] of Object.entries(testData.expectedValues)) {
           const col = cell.charCodeAt(0) - 'A'.charCodeAt(0);
-          const row = parseInt(cell.substring(1));
+          const row = parseInt(cell.substring(1)); // Excelの行番号をそのまま使用（テーブルのインデックスとして）
           const actualValue = await getCellValue(page, row, col);
           
           // 数値または文字列として比較
@@ -94,7 +100,7 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
             // 元の値を保存
             const firstCell = Object.keys(testData.expectedValues)[0];
             const col = firstCell.charCodeAt(0) - 'A'.charCodeAt(0);
-            const row = parseInt(firstCell.substring(1));
+            const row = parseInt(firstCell.substring(1)); // Excelの行番号をそのまま使用
             const originalValue = await getCellValue(page, row, col);
             
             // 値を大きく変更（10倍）して確実に結果が変わるようにする
