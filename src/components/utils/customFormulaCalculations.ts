@@ -207,7 +207,7 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
 }
 
 // 単一の数式を計算する関数
-function calculateSingleFormula(formula: string, data: CellData[][], currentRow: number, currentCol: number): FormulaResult {
+export function calculateSingleFormula(formula: string, data: CellData[][], currentRow: number, currentCol: number): FormulaResult {
   try {
     // 先頭の = を除去
     const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;

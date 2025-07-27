@@ -5,7 +5,7 @@ import {
   type IndividualFunctionTest
 } from '../data/individualFunctionTests';
 import { Link } from 'react-router-dom';
-import { recalculateFormulas } from './utils/customFormulaCalculations';
+import { calculateSingleFormula as calculateFormula } from './utils/customFormulaCalculations';
 import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
 import { FunctionSelectorModal } from './FunctionSelectorModal';
 import { matchFormula } from "../utils/spreadsheet/logic";
@@ -103,51 +103,6 @@ function DemoSpreadsheet() {
     setSelectedCell(null);
   };
 
-  // 単一の数式を計算する関数
-  const calculateSingleFormula = (formula: string, data: CellData[][], currentRow: number, currentCol: number): string | number | boolean | null => {
-    try {
-      // 先頭の = を除去
-      const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;
-      
-      // FormulaContextを作成
-      const context: FormulaContext = {
-        data,
-        row: currentRow,
-        col: currentCol
-      };
-      
-      // カスタム関数のマッチングを試行
-      const matchResult = matchFormula(cleanFormula);
-      
-      if (matchResult) {
-        // 関数を実行
-        const result = matchResult.function.calculate(matchResult.matches, context);
-        
-        // Date型の結果を文字列に変換
-        if (result instanceof Date) {
-          return result.toISOString().split('T')[0]; // YYYY-MM-DD形式
-        }
-        
-        // 配列の結果を処理（配列式の場合）
-        if (Array.isArray(result)) {
-          // 2次元配列の場合
-          if (Array.isArray(result[0])) {
-            return JSON.stringify(result); // または適切な文字列表現
-          }
-          // 1次元配列の場合
-          return result.join(', ');
-        }
-        
-        return result;
-      }
-      
-      // 単純な値の場合
-      return cleanFormula;
-    } catch (error) {
-      console.error('Formula calculation error:', error);
-      return '#ERROR';
-    }
-  };
 
   // 全ての数式を計算する関数
   const calculateAllFormulas = (data: CellData[][]): CellData[][] => {
@@ -162,7 +117,7 @@ function DemoSpreadsheet() {
           const cell = result[rowIndex][colIndex];
           
           if (cell.formula) {
-            const newValue = calculateSingleFormula(cell.formula, result, rowIndex, colIndex);
+            const newValue = calculateFormula(cell.formula, result, rowIndex, colIndex);
             
             if (newValue !== cell.value) {
               cell.value = newValue;
@@ -192,10 +147,28 @@ function DemoSpreadsheet() {
           
           if (typeof cell === 'object' && 'value' in cell) {
             const cellObj = cell as any;
+            let value = cellObj.value ?? '';
+            
+            // 数値文字列を数値に変換
+            if (typeof value === 'string' && value !== '') {
+              const num = parseFloat(value);
+              if (!isNaN(num) && num.toString() === value.trim()) {
+                value = num;
+              }
+            }
+            
             return {
-              value: cellObj.value ?? '',
+              value: value,
               formula: cellObj.formula || cellObj['data-formula']
             };
+          }
+          
+          // 単純な値の場合も数値変換を試みる
+          if (typeof cell === 'string' && cell !== '') {
+            const num = parseFloat(cell);
+            if (!isNaN(num) && num.toString() === cell.trim()) {
+              return { value: num };
+            }
           }
           
           return { value: cell };
