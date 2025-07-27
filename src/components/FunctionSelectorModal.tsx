@@ -58,10 +58,15 @@ export function FunctionSelectorModal({
     return functions;
   }, [selectedCategory, functionCategories, searchQuery]);
   
-  // カテゴリを表示用に整理（頻度順）
+  // カテゴリを表示用に整理（番号順）
   const sortedCategories = useMemo(() => {
     return Object.entries(functionCategories)
-      .sort((a, b) => b[1].length - a[1].length)
+      .sort((a, b) => {
+        // 番号でソート（00. 01. 02. など）
+        const numA = parseInt(a[0].match(/^(\d+)\./)?.[1] || '99');
+        const numB = parseInt(b[0].match(/^(\d+)\./)?.[1] || '99');
+        return numA - numB;
+      })
       .map(([category]) => category);
   }, [functionCategories]);
 

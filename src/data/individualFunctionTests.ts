@@ -10,7 +10,7 @@ export interface IndividualFunctionTest {
 export const basicOperatorTests: IndividualFunctionTest[] = [
   {
     name: 'ADD_OPERATOR',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '加算演算子（+）',
     data: [
       ['値1', '値2', '結果'],
@@ -22,7 +22,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUBTRACT_OPERATOR',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '減算演算子（-）',
     data: [
       ['値1', '値2', '結果'],
@@ -34,7 +34,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MULTIPLY_OPERATOR',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '乗算演算子（*）',
     data: [
       ['値1', '値2', '結果'],
@@ -46,7 +46,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DIVIDE_OPERATOR',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '除算演算子（/）',
     data: [
       ['値1', '値2', '結果'],
@@ -58,7 +58,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GREATER_THAN',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '大なり演算子（>）',
     data: [
       ['値1', '値2', '結果'],
@@ -70,7 +70,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LESS_THAN',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '小なり演算子（<）',
     data: [
       ['値1', '値2', '結果'],
@@ -82,7 +82,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GREATER_THAN_OR_EQUAL',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '以上演算子（>=）',
     data: [
       ['値1', '値2', '結果'],
@@ -94,7 +94,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LESS_THAN_OR_EQUAL',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '以下演算子（<=）',
     data: [
       ['値1', '値2', '結果'],
@@ -106,7 +106,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EQUAL',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '等価演算子（=）',
     data: [
       ['値1', '値2', '結果'],
@@ -118,7 +118,7 @@ export const basicOperatorTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NOT_EQUAL',
-    category: '基本演算子',
+    category: '00. 基本演算子',
     description: '不等価演算子（<>）',
     data: [
       ['値1', '値2', '結果'],
@@ -135,7 +135,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   // 基本的な数学関数
   {
     name: 'SUM',
-    category: '数学',
+    category: '01. 数学',
     description: '数値の合計を計算',
     data: [
       ['値1', '値2', '値3', '値4', '結果'],
@@ -145,7 +145,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUMIF',
-    category: '数学',
+    category: '01. 数学',
     description: '条件に一致するセルの合計',
     data: [
       ['値', '条件', '結果'],
@@ -158,7 +158,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUMIFS',
-    category: '数学',
+    category: '01. 数学',
     description: '複数条件に一致するセルの合計',
     data: [
       ['値', '条件1', '条件2', '結果'],
@@ -171,7 +171,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PRODUCT',
-    category: '数学',
+    category: '01. 数学',
     description: '数値の積を計算',
     data: [
       ['値1', '値2', '値3', '結果'],
@@ -181,7 +181,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SQRT',
-    category: '数学',
+    category: '01. 数学',
     description: '平方根を計算',
     data: [
       ['値', '結果'],
@@ -193,7 +193,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'POWER',
-    category: '数学',
+    category: '01. 数学',
     description: 'べき乗を計算',
     data: [
       ['底', '指数', '結果'],
@@ -204,7 +204,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ABS',
-    category: '数学',
+    category: '01. 数学',
     description: '絶対値を返す',
     data: [
       ['値', '結果'],
@@ -216,7 +216,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ROUND',
-    category: '数学',
+    category: '01. 数学',
     description: '指定桁数で四捨五入',
     data: [
       ['値', '桁数', '結果'],
@@ -228,7 +228,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ROUNDUP',
-    category: '数学',
+    category: '01. 数学',
     description: '指定桁数で切り上げ',
     data: [
       ['値', '桁数', '結果'],
@@ -240,7 +240,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ROUNDDOWN',
-    category: '数学',
+    category: '01. 数学',
     description: '指定桁数で切り下げ',
     data: [
       ['値', '桁数', '結果'],
@@ -252,7 +252,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CEILING',
-    category: '数学',
+    category: '01. 数学',
     description: '基準値の倍数に切り上げ',
     data: [
       ['値', '基準値', '結果'],
@@ -264,7 +264,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FLOOR',
-    category: '数学',
+    category: '01. 数学',
     description: '基準値の倍数に切り下げ',
     data: [
       ['値', '基準値', '結果'],
@@ -276,7 +276,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MOD',
-    category: '数学',
+    category: '01. 数学',
     description: '剰余を返す',
     data: [
       ['被除数', '除数', '結果'],
@@ -288,7 +288,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'INT',
-    category: '数学',
+    category: '01. 数学',
     description: '整数部分を返す',
     data: [
       ['値', '結果'],
@@ -300,7 +300,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TRUNC',
-    category: '数学',
+    category: '01. 数学',
     description: '小数部分を切り捨て',
     data: [
       ['値', '桁数', '結果'],
@@ -312,7 +312,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SIGN',
-    category: '数学',
+    category: '01. 数学',
     description: '数値の符号を返す',
     data: [
       ['値', '結果'],
@@ -324,7 +324,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RAND',
-    category: '数学',
+    category: '01. 数学',
     description: '0以上1未満の乱数',
     data: [
       ['乱数1', '乱数2', '乱数3'],
@@ -333,7 +333,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RANDBETWEEN',
-    category: '数学',
+    category: '01. 数学',
     description: '指定範囲の整数乱数',
     data: [
       ['最小', '最大', '結果'],
@@ -343,7 +343,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EXP',
-    category: '数学',
+    category: '01. 数学',
     description: 'eのべき乗を計算',
     data: [
       ['値', '結果'],
@@ -355,7 +355,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LN',
-    category: '数学',
+    category: '01. 数学',
     description: '自然対数を計算',
     data: [
       ['値', '結果'],
@@ -367,7 +367,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LOG',
-    category: '数学',
+    category: '01. 数学',
     description: '対数を計算',
     data: [
       ['値', '底', '結果'],
@@ -379,7 +379,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LOG10',
-    category: '数学',
+    category: '01. 数学',
     description: '常用対数を計算',
     data: [
       ['値', '結果'],
@@ -391,7 +391,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FACT',
-    category: '数学',
+    category: '01. 数学',
     description: '階乗を計算',
     data: [
       ['値', '結果'],
@@ -403,7 +403,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COMBIN',
-    category: '数学',
+    category: '01. 数学',
     description: '組み合わせ数を計算',
     data: [
       ['総数', '選択数', '結果'],
@@ -415,7 +415,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PERMUT',
-    category: '数学',
+    category: '01. 数学',
     description: '順列数を計算',
     data: [
       ['総数', '選択数', '結果'],
@@ -427,7 +427,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GCD',
-    category: '数学',
+    category: '01. 数学',
     description: '最大公約数を計算',
     data: [
       ['値1', '値2', '値3', '結果'],
@@ -438,7 +438,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LCM',
-    category: '数学',
+    category: '01. 数学',
     description: '最小公倍数を計算',
     data: [
       ['値1', '値2', '値3', '結果'],
@@ -449,7 +449,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'QUOTIENT',
-    category: '数学',
+    category: '01. 数学',
     description: '商の整数部分を返す',
     data: [
       ['被除数', '除数', '結果'],
@@ -461,7 +461,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MROUND',
-    category: '数学',
+    category: '01. 数学',
     description: '倍数に丸める',
     data: [
       ['値', '倍数', '結果'],
@@ -473,7 +473,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUMSQ',
-    category: '数学',
+    category: '01. 数学',
     description: '平方和を計算',
     data: [
       ['値1', '値2', '値3', '結果'],
@@ -484,7 +484,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUMPRODUCT',
-    category: '数学',
+    category: '01. 数学',
     description: '配列の積の和を計算',
     data: [
       ['配列1', '', '', '配列2', '', '', '結果'],
@@ -495,7 +495,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   // 三角関数
   {
     name: 'SIN',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '正弦を計算',
     data: [
       ['角度(ラジアン)', '結果'],
@@ -507,7 +507,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COS',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '余弦を計算',
     data: [
       ['角度(ラジアン)', '結果'],
@@ -519,7 +519,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TAN',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '正接を計算',
     data: [
       ['角度(ラジアン)', '結果'],
@@ -530,7 +530,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ASIN',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '逆正弦を計算',
     data: [
       ['値', '結果'],
@@ -542,7 +542,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ACOS',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '逆余弦を計算',
     data: [
       ['値', '結果'],
@@ -554,7 +554,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ATAN',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '逆正接を計算',
     data: [
       ['値', '結果'],
@@ -566,7 +566,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ATAN2',
-    category: '三角',
+    category: '01. 数学・三角',
     description: 'x,y座標から角度を計算',
     data: [
       ['x座標', 'y座標', '結果'],
@@ -578,7 +578,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DEGREES',
-    category: '三角',
+    category: '01. 数学・三角',
     description: 'ラジアンを度に変換',
     data: [
       ['ラジアン', '度'],
@@ -590,7 +590,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RADIANS',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '度をラジアンに変換',
     data: [
       ['度', 'ラジアン'],
@@ -602,7 +602,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PI',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '円周率を返す',
     data: [
       ['円周率'],
@@ -613,7 +613,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   // 追加の数学関数
   {
     name: 'SUMX2MY2',
-    category: '数学',
+    category: '01. 数学',
     description: 'x^2-y^2の和を計算',
     data: [
       ['X値', 'Y値'],
@@ -626,7 +626,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUMX2PY2',
-    category: '数学',
+    category: '01. 数学',
     description: 'x^2+y^2の和を計算',
     data: [
       ['X値', 'Y値'],
@@ -639,7 +639,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUMXMY2',
-    category: '数学',
+    category: '01. 数学',
     description: '(x-y)^2の和を計算',
     data: [
       ['X値', 'Y値'],
@@ -652,7 +652,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CEILING.MATH',
-    category: '数学',
+    category: '01. 数学',
     description: '数学的な切り上げ',
     data: [
       ['値', '基準値', '結果'],
@@ -663,7 +663,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FLOOR.MATH',
-    category: '数学',
+    category: '01. 数学',
     description: '数学的な切り下げ',
     data: [
       ['値', '基準値', '結果'],
@@ -674,7 +674,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EVEN',
-    category: '数学',
+    category: '01. 数学',
     description: '最も近い偶数に切り上げ',
     data: [
       ['値', '偶数'],
@@ -686,7 +686,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ODD',
-    category: '数学',
+    category: '01. 数学',
     description: '最も近い奇数に切り上げ',
     data: [
       ['値', '奇数'],
@@ -698,7 +698,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SINH',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '双曲線正弦を計算',
     data: [
       ['値', '双曲線正弦'],
@@ -709,7 +709,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COSH',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '双曲線余弦を計算',
     data: [
       ['値', '双曲線余弦'],
@@ -720,7 +720,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TANH',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '双曲線正接を計算',
     data: [
       ['値', '双曲線正接'],
@@ -731,7 +731,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ASINH',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '逆双曲線正弦',
     data: [
       ['値', '逆双曲線正弦'],
@@ -742,7 +742,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ACOSH',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '逆双曲線余弦',
     data: [
       ['値', '逆双曲線余弦'],
@@ -753,7 +753,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ATANH',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '逆双曲線正接',
     data: [
       ['値', '逆双曲線正接'],
@@ -764,7 +764,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SEC',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '正割',
     data: [
       ['角度(ラジアン)', '正割'],
@@ -775,7 +775,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CSC',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '余割',
     data: [
       ['角度(ラジアン)', '余割'],
@@ -786,7 +786,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COT',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '余接',
     data: [
       ['角度(ラジアン)', '余接'],
@@ -797,7 +797,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ACOT',
-    category: '三角',
+    category: '01. 数学・三角',
     description: '逆余接',
     data: [
       ['値', '逆余接'],
@@ -808,7 +808,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ARABIC',
-    category: '数学',
+    category: '01. 数学',
     description: 'ローマ数字をアラビア数字に',
     data: [
       ['ローマ数字', 'アラビア数字'],
@@ -819,7 +819,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ROMAN',
-    category: '数学',
+    category: '01. 数学',
     description: 'アラビア数字をローマ数字に',
     data: [
       ['アラビア数字', 'ローマ数字'],
@@ -830,7 +830,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BASE',
-    category: '数学',
+    category: '01. 数学',
     description: '基数変換',
     data: [
       ['数値', '基数', '最小桁数', '結果'],
@@ -841,7 +841,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DECIMAL',
-    category: '数学',
+    category: '01. 数学',
     description: '基数から10進数に変換',
     data: [
       ['テキスト', '基数', '10進数'],
@@ -852,7 +852,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SQRTPI',
-    category: '数学',
+    category: '01. 数学',
     description: '数値×πの平方根',
     data: [
       ['数値', '√(数値×π)'],
@@ -863,7 +863,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FACTDOUBLE',
-    category: '数学',
+    category: '01. 数学',
     description: '二重階乗',
     data: [
       ['数値', '二重階乗'],
@@ -874,7 +874,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MULTINOMIAL',
-    category: '数学',
+    category: '01. 数学',
     description: '多項係数',
     data: [
       ['値1', '値2', '値3', '多項係数'],
@@ -884,7 +884,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COMBINA',
-    category: '数学',
+    category: '01. 数学',
     description: '重複組み合わせ',
     data: [
       ['要素数', '選択数', '重複組み合わせ'],
@@ -895,7 +895,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PERMUTATIONA',
-    category: '数学',
+    category: '01. 数学',
     description: '重複順列',
     data: [
       ['要素数', '選択数', '重複順列'],
@@ -906,7 +906,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SERIESSUM',
-    category: '数学',
+    category: '01. 数学',
     description: 'べき級数の和',
     data: [
       ['x', 'n', 'm', '係数', '', '', 'べき級数'],
@@ -915,7 +915,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CEILING.PRECISE',
-    category: '数学',
+    category: '01. 数学',
     description: '正確な切り上げ',
     data: [
       ['数値', '基準値', '切り上げ'],
@@ -926,7 +926,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FLOOR.PRECISE',
-    category: '数学',
+    category: '01. 数学',
     description: '正確な切り捨て',
     data: [
       ['数値', '基準値', '切り捨て'],
@@ -937,7 +937,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISO.CEILING',
-    category: '数学',
+    category: '01. 数学',
     description: 'ISO規格の切り上げ',
     data: [
       ['数値', '基準値', '切り上げ'],
@@ -952,7 +952,7 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
 export const statisticalFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'AVERAGE',
-    category: '統計',
+    category: '02. 統計',
     description: '平均値を計算',
     data: [
       ['値1', '値2', '値3', '値4', '平均'],
@@ -962,7 +962,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'AVERAGEIF',
-    category: '統計',
+    category: '02. 統計',
     description: '条件付き平均値',
     data: [
       ['値', '条件', '平均'],
@@ -975,7 +975,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'AVERAGEIFS',
-    category: '統計',
+    category: '02. 統計',
     description: '複数条件付き平均値',
     data: [
       ['値', '条件1', '条件2', '平均'],
@@ -988,7 +988,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUNT',
-    category: '統計',
+    category: '02. 統計',
     description: '数値の個数を数える',
     data: [
       ['値1', '値2', '値3', '値4', '個数'],
@@ -998,7 +998,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUNTA',
-    category: '統計',
+    category: '02. 統計',
     description: '空白以外のセル数',
     data: [
       ['値1', '値2', '値3', '値4', '個数'],
@@ -1008,7 +1008,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUNTBLANK',
-    category: '統計',
+    category: '02. 統計',
     description: '空白セルの個数',
     data: [
       ['値1', '値2', '値3', '値4', '空白数'],
@@ -1018,7 +1018,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUNTIF',
-    category: '統計',
+    category: '02. 統計',
     description: '条件に一致するセル数',
     data: [
       ['値', '個数'],
@@ -1031,7 +1031,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUNTIFS',
-    category: '統計',
+    category: '02. 統計',
     description: '複数条件に一致するセル数',
     data: [
       ['値1', '値2', '個数'],
@@ -1044,7 +1044,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MAX',
-    category: '統計',
+    category: '02. 統計',
     description: '最大値を返す',
     data: [
       ['値1', '値2', '値3', '値4', '最大値'],
@@ -1054,7 +1054,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MIN',
-    category: '統計',
+    category: '02. 統計',
     description: '最小値を返す',
     data: [
       ['値1', '値2', '値3', '値4', '最小値'],
@@ -1064,7 +1064,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MAXIFS',
-    category: '統計',
+    category: '02. 統計',
     description: '条件付き最大値',
     data: [
       ['値', '条件', '最大値'],
@@ -1077,7 +1077,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MINIFS',
-    category: '統計',
+    category: '02. 統計',
     description: '条件付き最小値',
     data: [
       ['値', '条件', '最小値'],
@@ -1090,7 +1090,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MEDIAN',
-    category: '統計',
+    category: '02. 統計',
     description: '中央値を計算',
     data: [
       ['値1', '値2', '値3', '値4', '値5', '中央値'],
@@ -1100,7 +1100,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MODE',
-    category: '統計',
+    category: '02. 統計',
     description: '最頻値を計算',
     data: [
       ['値1', '値2', '値3', '値4', '値5', '最頻値'],
@@ -1110,7 +1110,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'STDEV',
-    category: '統計',
+    category: '02. 統計',
     description: '標準偏差（標本）',
     data: [
       ['値1', '値2', '値3', '値4', '標準偏差'],
@@ -1120,7 +1120,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'STDEV.S',
-    category: '統計',
+    category: '02. 統計',
     description: '標準偏差（標本）',
     data: [
       ['値1', '値2', '値3', '値4', '標準偏差'],
@@ -1130,7 +1130,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'STDEV.P',
-    category: '統計',
+    category: '02. 統計',
     description: '標準偏差（母集団）',
     data: [
       ['値1', '値2', '値3', '値4', '標準偏差'],
@@ -1140,7 +1140,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VAR',
-    category: '統計',
+    category: '02. 統計',
     description: '分散（標本）',
     data: [
       ['値1', '値2', '値3', '値4', '分散'],
@@ -1150,7 +1150,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VAR.S',
-    category: '統計',
+    category: '02. 統計',
     description: '分散（標本）',
     data: [
       ['値1', '値2', '値3', '値4', '分散'],
@@ -1160,7 +1160,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VAR.P',
-    category: '統計',
+    category: '02. 統計',
     description: '分散（母集団）',
     data: [
       ['値1', '値2', '値3', '値4', '分散'],
@@ -1170,7 +1170,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CORREL',
-    category: '統計',
+    category: '02. 統計',
     description: '相関係数を計算',
     data: [
       ['X', 'Y', '', '相関係数'],
@@ -1183,7 +1183,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LARGE',
-    category: '統計',
+    category: '02. 統計',
     description: 'k番目に大きい値',
     data: [
       ['値', '', '', '', 'k', '結果'],
@@ -1193,7 +1193,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SMALL',
-    category: '統計',
+    category: '02. 統計',
     description: 'k番目に小さい値',
     data: [
       ['値', '', '', '', 'k', '結果'],
@@ -1203,7 +1203,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RANK',
-    category: '統計',
+    category: '02. 統計',
     description: '順位を返す',
     data: [
       ['値', '順位'],
@@ -1216,7 +1216,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PERCENTILE',
-    category: '統計',
+    category: '02. 統計',
     description: 'パーセンタイル値',
     data: [
       ['値', '', '', '', 'k', '結果'],
@@ -1226,7 +1226,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'QUARTILE',
-    category: '統計',
+    category: '02. 統計',
     description: '四分位数',
     data: [
       ['値', '', '', '', '四分位', '結果'],
@@ -1237,7 +1237,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   // 追加の統計関数
   {
     name: 'SKEW',
-    category: '統計',
+    category: '02. 統計',
     description: '歪度を計算',
     data: [
       ['値1', '値2', '値3', '値4', '値5', '歪度'],
@@ -1246,7 +1246,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SKEW.P',
-    category: '統計',
+    category: '02. 統計',
     description: '歪度（母集団）',
     data: [
       ['値1', '値2', '値3', '値4', '値5', '歪度'],
@@ -1255,7 +1255,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MODE.SNGL',
-    category: '統計',
+    category: '02. 統計',
     description: '最頻値（単一）',
     data: [
       ['値1', '値2', '値3', '値4', '値5', '最頻値'],
@@ -1264,7 +1264,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'QUARTILE.INC',
-    category: '統計',
+    category: '02. 統計',
     description: '四分位数（境界値含む）',
     data: [
       ['値1', '値2', '値3', '値4', '第1四分位'],
@@ -1273,7 +1273,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PERCENTILE.INC',
-    category: '統計',
+    category: '02. 統計',
     description: 'パーセンタイル（境界値含む）',
     data: [
       ['値1', '値2', '値3', '値4', '50%タイル'],
@@ -1282,7 +1282,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RANK.EQ',
-    category: '統計',
+    category: '02. 統計',
     description: '順位（同順位は最小）',
     data: [
       ['値', '順位'],
@@ -1294,7 +1294,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'KURT',
-    category: '統計',
+    category: '02. 統計',
     description: '尖度を計算',
     data: [
       ['値1', '値2', '値3', '値4', '値5', '尖度'],
@@ -1303,7 +1303,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'STANDARDIZE',
-    category: '統計',
+    category: '02. 統計',
     description: '標準化する',
     data: [
       ['値', '平均', '標準偏差', '標準化値'],
@@ -1313,7 +1313,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DEVSQ',
-    category: '統計',
+    category: '02. 統計',
     description: '偏差平方和を計算',
     data: [
       ['値1', '値2', '値3', '値4', '偏差平方和'],
@@ -1323,7 +1323,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GEOMEAN',
-    category: '統計',
+    category: '02. 統計',
     description: '幾何平均を計算',
     data: [
       ['値1', '値2', '値3', '値4', '幾何平均'],
@@ -1332,7 +1332,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HARMEAN',
-    category: '統計',
+    category: '02. 統計',
     description: '調和平均を計算',
     data: [
       ['値1', '値2', '値3', '値4', '調和平均'],
@@ -1341,7 +1341,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TRIMMEAN',
-    category: '統計',
+    category: '02. 統計',
     description: 'トリム平均を計算',
     data: [
       ['値1', '値2', '値3', '値4', '値5', '値6', '除外率', 'トリム平均'],
@@ -1351,7 +1351,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   // 統計分布関数（高優先度）
   {
     name: 'NORM.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: '正規分布',
     data: [
       ['値', '平均', '標準偏差', '累積', '確率密度'],
@@ -1361,7 +1361,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NORM.INV',
-    category: '統計',
+    category: '02. 統計',
     description: '正規分布の逆関数',
     data: [
       ['確率', '平均', '標準偏差', '値'],
@@ -1371,7 +1371,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NORM.S.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: '標準正規分布',
     data: [
       ['z値', '累積', '確率'],
@@ -1381,7 +1381,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NORM.S.INV',
-    category: '統計',
+    category: '02. 統計',
     description: '標準正規分布の逆関数',
     data: [
       ['確率', 'z値'],
@@ -1391,7 +1391,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'T.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: 't分布（左側）',
     data: [
       ['値', '自由度', '累積', '確率'],
@@ -1400,7 +1400,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'T.DIST.2T',
-    category: '統計',
+    category: '02. 統計',
     description: 't分布（両側）',
     data: [
       ['値', '自由度', '確率'],
@@ -1409,7 +1409,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'T.INV',
-    category: '統計',
+    category: '02. 統計',
     description: 't分布の逆関数（左側）',
     data: [
       ['確率', '自由度', '値'],
@@ -1419,7 +1419,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'T.INV.2T',
-    category: '統計',
+    category: '02. 統計',
     description: 't分布の逆関数（両側）',
     data: [
       ['確率', '自由度', '値'],
@@ -1429,7 +1429,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHISQ.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: 'カイ二乗分布',
     data: [
       ['値', '自由度', '累積', '確率'],
@@ -1438,7 +1438,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHISQ.INV',
-    category: '統計',
+    category: '02. 統計',
     description: 'カイ二乗分布の逆関数',
     data: [
       ['確率', '自由度', '値'],
@@ -1448,7 +1448,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'F.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: 'F分布',
     data: [
       ['値', '自由度1', '自由度2', '累積', '確率'],
@@ -1458,7 +1458,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'F.INV',
-    category: '統計',
+    category: '02. 統計',
     description: 'F分布の逆関数',
     data: [
       ['確率', '自由度1', '自由度2', '値'],
@@ -1468,7 +1468,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EXPON.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: '指数分布',
     data: [
       ['値', 'λ', '累積', '確率'],
@@ -1478,7 +1478,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COVARIANCE.P',
-    category: '統計',
+    category: '02. 統計',
     description: '母共分散',
     data: [
       ['データ1', 'データ2', '', '共分散'],
@@ -1491,7 +1491,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COVARIANCE.S',
-    category: '統計',
+    category: '02. 統計',
     description: '標本共分散',
     data: [
       ['データ1', 'データ2', '', '共分散'],
@@ -1503,7 +1503,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MODE.MULT',
-    category: '統計',
+    category: '02. 統計',
     description: '最頻値（複数）',
     data: [
       ['データ', '最頻値'],
@@ -1518,7 +1518,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RANK.AVG',
-    category: '統計',
+    category: '02. 統計',
     description: '順位（平均）',
     data: [
       ['データ', '順位'],
@@ -1532,7 +1532,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LOGNORM.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: '対数正規分布',
     data: [
       ['値', '平均', '標準偏差', '累積', '確率'],
@@ -1541,7 +1541,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LOGNORM.INV',
-    category: '統計',
+    category: '02. 統計',
     description: '対数正規分布の逆関数',
     data: [
       ['確率', '平均', '標準偏差', '値'],
@@ -1550,7 +1550,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'T.DIST.RT',
-    category: '統計',
+    category: '02. 統計',
     description: 'T分布（右側）',
     data: [
       ['値', '自由度', '確率'],
@@ -1559,7 +1559,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHISQ.DIST.RT',
-    category: '統計',
+    category: '02. 統計',
     description: 'カイ二乗分布（右側）',
     data: [
       ['値', '自由度', '確率'],
@@ -1568,7 +1568,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHISQ.INV.RT',
-    category: '統計',
+    category: '02. 統計',
     description: 'カイ二乗分布の逆関数（右側）',
     data: [
       ['確率', '自由度', '値'],
@@ -1577,7 +1577,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'F.DIST.RT',
-    category: '統計',
+    category: '02. 統計',
     description: 'F分布（右側）',
     data: [
       ['値', '自由度1', '自由度2', '確率'],
@@ -1586,7 +1586,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'F.INV.RT',
-    category: '統計',
+    category: '02. 統計',
     description: 'F分布の逆関数（右側）',
     data: [
       ['確率', '自由度1', '自由度2', '値'],
@@ -1595,7 +1595,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BETA.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: 'ベータ分布',
     data: [
       ['値', 'α', 'β', '下限', '上限', '累積', '確率'],
@@ -1604,7 +1604,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BETA.INV',
-    category: '統計',
+    category: '02. 統計',
     description: 'ベータ分布の逆関数',
     data: [
       ['確率', 'α', 'β', '下限', '上限', '値'],
@@ -1613,7 +1613,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GAMMA.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: 'ガンマ分布',
     data: [
       ['値', 'α', 'β', '累積', '確率'],
@@ -1622,7 +1622,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GAMMA.INV',
-    category: '統計',
+    category: '02. 統計',
     description: 'ガンマ分布の逆関数',
     data: [
       ['確率', 'α', 'β', '値'],
@@ -1631,7 +1631,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WEIBULL.DIST',
-    category: '統計',
+    category: '02. 統計',
     description: 'ワイブル分布',
     data: [
       ['値', 'α', 'β', '累積', '確率'],
@@ -1640,7 +1640,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PERCENTILE.EXC',
-    category: '統計',
+    category: '02. 統計',
     description: 'パーセンタイル（除外）',
     data: [
       ['データ', '', 'パーセンタイル'],
@@ -1654,7 +1654,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PERCENTRANK.INC',
-    category: '統計',
+    category: '02. 統計',
     description: 'パーセントランク（含む）',
     data: [
       ['データ', '値', 'ランク'],
@@ -1668,7 +1668,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PERCENTRANK.EXC',
-    category: '統計',
+    category: '02. 統計',
     description: 'パーセントランク（除外）',
     data: [
       ['データ', '値', 'ランク'],
@@ -1681,7 +1681,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'QUARTILE.EXC',
-    category: '統計',
+    category: '02. 統計',
     description: '四分位数（除外）',
     data: [
       ['データ', '四分位', '値'],
@@ -1697,7 +1697,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'STDEVA',
-    category: '統計',
+    category: '02. 統計',
     description: '標準偏差（テキスト含む）',
     data: [
       ['データ', '標準偏差'],
@@ -1710,7 +1710,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'STDEVPA',
-    category: '統計',
+    category: '02. 統計',
     description: '母標準偏差（テキスト含む）',
     data: [
       ['データ', '母標準偏差'],
@@ -1723,7 +1723,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VARA',
-    category: '統計',
+    category: '02. 統計',
     description: '分散（テキスト含む）',
     data: [
       ['データ', '分散'],
@@ -1736,7 +1736,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VARPA',
-    category: '統計',
+    category: '02. 統計',
     description: '母分散（テキスト含む）',
     data: [
       ['データ', '母分散'],
@@ -1753,7 +1753,7 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
 export const textFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'CONCATENATE',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字列を結合',
     data: [
       ['文字列1', '文字列2', '文字列3', '結果'],
@@ -1763,7 +1763,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CONCAT',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字列を結合（新版）',
     data: [
       ['文字列1', '文字列2', '結果'],
@@ -1773,7 +1773,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TEXTJOIN',
-    category: '文字列',
+    category: '03. 文字列',
     description: '区切り文字で結合',
     data: [
       ['値1', '値2', '値3', '結果'],
@@ -1783,7 +1783,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LEFT',
-    category: '文字列',
+    category: '03. 文字列',
     description: '左から文字を抽出',
     data: [
       ['文字列', '文字数', '結果'],
@@ -1793,7 +1793,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RIGHT',
-    category: '文字列',
+    category: '03. 文字列',
     description: '右から文字を抽出',
     data: [
       ['文字列', '文字数', '結果'],
@@ -1803,7 +1803,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MID',
-    category: '文字列',
+    category: '03. 文字列',
     description: '中間の文字を抽出',
     data: [
       ['文字列', '開始位置', '文字数', '結果'],
@@ -1813,7 +1813,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LEN',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字数を返す',
     data: [
       ['文字列', '文字数'],
@@ -1824,7 +1824,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FIND',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字位置を検索（大小区別）',
     data: [
       ['検索文字列', '対象文字列', '位置'],
@@ -1834,7 +1834,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SEARCH',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字位置を検索（大小区別なし）',
     data: [
       ['検索文字列', '対象文字列', '位置'],
@@ -1844,7 +1844,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'REPLACE',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字を置換（位置指定）',
     data: [
       ['文字列', '開始位置', '文字数', '新文字列', '結果'],
@@ -1854,7 +1854,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SUBSTITUTE',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字を置換（文字指定）',
     data: [
       ['文字列', '検索文字列', '置換文字列', '結果'],
@@ -1864,7 +1864,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'UPPER',
-    category: '文字列',
+    category: '03. 文字列',
     description: '大文字に変換',
     data: [
       ['文字列', '結果'],
@@ -1874,7 +1874,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LOWER',
-    category: '文字列',
+    category: '03. 文字列',
     description: '小文字に変換',
     data: [
       ['文字列', '結果'],
@@ -1884,7 +1884,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PROPER',
-    category: '文字列',
+    category: '03. 文字列',
     description: '先頭を大文字に変換',
     data: [
       ['文字列', '結果'],
@@ -1894,7 +1894,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TRIM',
-    category: '文字列',
+    category: '03. 文字列',
     description: '余分なスペースを削除',
     data: [
       ['文字列', '結果'],
@@ -1904,7 +1904,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TEXT',
-    category: '文字列',
+    category: '03. 文字列',
     description: '数値を書式付き文字列に変換',
     data: [
       ['値', '表示形式', '結果'],
@@ -1914,7 +1914,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VALUE',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字列を数値に変換',
     data: [
       ['文字列', '結果'],
@@ -1924,7 +1924,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'REPT',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字列を繰り返す',
     data: [
       ['文字列', '繰り返し回数', '結果'],
@@ -1934,7 +1934,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHAR',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字コードから文字を返す',
     data: [
       ['文字コード', '文字'],
@@ -1945,7 +1945,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CODE',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字から文字コードを返す',
     data: [
       ['文字', '文字コード'],
@@ -1956,7 +1956,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EXACT',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字列が同一か判定',
     data: [
       ['文字列1', '文字列2', '結果'],
@@ -1967,7 +1967,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CLEAN',
-    category: '文字列',
+    category: '03. 文字列',
     description: '印刷できない文字を削除',
     data: [
       ['テキスト', 'クリーン後'],
@@ -1978,7 +1978,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DOLLAR',
-    category: '文字列',
+    category: '03. 文字列',
     description: '通貨形式に変換',
     data: [
       ['数値', '小数桁', '結果'],
@@ -1989,7 +1989,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FIXED',
-    category: '文字列',
+    category: '03. 文字列',
     description: '小数点以下の桁数を固定',
     data: [
       ['数値', '小数桁', 'カンマなし', '結果'],
@@ -2000,7 +2000,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NUMBERVALUE',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'テキストを数値に変換',
     data: [
       ['テキスト', '小数点', '桁区切り', '結果'],
@@ -2011,7 +2011,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TEXTBEFORE',
-    category: '文字列',
+    category: '03. 文字列',
     description: '指定文字の前のテキストを抽出',
     data: [
       ['テキスト', '区切り文字', '結果'],
@@ -2023,7 +2023,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TEXTAFTER',
-    category: '文字列',
+    category: '03. 文字列',
     description: '指定文字の後のテキストを抽出',
     data: [
       ['テキスト', '区切り文字', '結果'],
@@ -2035,7 +2035,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TEXTSPLIT',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'テキストを分割',
     data: [
       ['テキスト', '区切り文字', '分割結果'],
@@ -2046,7 +2046,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'UNICHAR',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'Unicode番号から文字を返す',
     data: [
       ['Unicode番号', '文字'],
@@ -2058,7 +2058,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'UNICODE',
-    category: '文字列',
+    category: '03. 文字列',
     description: '文字からUnicode番号を返す',
     data: [
       ['文字', 'Unicode番号'],
@@ -2070,7 +2070,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'T',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'テキストのみを返す',
     data: [
       ['値', 'テキスト'],
@@ -2082,7 +2082,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ASC',
-    category: '文字列',
+    category: '03. 文字列',
     description: '全角を半角に変換',
     data: [
       ['全角文字', '半角文字'],
@@ -2094,7 +2094,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'JIS',
-    category: '文字列',
+    category: '03. 文字列',
     description: '半角を全角に変換',
     data: [
       ['半角文字', '全角文字'],
@@ -2106,7 +2106,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DBCS',
-    category: '文字列',
+    category: '03. 文字列',
     description: '半角を全角に変換（DBCS）',
     data: [
       ['半角文字', '全角文字'],
@@ -2117,7 +2117,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LENB',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'バイト数を返す',
     data: [
       ['文字列', 'バイト数'],
@@ -2128,7 +2128,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FINDB',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'バイト位置を検索',
     data: [
       ['検索文字', '対象文字列', 'バイト位置'],
@@ -2139,7 +2139,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SEARCHB',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'バイト位置を検索（大小区別なし）',
     data: [
       ['検索文字', '対象文字列', 'バイト位置'],
@@ -2149,7 +2149,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'REPLACEB',
-    category: '文字列',
+    category: '03. 文字列',
     description: 'バイト位置で置換',
     data: [
       ['文字列', '開始位置', 'バイト数', '新文字列', '結果'],
@@ -2163,7 +2163,7 @@ export const textFunctionTests: IndividualFunctionTest[] = [
 export const dateFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'TODAY',
-    category: '日付',
+    category: '04. 日付',
     description: '今日の日付を返す',
     data: [
       ['今日の日付'],
@@ -2172,7 +2172,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NOW',
-    category: '日付',
+    category: '04. 日付',
     description: '現在の日時を返す',
     data: [
       ['現在の日時'],
@@ -2181,7 +2181,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DATE',
-    category: '日付',
+    category: '04. 日付',
     description: '日付を作成',
     data: [
       ['年', '月', '日', '日付'],
@@ -2191,7 +2191,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TIME',
-    category: '日付',
+    category: '04. 日付',
     description: '時刻を作成',
     data: [
       ['時', '分', '秒', '時刻'],
@@ -2201,7 +2201,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'YEAR',
-    category: '日付',
+    category: '04. 日付',
     description: '年を抽出',
     data: [
       ['日付', '年'],
@@ -2211,7 +2211,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MONTH',
-    category: '日付',
+    category: '04. 日付',
     description: '月を抽出',
     data: [
       ['日付', '月'],
@@ -2221,7 +2221,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DAY',
-    category: '日付',
+    category: '04. 日付',
     description: '日を抽出',
     data: [
       ['日付', '日'],
@@ -2231,7 +2231,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HOUR',
-    category: '日付',
+    category: '04. 日付',
     description: '時を抽出',
     data: [
       ['時刻', '時'],
@@ -2241,7 +2241,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MINUTE',
-    category: '日付',
+    category: '04. 日付',
     description: '分を抽出',
     data: [
       ['時刻', '分'],
@@ -2251,7 +2251,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SECOND',
-    category: '日付',
+    category: '04. 日付',
     description: '秒を抽出',
     data: [
       ['時刻', '秒'],
@@ -2261,7 +2261,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WEEKDAY',
-    category: '日付',
+    category: '04. 日付',
     description: '曜日を数値で返す',
     data: [
       ['日付', '曜日番号'],
@@ -2271,7 +2271,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DATEDIF',
-    category: '日付',
+    category: '04. 日付',
     description: '日付間の期間を計算',
     data: [
       ['開始日', '終了日', '単位', '期間'],
@@ -2281,7 +2281,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DAYS',
-    category: '日付',
+    category: '04. 日付',
     description: '日数差を計算',
     data: [
       ['開始日', '終了日', '日数'],
@@ -2291,7 +2291,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EDATE',
-    category: '日付',
+    category: '04. 日付',
     description: '月数後の日付',
     data: [
       ['開始日', '月数', '結果'],
@@ -2300,7 +2300,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EOMONTH',
-    category: '日付',
+    category: '04. 日付',
     description: '月末日を返す',
     data: [
       ['開始日', '月数', '月末日'],
@@ -2309,7 +2309,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NETWORKDAYS',
-    category: '日付',
+    category: '04. 日付',
     description: '営業日数を計算',
     data: [
       ['開始日', '終了日', '営業日数'],
@@ -2320,7 +2320,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WORKDAY',
-    category: '日付',
+    category: '04. 日付',
     description: '営業日後の日付を計算',
     data: [
       ['開始日', '営業日数', '結果日'],
@@ -2330,7 +2330,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DATEVALUE',
-    category: '日付',
+    category: '04. 日付',
     description: '日付文字列を日付値に変換',
     data: [
       ['日付文字列', '日付値'],
@@ -2340,7 +2340,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TIMEVALUE',
-    category: '日付',
+    category: '04. 日付',
     description: '時刻文字列を時刻値に変換',
     data: [
       ['時刻文字列', '時刻値'],
@@ -2350,7 +2350,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WEEKNUM',
-    category: '日付',
+    category: '04. 日付',
     description: '週番号を返す',
     data: [
       ['日付', '週番号'],
@@ -2361,7 +2361,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISOWEEKNUM',
-    category: '日付',
+    category: '04. 日付',
     description: 'ISO週番号を返す',
     data: [
       ['日付', 'ISO週番号'],
@@ -2371,7 +2371,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'YEARFRAC',
-    category: '日付',
+    category: '04. 日付',
     description: '年の端数を計算',
     data: [
       ['開始日', '終了日', '基準', '年の端数'],
@@ -2382,7 +2382,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DAYS360',
-    category: '日付',
+    category: '04. 日付',
     description: '360日基準の日数',
     data: [
       ['開始日', '終了日', '方式', '日数'],
@@ -2393,7 +2393,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NETWORKDAYS.INTL',
-    category: '日付',
+    category: '04. 日付',
     description: '営業日数（国際版）',
     data: [
       ['開始日', '終了日', '週末', '営業日数'],
@@ -2403,7 +2403,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WORKDAY.INTL',
-    category: '日付',
+    category: '04. 日付',
     description: '営業日後の日付（国際版）',
     data: [
       ['開始日', '営業日数', '週末', '結果日'],
@@ -2417,7 +2417,7 @@ export const dateFunctionTests: IndividualFunctionTest[] = [
 export const logicalFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'IF',
-    category: '論理',
+    category: '05. 論理',
     description: '条件分岐',
     data: [
       ['値', '結果'],
@@ -2428,7 +2428,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IFS',
-    category: '論理',
+    category: '05. 論理',
     description: '複数条件分岐',
     data: [
       ['点数', '評価'],
@@ -2439,7 +2439,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'AND',
-    category: '論理',
+    category: '05. 論理',
     description: '論理積（すべて真）',
     data: [
       ['条件1', '条件2', '結果'],
@@ -2450,7 +2450,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'OR',
-    category: '論理',
+    category: '05. 論理',
     description: '論理和（いずれか真）',
     data: [
       ['条件1', '条件2', '結果'],
@@ -2461,7 +2461,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NOT',
-    category: '論理',
+    category: '05. 論理',
     description: '論理否定',
     data: [
       ['条件', '結果'],
@@ -2472,7 +2472,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'XOR',
-    category: '論理',
+    category: '05. 論理',
     description: '排他的論理和',
     data: [
       ['条件1', '条件2', '結果'],
@@ -2483,7 +2483,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TRUE',
-    category: '論理',
+    category: '05. 論理',
     description: '真を返す',
     data: [
       ['結果'],
@@ -2493,7 +2493,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FALSE',
-    category: '論理',
+    category: '05. 論理',
     description: '偽を返す',
     data: [
       ['結果'],
@@ -2503,7 +2503,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IFERROR',
-    category: '論理',
+    category: '05. 論理',
     description: 'エラー時の値を指定',
     data: [
       ['値1', '値2', '結果'],
@@ -2514,7 +2514,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IFNA',
-    category: '論理',
+    category: '05. 論理',
     description: '#N/Aエラー時の値',
     data: [
       ['検索値', '結果'],
@@ -2524,7 +2524,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SWITCH',
-    category: '論理',
+    category: '05. 論理',
     description: '値に応じて切り替え',
     data: [
       ['値', '結果'],
@@ -2540,7 +2540,7 @@ export const logicalFunctionTests: IndividualFunctionTest[] = [
 export const lookupFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'VLOOKUP',
-    category: '検索',
+    category: '06. 検索',
     description: '垂直方向検索',
     data: [
       ['ID', '名前', '部署', '', '検索ID', '結果'],
@@ -2552,7 +2552,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HLOOKUP',
-    category: '検索',
+    category: '06. 検索',
     description: '水平方向検索',
     data: [
       ['項目', '1月', '2月', '3月'],
@@ -2565,7 +2565,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'XLOOKUP',
-    category: '検索',
+    category: '06. 検索',
     description: '柔軟な検索',
     data: [
       ['ID', '名前', '', '検索ID', '結果'],
@@ -2577,7 +2577,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'INDEX',
-    category: '検索',
+    category: '06. 検索',
     description: '位置から値を取得',
     data: [
       ['データ', '', '', '行', '列', '結果'],
@@ -2589,7 +2589,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MATCH',
-    category: '検索',
+    category: '06. 検索',
     description: '値の位置を検索',
     data: [
       ['値', '', '', '検索値', '位置'],
@@ -2599,7 +2599,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHOOSE',
-    category: '検索',
+    category: '06. 検索',
     description: 'リストから選択',
     data: [
       ['インデックス', '結果'],
@@ -2610,7 +2610,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'OFFSET',
-    category: '検索',
+    category: '06. 検索',
     description: 'オフセット参照',
     data: [
       ['A1', 'B1', 'C1'],
@@ -2623,7 +2623,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'INDIRECT',
-    category: '検索',
+    category: '06. 検索',
     description: '文字列を参照に変換',
     data: [
       ['値1', '値2', '', '参照文字列', '結果'],
@@ -2633,7 +2633,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ROW',
-    category: '検索',
+    category: '06. 検索',
     description: '行番号を返す',
     data: [
       ['行番号'],
@@ -2645,7 +2645,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COLUMN',
-    category: '検索',
+    category: '06. 検索',
     description: '列番号を返す',
     data: [
       ['列1', '列2', '列3'],
@@ -2655,7 +2655,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'XMATCH',
-    category: '検索',
+    category: '06. 検索',
     description: '配列内の項目の位置を返す',
     data: [
       ['データ', '検索値', '位置'],
@@ -2668,7 +2668,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ROWS',
-    category: '検索',
+    category: '06. 検索',
     description: '範囲の行数を返す',
     data: [
       ['データ', '', '行数'],
@@ -2681,7 +2681,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COLUMNS',
-    category: '検索',
+    category: '06. 検索',
     description: '範囲の列数を返す',
     data: [
       ['データ', '', '', '', '列数'],
@@ -2691,7 +2691,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ADDRESS',
-    category: '検索',
+    category: '06. 検索',
     description: 'セルアドレスを文字列で返す',
     data: [
       ['行番号', '列番号', '絶対参照', 'アドレス'],
@@ -2702,7 +2702,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HYPERLINK',
-    category: '検索',
+    category: '06. 検索',
     description: 'ハイパーリンクを作成',
     data: [
       ['URL', '表示テキスト', 'リンク'],
@@ -2711,7 +2711,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LOOKUP',
-    category: '検索',
+    category: '06. 検索',
     description: 'ベクトル検索',
     data: [
       ['検索値', '検索範囲', '', '結果範囲', '', '結果'],
@@ -2722,7 +2722,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'AREAS',
-    category: '検索',
+    category: '06. 検索',
     description: '参照の領域数',
     data: [
       ['数式', '領域数'],
@@ -2733,7 +2733,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FORMULATEXT',
-    category: '検索',
+    category: '06. 検索',
     description: '数式を文字列として返す',
     data: [
       ['値', '数式テキスト'],
@@ -2744,7 +2744,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GETPIVOTDATA',
-    category: '検索',
+    category: '06. 検索',
     description: 'ピボットテーブルからデータ取得',
     data: [
       ['製品', '地域', '売上'],
@@ -2762,7 +2762,7 @@ export const lookupFunctionTests: IndividualFunctionTest[] = [
 export const financialFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'PMT',
-    category: '財務',
+    category: '07. 財務',
     description: 'ローン定期支払額',
     data: [
       ['元本', '年利率', '期間(月)', '月額支払額'],
@@ -2771,7 +2771,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FV',
-    category: '財務',
+    category: '07. 財務',
     description: '将来価値',
     data: [
       ['定期支払額', '利率', '期間', '将来価値'],
@@ -2780,7 +2780,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PV',
-    category: '財務',
+    category: '07. 財務',
     description: '現在価値',
     data: [
       ['定期支払額', '利率', '期間', '現在価値'],
@@ -2789,7 +2789,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RATE',
-    category: '財務',
+    category: '07. 財務',
     description: '利率',
     data: [
       ['期間', '支払額', '現在価値', '利率'],
@@ -2798,7 +2798,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NPER',
-    category: '財務',
+    category: '07. 財務',
     description: '支払回数',
     data: [
       ['利率', '支払額', '現在価値', '期間'],
@@ -2807,7 +2807,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NPV',
-    category: '財務',
+    category: '07. 財務',
     description: '正味現在価値',
     data: [
       ['割引率', 'CF1', 'CF2', 'CF3', 'NPV'],
@@ -2816,7 +2816,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IRR',
-    category: '財務',
+    category: '07. 財務',
     description: '内部収益率',
     data: [
       ['初期投資', 'CF1', 'CF2', 'CF3', 'IRR'],
@@ -2825,7 +2825,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'XNPV',
-    category: '財務',
+    category: '07. 財務',
     description: '不定期のキャッシュフローの正味現在価値',
     data: [
       ['割引率', 0.1, '', ''],
@@ -2838,7 +2838,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'XIRR',
-    category: '財務',
+    category: '07. 財務',
     description: '不定期のキャッシュフローの内部収益率',
     data: [
       ['日付', 'キャッシュフロー', 'XIRR'],
@@ -2850,7 +2850,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IPMT',
-    category: '財務',
+    category: '07. 財務',
     description: '利息部分の支払額',
     data: [
       ['利率', '期', '期間', '現在価値', '利息支払額'],
@@ -2859,7 +2859,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PPMT',
-    category: '財務',
+    category: '07. 財務',
     description: '元本部分の支払額',
     data: [
       ['利率', '期', '期間', '現在価値', '元本支払額'],
@@ -2868,7 +2868,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MIRR',
-    category: '財務',
+    category: '07. 財務',
     description: '修正内部収益率',
     data: [
       ['CF0', 'CF1', 'CF2', 'CF3', '投資利率', '再投資利率', 'MIRR'],
@@ -2877,7 +2877,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SLN',
-    category: '財務',
+    category: '07. 財務',
     description: '定額法による減価償却',
     data: [
       ['取得価額', '残存価額', '耐用年数', '減価償却費'],
@@ -2887,7 +2887,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SYD',
-    category: '財務',
+    category: '07. 財務',
     description: '級数法による減価償却',
     data: [
       ['取得価額', '残存価額', '耐用年数', '期', '減価償却費'],
@@ -2896,7 +2896,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DDB',
-    category: '財務',
+    category: '07. 財務',
     description: '倍率法による減価償却',
     data: [
       ['取得価額', '残存価額', '耐用年数', '期', '倍率', '減価償却費'],
@@ -2905,7 +2905,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DB',
-    category: '財務',
+    category: '07. 財務',
     description: '定率法による減価償却',
     data: [
       ['取得価額', '残存価額', '耐用年数', '期', '月', '減価償却費'],
@@ -2914,7 +2914,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VDB',
-    category: '財務',
+    category: '07. 財務',
     description: '倍率法減価償却（期間指定）',
     data: [
       ['取得価額', '残存価額', '耐用年数', '開始期', '終了期', '倍率', '切替なし', '償却費'],
@@ -2924,7 +2924,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // 債券関連関数
   {
     name: 'ACCRINT',
-    category: '財務',
+    category: '07. 財務',
     description: '定期利息証券の未収利息額',
     data: [
       ['発行日', '初回利払日', '決済日', '利率', '額面', '頻度', '基準', '未収利息'],
@@ -2933,7 +2933,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ACCRINTM',
-    category: '財務',
+    category: '07. 財務',
     description: '満期一括払い証券の未収利息額',
     data: [
       ['発行日', '満期日', '利率', '額面', '基準', '未収利息'],
@@ -2942,7 +2942,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DISC',
-    category: '財務',
+    category: '07. 財務',
     description: '証券の割引率',
     data: [
       ['決済日', '満期日', '価格', '償還価格', '基準', '割引率'],
@@ -2951,7 +2951,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DURATION',
-    category: '財務',
+    category: '07. 財務',
     description: '定期利息証券の年間マコーレー・デュレーション',
     data: [
       ['決済日', '満期日', '利率', '利回り', '頻度', '基準', 'デュレーション'],
@@ -2960,7 +2960,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MDURATION',
-    category: '財務',
+    category: '07. 財務',
     description: '修正マコーレー・デュレーション',
     data: [
       ['決済日', '満期日', '利率', '利回り', '頻度', '基準', '修正デュレーション'],
@@ -2969,7 +2969,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PRICE',
-    category: '財務',
+    category: '07. 財務',
     description: '定期利息証券の価格',
     data: [
       ['決済日', '満期日', '利率', '利回り', '償還価格', '頻度', '基準', '価格'],
@@ -2978,7 +2978,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'YIELD',
-    category: '財務',
+    category: '07. 財務',
     description: '定期利息証券の利回り',
     data: [
       ['決済日', '満期日', '利率', '価格', '償還価格', '頻度', '基準', '利回り'],
@@ -2988,7 +2988,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // クーポン関連関数
   {
     name: 'COUPDAYBS',
-    category: '財務',
+    category: '07. 財務',
     description: '利払期の開始日から決済日までの日数',
     data: [
       ['決済日', '満期日', '頻度', '基準', '日数'],
@@ -2997,7 +2997,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUPDAYS',
-    category: '財務',
+    category: '07. 財務',
     description: '決済日を含む利払期の日数',
     data: [
       ['決済日', '満期日', '頻度', '基準', '日数'],
@@ -3006,7 +3006,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUPDAYSNC',
-    category: '財務',
+    category: '07. 財務',
     description: '決済日から次回利払日までの日数',
     data: [
       ['決済日', '満期日', '頻度', '基準', '日数'],
@@ -3015,7 +3015,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUPNCD',
-    category: '財務',
+    category: '07. 財務',
     description: '決済日後の次回利払日',
     data: [
       ['決済日', '満期日', '頻度', '基準', '次回利払日'],
@@ -3024,7 +3024,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUPNUM',
-    category: '財務',
+    category: '07. 財務',
     description: '決済日から満期日までの利払回数',
     data: [
       ['決済日', '満期日', '頻度', '基準', '利払回数'],
@@ -3033,7 +3033,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COUPPCD',
-    category: '財務',
+    category: '07. 財務',
     description: '決済日直前の利払日',
     data: [
       ['決済日', '満期日', '頻度', '基準', '前回利払日'],
@@ -3043,7 +3043,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // 減価償却関連関数
   {
     name: 'AMORDEGRC',
-    category: '財務',
+    category: '07. 財務',
     description: '減価償却費（フランス会計システム）',
     data: [
       ['取得価額', '購入日', '最初の期末', '残存価額', '期', '率', '基準', '減価償却費'],
@@ -3052,7 +3052,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'AMORLINC',
-    category: '財務',
+    category: '07. 財務',
     description: '減価償却費（フランス会計システム、線形）',
     data: [
       ['取得価額', '購入日', '最初の期末', '残存価額', '期', '率', '基準', '減価償却費'],
@@ -3061,7 +3061,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUMIPMT',
-    category: '財務',
+    category: '07. 財務',
     description: '累計利息支払額',
     data: [
       ['利率', '期間', '現在価値', '開始期', '終了期', 'タイプ', '累計利息'],
@@ -3070,7 +3070,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUMPRINC',
-    category: '財務',
+    category: '07. 財務',
     description: '累計元本支払額',
     data: [
       ['利率', '期間', '現在価値', '開始期', '終了期', 'タイプ', '累計元本'],
@@ -3080,7 +3080,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // 特殊債券関連関数
   {
     name: 'ODDFPRICE',
-    category: '財務',
+    category: '07. 財務',
     description: '期間が半端な最初の期の証券価格',
     data: [
       ['決済日', '満期日', '発行日', '初回利払日', '利率', '利回り', '償還価格', '頻度', '基準', '価格'],
@@ -3089,7 +3089,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ODDFYIELD',
-    category: '財務',
+    category: '07. 財務',
     description: '期間が半端な最初の期の証券利回り',
     data: [
       ['決済日', '満期日', '発行日', '初回利払日', '利率', '価格', '償還価格', '頻度', '基準', '利回り'],
@@ -3098,7 +3098,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ODDLPRICE',
-    category: '財務',
+    category: '07. 財務',
     description: '期間が半端な最後の期の証券価格',
     data: [
       ['決済日', '満期日', '最終利払日', '利率', '利回り', '償還価格', '頻度', '基準', '価格'],
@@ -3107,7 +3107,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ODDLYIELD',
-    category: '財務',
+    category: '07. 財務',
     description: '期間が半端な最後の期の証券利回り',
     data: [
       ['決済日', '満期日', '最終利払日', '利率', '価格', '償還価格', '頻度', '基準', '利回り'],
@@ -3117,7 +3117,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // 財務省証券関連関数
   {
     name: 'TBILLEQ',
-    category: '財務',
+    category: '07. 財務',
     description: '財務省短期証券の債券換算利回り',
     data: [
       ['決済日', '満期日', '割引率', '債券換算利回り'],
@@ -3126,7 +3126,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TBILLPRICE',
-    category: '財務',
+    category: '07. 財務',
     description: '財務省短期証券の価格',
     data: [
       ['決済日', '満期日', '割引率', '価格'],
@@ -3135,7 +3135,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TBILLYIELD',
-    category: '財務',
+    category: '07. 財務',
     description: '財務省短期証券の利回り',
     data: [
       ['決済日', '満期日', '価格', '利回り'],
@@ -3145,7 +3145,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // 通貨変換関連関数
   {
     name: 'DOLLARDE',
-    category: '財務',
+    category: '07. 財務',
     description: '分数表記のドル価格を小数表記に変換',
     data: [
       ['分数価格', '分母', '小数価格'],
@@ -3155,7 +3155,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DOLLARFR',
-    category: '財務',
+    category: '07. 財務',
     description: '小数表記のドル価格を分数表記に変換',
     data: [
       ['小数価格', '分母', '分数価格'],
@@ -3166,7 +3166,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // 利率変換関連関数
   {
     name: 'EFFECT',
-    category: '財務',
+    category: '07. 財務',
     description: '実効年利率',
     data: [
       ['名目利率', '年間複利回数', '実効利率'],
@@ -3176,7 +3176,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'NOMINAL',
-    category: '財務',
+    category: '07. 財務',
     description: '名目年利率',
     data: [
       ['実効利率', '年間複利回数', '名目利率'],
@@ -3187,7 +3187,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   // その他の証券関連関数
   {
     name: 'PRICEDISC',
-    category: '財務',
+    category: '07. 財務',
     description: '割引証券の価格',
     data: [
       ['決済日', '満期日', '割引率', '償還価格', '基準', '価格'],
@@ -3196,7 +3196,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RECEIVED',
-    category: '財務',
+    category: '07. 財務',
     description: '満期保有証券の受取額',
     data: [
       ['決済日', '満期日', '投資額', '割引率', '基準', '受取額'],
@@ -3205,7 +3205,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'INTRATE',
-    category: '財務',
+    category: '07. 財務',
     description: '満期保有証券の利率',
     data: [
       ['決済日', '満期日', '投資額', '償還価格', '基準', '利率'],
@@ -3214,7 +3214,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PRICEMAT',
-    category: '財務',
+    category: '07. 財務',
     description: '満期利息付証券の価格',
     data: [
       ['決済日', '満期日', '発行日', '利率', '利回り', '基準', '価格'],
@@ -3223,7 +3223,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'YIELDDISC',
-    category: '財務',
+    category: '07. 財務',
     description: '割引証券の年利回り',
     data: [
       ['決済日', '満期日', '価格', '償還価格', '基準', '利回り'],
@@ -3232,7 +3232,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'YIELDMAT',
-    category: '財務',
+    category: '07. 財務',
     description: '満期利息付証券の年利回り',
     data: [
       ['決済日', '満期日', '発行日', '利率', '価格', '基準', '利回り'],
@@ -3245,7 +3245,7 @@ export const financialFunctionTests: IndividualFunctionTest[] = [
 export const matrixFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'MMULT',
-    category: '行列',
+    category: '08. 行列',
     description: '行列の積',
     data: [
       ['行列A', '', '行列B', '', '積'],
@@ -3255,7 +3255,7 @@ export const matrixFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MDETERM',
-    category: '行列',
+    category: '08. 行列',
     description: '行列式',
     data: [
       ['行列', '', '行列式'],
@@ -3266,7 +3266,7 @@ export const matrixFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MINVERSE',
-    category: '行列',
+    category: '08. 行列',
     description: '逆行列',
     data: [
       ['行列', '', '逆行列'],
@@ -3276,7 +3276,7 @@ export const matrixFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MUNIT',
-    category: '行列',
+    category: '08. 行列',
     description: '単位行列',
     data: [
       ['サイズ', '単位行列'],
@@ -3289,7 +3289,7 @@ export const matrixFunctionTests: IndividualFunctionTest[] = [
 export const informationFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'ISBLANK',
-    category: '情報',
+    category: '09. 情報',
     description: '空白セルか判定',
     data: [
       ['値', '空白判定'],
@@ -3301,7 +3301,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISERROR',
-    category: '情報',
+    category: '09. 情報',
     description: 'エラー値か判定',
     data: [
       ['値', 'エラー判定'],
@@ -3312,7 +3312,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISNA',
-    category: '情報',
+    category: '09. 情報',
     description: '#N/Aエラーか判定',
     data: [
       ['値', '#N/A判定'],
@@ -3323,7 +3323,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISTEXT',
-    category: '情報',
+    category: '09. 情報',
     description: '文字列か判定',
     data: [
       ['値', '文字列判定'],
@@ -3334,7 +3334,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISNUMBER',
-    category: '情報',
+    category: '09. 情報',
     description: '数値か判定',
     data: [
       ['値', '数値判定'],
@@ -3345,7 +3345,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISLOGICAL',
-    category: '情報',
+    category: '09. 情報',
     description: '論理値か判定',
     data: [
       ['値', '論理値判定'],
@@ -3356,7 +3356,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TYPE',
-    category: '情報',
+    category: '09. 情報',
     description: 'データ型を返す',
     data: [
       ['値', 'データ型'],
@@ -3368,7 +3368,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'N',
-    category: '情報',
+    category: '09. 情報',
     description: '数値に変換',
     data: [
       ['値', '数値変換'],
@@ -3380,7 +3380,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ERROR.TYPE',
-    category: '情報',
+    category: '09. 情報',
     description: 'エラーの種類',
     data: [
       ['エラー', 'エラー番号'],
@@ -3391,7 +3391,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SHEET',
-    category: '情報',
+    category: '09. 情報',
     description: 'シート番号を返す',
     data: [
       ['シート番号'],
@@ -3400,7 +3400,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SHEETS',
-    category: '情報',
+    category: '09. 情報',
     description: 'シート数を返す',
     data: [
       ['シート数'],
@@ -3409,7 +3409,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISFORMULA',
-    category: '情報',
+    category: '09. 情報',
     description: '数式か判定',
     data: [
       ['値', '数式判定'],
@@ -3420,7 +3420,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISREF',
-    category: '情報',
+    category: '09. 情報',
     description: '参照か判定',
     data: [
       ['値', '参照判定'],
@@ -3431,7 +3431,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CELL',
-    category: '情報',
+    category: '09. 情報',
     description: 'セル情報を取得',
     data: [
       ['情報タイプ', '参照', '結果'],
@@ -3441,7 +3441,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'INFO',
-    category: '情報',
+    category: '09. 情報',
     description: 'システム情報',
     data: [
       ['情報タイプ', '結果'],
@@ -3451,7 +3451,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ISBETWEEN',
-    category: '情報',
+    category: '09. 情報',
     description: '値が範囲内か判定',
     data: [
       ['値', '下限', '上限', '範囲内判定'],
@@ -3467,7 +3467,7 @@ export const informationFunctionTests: IndividualFunctionTest[] = [
 export const databaseFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'DSUM',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き合計',
     data: [
       ['名前', '部署', '売上'],
@@ -3483,7 +3483,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DAVERAGE',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き平均',
     data: [
       ['名前', '部署', '売上'],
@@ -3499,7 +3499,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DCOUNT',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付きカウント',
     data: [
       ['名前', '部署', '売上'],
@@ -3515,7 +3515,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DCOUNTA',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き非空白カウント',
     data: [
       ['名前', '部署', '売上'],
@@ -3531,7 +3531,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DMAX',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き最大値',
     data: [
       ['名前', '部署', '売上'],
@@ -3547,7 +3547,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DMIN',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き最小値',
     data: [
       ['名前', '部署', '売上'],
@@ -3563,7 +3563,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DPRODUCT',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き積',
     data: [
       ['商品', 'カテゴリ', '数量'],
@@ -3579,7 +3579,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DSTDEV',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き標準偏差',
     data: [
       ['名前', '部署', '売上'],
@@ -3594,7 +3594,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DSTDEVP',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き母標準偏差',
     data: [
       ['名前', '部署', '売上'],
@@ -3609,7 +3609,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DVAR',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き分散',
     data: [
       ['名前', '部署', '売上'],
@@ -3624,7 +3624,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DVARP',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件付き母分散',
     data: [
       ['名前', '部署', '売上'],
@@ -3639,7 +3639,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DGET',
-    category: 'データベース',
+    category: '10. データベース',
     description: '条件に一致する単一値',
     data: [
       ['ID', '名前', '部署'],
@@ -3659,7 +3659,7 @@ export const databaseFunctionTests: IndividualFunctionTest[] = [
 export const engineeringFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'CONVERT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '単位変換',
     data: [
       ['値', '変換元', '変換先', '結果'],
@@ -3671,7 +3671,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BIN2DEC',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '2進数→10進数',
     data: [
       ['2進数', '10進数'],
@@ -3682,7 +3682,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DEC2BIN',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '10進数→2進数',
     data: [
       ['10進数', '桁数', '2進数'],
@@ -3693,7 +3693,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HEX2DEC',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '16進数→10進数',
     data: [
       ['16進数', '10進数'],
@@ -3704,7 +3704,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'COMPLEX',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数を作成',
     data: [
       ['実部', '虚部', '複素数'],
@@ -3715,7 +3715,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BIN2HEX',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '2進数→16進数',
     data: [
       ['2進数', '桁数', '16進数'],
@@ -3726,7 +3726,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BIN2OCT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '2進数→8進数',
     data: [
       ['2進数', '桁数', '8進数'],
@@ -3737,7 +3737,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DEC2HEX',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '10進数→16進数',
     data: [
       ['10進数', '桁数', '16進数'],
@@ -3748,7 +3748,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DEC2OCT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '10進数→8進数',
     data: [
       ['10進数', '桁数', '8進数'],
@@ -3759,7 +3759,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HEX2BIN',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '16進数→2進数',
     data: [
       ['16進数', '桁数', '2進数'],
@@ -3770,7 +3770,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HEX2OCT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '16進数→8進数',
     data: [
       ['16進数', '桁数', '8進数'],
@@ -3781,7 +3781,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'OCT2BIN',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '8進数→2進数',
     data: [
       ['8進数', '桁数', '2進数'],
@@ -3792,7 +3792,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'OCT2DEC',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '8進数→10進数',
     data: [
       ['8進数', '10進数'],
@@ -3803,7 +3803,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'OCT2HEX',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '8進数→16進数',
     data: [
       ['8進数', '桁数', '16進数'],
@@ -3814,7 +3814,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMABS',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の絶対値',
     data: [
       ['複素数', '絶対値'],
@@ -3825,7 +3825,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMAGINARY',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の虚部',
     data: [
       ['複素数', '虚部'],
@@ -3836,7 +3836,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMREAL',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の実部',
     data: [
       ['複素数', '実部'],
@@ -3847,7 +3847,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMCONJUGATE',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素共役',
     data: [
       ['複素数', '共役'],
@@ -3858,7 +3858,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMARGUMENT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の偏角',
     data: [
       ['複素数', '偏角'],
@@ -3869,7 +3869,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMSUM',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の和',
     data: [
       ['複素数1', '複素数2', '和'],
@@ -3880,7 +3880,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMSUB',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の差',
     data: [
       ['複素数1', '複素数2', '差'],
@@ -3891,7 +3891,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMPRODUCT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の積',
     data: [
       ['複素数1', '複素数2', '積'],
@@ -3902,7 +3902,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMDIV',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の商',
     data: [
       ['複素数1', '複素数2', '商'],
@@ -3912,7 +3912,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMPOWER',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数のべき乗',
     data: [
       ['複素数', 'べき指数', 'べき乗'],
@@ -3923,7 +3923,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMLOG10',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の常用対数',
     data: [
       ['複素数', '常用対数'],
@@ -3933,7 +3933,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMLOG2',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の2を底とする対数',
     data: [
       ['複素数', '対数'],
@@ -3943,7 +3943,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ERF.PRECISE',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '誤差関数（精密）',
     data: [
       ['値', '誤差関数'],
@@ -3954,7 +3954,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ERFC.PRECISE',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '相補誤差関数（精密）',
     data: [
       ['値', '相補誤差関数'],
@@ -3965,7 +3965,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'PHONETIC',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ふりがなを抽出',
     data: [
       ['テキスト', 'ふりがな'],
@@ -3975,7 +3975,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMSQRT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の平方根',
     data: [
       ['複素数', '平方根'],
@@ -3985,7 +3985,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMEXP',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の指数',
     data: [
       ['複素数', '指数'],
@@ -3995,7 +3995,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMLN',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の自然対数',
     data: [
       ['複素数', '自然対数'],
@@ -4005,7 +4005,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMSIN',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の正弦',
     data: [
       ['複素数', '正弦'],
@@ -4015,7 +4015,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMCOS',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の余弦',
     data: [
       ['複素数', '余弦'],
@@ -4025,7 +4025,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMTAN',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '複素数の正接',
     data: [
       ['複素数', '正接'],
@@ -4036,7 +4036,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   // ベッセル関数
   {
     name: 'BESSELJ',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ベッセル関数Jn(x)',
     data: [
       ['X', 'N', 'ベッセルJ'],
@@ -4045,7 +4045,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BESSELY',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ベッセル関数Yn(x)',
     data: [
       ['X', 'N', 'ベッセルY'],
@@ -4054,7 +4054,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BESSELI',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '修正ベッセル関数In(x)',
     data: [
       ['X', 'N', '修正ベッセルI'],
@@ -4063,7 +4063,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BESSELK',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: '修正ベッセル関数Kn(x)',
     data: [
       ['X', 'N', '修正ベッセルK'],
@@ -4073,7 +4073,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   // ビット演算関数
   {
     name: 'BITAND',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ビット単位AND',
     data: [
       ['値1', '値2', 'AND結果'],
@@ -4084,7 +4084,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BITOR',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ビット単位OR',
     data: [
       ['値1', '値2', 'OR結果'],
@@ -4095,7 +4095,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BITXOR',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ビット単位XOR',
     data: [
       ['値1', '値2', 'XOR結果'],
@@ -4106,7 +4106,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BITLSHIFT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ビット左シフト',
     data: [
       ['値', 'シフト量', '結果'],
@@ -4117,7 +4117,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BITRSHIFT',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ビット右シフト',
     data: [
       ['値', 'シフト量', '結果'],
@@ -4129,7 +4129,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   // エラー関数
   {
     name: 'DELTA',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'クロネッカーのデルタ関数',
     data: [
       ['値1', '値2', 'デルタ'],
@@ -4140,7 +4140,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GESTEP',
-    category: 'エンジニアリング',
+    category: '11. エンジニアリング',
     description: 'ステップ関数',
     data: [
       ['値', 'ステップ', '結果'],
@@ -4155,7 +4155,7 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
 export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'FILTER',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '条件でフィルタ',
     data: [
       ['名前', '年齢', 'フィルタ結果'],
@@ -4166,7 +4166,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SORT',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '並べ替え',
     data: [
       ['名前', '点数', 'ソート結果'],
@@ -4177,7 +4177,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'UNIQUE',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '一意の値を抽出',
     data: [
       ['値', '一意の値'],
@@ -4190,7 +4190,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TRANSPOSE',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '行列を入れ替え',
     data: [
       ['', 'A', 'B', 'C'],
@@ -4202,7 +4202,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SEQUENCE',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '連続値を生成',
     data: [
       ['行数', '列数', '開始', 'ステップ', '連続値'],
@@ -4211,7 +4211,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'RANDARRAY',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: 'ランダム配列を生成',
     data: [
       ['行数', '列数', '最小', '最大', '整数', 'ランダム配列'],
@@ -4220,7 +4220,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LAMBDA',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: 'カスタム関数を作成',
     data: [
       ['値', '二乗'],
@@ -4231,7 +4231,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'LET',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '変数を定義して使用',
     data: [
       ['長さ', '幅', '面積'],
@@ -4242,7 +4242,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'HSTACK',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '水平方向に結合',
     data: [
       ['配列1', '', '配列2', '', '結合結果'],
@@ -4252,7 +4252,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'VSTACK',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '垂直方向に結合',
     data: [
       ['配列1', '配列2', '結合結果'],
@@ -4265,7 +4265,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BYROW',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '各行に関数を適用',
     data: [
       ['値1', '値2', '値3', '行の合計'],
@@ -4277,7 +4277,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'BYCOL',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '各列に関数を適用',
     data: [
       ['値1', '値2', '値3'],
@@ -4291,7 +4291,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MAKEARRAY',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を生成',
     data: [
       ['行数', '列数', '配列'],
@@ -4300,7 +4300,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'MAP',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列の各要素に関数を適用',
     data: [
       ['値', '二乗'],
@@ -4313,7 +4313,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'REDUCE',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を集約',
     data: [
       ['値', '累積合計'],
@@ -4326,7 +4326,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SCAN',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を累積的に処理',
     data: [
       ['値', '累積合計'],
@@ -4339,7 +4339,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SORTBY',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '別の配列でソート',
     data: [
       ['商品', '売上', 'ソート結果'],
@@ -4351,7 +4351,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TAKE',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列の一部を取得',
     data: [
       ['データ', '上位3つ'],
@@ -4365,7 +4365,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DROP',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列の一部を削除',
     data: [
       ['データ', '最初の2つを削除'],
@@ -4379,7 +4379,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'EXPAND',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を拡張',
     data: [
       ['元データ', '', '拡張結果'],
@@ -4391,7 +4391,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TOCOL',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を1列に変換',
     data: [
       ['配列', '', '1列変換'],
@@ -4401,7 +4401,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TOROW',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を1行に変換',
     data: [
       ['配列', '', '', '1行変換'],
@@ -4411,7 +4411,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHOOSEROWS',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '指定した行を選択',
     data: [
       ['データ', '列2', '選択結果'],
@@ -4423,7 +4423,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CHOOSECOLS',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '指定した列を選択',
     data: [
       ['データ', '列2', '列3', '選択結果'],
@@ -4434,7 +4434,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WRAPROWS',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を行で折り返し',
     data: [
       ['データ', '', '', '折り返し結果'],
@@ -4444,7 +4444,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WRAPCOLS',
-    category: '動的配列',
+    category: '12. 動的配列',
     description: '配列を列で折り返し',
     data: [
       ['データ', '', '折り返し結果'],
@@ -4459,7 +4459,7 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
 export const cubeFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'CUBEVALUE',
-    category: 'キューブ',
+    category: '13. キューブ',
     description: 'キューブから集計値を返す',
     data: [
       ['接続', 'メンバー1', 'メンバー2', '値'],
@@ -4468,7 +4468,7 @@ export const cubeFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUBEMEMBER',
-    category: 'キューブ',
+    category: '13. キューブ',
     description: 'キューブのメンバーを返す',
     data: [
       ['接続', 'メンバー式', 'キャプション', 'メンバー'],
@@ -4477,7 +4477,7 @@ export const cubeFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUBESET',
-    category: 'キューブ',
+    category: '13. キューブ',
     description: 'キューブからセットを定義',
     data: [
       ['接続', 'セット式', 'キャプション', 'セット'],
@@ -4486,7 +4486,7 @@ export const cubeFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUBESETCOUNT',
-    category: 'キューブ',
+    category: '13. キューブ',
     description: 'セット内のアイテム数',
     data: [
       ['セット', 'カウント'],
@@ -4495,7 +4495,7 @@ export const cubeFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUBERANKEDMEMBER',
-    category: 'キューブ',
+    category: '13. キューブ',
     description: 'セット内のn番目のメンバー',
     data: [
       ['接続', 'セット式', 'ランク', 'メンバー'],
@@ -4504,7 +4504,7 @@ export const cubeFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUBEMEMBERPROPERTY',
-    category: 'キューブ',
+    category: '13. キューブ',
     description: 'メンバーのプロパティ値',
     data: [
       ['接続', 'メンバー', 'プロパティ', '値'],
@@ -4513,7 +4513,7 @@ export const cubeFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'CUBEKPIMEMBER',
-    category: 'キューブ',
+    category: '13. キューブ',
     description: 'KPIメンバーを返す',
     data: [
       ['接続', 'KPI名', 'KPIプロパティ', 'メンバー'],
@@ -4526,7 +4526,7 @@ export const cubeFunctionTests: IndividualFunctionTest[] = [
 export const webFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'ENCODEURL',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'URLエンコード',
     data: [
       ['テキスト', 'エンコード結果'],
@@ -4537,7 +4537,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SPLIT',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'テキストを分割',
     data: [
       ['テキスト', '区切り文字', '分割結果'],
@@ -4547,7 +4547,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'JOIN',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'テキストを結合',
     data: [
       ['区切り文字', '値1', '値2', '値3', '結合結果'],
@@ -4558,7 +4558,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'QUERY',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'データのクエリ',
     data: [
       ['名前', '年齢', '部署', '', 'クエリ結果'],
@@ -4569,7 +4569,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FLATTEN',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '多次元配列を1次元に',
     data: [
       ['配列1', '', '配列2', '', 'フラット化'],
@@ -4579,7 +4579,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'ARRAYFORMULA',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '配列数式',
     data: [
       ['値', '結果'],
@@ -4592,7 +4592,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'REGEXEXTRACT',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '正規表現で抽出',
     data: [
       ['テキスト', 'パターン', '抽出結果'],
@@ -4603,7 +4603,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'REGEXMATCH',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '正規表現でマッチ',
     data: [
       ['テキスト', 'パターン', 'マッチ'],
@@ -4614,7 +4614,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'REGEXREPLACE',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '正規表現で置換',
     data: [
       ['テキスト', 'パターン', '置換文字', '結果'],
@@ -4625,7 +4625,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SORTN',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '上位N件をソート',
     data: [
       ['値', 'ソート結果'],
@@ -4638,7 +4638,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'WEBSERVICE',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'Webサービスからデータ取得',
     data: [
       ['URL', '取得結果'],
@@ -4647,7 +4647,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'FILTERXML',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'XMLからデータ抽出',
     data: [
       ['XMLデータ', 'XPath', '抽出結果'],
@@ -4657,7 +4657,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'SPARKLINE',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'ミニグラフを作成',
     data: [
       ['データ', '', '', '', 'スパークライン'],
@@ -4668,7 +4668,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   // インポート関数
   {
     name: 'IMPORTDATA',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'URLからデータをインポート',
     data: [
       ['URL', 'インポート結果'],
@@ -4677,7 +4677,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMPORTFEED',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'RSSやAtomフィードをインポート',
     data: [
       ['フィードURL', 'クエリ', 'ヘッダー', 'アイテム数', 'インポート結果'],
@@ -4686,7 +4686,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMPORTHTML',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'HTMLテーブルやリストをインポート',
     data: [
       ['URL', 'クエリ', 'インデックス', 'インポート結果'],
@@ -4695,7 +4695,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMPORTXML',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: 'XMLデータをインポート',
     data: [
       ['URL', 'XPathクエリ', 'インポート結果'],
@@ -4704,7 +4704,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMPORTRANGE',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '他のスプレッドシートから範囲をインポート',
     data: [
       ['スプレッドシートURL', '範囲', 'インポート結果'],
@@ -4713,7 +4713,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'IMAGE',
-    category: 'Web',
+    category: '14. Web・インポート',
     description: '画像を挿入',
     data: [
       ['画像URL', 'モード', '高さ', '幅', '画像'],
@@ -4726,7 +4726,7 @@ export const webFunctionTests: IndividualFunctionTest[] = [
 export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'GOOGLEFINANCE',
-    category: 'Google Sheets',
+    category: '14. Web・インポート',
     description: '金融情報を取得',
     data: [
       ['銘柄', '属性', '開始日', '終了日', '間隔', '結果'],
@@ -4736,7 +4736,7 @@ export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GOOGLETRANSLATE',
-    category: 'Google Sheets',
+    category: '14. Web・インポート',
     description: 'テキストを翻訳',
     data: [
       ['テキスト', '元言語', '翻訳先言語', '翻訳結果'],
@@ -4746,7 +4746,7 @@ export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'DETECTLANGUAGE',
-    category: 'Google Sheets',
+    category: '14. Web・インポート',
     description: '言語を検出',
     data: [
       ['テキスト', '検出言語'],
@@ -4758,7 +4758,7 @@ export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TO_DATE',
-    category: 'Google Sheets',
+    category: '14. Web・インポート',
     description: '値を日付に変換',
     data: [
       ['値', '日付'],
@@ -4768,7 +4768,7 @@ export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TO_PERCENT',
-    category: 'Google Sheets',
+    category: '14. Web・インポート',
     description: '値をパーセントに変換',
     data: [
       ['値', 'パーセント'],
@@ -4779,7 +4779,7 @@ export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TO_DOLLARS',
-    category: 'Google Sheets',
+    category: '14. Web・インポート',
     description: '値をドル表記に変換',
     data: [
       ['値', 'ドル表記'],
@@ -4790,7 +4790,7 @@ export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'TO_TEXT',
-    category: 'Google Sheets',
+    category: '14. Web・インポート',
     description: '値をテキストに変換',
     data: [
       ['値', 'テキスト'],
@@ -4805,7 +4805,7 @@ export const googleSheetsFunctionTests: IndividualFunctionTest[] = [
 export const otherFunctionTests: IndividualFunctionTest[] = [
   {
     name: 'ISOMITTED',
-    category: 'その他',
+    category: '15. その他',
     description: '引数が省略されているか判定',
     data: [
       ['値', '省略判定'],
@@ -4815,7 +4815,7 @@ export const otherFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'STOCKHISTORY',
-    category: 'その他',
+    category: '15. その他',
     description: '株価履歴を取得',
     data: [
       ['銘柄', '開始日', '終了日', '間隔', 'ヘッダー', 'プロパティ', '履歴'],
@@ -4824,7 +4824,7 @@ export const otherFunctionTests: IndividualFunctionTest[] = [
   },
   {
     name: 'GPT',
-    category: 'その他',
+    category: '15. その他',
     description: 'GPTによるテキスト生成',
     data: [
       ['プロンプト', '生成結果'],
