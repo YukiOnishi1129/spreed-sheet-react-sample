@@ -953,10 +953,17 @@ export const MROUND: CustomFormula = {
   name: 'MROUND',
   pattern: /MROUND\(([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, numberRef, multipleRef] = matches;
+    const [fullMatch, numberRef, multipleRef] = matches;
     
-    const number = Number(getCellValue(numberRef, context) ?? numberRef);
-    const multiple = Number(getCellValue(multipleRef, context) ?? multipleRef);
+    console.log('MROUND called with:', { fullMatch, numberRef, multipleRef });
+    
+    const numberValue = getCellValue(numberRef, context);
+    const multipleValue = getCellValue(multipleRef, context);
+    
+    console.log('MROUND values:', { numberValue, multipleValue });
+    
+    const number = Number(numberValue ?? numberRef);
+    const multiple = Number(multipleValue ?? multipleRef);
     
     if (isNaN(number) || isNaN(multiple)) {
       return FormulaError.VALUE;
@@ -971,7 +978,9 @@ export const MROUND: CustomFormula = {
       return FormulaError.NUM;
     }
     
-    return Math.round(number / multiple) * multiple;
+    const result = Math.round(number / multiple) * multiple;
+    console.log('MROUND result:', { number, multiple, result });
+    return result;
   }
 };
 

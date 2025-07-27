@@ -25,7 +25,13 @@ export async function selectFunction(page: any, category: string, functionName: 
 }
 
 export async function changeCellValue(page: any, row: number, col: number, value: string) {
-  const cell = page.locator('table tbody tr').nth(row).locator('td').nth(col);
+  // スプレッドシートの構造:
+  // - Row 0: ヘッダー行（空th、A、B、C）
+  // - Row 1: データヘッダー（1、値、倍数、結果）
+  // - Row 2以降: 実際のデータ
+  // - 各行の最初のセルは<th>（行番号）、残りは<td>
+  const actualRow = row + 1; // Row 0はヘッダーなのでスキップ
+  const cell = page.locator('table tbody tr').nth(actualRow).locator('td').nth(col);
   await cell.click();
   await page.keyboard.press('Control+a');
   await page.keyboard.press('Delete');
@@ -35,10 +41,16 @@ export async function changeCellValue(page: any, row: number, col: number, value
 }
 
 export async function getCellValue(page: any, row: number, col: number): Promise<string> {
-  const cell = page.locator('table tbody tr').nth(row).locator('td').nth(col);
+  // スプレッドシートの構造:
+  // - Row 0: ヘッダー行（空th、A、B、C）
+  // - Row 1: データヘッダー（1、値、倍数、結果）
+  // - Row 2以降: 実際のデータ
+  // - 各行の最初のセルは<th>（行番号）、残りは<td>
+  const actualRow = row + 1; // Row 0はヘッダーなのでスキップ
+  const cell = page.locator('table tbody tr').nth(actualRow).locator('td').nth(col);
   const value = await cell.textContent() || '';
   
-  // デバッグ用ログ（0ベースのrowを1ベースに変換して表示）
+  // デバッグ用ログ
   const cellAddress = `${String.fromCharCode(65 + col)}${row + 1}`;
   console.log(`Getting cell ${cellAddress}: "${value}"`);
   
@@ -71,7 +83,7 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
         // expectedValuesと実際の計算結果を比較
         for (const [cell, expectedValue] of Object.entries(testData.expectedValues)) {
           const col = cell.charCodeAt(0) - 'A'.charCodeAt(0);
-          const row = parseInt(cell.substring(1)); // Excelの行番号をそのまま使用（テーブルのインデックスとして）
+          const row = parseInt(cell.substring(1)) - 1; // Excelの行番号を0ベースのインデックスに変換
           const actualValue = await getCellValue(page, row, col);
           
           // 数値または文字列として比較
@@ -100,12 +112,12 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
             // 元の値を保存
             const firstCell = Object.keys(testData.expectedValues)[0];
             const col = firstCell.charCodeAt(0) - 'A'.charCodeAt(0);
-            const row = parseInt(firstCell.substring(1)); // Excelの行番号をそのまま使用
+            const row = parseInt(firstCell.substring(1)) - 1; // Excelの行番号を0ベースのインデックスに変換
             const originalValue = await getCellValue(page, row, col);
             
             // 値を大きく変更（10倍）して確実に結果が変わるようにする
             const newTestValue = newValue > 0 ? newValue + 10 : newValue - 10;
-            await changeCellValue(page, 2, firstDataCol, newTestValue.toString());
+            await changeCellValue(page, 1, firstDataCol, newTestValue.toString());
             await page.waitForTimeout(500);
             
             // 再計算後の値を確認

@@ -130,6 +130,14 @@ function calculateAllFormulas(data: CellData[][]): CellData[][] {
         if (cell.formula && (cell.value === undefined || cell.value === '' || typeof cell.value === 'string')) {
           const calculatedValue = calculateSingleFormula(cell.formula, result, rowIndex, colIndex);
           
+          // MROUND関数のデバッグ
+          if (cell.formula.includes('MROUND')) {
+            console.log(`calculateAllFormulas: [${rowIndex}][${colIndex}]`, {
+              formula: cell.formula,
+              oldValue: cell.value,
+              newValue: calculatedValue
+            });
+          }
           
           if (calculatedValue !== cell.value) {
             cell.value = calculatedValue;
@@ -154,14 +162,16 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
   let iterations = 0;
   const maxIterations = 10;
   
-  // デバッグ用：MROUND/COUNTBLANKの評価をログ
-  if (formula.includes('MROUND') || formula.includes('COUNTBLANK')) {
-    console.log(`Evaluating nested formula: ${formula}`);
-  }
+  
   
   while (hasChanges && iterations < maxIterations) {
     hasChanges = false;
     iterations++;
+    
+    // MROUNDのデバッグ
+    if (formula.includes('MROUND')) {
+      console.log(`evaluateNestedFormula iteration ${iterations}:`, evaluatedFormula);
+    }
     
     // 最も内側の関数から評価する - より正確なパターンマッチング
     const innerFunctionRegex = /([A-Z]+(?:\.[A-Z]+)?)\(([^()]*)\)/;
@@ -176,9 +186,12 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
       // この関数を評価
       const matchResult = matchFormula(fullMatch);
       
-      // デバッグ：MROUND/COUNTBLANKのマッチング結果
-      if (functionName === 'MROUND' || functionName === 'COUNTBLANK') {
-        console.log(`Matching ${functionName}: ${fullMatch}`, matchResult ? 'SUCCESS' : 'FAILED');
+      // MROUNDのデバッグ
+      if (functionName === 'MROUND') {
+        console.log('Trying to match MROUND:', {
+          fullMatch,
+          matchResult: matchResult ? 'FOUND' : 'NOT FOUND'
+        });
       }
       
       if (matchResult) {
@@ -222,10 +235,6 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     // 先頭の = を除去
     const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;
     
-    // デバッグ：MROUND関数とCOUNTBLANK関数の実行をログ
-    if (cleanFormula.includes('MROUND') || cleanFormula.includes('COUNTBLANK')) {
-      console.log(`Calculating formula: ${cleanFormula} at row ${currentRow}, col ${currentCol}`);
-    }
     
     // FormulaContextを作成
     const context: FormulaContext = {
@@ -236,6 +245,14 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     
     // ネストされた関数を評価
     const evaluatedFormula = evaluateNestedFormula(cleanFormula, context);
+    
+    // MROUNDのデバッグ
+    if (cleanFormula.includes('MROUND')) {
+      console.log('calculateSingleFormula MROUND:', {
+        cleanFormula,
+        evaluatedFormula
+      });
+    }
     
     // カスタム関数のマッチングを試行
     let matchResult = matchFormula(evaluatedFormula);
@@ -254,6 +271,12 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     if (matchResult) {
       // 関数を実行
       const result = matchResult.function.calculate(matchResult.matches, context);
+      
+      // MROUNDのデバッグ
+      if (cleanFormula.includes('MROUND')) {
+        console.log('MROUND calculation result:', result);
+      }
+      
       return result;
     } else {
       // 評価済みの式が単純な値の場合
@@ -270,10 +293,6 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
         return evaluatedFormula as FormulaResult;
       }
       
-      // デバッグ用：MROUNDまたはCOUNTBLANKが見つからない場合
-      if (cleanFormula.includes('MROUND') || cleanFormula.includes('COUNTBLANK')) {
-        console.warn(`関数が見つかりません: ${evaluatedFormula} (original: ${cleanFormula})`);
-      }
       console.warn(`未対応の数式: ${evaluatedFormula} (original: ${cleanFormula})`);
       return `#NAME?`; // 未対応の関数エラー
     }

@@ -61,7 +61,8 @@
       "Bash(cp:*)",
       "Bash(timeout 10 npx playwright test:*)",
       "Bash(gtimeout:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(open /tmp/test-mround.html)"
     ],
     "deny": []
   }
