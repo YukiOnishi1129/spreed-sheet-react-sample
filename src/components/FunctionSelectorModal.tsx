@@ -1,8 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { 
-  type IndividualFunctionTest,
-  allIndividualFunctionTests
-} from '../data/individualFunctionTests';
+import type { IndividualFunctionTest } from '../types/spreadsheet';
+import { allIndividualFunctionTests } from '../data/individualFunctionTests';
 
 interface FunctionSelectorModalProps {
   isOpen: boolean;
@@ -42,9 +40,9 @@ export function FunctionSelectorModal({
     let functions: IndividualFunctionTest[] = [];
     
     if (selectedCategory === 'all') {
-      functions = allIndividualFunctionTests;
-    } else if (selectedCategory in functionCategories) {
-      functions = functionCategories[selectedCategory];
+      functions = [...allIndividualFunctionTests];
+    } else if (functionCategories[selectedCategory]) {
+      functions = [...functionCategories[selectedCategory]];
     }
     
     if (searchQuery) {

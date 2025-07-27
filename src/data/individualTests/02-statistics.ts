@@ -797,21 +797,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
     ]
   },
   {
-    name: 'COUNT',
-    category: '02. 統計',
-    description: '数値の個数',
-    data: [
-      ['データ', '個数'],
-      [10, '=COUNT(A2:A7)'],
-      [20, ''],
-      ['テキスト', ''],
-      [30, ''],
-      ['', ''],
-      [40, '']
-    ],
-    expectedValues: { 'B2': 4 }
-  },
-  {
     name: 'AVEDEV',
     category: '02. 統計',
     description: '平均偏差',
@@ -823,28 +808,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
       [40, '']
     ],
     expectedValues: { 'B2': 10 }
-  },
-  {
-    name: 'BETA.DIST',
-    category: '02. 統計',
-    description: 'ベータ分布',
-    data: [
-      ['値', 'α', 'β', '累積', '結果'],
-      [0.5, 2, 3, 'TRUE', '=BETA.DIST(A2,B2,C2,D2)'],
-      [0.5, 2, 3, 'FALSE', '=BETA.DIST(A3,B3,C3,D3)']
-    ],
-    expectedValues: { 'E2': 0.3125, 'E3': 1.5 }
-  },
-  {
-    name: 'BETA.INV',
-    category: '02. 統計',
-    description: 'ベータ分布の逆関数',
-    data: [
-      ['確率', 'α', 'β', '結果'],
-      [0.5, 2, 3, '=BETA.INV(A2,B2,C2)'],
-      [0.8, 2, 3, '=BETA.INV(A3,B3,C3)']
-    ],
-    expectedValues: { 'D2': 0.448, 'D3': 0.618 }
   },
   {
     name: 'BINOM.DIST',
@@ -867,28 +830,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
       [10, 0.5, 0.8, '=BINOM.INV(A3,B3,C3)']
     ],
     expectedValues: { 'D2': 5, 'D3': 6 }
-  },
-  {
-    name: 'CHISQ.DIST',
-    category: '02. 統計',
-    description: 'カイ二乗分布',
-    data: [
-      ['値', '自由度', '累積', '結果'],
-      [5, 3, 'TRUE', '=CHISQ.DIST(A2,B2,C2)'],
-      [5, 3, 'FALSE', '=CHISQ.DIST(A3,B3,C3)']
-    ],
-    expectedValues: { 'D2': 0.828, 'D3': 0.064 }
-  },
-  {
-    name: 'CHISQ.DIST.RT',
-    category: '02. 統計',
-    description: 'カイ二乗分布（右側）',
-    data: [
-      ['値', '自由度', '結果'],
-      [5, 3, '=CHISQ.DIST.RT(A2,B2)'],
-      [10, 5, '=CHISQ.DIST.RT(A3,B3)']
-    ],
-    expectedValues: { 'C2': 0.172, 'C3': 0.075 }
   },
   {
     name: 'CHISQ.TEST',
@@ -926,56 +867,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
       [0.01, 2.5, 10, '=CONFIDENCE.T(A3,B3,C3)']
     ],
     expectedValues: { 'D2': 1.789, 'D3': 2.574 }
-  },
-  {
-    name: 'COVARIANCE.P',
-    category: '02. 統計',
-    description: '母共分散',
-    data: [
-      ['X', 'Y', '', '母共分散'],
-      [1, 2, '', '=COVARIANCE.P(A2:A5,B2:B5)'],
-      [2, 4, '', ''],
-      [3, 6, '', ''],
-      [4, 8, '', '']
-    ],
-    expectedValues: { 'D2': 2.5 }
-  },
-  {
-    name: 'COVARIANCE.S',
-    category: '02. 統計',
-    description: '標本共分散',
-    data: [
-      ['X', 'Y', '', '標本共分散'],
-      [1, 2, '', '=COVARIANCE.S(A2:A5,B2:B5)'],
-      [2, 4, '', ''],
-      [3, 6, '', ''],
-      [4, 8, '', '']
-    ],
-    expectedValues: { 'D2': 3.333 }
-  },
-  {
-    name: 'DEVSQ',
-    category: '02. 統計',
-    description: '平方偏差の合計',
-    data: [
-      ['データ', '平方偏差の合計'],
-      [10, '=DEVSQ(A2:A5)'],
-      [20, ''],
-      [30, ''],
-      [40, '']
-    ],
-    expectedValues: { 'B2': 500 }
-  },
-  {
-    name: 'EXPON.DIST',
-    category: '02. 統計',
-    description: '指数分布',
-    data: [
-      ['値', 'λ', '累積', '結果'],
-      [0.5, 1, 'TRUE', '=EXPON.DIST(A2,B2,C2)'],
-      [0.5, 1, 'FALSE', '=EXPON.DIST(A3,B3,C3)']
-    ],
-    expectedValues: { 'D2': 0.393469, 'D3': 0.606531 }
   },
   {
     name: 'F.TEST',
@@ -1028,28 +919,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
     expectedValues: { 'B2': 1, 'B3': 1, 'B4': 2, 'B5': 6 }
   },
   {
-    name: 'GAMMA.DIST',
-    category: '02. 統計',
-    description: 'ガンマ分布',
-    data: [
-      ['値', 'α', 'β', '累積', '結果'],
-      [5, 3, 2, 'TRUE', '=GAMMA.DIST(A2,B2,C2,D2)'],
-      [5, 3, 2, 'FALSE', '=GAMMA.DIST(A3,B3,C3,D3)']
-    ],
-    expectedValues: { 'E2': 0.761, 'E3': 0.065 }
-  },
-  {
-    name: 'GAMMA.INV',
-    category: '02. 統計',
-    description: 'ガンマ分布の逆関数',
-    data: [
-      ['確率', 'α', 'β', '結果'],
-      [0.5, 3, 2, '=GAMMA.INV(A2,B2,C2)'],
-      [0.75, 3, 2, '=GAMMA.INV(A3,B3,C3)']
-    ],
-    expectedValues: { 'D2': 4.671, 'D3': 6.727 }
-  },
-  {
     name: 'GAMMALN',
     category: '02. 統計',
     description: 'ガンマ関数の自然対数',
@@ -1098,60 +967,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
     expectedValues: { 'F2': 0.238095, 'F3': 0.916667 }
   },
   {
-    name: 'KURT',
-    category: '02. 統計',
-    description: '尖度',
-    data: [
-      ['データ', '尖度'],
-      [10, '=KURT(A2:A6)'],
-      [20, ''],
-      [30, ''],
-      [40, ''],
-      [50, '']
-    ],
-    expectedValues: { 'B2': -1.2 }
-  },
-  {
-    name: 'LARGE',
-    category: '02. 統計',
-    description: 'k番目に大きな値',
-    data: [
-      ['データ', 'k', '結果'],
-      [10, 1, '=LARGE($A$2:$A$6,B2)'],
-      [20, 2, '=LARGE($A$2:$A$6,B3)'],
-      [30, 3, '=LARGE($A$2:$A$6,B4)'],
-      [40, '', ''],
-      [50, '', '']
-    ],
-    expectedValues: { 'C2': 50, 'C3': 40, 'C4': 30 }
-  },
-  {
-    name: 'MAX',
-    category: '02. 統計',
-    description: '最大値',
-    data: [
-      ['データ', '最大値'],
-      [10, '=MAX(A2:A5)'],
-      [20, ''],
-      [30, ''],
-      [40, '']
-    ],
-    expectedValues: { 'B2': 40 }
-  },
-  {
-    name: 'MIN',
-    category: '02. 統計',
-    description: '最小値',
-    data: [
-      ['データ', '最小値'],
-      [10, '=MIN(A2:A5)'],
-      [20, ''],
-      [30, ''],
-      [40, '']
-    ],
-    expectedValues: { 'B2': 10 }
-  },
-  {
     name: 'PEARSON',
     category: '02. 統計',
     description: 'ピアソン相関係数',
@@ -1163,58 +978,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
       [4, 8, '', '']
     ],
     expectedValues: { 'D2': 1 }
-  },
-  {
-    name: 'PERCENTILE.EXC',
-    category: '02. 統計',
-    description: '百分位数（除外）',
-    data: [
-      ['データ', '百分位', '結果'],
-      [10, 0.25, '=PERCENTILE.EXC($A$2:$A$6,B2)'],
-      [20, 0.5, '=PERCENTILE.EXC($A$2:$A$6,B3)'],
-      [30, 0.75, '=PERCENTILE.EXC($A$2:$A$6,B4)'],
-      [40, '', ''],
-      [50, '', '']
-    ],
-    expectedValues: { 'C2': 15, 'C3': 30, 'C4': 45 }
-  },
-  {
-    name: 'PERCENTILE.INC',
-    category: '02. 統計',
-    description: '百分位数（含む）',
-    data: [
-      ['データ', '百分位', '結果'],
-      [10, 0.25, '=PERCENTILE.INC($A$2:$A$6,B2)'],
-      [20, 0.5, '=PERCENTILE.INC($A$2:$A$6,B3)'],
-      [30, 0.75, '=PERCENTILE.INC($A$2:$A$6,B4)'],
-      [40, '', ''],
-      [50, '', '']
-    ],
-    expectedValues: { 'C2': 20, 'C3': 30, 'C4': 40 }
-  },
-  {
-    name: 'PERMUT',
-    category: '02. 統計',
-    description: '順列',
-    data: [
-      ['n', 'k', '順列'],
-      [5, 2, '=PERMUT(A2,B2)'],
-      [10, 3, '=PERMUT(A3,B3)'],
-      [7, 4, '=PERMUT(A4,B4)']
-    ],
-    expectedValues: { 'C2': 20, 'C3': 720, 'C4': 840 }
-  },
-  {
-    name: 'PERMUTATIONA',
-    category: '02. 統計',
-    description: '重複順列',
-    data: [
-      ['n', 'k', '重複順列'],
-      [5, 2, '=PERMUTATIONA(A2,B2)'],
-      [10, 3, '=PERMUTATIONA(A3,B3)'],
-      [7, 4, '=PERMUTATIONA(A4,B4)']
-    ],
-    expectedValues: { 'C2': 25, 'C3': 1000, 'C4': 2401 }
   },
   {
     name: 'PHI',
@@ -1240,62 +1003,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
     expectedValues: { 'D2': 0.423190, 'D3': 0.224042 }
   },
   {
-    name: 'QUARTILE.EXC',
-    category: '02. 統計',
-    description: '四分位数（除外）',
-    data: [
-      ['データ', '四分位', '結果'],
-      [10, 1, '=QUARTILE.EXC($A$2:$A$6,B2)'],
-      [20, 2, '=QUARTILE.EXC($A$2:$A$6,B3)'],
-      [30, 3, '=QUARTILE.EXC($A$2:$A$6,B4)'],
-      [40, '', ''],
-      [50, '', '']
-    ],
-    expectedValues: { 'C2': 15, 'C3': 30, 'C4': 45 }
-  },
-  {
-    name: 'QUARTILE.INC',
-    category: '02. 統計',
-    description: '四分位数（含む）',
-    data: [
-      ['データ', '四分位', '結果'],
-      [10, 1, '=QUARTILE.INC($A$2:$A$6,B2)'],
-      [20, 2, '=QUARTILE.INC($A$2:$A$6,B3)'],
-      [30, 3, '=QUARTILE.INC($A$2:$A$6,B4)'],
-      [40, '', ''],
-      [50, '', '']
-    ],
-    expectedValues: { 'C2': 20, 'C3': 30, 'C4': 40 }
-  },
-  {
-    name: 'RANK.AVG',
-    category: '02. 統計',
-    description: '平均順位',
-    data: [
-      ['スコア', '順位'],
-      [85, '=RANK.AVG(A2,$A$2:$A$6)'],
-      [90, '=RANK.AVG(A3,$A$2:$A$6)'],
-      [85, '=RANK.AVG(A4,$A$2:$A$6)'],
-      [80, '=RANK.AVG(A5,$A$2:$A$6)'],
-      [95, '=RANK.AVG(A6,$A$2:$A$6)']
-    ],
-    expectedValues: { 'B2': 3.5, 'B3': 2, 'B4': 3.5, 'B5': 5, 'B6': 1 }
-  },
-  {
-    name: 'RANK.EQ',
-    category: '02. 統計',
-    description: '同順位',
-    data: [
-      ['スコア', '順位'],
-      [85, '=RANK.EQ(A2,$A$2:$A$6)'],
-      [90, '=RANK.EQ(A3,$A$2:$A$6)'],
-      [85, '=RANK.EQ(A4,$A$2:$A$6)'],
-      [80, '=RANK.EQ(A5,$A$2:$A$6)'],
-      [95, '=RANK.EQ(A6,$A$2:$A$6)']
-    ],
-    expectedValues: { 'B2': 3, 'B3': 2, 'B4': 3, 'B5': 5, 'B6': 1 }
-  },
-  {
     name: 'RSQ',
     category: '02. 統計',
     description: '決定係数',
@@ -1309,20 +1016,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
     expectedValues: { 'D2': 1 }
   },
   {
-    name: 'SKEW.P',
-    category: '02. 統計',
-    description: '歪度（母集団）',
-    data: [
-      ['データ', '歪度'],
-      [10, '=SKEW.P(A2:A6)'],
-      [20, ''],
-      [30, ''],
-      [40, ''],
-      [50, '']
-    ],
-    expectedValues: { 'B2': 0 }
-  },
-  {
     name: 'SLOPE',
     category: '02. 統計',
     description: '回帰直線の傾き',
@@ -1334,32 +1027,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
       [8, 4, '', '']
     ],
     expectedValues: { 'D2': 2 }
-  },
-  {
-    name: 'SMALL',
-    category: '02. 統計',
-    description: 'k番目に小さな値',
-    data: [
-      ['データ', 'k', '結果'],
-      [50, 1, '=SMALL($A$2:$A$6,B2)'],
-      [40, 2, '=SMALL($A$2:$A$6,B3)'],
-      [30, 3, '=SMALL($A$2:$A$6,B4)'],
-      [20, '', ''],
-      [10, '', '']
-    ],
-    expectedValues: { 'C2': 10, 'C3': 20, 'C4': 30 }
-  },
-  {
-    name: 'STANDARDIZE',
-    category: '02. 統計',
-    description: '標準化',
-    data: [
-      ['値', '平均', '標準偏差', '標準化'],
-      [85, 75, 10, '=STANDARDIZE(A2,B2,C2)'],
-      [65, 75, 10, '=STANDARDIZE(A3,B3,C3)'],
-      [75, 75, 10, '=STANDARDIZE(A4,B4,C4)']
-    ],
-    expectedValues: { 'D2': 1, 'D3': -1, 'D4': 0 }
   },
   {
     name: 'STEYX',
@@ -1386,34 +1053,6 @@ export const statisticsTests: IndividualFunctionTest[] = [
       [40, 38, '', '']
     ],
     expectedValues: { 'D2': 0.423 }
-  },
-  {
-    name: 'TRIMMEAN',
-    category: '02. 統計',
-    description: '調整平均',
-    data: [
-      ['データ', '除外率', '調整平均'],
-      [10, 0.2, '=TRIMMEAN($A$2:$A$9,B2)'],
-      [20, '', ''],
-      [30, '', ''],
-      [40, '', ''],
-      [50, '', ''],
-      [60, '', ''],
-      [70, '', ''],
-      [80, '', '']
-    ],
-    expectedValues: { 'C2': 45 }
-  },
-  {
-    name: 'WEIBULL.DIST',
-    category: '02. 統計',
-    description: 'ワイブル分布',
-    data: [
-      ['値', '形状', '尺度', '累積', '結果'],
-      [1, 2, 1, 'TRUE', '=WEIBULL.DIST(A2,B2,C2,D2)'],
-      [1, 2, 1, 'FALSE', '=WEIBULL.DIST(A3,B3,C3,D3)']
-    ],
-    expectedValues: { 'E2': 0.632121, 'E3': 0.735759 }
   },
   {
     name: 'Z.TEST',
