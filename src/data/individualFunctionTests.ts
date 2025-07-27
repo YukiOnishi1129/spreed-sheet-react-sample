@@ -945,6 +945,251 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
       [-4.3, 1, '=ISO.CEILING(A3,B3)']
     ],
     expectedValues: { 'C2': 5, 'C3': -4 }
+  },
+  // 追加の三角関数
+  {
+    name: 'ACOS',
+    category: '01. 数学・三角',
+    description: '逆余弦（アークコサイン）',
+    data: [
+      ['値', '逆余弦'],
+      [1, '=ACOS(A2)'],
+      [0.5, '=ACOS(A3)'],
+      [0, '=ACOS(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 1.047198, 'B4': 1.570796 }
+  },
+  {
+    name: 'ASIN',
+    category: '01. 数学・三角',
+    description: '逆正弦（アークサイン）',
+    data: [
+      ['値', '逆正弦'],
+      [0, '=ASIN(A2)'],
+      [0.5, '=ASIN(A3)'],
+      [1, '=ASIN(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.523599, 'B4': 1.570796 }
+  },
+  {
+    name: 'ATAN',
+    category: '01. 数学・三角',
+    description: '逆正接（アークタンジェント）',
+    data: [
+      ['値', '逆正接'],
+      [0, '=ATAN(A2)'],
+      [1, '=ATAN(A3)'],
+      [2, '=ATAN(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.785398, 'B4': 1.107149 }
+  },
+  {
+    name: 'COS',
+    category: '01. 数学・三角',
+    description: '余弦（コサイン）',
+    data: [
+      ['角度（ラジアン）', '余弦'],
+      [0, '=COS(A2)'],
+      ['=PI()/4', '=COS(A3)'],
+      ['=PI()/2', '=COS(A4)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 0.707107, 'B4': 0 }
+  },
+  {
+    name: 'SIN',
+    category: '01. 数学・三角',
+    description: '正弦（サイン）',
+    data: [
+      ['角度（ラジアン）', '正弦'],
+      [0, '=SIN(A2)'],
+      ['=PI()/4', '=SIN(A3)'],
+      ['=PI()/2', '=SIN(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.707107, 'B4': 1 }
+  },
+  {
+    name: 'TAN',
+    category: '01. 数学・三角',
+    description: '正接（タンジェント）',
+    data: [
+      ['角度（ラジアン）', '正接'],
+      [0, '=TAN(A2)'],
+      ['=PI()/4', '=TAN(A3)'],
+      ['=PI()/3', '=TAN(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 1, 'B4': 1.732051 }
+  },
+  {
+    name: 'COT',
+    category: '01. 数学・三角',
+    description: '余接（コタンジェント）',
+    data: [
+      ['角度（ラジアン）', '余接'],
+      ['=PI()/4', '=COT(A2)'],
+      ['=PI()/3', '=COT(A3)'],
+      ['=PI()/2', '=COT(A4)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 0.577350, 'B4': 0 }
+  },
+  {
+    name: 'SEC',
+    category: '01. 数学・三角',
+    description: '正割（セカント）',
+    data: [
+      ['角度（ラジアン）', '正割'],
+      [0, '=SEC(A2)'],
+      ['=PI()/4', '=SEC(A3)'],
+      ['=PI()/3', '=SEC(A4)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 1.414214, 'B4': 2 }
+  },
+  {
+    name: 'CSC',
+    category: '01. 数学・三角',
+    description: '余割（コセカント）',
+    data: [
+      ['角度（ラジアン）', '余割'],
+      ['=PI()/6', '=CSC(A2)'],
+      ['=PI()/4', '=CSC(A3)'],
+      ['=PI()/2', '=CSC(A4)']
+    ],
+    expectedValues: { 'B2': 2, 'B3': 1.414214, 'B4': 1 }
+  },
+  {
+    name: 'ACOT',
+    category: '01. 数学・三角',
+    description: '逆余接（アークコタンジェント）',
+    data: [
+      ['値', '逆余接'],
+      [0, '=ACOT(A2)'],
+      [1, '=ACOT(A3)'],
+      [2, '=ACOT(A4)']
+    ],
+    expectedValues: { 'B2': 1.570796, 'B3': 0.785398, 'B4': 0.463648 }
+  },
+  {
+    name: 'AGGREGATE',
+    category: '01. 数学',
+    description: '集約関数',
+    data: [
+      ['機能番号', 'オプション', '配列', '結果'],
+      [1, 0, 'C5:C8', '=AGGREGATE(A2,B2,C5:C8)'],
+      [4, 0, 'C5:C8', '=AGGREGATE(A3,B3,C5:C8)'],
+      ['', '', 10, ''],
+      ['', '', 20, ''],
+      ['', '', 30, ''],
+      ['', '', 40, '']
+    ],
+    expectedValues: { 'D2': 25, 'D3': 40 }
+  },
+  {
+    name: 'CEILING.MATH',
+    category: '01. 数学',
+    description: '切り上げ（数学）',
+    data: [
+      ['値', '基準値', '結果'],
+      [2.3, 1, '=CEILING.MATH(A2,B2)'],
+      [-2.3, 1, '=CEILING.MATH(A3,B3)'],
+      [2.7, 0.5, '=CEILING.MATH(A4,B4)']
+    ],
+    expectedValues: { 'C2': 3, 'C3': -2, 'C4': 3 }
+  },
+  {
+    name: 'CEILING.PRECISE',
+    category: '01. 数学',
+    description: '切り上げ（高精度）',
+    data: [
+      ['値', '基準値', '結果'],
+      [2.3, 1, '=CEILING.PRECISE(A2,B2)'],
+      [-2.3, 1, '=CEILING.PRECISE(A3,B3)'],
+      [2.7, 0.5, '=CEILING.PRECISE(A4,B4)']
+    ],
+    expectedValues: { 'C2': 3, 'C3': -2, 'C4': 3 }
+  },
+  {
+    name: 'FLOOR.MATH',
+    category: '01. 数学',
+    description: '切り捨て（数学）',
+    data: [
+      ['値', '基準値', '結果'],
+      [2.7, 1, '=FLOOR.MATH(A2,B2)'],
+      [-2.3, 1, '=FLOOR.MATH(A3,B3)'],
+      [2.7, 0.5, '=FLOOR.MATH(A4,B4)']
+    ],
+    expectedValues: { 'C2': 2, 'C3': -3, 'C4': 2.5 }
+  },
+  {
+    name: 'FLOOR.PRECISE',
+    category: '01. 数学',
+    description: '切り捨て（高精度）',
+    data: [
+      ['値', '基準値', '結果'],
+      [2.7, 1, '=FLOOR.PRECISE(A2,B2)'],
+      [-2.3, 1, '=FLOOR.PRECISE(A3,B3)'],
+      [2.7, 0.5, '=FLOOR.PRECISE(A4,B4)']
+    ],
+    expectedValues: { 'C2': 2, 'C3': -3, 'C4': 2.5 }
+  },
+  // 双曲線関数
+  {
+    name: 'ACOSH',
+    category: '01. 数学・三角',
+    description: '双曲線逆余弦',
+    data: [
+      ['値', '双曲線逆余弦'],
+      [1, '=ACOSH(A2)'],
+      [2, '=ACOSH(A3)'],
+      [10, '=ACOSH(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 1.316958, 'B4': 2.993223 }
+  },
+  {
+    name: 'ACOTH',
+    category: '01. 数学・三角',
+    description: '双曲線逆余接',
+    data: [
+      ['値', '双曲線逆余接'],
+      [2, '=ACOTH(A2)'],
+      [5, '=ACOTH(A3)'],
+      [10, '=ACOTH(A4)']
+    ],
+    expectedValues: { 'B2': 0.549306, 'B3': 0.202733, 'B4': 0.100335 }
+  },
+  {
+    name: 'COTH',
+    category: '01. 数学・三角',
+    description: '双曲線余接',
+    data: [
+      ['値', '双曲線余接'],
+      [1, '=COTH(A2)'],
+      [2, '=COTH(A3)'],
+      [3, '=COTH(A4)']
+    ],
+    expectedValues: { 'B2': 1.313035, 'B3': 1.037315, 'B4': 1.004964 }
+  },
+  {
+    name: 'CSCH',
+    category: '01. 数学・三角',
+    description: '双曲線余割',
+    data: [
+      ['値', '双曲線余割'],
+      [1, '=CSCH(A2)'],
+      [2, '=CSCH(A3)'],
+      [3, '=CSCH(A4)']
+    ],
+    expectedValues: { 'B2': 0.850918, 'B3': 0.275721, 'B4': 0.099821 }
+  },
+  {
+    name: 'SECH',
+    category: '01. 数学・三角',
+    description: '双曲線正割',
+    data: [
+      ['値', '双曲線正割'],
+      [0, '=SECH(A2)'],
+      [1, '=SECH(A3)'],
+      [2, '=SECH(A4)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 0.648054, 'B4': 0.265802 }
   }
 ];
 
@@ -1746,6 +1991,641 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
       [30, ''],
       [40, '']
     ]
+  },
+  // 追加の統計関数
+  {
+    name: 'COUNT',
+    category: '02. 統計',
+    description: '数値の個数',
+    data: [
+      ['データ', '個数'],
+      [10, '=COUNT(A2:A7)'],
+      [20, ''],
+      ['テキスト', ''],
+      [30, ''],
+      ['', ''],
+      [40, '']
+    ],
+    expectedValues: { 'B2': 4 }
+  },
+  {
+    name: 'AVEDEV',
+    category: '02. 統計',
+    description: '平均偏差',
+    data: [
+      ['データ', '平均偏差'],
+      [10, '=AVEDEV(A2:A5)'],
+      [20, ''],
+      [30, ''],
+      [40, '']
+    ],
+    expectedValues: { 'B2': 10 }
+  },
+  {
+    name: 'BETA.DIST',
+    category: '02. 統計',
+    description: 'ベータ分布',
+    data: [
+      ['値', 'α', 'β', '累積', '結果'],
+      [0.5, 2, 3, 'TRUE', '=BETA.DIST(A2,B2,C2,D2)'],
+      [0.5, 2, 3, 'FALSE', '=BETA.DIST(A3,B3,C3,D3)']
+    ],
+    expectedValues: { 'E2': 0.3125, 'E3': 1.5 }
+  },
+  {
+    name: 'BETA.INV',
+    category: '02. 統計',
+    description: 'ベータ分布の逆関数',
+    data: [
+      ['確率', 'α', 'β', '結果'],
+      [0.5, 2, 3, '=BETA.INV(A2,B2,C2)'],
+      [0.8, 2, 3, '=BETA.INV(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 0.448, 'D3': 0.618 }
+  },
+  {
+    name: 'BINOM.DIST',
+    category: '02. 統計',
+    description: '二項分布',
+    data: [
+      ['成功数', '試行回数', '成功率', '累積', '結果'],
+      [3, 10, 0.5, 'TRUE', '=BINOM.DIST(A2,B2,C2,D2)'],
+      [3, 10, 0.5, 'FALSE', '=BINOM.DIST(A3,B3,C3,D3)']
+    ],
+    expectedValues: { 'E2': 0.171875, 'E3': 0.117188 }
+  },
+  {
+    name: 'BINOM.INV',
+    category: '02. 統計',
+    description: '二項分布の逆関数',
+    data: [
+      ['試行回数', '成功率', '確率', '結果'],
+      [10, 0.5, 0.5, '=BINOM.INV(A2,B2,C2)'],
+      [10, 0.5, 0.8, '=BINOM.INV(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 5, 'D3': 6 }
+  },
+  {
+    name: 'CHISQ.DIST',
+    category: '02. 統計',
+    description: 'カイ二乗分布',
+    data: [
+      ['値', '自由度', '累積', '結果'],
+      [5, 3, 'TRUE', '=CHISQ.DIST(A2,B2,C2)'],
+      [5, 3, 'FALSE', '=CHISQ.DIST(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 0.828, 'D3': 0.064 }
+  },
+  {
+    name: 'CHISQ.DIST.RT',
+    category: '02. 統計',
+    description: 'カイ二乗分布（右側）',
+    data: [
+      ['値', '自由度', '結果'],
+      [5, 3, '=CHISQ.DIST.RT(A2,B2)'],
+      [10, 5, '=CHISQ.DIST.RT(A3,B3)']
+    ],
+    expectedValues: { 'C2': 0.172, 'C3': 0.075 }
+  },
+  {
+    name: 'CHISQ.TEST',
+    category: '02. 統計',
+    description: 'カイ二乗検定',
+    data: [
+      ['観測値', '期待値', '', '', '検定結果'],
+      [10, 12, '', '', '=CHISQ.TEST(A2:B4,D2:E4)'],
+      [15, 14, '', '', ''],
+      [20, 19, '', '', ''],
+      [12, 10, '', '', ''],
+      [14, 15, '', '', ''],
+      [19, 20, '', '', '']
+    ],
+    expectedValues: { 'F2': 0.807 }
+  },
+  {
+    name: 'CONFIDENCE.NORM',
+    category: '02. 統計',
+    description: '正規分布の信頼区間',
+    data: [
+      ['有意水準', '標準偏差', 'サンプル数', '信頼区間'],
+      [0.05, 2.5, 50, '=CONFIDENCE.NORM(A2,B2,C2)'],
+      [0.01, 2.5, 50, '=CONFIDENCE.NORM(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 0.693, 'D3': 0.911 }
+  },
+  {
+    name: 'CONFIDENCE.T',
+    category: '02. 統計',
+    description: 'T分布の信頼区間',
+    data: [
+      ['有意水準', '標準偏差', 'サンプル数', '信頼区間'],
+      [0.05, 2.5, 10, '=CONFIDENCE.T(A2,B2,C2)'],
+      [0.01, 2.5, 10, '=CONFIDENCE.T(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 1.789, 'D3': 2.574 }
+  },
+  {
+    name: 'COVARIANCE.P',
+    category: '02. 統計',
+    description: '母共分散',
+    data: [
+      ['X', 'Y', '', '母共分散'],
+      [1, 2, '', '=COVARIANCE.P(A2:A5,B2:B5)'],
+      [2, 4, '', ''],
+      [3, 6, '', ''],
+      [4, 8, '', '']
+    ],
+    expectedValues: { 'D2': 2.5 }
+  },
+  {
+    name: 'COVARIANCE.S',
+    category: '02. 統計',
+    description: '標本共分散',
+    data: [
+      ['X', 'Y', '', '標本共分散'],
+      [1, 2, '', '=COVARIANCE.S(A2:A5,B2:B5)'],
+      [2, 4, '', ''],
+      [3, 6, '', ''],
+      [4, 8, '', '']
+    ],
+    expectedValues: { 'D2': 3.333 }
+  },
+  // 追加の統計関数（続き）
+  {
+    name: 'DEVSQ',
+    category: '02. 統計',
+    description: '平方偏差の合計',
+    data: [
+      ['データ', '平方偏差の合計'],
+      [10, '=DEVSQ(A2:A5)'],
+      [20, ''],
+      [30, ''],
+      [40, '']
+    ],
+    expectedValues: { 'B2': 500 }
+  },
+  {
+    name: 'EXPON.DIST',
+    category: '02. 統計',
+    description: '指数分布',
+    data: [
+      ['値', 'λ', '累積', '結果'],
+      [0.5, 1, 'TRUE', '=EXPON.DIST(A2,B2,C2)'],
+      [0.5, 1, 'FALSE', '=EXPON.DIST(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 0.393469, 'D3': 0.606531 }
+  },
+  {
+    name: 'F.TEST',
+    category: '02. 統計',
+    description: 'F検定',
+    data: [
+      ['データ1', 'データ2', '', 'F検定'],
+      [10, 12, '', '=F.TEST(A2:A5,B2:B5)'],
+      [20, 18, '', ''],
+      [30, 32, '', ''],
+      [40, 38, '', '']
+    ],
+    expectedValues: { 'D2': 0.646 }
+  },
+  {
+    name: 'FISHER',
+    category: '02. 統計',
+    description: 'フィッシャー変換',
+    data: [
+      ['相関係数', 'フィッシャー変換'],
+      [0.5, '=FISHER(A2)'],
+      [0.75, '=FISHER(A3)'],
+      [0.9, '=FISHER(A4)']
+    ],
+    expectedValues: { 'B2': 0.549306, 'B3': 0.972955, 'B4': 1.472219 }
+  },
+  {
+    name: 'FISHERINV',
+    category: '02. 統計',
+    description: 'フィッシャー変換の逆関数',
+    data: [
+      ['値', '相関係数'],
+      [0.549306, '=FISHERINV(A2)'],
+      [0.972955, '=FISHERINV(A3)'],
+      [1.472219, '=FISHERINV(A4)']
+    ],
+    expectedValues: { 'B2': 0.5, 'B3': 0.75, 'B4': 0.9 }
+  },
+  {
+    name: 'GAMMA',
+    category: '02. 統計',
+    description: 'ガンマ関数',
+    data: [
+      ['値', 'ガンマ関数'],
+      [1, '=GAMMA(A2)'],
+      [2, '=GAMMA(A3)'],
+      [3, '=GAMMA(A4)'],
+      [4, '=GAMMA(A5)']
+    ],
+    expectedValues: { 'B2': 1, 'B3': 1, 'B4': 2, 'B5': 6 }
+  },
+  {
+    name: 'GAMMA.DIST',
+    category: '02. 統計',
+    description: 'ガンマ分布',
+    data: [
+      ['値', 'α', 'β', '累積', '結果'],
+      [5, 3, 2, 'TRUE', '=GAMMA.DIST(A2,B2,C2,D2)'],
+      [5, 3, 2, 'FALSE', '=GAMMA.DIST(A3,B3,C3,D3)']
+    ],
+    expectedValues: { 'E2': 0.761, 'E3': 0.065 }
+  },
+  {
+    name: 'GAMMA.INV',
+    category: '02. 統計',
+    description: 'ガンマ分布の逆関数',
+    data: [
+      ['確率', 'α', 'β', '結果'],
+      [0.5, 3, 2, '=GAMMA.INV(A2,B2,C2)'],
+      [0.75, 3, 2, '=GAMMA.INV(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 4.671, 'D3': 6.727 }
+  },
+  {
+    name: 'GAMMALN',
+    category: '02. 統計',
+    description: 'ガンマ関数の自然対数',
+    data: [
+      ['値', '自然対数'],
+      [2, '=GAMMALN(A2)'],
+      [3, '=GAMMALN(A3)'],
+      [4, '=GAMMALN(A4)'],
+      [5, '=GAMMALN(A5)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.693147, 'B4': 1.791759, 'B5': 3.178054 }
+  },
+  {
+    name: 'GAMMALN.PRECISE',
+    category: '02. 統計',
+    description: 'ガンマ関数の自然対数（高精度）',
+    data: [
+      ['値', '自然対数'],
+      [2, '=GAMMALN.PRECISE(A2)'],
+      [3, '=GAMMALN.PRECISE(A3)'],
+      [4, '=GAMMALN.PRECISE(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.693147, 'B4': 1.791759 }
+  },
+  {
+    name: 'GAUSS',
+    category: '02. 統計',
+    description: '標準正規分布（0.5を引いた値）',
+    data: [
+      ['z値', 'ガウス分布'],
+      [0, '=GAUSS(A2)'],
+      [1, '=GAUSS(A3)'],
+      [2, '=GAUSS(A4)']
+    ],
+    expectedValues: { 'B2': 0, 'B3': 0.341345, 'B4': 0.477250 }
+  },
+  {
+    name: 'HYPGEOM.DIST',
+    category: '02. 統計',
+    description: '超幾何分布',
+    data: [
+      ['成功数', '標本数', '母成功数', '母集団数', '累積', '結果'],
+      [2, 5, 3, 10, 'FALSE', '=HYPGEOM.DIST(A2,B2,C2,D2,E2)'],
+      [2, 5, 3, 10, 'TRUE', '=HYPGEOM.DIST(A3,B3,C3,D3,E3)']
+    ],
+    expectedValues: { 'F2': 0.238095, 'F3': 0.916667 }
+  },
+  {
+    name: 'KURT',
+    category: '02. 統計',
+    description: '尖度',
+    data: [
+      ['データ', '尖度'],
+      [10, '=KURT(A2:A6)'],
+      [20, ''],
+      [30, ''],
+      [40, ''],
+      [50, '']
+    ],
+    expectedValues: { 'B2': -1.2 }
+  },
+  {
+    name: 'LARGE',
+    category: '02. 統計',
+    description: 'k番目に大きな値',
+    data: [
+      ['データ', 'k', '結果'],
+      [10, 1, '=LARGE($A$2:$A$6,B2)'],
+      [20, 2, '=LARGE($A$2:$A$6,B3)'],
+      [30, 3, '=LARGE($A$2:$A$6,B4)'],
+      [40, '', ''],
+      [50, '', '']
+    ],
+    expectedValues: { 'C2': 50, 'C3': 40, 'C4': 30 }
+  },
+  {
+    name: 'MAX',
+    category: '02. 統計',
+    description: '最大値',
+    data: [
+      ['データ', '最大値'],
+      [10, '=MAX(A2:A5)'],
+      [20, ''],
+      [30, ''],
+      [40, '']
+    ],
+    expectedValues: { 'B2': 40 }
+  },
+  {
+    name: 'MIN',
+    category: '02. 統計',
+    description: '最小値',
+    data: [
+      ['データ', '最小値'],
+      [10, '=MIN(A2:A5)'],
+      [20, ''],
+      [30, ''],
+      [40, '']
+    ],
+    expectedValues: { 'B2': 10 }
+  },
+  {
+    name: 'PEARSON',
+    category: '02. 統計',
+    description: 'ピアソン相関係数',
+    data: [
+      ['X', 'Y', '', '相関係数'],
+      [1, 2, '', '=PEARSON(A2:A5,B2:B5)'],
+      [2, 4, '', ''],
+      [3, 6, '', ''],
+      [4, 8, '', '']
+    ],
+    expectedValues: { 'D2': 1 }
+  },
+  {
+    name: 'PERCENTILE.EXC',
+    category: '02. 統計',
+    description: '百分位数（除外）',
+    data: [
+      ['データ', '百分位', '結果'],
+      [10, 0.25, '=PERCENTILE.EXC($A$2:$A$6,B2)'],
+      [20, 0.5, '=PERCENTILE.EXC($A$2:$A$6,B3)'],
+      [30, 0.75, '=PERCENTILE.EXC($A$2:$A$6,B4)'],
+      [40, '', ''],
+      [50, '', '']
+    ],
+    expectedValues: { 'C2': 15, 'C3': 30, 'C4': 45 }
+  },
+  {
+    name: 'PERCENTILE.INC',
+    category: '02. 統計',
+    description: '百分位数（含む）',
+    data: [
+      ['データ', '百分位', '結果'],
+      [10, 0.25, '=PERCENTILE.INC($A$2:$A$6,B2)'],
+      [20, 0.5, '=PERCENTILE.INC($A$2:$A$6,B3)'],
+      [30, 0.75, '=PERCENTILE.INC($A$2:$A$6,B4)'],
+      [40, '', ''],
+      [50, '', '']
+    ],
+    expectedValues: { 'C2': 20, 'C3': 30, 'C4': 40 }
+  },
+  {
+    name: 'PERMUT',
+    category: '02. 統計',
+    description: '順列',
+    data: [
+      ['n', 'k', '順列'],
+      [5, 2, '=PERMUT(A2,B2)'],
+      [10, 3, '=PERMUT(A3,B3)'],
+      [7, 4, '=PERMUT(A4,B4)']
+    ],
+    expectedValues: { 'C2': 20, 'C3': 720, 'C4': 840 }
+  },
+  {
+    name: 'PERMUTATIONA',
+    category: '02. 統計',
+    description: '重複順列',
+    data: [
+      ['n', 'k', '重複順列'],
+      [5, 2, '=PERMUTATIONA(A2,B2)'],
+      [10, 3, '=PERMUTATIONA(A3,B3)'],
+      [7, 4, '=PERMUTATIONA(A4,B4)']
+    ],
+    expectedValues: { 'C2': 25, 'C3': 1000, 'C4': 2401 }
+  },
+  {
+    name: 'PHI',
+    category: '02. 統計',
+    description: '標準正規分布の密度関数',
+    data: [
+      ['z値', '密度'],
+      [0, '=PHI(A2)'],
+      [1, '=PHI(A3)'],
+      [-1, '=PHI(A4)']
+    ],
+    expectedValues: { 'B2': 0.398942, 'B3': 0.241971, 'B4': 0.241971 }
+  },
+  {
+    name: 'POISSON.DIST',
+    category: '02. 統計',
+    description: 'ポアソン分布',
+    data: [
+      ['x', '平均', '累積', '結果'],
+      [2, 3, 'TRUE', '=POISSON.DIST(A2,B2,C2)'],
+      [2, 3, 'FALSE', '=POISSON.DIST(A3,B3,C3)']
+    ],
+    expectedValues: { 'D2': 0.423190, 'D3': 0.224042 }
+  },
+  {
+    name: 'QUARTILE.EXC',
+    category: '02. 統計',
+    description: '四分位数（除外）',
+    data: [
+      ['データ', '四分位', '結果'],
+      [10, 1, '=QUARTILE.EXC($A$2:$A$6,B2)'],
+      [20, 2, '=QUARTILE.EXC($A$2:$A$6,B3)'],
+      [30, 3, '=QUARTILE.EXC($A$2:$A$6,B4)'],
+      [40, '', ''],
+      [50, '', '']
+    ],
+    expectedValues: { 'C2': 15, 'C3': 30, 'C4': 45 }
+  },
+  {
+    name: 'QUARTILE.INC',
+    category: '02. 統計',
+    description: '四分位数（含む）',
+    data: [
+      ['データ', '四分位', '結果'],
+      [10, 1, '=QUARTILE.INC($A$2:$A$6,B2)'],
+      [20, 2, '=QUARTILE.INC($A$2:$A$6,B3)'],
+      [30, 3, '=QUARTILE.INC($A$2:$A$6,B4)'],
+      [40, '', ''],
+      [50, '', '']
+    ],
+    expectedValues: { 'C2': 20, 'C3': 30, 'C4': 40 }
+  },
+  {
+    name: 'RANK.AVG',
+    category: '02. 統計',
+    description: '平均順位',
+    data: [
+      ['スコア', '順位'],
+      [85, '=RANK.AVG(A2,$A$2:$A$6)'],
+      [90, '=RANK.AVG(A3,$A$2:$A$6)'],
+      [85, '=RANK.AVG(A4,$A$2:$A$6)'],
+      [80, '=RANK.AVG(A5,$A$2:$A$6)'],
+      [95, '=RANK.AVG(A6,$A$2:$A$6)']
+    ],
+    expectedValues: { 'B2': 3.5, 'B3': 2, 'B4': 3.5, 'B5': 5, 'B6': 1 }
+  },
+  {
+    name: 'RANK.EQ',
+    category: '02. 統計',
+    description: '同順位',
+    data: [
+      ['スコア', '順位'],
+      [85, '=RANK.EQ(A2,$A$2:$A$6)'],
+      [90, '=RANK.EQ(A3,$A$2:$A$6)'],
+      [85, '=RANK.EQ(A4,$A$2:$A$6)'],
+      [80, '=RANK.EQ(A5,$A$2:$A$6)'],
+      [95, '=RANK.EQ(A6,$A$2:$A$6)']
+    ],
+    expectedValues: { 'B2': 3, 'B3': 2, 'B4': 3, 'B5': 5, 'B6': 1 }
+  },
+  {
+    name: 'RSQ',
+    category: '02. 統計',
+    description: '決定係数',
+    data: [
+      ['X', 'Y', '', '決定係数'],
+      [1, 2, '', '=RSQ(A2:A5,B2:B5)'],
+      [2, 4, '', ''],
+      [3, 6, '', ''],
+      [4, 8, '', '']
+    ],
+    expectedValues: { 'D2': 1 }
+  },
+  {
+    name: 'SKEW.P',
+    category: '02. 統計',
+    description: '歪度（母集団）',
+    data: [
+      ['データ', '歪度'],
+      [10, '=SKEW.P(A2:A6)'],
+      [20, ''],
+      [30, ''],
+      [40, ''],
+      [50, '']
+    ],
+    expectedValues: { 'B2': 0 }
+  },
+  {
+    name: 'SLOPE',
+    category: '02. 統計',
+    description: '回帰直線の傾き',
+    data: [
+      ['Y', 'X', '', '傾き'],
+      [2, 1, '', '=SLOPE(A2:A5,B2:B5)'],
+      [4, 2, '', ''],
+      [6, 3, '', ''],
+      [8, 4, '', '']
+    ],
+    expectedValues: { 'D2': 2 }
+  },
+  {
+    name: 'SMALL',
+    category: '02. 統計',
+    description: 'k番目に小さな値',
+    data: [
+      ['データ', 'k', '結果'],
+      [50, 1, '=SMALL($A$2:$A$6,B2)'],
+      [40, 2, '=SMALL($A$2:$A$6,B3)'],
+      [30, 3, '=SMALL($A$2:$A$6,B4)'],
+      [20, '', ''],
+      [10, '', '']
+    ],
+    expectedValues: { 'C2': 10, 'C3': 20, 'C4': 30 }
+  },
+  {
+    name: 'STANDARDIZE',
+    category: '02. 統計',
+    description: '標準化',
+    data: [
+      ['値', '平均', '標準偏差', '標準化'],
+      [85, 75, 10, '=STANDARDIZE(A2,B2,C2)'],
+      [65, 75, 10, '=STANDARDIZE(A3,B3,C3)'],
+      [75, 75, 10, '=STANDARDIZE(A4,B4,C4)']
+    ],
+    expectedValues: { 'D2': 1, 'D3': -1, 'D4': 0 }
+  },
+  {
+    name: 'STEYX',
+    category: '02. 統計',
+    description: '回帰の標準誤差',
+    data: [
+      ['Y', 'X', '', '標準誤差'],
+      [2, 1, '', '=STEYX(A2:A5,B2:B5)'],
+      [4.1, 2, '', ''],
+      [5.9, 3, '', ''],
+      [8, 4, '', '']
+    ],
+    expectedValues: { 'D2': 0.05 }
+  },
+  {
+    name: 'T.TEST',
+    category: '02. 統計',
+    description: 'T検定',
+    data: [
+      ['データ1', 'データ2', '', 'T検定'],
+      [10, 12, '', '=T.TEST(A2:A5,B2:B5,2,1)'],
+      [20, 18, '', ''],
+      [30, 32, '', ''],
+      [40, 38, '', '']
+    ],
+    expectedValues: { 'D2': 0.423 }
+  },
+  {
+    name: 'TRIMMEAN',
+    category: '02. 統計',
+    description: '調整平均',
+    data: [
+      ['データ', '除外率', '調整平均'],
+      [10, 0.2, '=TRIMMEAN($A$2:$A$9,B2)'],
+      [20, '', ''],
+      [30, '', ''],
+      [40, '', ''],
+      [50, '', ''],
+      [60, '', ''],
+      [70, '', ''],
+      [80, '', '']
+    ],
+    expectedValues: { 'C2': 45 }
+  },
+  {
+    name: 'WEIBULL.DIST',
+    category: '02. 統計',
+    description: 'ワイブル分布',
+    data: [
+      ['値', '形状', '尺度', '累積', '結果'],
+      [1, 2, 1, 'TRUE', '=WEIBULL.DIST(A2,B2,C2,D2)'],
+      [1, 2, 1, 'FALSE', '=WEIBULL.DIST(A3,B3,C3,D3)']
+    ],
+    expectedValues: { 'E2': 0.632121, 'E3': 0.735759 }
+  },
+  {
+    name: 'Z.TEST',
+    category: '02. 統計',
+    description: 'Z検定',
+    data: [
+      ['データ', '', '', 'Z検定'],
+      [10, '', '', '=Z.TEST(A2:A6,25)'],
+      [20, '', '', ''],
+      [30, '', '', ''],
+      [40, '', '', ''],
+      [50, '', '', '']
+    ],
+    expectedValues: { 'D2': 0.066 }
   }
 ];
 
