@@ -35,6 +35,7 @@ export const parseCellRange = (range: string): { start: { col: number; row: numb
   
   if (!start || !end) return null;
   
+  
   return { start, end };
 };
 
@@ -83,11 +84,13 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
   const { start, end } = rangeCoords;
   const values: unknown[] = [];
   
+  
   for (let row = start.row; row <= end.row; row++) {
     for (let col = start.col; col <= end.col; col++) {
       if (row >= 0 && row < context.data.length && col >= 0 && col < context.data[0]?.length) {
         const cellData = context.data[row][col];
         let value: unknown;
+        
         
         // Handle both direct values and object values
         if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {
@@ -105,9 +108,8 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
           value = cellData;
         }
         
-        if (value !== null && value !== undefined && value !== '') {
-          values.push(value);
-        }
+        // Always push the value, even if it's empty (needed for COUNTBLANK)
+        values.push(value);
       }
     }
   }

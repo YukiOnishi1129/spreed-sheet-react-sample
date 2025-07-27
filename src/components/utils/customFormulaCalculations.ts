@@ -8,6 +8,7 @@ import {
   isFormulaCell,
 } from './typeGuards';
 import { formatCellValue } from '../../utils/spreadsheet/formatting';
+import { getCellValue } from '../../utils/spreadsheet/logic/shared/utils';
 
 // カスタム関数システムで再計算する関数
 export const recalculateFormulas = (
@@ -127,22 +128,13 @@ function calculateAllFormulas(data: CellData[][]): CellData[][] {
       for (let colIndex = 0; colIndex < result[rowIndex].length; colIndex++) {
         const cell = result[rowIndex][colIndex];
         
-        if (cell.formula && (cell.value === undefined || cell.value === '' || typeof cell.value === 'string')) {
+        if (cell.formula) {
           const calculatedValue = calculateSingleFormula(cell.formula, result, rowIndex, colIndex);
           
-          // MROUND関数のデバッグ
-          if (cell.formula.includes('MROUND')) {
-            console.log(`calculateAllFormulas: [${rowIndex}][${colIndex}]`, {
-              formula: cell.formula,
-              oldValue: cell.value,
-              newValue: calculatedValue
-            });
-          }
           
-          if (calculatedValue !== cell.value) {
-            cell.value = calculatedValue;
-            hasChanges = true;
-          }
+          // 常に計算結果を設定する
+          cell.value = calculatedValue;
+          hasChanges = true;
         }
       }
     }
@@ -163,19 +155,14 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
   const maxIterations = 10;
   
   
-  
   while (hasChanges && iterations < maxIterations) {
     hasChanges = false;
     iterations++;
     
-    // MROUNDのデバッグ
-    if (formula.includes('MROUND')) {
-      console.log(`evaluateNestedFormula iteration ${iterations}:`, evaluatedFormula);
-    }
-    
     // 最も内側の関数から評価する - より正確なパターンマッチング
     const innerFunctionRegex = /([A-Z]+(?:\.[A-Z]+)?)\(([^()]*)\)/;
     const matches = [...evaluatedFormula.matchAll(new RegExp(innerFunctionRegex, 'g'))];
+    
     
     // 最も深い（最後の）マッチから処理
     for (let i = matches.length - 1; i >= 0; i--) {
@@ -183,20 +170,15 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
       const fullMatch = match[0];
       const functionName = match[1];
       
+      
       // この関数を評価
       const matchResult = matchFormula(fullMatch);
       
-      // MROUNDのデバッグ
-      if (functionName === 'MROUND') {
-        console.log('Trying to match MROUND:', {
-          fullMatch,
-          matchResult: matchResult ? 'FOUND' : 'NOT FOUND'
-        });
-      }
       
       if (matchResult) {
         try {
           const result = matchResult.function.calculate(matchResult.matches, context);
+          
           
           // 結果を文字列に変換して置換
           let resultStr: string;
@@ -216,6 +198,7 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
           }
           evaluatedFormula = evaluatedFormula.replace(fullMatch, resultStr);
           hasChanges = true;
+          
         } catch (error) {
           console.error(`Error evaluating ${functionName}:`, error);
           return formula; // Return original formula on error
@@ -224,7 +207,6 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
     }
   }
   
-  // INDEX式の最終結果をトレース
   
   return evaluatedFormula;
 }
@@ -246,13 +228,7 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     // ネストされた関数を評価
     const evaluatedFormula = evaluateNestedFormula(cleanFormula, context);
     
-    // MROUNDのデバッグ
-    if (cleanFormula.includes('MROUND')) {
-      console.log('calculateSingleFormula MROUND:', {
-        cleanFormula,
-        evaluatedFormula
-      });
-    }
+    
     
     // カスタム関数のマッチングを試行
     let matchResult = matchFormula(evaluatedFormula);
@@ -272,10 +248,6 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
       // 関数を実行
       const result = matchResult.function.calculate(matchResult.matches, context);
       
-      // MROUNDのデバッグ
-      if (cleanFormula.includes('MROUND')) {
-        console.log('MROUND calculation result:', result);
-      }
       
       return result;
     } else {

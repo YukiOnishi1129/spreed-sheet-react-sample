@@ -955,12 +955,8 @@ export const MROUND: CustomFormula = {
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [fullMatch, numberRef, multipleRef] = matches;
     
-    console.log('MROUND called with:', { fullMatch, numberRef, multipleRef });
-    
-    const numberValue = getCellValue(numberRef, context);
-    const multipleValue = getCellValue(multipleRef, context);
-    
-    console.log('MROUND values:', { numberValue, multipleValue });
+    const numberValue = getCellValue(numberRef.trim(), context);
+    const multipleValue = getCellValue(multipleRef.trim(), context);
     
     const number = Number(numberValue ?? numberRef);
     const multiple = Number(multipleValue ?? multipleRef);
@@ -979,7 +975,6 @@ export const MROUND: CustomFormula = {
     }
     
     const result = Math.round(number / multiple) * multiple;
-    console.log('MROUND result:', { number, multiple, result });
     return result;
   }
 };

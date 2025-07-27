@@ -72,6 +72,7 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
     // 各関数のテストを生成
     for (const testData of categoryTests) {
       test(`${testData.name} - ${testData.description}`, async ({ page }) => {
+        
         await selectFunction(page, testData.category, testData.name, testData.description);
         
         // expectedValuesが存在しない場合はスキップ

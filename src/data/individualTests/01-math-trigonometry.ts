@@ -818,8 +818,8 @@ export const mathTrigonometryTests: IndividualFunctionTest[] = [
     description: '集約関数',
     data: [
       ['機能番号', 'オプション', '配列', '結果'],
-      [1, 0, 'C5:C8', '=AGGREGATE(A2,B2,C5:C8)'],
-      [4, 0, 'C5:C8', '=AGGREGATE(A3,B3,C5:C8)'],
+      [1, 0, 'C4:C7', '=AGGREGATE(A2,B2,C4:C7)'],
+      [4, 0, 'C4:C7', '=AGGREGATE(A3,B3,C4:C7)'],
       ['', '', 10, ''],
       ['', '', 20, ''],
       ['', '', 30, ''],

@@ -82,15 +82,11 @@ function DemoSpreadsheet() {
     );
     setOriginalFormulas(formulas);
     
-    const initialData: Matrix<CellBase> = selectedFunction.data.map((row: (string | number | boolean | null)[], rowIdx) => 
-      row.map((cellValue: string | number | boolean | null, colIdx) => {
+    const initialData: Matrix<CellBase> = selectedFunction.data.map((row: (string | number | boolean | null)[]) => 
+      row.map((cellValue: string | number | boolean | null) => {
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
-          // MROUNDのデバッグ
-          if (selectedFunction.name === 'MROUND') {
-            console.log(`Creating formula cell at [${rowIdx}][${colIdx}]:`, cellValue);
-          }
           return {
-            value: '',
+            value: '',  // 元に戻す
             formula: cellValue,
             'data-formula': cellValue
           };
@@ -122,7 +118,6 @@ function DemoSpreadsheet() {
           if (cell.formula) {
             const newValue = calculateFormula(cell.formula, result, rowIndex, colIndex);
             
-            
             if (newValue !== cell.value) {
               cell.value = newValue;
               hasChanges = true;
@@ -145,8 +140,8 @@ function DemoSpreadsheet() {
       setIsCalculating(true);
       
       // CellData形式に変換（数式計算用）
-      const cellData: CellData[][] = data.map((row, rowIdx) =>
-        row.map((cell, colIdx) => {
+      const cellData: CellData[][] = data.map((row) =>
+        row.map((cell) => {
           if (!cell) return { value: '' };
           
           if (typeof cell === 'object' && 'value' in cell) {
@@ -163,14 +158,6 @@ function DemoSpreadsheet() {
             
             const formula = cellObj.formula || cellObj['data-formula'];
             
-            // MROUND関数のデバッグ
-            if (selectedFunction?.name === 'MROUND' && formula && formula.includes('MROUND')) {
-              console.log(`Converting cell [${rowIdx}][${colIdx}] to CellData:`, {
-                originalCell: cell,
-                value,
-                formula
-              });
-            }
             
             return {
               value: value,
@@ -191,13 +178,26 @@ function DemoSpreadsheet() {
       );
       
       // 数式を計算
+      if (selectedFunction?.name === 'MROUND') {
+        console.log('Before calculateAllFormulas:');
+        cellData.forEach((row, idx) => {
+          console.log(`Row ${idx}:`, JSON.stringify(row));
+        });
+      }
+      
       const calculatedData = calculateAllFormulas(cellData);
+      
+      if (selectedFunction?.name === 'MROUND') {
+        console.log('After calculateAllFormulas:');
+        calculatedData.forEach((row, idx) => {
+          console.log(`Row ${idx}:`, JSON.stringify(row));
+        });
+      }
       
       // 結果をSpreadsheet形式に変換
       const resultData: Matrix<CellBase> = calculatedData.map((row) =>
         row.map((cell) => {
           if (cell.formula) {
-            
             return {
               value: cell.value,
               formula: cell.formula,
@@ -213,12 +213,13 @@ function DemoSpreadsheet() {
       );
       
       
-      // MROUND関数の場合、最終的なデータを確認
+      
+      // デバッグ：MROUNDの場合、最終データを確認
       if (selectedFunction?.name === 'MROUND') {
-        console.log('Setting spreadsheet data for MROUND:');
-        resultData.forEach((row, rowIdx) => {
-          console.log(`Row ${rowIdx}:`, row.map(cell => 
-            typeof cell === 'object' && cell !== null ? 
+        console.log('Final spreadsheet data for MROUND:');
+        resultData.forEach((row, idx) => {
+          console.log(`Row ${idx}:`, row.map(cell => 
+            typeof cell === 'object' && cell ? 
               `{value: ${cell.value}, formula: ${(cell as any).formula || 'none'}}` : 
               cell
           ));
