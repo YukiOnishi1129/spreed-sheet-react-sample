@@ -4,11 +4,9 @@ import { matchFormula } from "../../utils/spreadsheet/logic";
 import type { CellData, FormulaContext, FormulaResult } from "../../utils/spreadsheet/logic";
 import { 
   hasSpreadsheetValue, 
-  hasDataFormula, 
-  isFormulaCell,
+  hasDataFormula
 } from './typeGuards';
 import { formatCellValue } from '../../utils/spreadsheet/formatting';
-import { getCellValue } from '../../utils/spreadsheet/logic/shared/utils';
 
 // カスタム関数システムで再計算する関数
 export const recalculateFormulas = (

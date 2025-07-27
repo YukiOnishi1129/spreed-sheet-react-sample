@@ -85,7 +85,7 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
       test(`${testData.name} - ${testData.description}`, async ({ page }) => {
         // コンソールログを取得
         page.on('console', msg => {
-          if (testData.name === 'SUMPRODUCT') {
+          if (testData.name === 'SUMPRODUCT' || testData.name === 'PMT' || testData.name === 'SLN') {
             console.log('Browser console:', msg.text());
           }
         });
@@ -124,6 +124,40 @@ export function generateTestsForCategory(categoryName: string, testDataArray: In
           const tableHTML = await page.locator('table').innerHTML();
           console.log('Table structure:', tableHTML.substring(0, 500) + '...');
           
+          console.log('======================');
+        }
+        
+        // PMTの場合、デバッグ情報を追加
+        if (testData.name === 'PMT') {
+          console.log('=== PMT Debug ===');
+          // 各セルの値を確認
+          for (let col = 0; col < 4; col++) {
+            const cellAddress = `${String.fromCharCode(65 + col)}2`;
+            const value = await getCellValue(page, 1, col);
+            console.log(`Cell ${cellAddress}: ${value}`);
+          }
+          
+          // D2セルをクリックして数式を確認
+          const d2Cell = page.locator('table tbody tr').nth(2).locator('td').nth(3);
+          await d2Cell.click();
+          await page.waitForTimeout(500);
+          
+          // 数式入力欄の値を取得
+          const formulaInput = page.locator('input[type="text"]').first();
+          const formulaValue = await formulaInput.inputValue();
+          console.log(`Formula in D2: ${formulaValue}`);
+          console.log('======================');
+        }
+        
+        // SLNの場合、デバッグ情報を追加
+        if (testData.name === 'SLN') {
+          console.log('=== SLN Debug ===');
+          // 各セルの値を確認
+          for (let col = 0; col < 4; col++) {
+            const cellAddress = `${String.fromCharCode(65 + col)}2`;
+            const value = await getCellValue(page, 1, col);
+            console.log(`Cell ${cellAddress}: ${value}`);
+          }
           console.log('======================');
         }
         
