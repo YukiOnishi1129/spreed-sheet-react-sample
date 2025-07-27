@@ -1,15 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Spreadsheet, { type Matrix, type CellBase, type Selection } from 'react-spreadsheet';
 import { demoSpreadsheetData, type DemoCategory } from '../data/demoSpreadsheetData';
-import { 
-  type IndividualFunctionTest
-} from '../data/individualFunctionTests';
+import type { IndividualFunctionTest } from '../types/spreadsheet';
 import { Link } from 'react-router-dom';
 import { calculateSingleFormula as calculateFormula } from './utils/customFormulaCalculations';
-import type { SpreadsheetData, ExcelFunctionResponse } from '../types/spreadsheet';
 import { FunctionSelectorModal } from './FunctionSelectorModal';
-import { matchFormula } from "../utils/spreadsheet/logic";
-import type { CellData, FormulaContext, FormulaResult as LogicFormulaResult } from "../utils/spreadsheet/logic";
+import type { CellData } from "../utils/spreadsheet/logic";
 
 function DemoSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<DemoCategory>(demoSpreadsheetData[0]);
@@ -40,8 +36,8 @@ function DemoSpreadsheet() {
     setIsCalculating(true);
     
     // 数式を別途保存
-    const formulas: Matrix<string | undefined> = selectedCategory.data.map((row) => 
-      row.map((cellValue) => {
+    const formulas: Matrix<string | undefined> = selectedCategory.data.map((row: (string | number | boolean | null)[]) => 
+      row.map((cellValue: string | number | boolean | null) => {
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
           return cellValue;
         }
@@ -50,8 +46,8 @@ function DemoSpreadsheet() {
     );
     setOriginalFormulas(formulas);
     
-    const initialData: Matrix<CellBase> = selectedCategory.data.map((row) => 
-      row.map((cellValue) => {
+    const initialData: Matrix<CellBase> = selectedCategory.data.map((row: (string | number | boolean | null)[]) => 
+      row.map((cellValue: string | number | boolean | null) => {
         // 数式が直接入っている場合
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
           return {
@@ -75,8 +71,8 @@ function DemoSpreadsheet() {
     setIsCalculating(true);
     
     // 数式を別途保存
-    const formulas: Matrix<string | undefined> = selectedFunction.data.map((row) => 
-      row.map((cellValue) => {
+    const formulas: Matrix<string | undefined> = selectedFunction.data.map((row: (string | number | boolean | null)[]) => 
+      row.map((cellValue: string | number | boolean | null) => {
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
           return cellValue;
         }
@@ -85,8 +81,8 @@ function DemoSpreadsheet() {
     );
     setOriginalFormulas(formulas);
     
-    const initialData: Matrix<CellBase> = selectedFunction.data.map((row) => 
-      row.map((cellValue) => {
+    const initialData: Matrix<CellBase> = selectedFunction.data.map((row: (string | number | boolean | null)[]) => 
+      row.map((cellValue: string | number | boolean | null) => {
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
           return {
             value: '',
@@ -152,7 +148,7 @@ function DemoSpreadsheet() {
             // 数値文字列を数値に変換
             if (typeof value === 'string' && value !== '') {
               const num = parseFloat(value);
-              if (!isNaN(num) && num.toString() === value.trim()) {
+              if (!isNaN(num) && num.toString() === (value as string).trim()) {
                 value = num;
               }
             }
@@ -166,7 +162,7 @@ function DemoSpreadsheet() {
           // 単純な値の場合も数値変換を試みる
           if (typeof cell === 'string' && cell !== '') {
             const num = parseFloat(cell);
-            if (!isNaN(num) && num.toString() === cell.trim()) {
+            if (!isNaN(num) && num.toString() === (cell as string).trim()) {
               return { value: num };
             }
           }

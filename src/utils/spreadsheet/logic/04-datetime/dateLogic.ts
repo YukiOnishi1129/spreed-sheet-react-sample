@@ -23,9 +23,9 @@ import {
 // DATEDIF関数の実装（Date版）
 export const DATEDIF: CustomFormula = {
   name: 'DATEDIF',
-  pattern: /DATEDIF\(([^,]+),\s*([^,]+),\s*"([^"]+)"\)/i,
+  pattern: /DATEDIF\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, startRef, endRef, unit] = matches;
+    const [, startRef, endRef, unitRef] = matches;
     
     // セル参照か直接値かを判定
     let startValue, endValue;
@@ -48,6 +48,16 @@ export const DATEDIF: CustomFormula = {
       endValue = endRef;
     }
     
+    // 単位の取得（セル参照または直接文字列）
+    let unit;
+    if (unitRef.startsWith('"') && unitRef.endsWith('"')) {
+      unit = unitRef.slice(1, -1);
+    } else if (unitRef.match(/^[A-Z]+\d+$/)) {
+      unit = getCellValue(unitRef, context);
+    } else {
+      unit = unitRef;
+    }
+    
     // Date版のparseDate関数を使用
     const startDate = parseDateNew(startValue);
     const endDate = parseDateNew(endValue);
@@ -60,7 +70,7 @@ export const DATEDIF: CustomFormula = {
       return FormulaError.NUM;
     }
     
-    switch (unit.toUpperCase()) {
+    switch (String(unit).toUpperCase()) {
       case 'D': {
         // 日数の差
         const days = diffDays(startDate, endDate);
