@@ -63,7 +63,8 @@
       "Bash(gtimeout:*)",
       "Bash(true)",
       "Bash(open /tmp/test-mround.html)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }
