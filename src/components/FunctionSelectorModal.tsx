@@ -1,24 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
   type IndividualFunctionTest,
-  allIndividualFunctionTests,
-  basicOperatorTests,
-  mathFunctionTests,
-  statisticalFunctionTests,
-  textFunctionTests,
-  dateFunctionTests,
-  logicalFunctionTests,
-  lookupFunctionTests,
-  financialFunctionTests,
-  matrixFunctionTests,
-  informationFunctionTests,
-  databaseFunctionTests,
-  engineeringFunctionTests,
-  dynamicArrayFunctionTests,
-  cubeFunctionTests,
-  webFunctionTests,
-  googleSheetsFunctionTests,
-  otherFunctionTests
+  allIndividualFunctionTests
 } from '../data/individualFunctionTests';
 
 interface FunctionSelectorModalProps {
@@ -38,25 +21,21 @@ export function FunctionSelectorModal({
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // カテゴリー別の関数マップ
-  const functionCategories = useMemo(() => ({
-    '基本演算子': basicOperatorTests,
-    '数学・三角関数': mathFunctionTests,
-    '統計関数': statisticalFunctionTests,
-    'テキスト関数': textFunctionTests,
-    '日付・時刻関数': dateFunctionTests,
-    '論理関数': logicalFunctionTests,
-    '検索・参照関数': lookupFunctionTests,
-    '財務関数': financialFunctionTests,
-    '行列関数': matrixFunctionTests,
-    '情報関数': informationFunctionTests,
-    'データベース関数': databaseFunctionTests,
-    'エンジニアリング関数': engineeringFunctionTests,
-    '動的配列関数': dynamicArrayFunctionTests,
-    'キューブ関数': cubeFunctionTests,
-    'Web関数': webFunctionTests,
-    'Google Sheets関数': googleSheetsFunctionTests,
-    'その他の関数': otherFunctionTests
-  }), []);
+  const functionCategories = useMemo(() => {
+    // 実際のカテゴリ名でグループ化
+    const categoryGroups: { [key: string]: IndividualFunctionTest[] } = {};
+    
+    // すべての関数を実際のカテゴリ名でグループ化
+    allIndividualFunctionTests.forEach(test => {
+      const categoryName = test.category;
+      if (!categoryGroups[categoryName]) {
+        categoryGroups[categoryName] = [];
+      }
+      categoryGroups[categoryName].push(test);
+    });
+    
+    return categoryGroups;
+  }, []);
 
   // フィルター済み関数リスト
   const filteredFunctions = useMemo(() => {
@@ -65,7 +44,7 @@ export function FunctionSelectorModal({
     if (selectedCategory === 'all') {
       functions = allIndividualFunctionTests;
     } else if (selectedCategory in functionCategories) {
-      functions = functionCategories[selectedCategory as keyof typeof functionCategories];
+      functions = functionCategories[selectedCategory];
     }
     
     if (searchQuery) {
@@ -78,6 +57,13 @@ export function FunctionSelectorModal({
     
     return functions;
   }, [selectedCategory, functionCategories, searchQuery]);
+  
+  // カテゴリを表示用に整理（頻度順）
+  const sortedCategories = useMemo(() => {
+    return Object.entries(functionCategories)
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(([category]) => category);
+  }, [functionCategories]);
 
   // ESCキーでモーダルを閉じる
   useEffect(() => {
@@ -159,7 +145,7 @@ export function FunctionSelectorModal({
                 >
                   すべて
                 </button>
-                {Object.keys(functionCategories).map(category => (
+                {sortedCategories.map(category => (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
@@ -169,7 +155,7 @@ export function FunctionSelectorModal({
                         : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                     }`}
                   >
-                    {category}
+                    {category} ({functionCategories[category].length})
                   </button>
                 ))}
               </div>

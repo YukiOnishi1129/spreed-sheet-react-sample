@@ -612,17 +612,6 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
   },
   // 追加の数学関数
   {
-    name: 'LOG10',
-    category: '数学',
-    description: '常用対数を計算',
-    data: [
-      ['値', '常用対数'],
-      [100, '=LOG10(A2)'],
-      [1000, '=LOG10(A3)']
-    ],
-    expectedValues: { 'B2': 2, 'B3': 3 }
-  },
-  {
     name: 'SUMX2MY2',
     category: '数学',
     description: 'x^2-y^2の和を計算',
@@ -739,51 +728,6 @@ export const mathFunctionTests: IndividualFunctionTest[] = [
       [0.5, '=TANH(A3)']
     ],
     expectedValues: { 'B2': 0, 'B3': 0.462117 }
-  },
-  {
-    name: 'ATAN2',
-    category: '三角',
-    description: 'x,y座標から角度を計算',
-    data: [
-      ['X座標', 'Y座標', '角度(ラジアン)'],
-      [1, 1, '=ATAN2(A2,B2)'],
-      [0, 1, '=ATAN2(A3,B3)']
-    ],
-    expectedValues: { 'C2': 0.785398, 'C3': 1.570796 }
-  },
-  {
-    name: 'SINH',
-    category: '三角',
-    description: '双曲線正弦',
-    data: [
-      ['値', '双曲線正弦'],
-      [0, '=SINH(A2)'],
-      [1, '=SINH(A3)'],
-      [-1, '=SINH(A4)']
-    ],
-    expectedValues: { 'B2': 0, 'B3': 1.175201, 'B4': -1.175201 }
-  },
-  {
-    name: 'COSH',
-    category: '三角',
-    description: '双曲線余弦',
-    data: [
-      ['値', '双曲線余弦'],
-      [0, '=COSH(A2)'],
-      [1, '=COSH(A3)']
-    ],
-    expectedValues: { 'B2': 1, 'B3': 1.543081 }
-  },
-  {
-    name: 'TANH',
-    category: '三角',
-    description: '双曲線正接',
-    data: [
-      ['値', '双曲線正接'],
-      [0, '=TANH(A2)'],
-      [1, '=TANH(A3)']
-    ],
-    expectedValues: { 'B2': 0, 'B3': 0.761594 }
   },
   {
     name: 'ASINH',
@@ -1310,42 +1254,6 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
     ]
   },
   {
-    name: 'STDEV.S',
-    category: '統計',
-    description: '標準偏差（標本）',
-    data: [
-      ['値1', '値2', '値3', '値4', '標準偏差'],
-      [10, 20, 30, 40, '=STDEV.S(A2:D2)']
-    ]
-  },
-  {
-    name: 'STDEV.P',
-    category: '統計',
-    description: '標準偏差（母集団）',
-    data: [
-      ['値1', '値2', '値3', '値4', '標準偏差'],
-      [10, 20, 30, 40, '=STDEV.P(A2:D2)']
-    ]
-  },
-  {
-    name: 'VAR.S',
-    category: '統計',
-    description: '分散（標本）',
-    data: [
-      ['値1', '値2', '値3', '値4', '分散'],
-      [10, 20, 30, 40, '=VAR.S(A2:D2)']
-    ]
-  },
-  {
-    name: 'VAR.P',
-    category: '統計',
-    description: '分散（母集団）',
-    data: [
-      ['値1', '値2', '値3', '値4', '分散'],
-      [10, 20, 30, 40, '=VAR.P(A2:D2)']
-    ]
-  },
-  {
     name: 'MODE.SNGL',
     category: '統計',
     description: '最頻値（単一）',
@@ -1545,7 +1453,8 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
     data: [
       ['値', '自由度1', '自由度2', '累積', '確率'],
       [2.5, 5, 10, 'TRUE', '=F.DIST(A2,B2,C2,D2)']
-    ]
+    ],
+    expectedValues: { 'E2': 0.8823 }
   },
   {
     name: 'F.INV',
@@ -1554,7 +1463,8 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
     data: [
       ['確率', '自由度1', '自由度2', '値'],
       [0.95, 5, 10, '=F.INV(A2,B2,C2)']
-    ]
+    ],
+    expectedValues: { 'D2': 3.3258 }
   },
   {
     name: 'EXPON.DIST',
@@ -1563,126 +1473,8 @@ export const statisticalFunctionTests: IndividualFunctionTest[] = [
     data: [
       ['値', 'λ', '累積', '確率'],
       [0.2, 10, 'TRUE', '=EXPON.DIST(A2,B2,C2)']
-    ]
-  },
-  {
-    name: 'NORM.DIST',
-    category: '統計',
-    description: '正規分布',
-    data: [
-      ['値', '平均', '標準偏差', '累積', '確率'],
-      [100, 100, 15, 'TRUE', '=NORM.DIST(A2,B2,C2,D2)'],
-      [110, 100, 15, 'FALSE', '=NORM.DIST(A3,B3,C3,D3)']
-    ]
-  },
-  {
-    name: 'NORM.INV',
-    category: '統計',
-    description: '正規分布の逆関数',
-    data: [
-      ['確率', '平均', '標準偏差', '値'],
-      [0.5, 100, 15, '=NORM.INV(A2,B2,C2)'],
-      [0.95, 100, 15, '=NORM.INV(A3,B3,C3)']
     ],
-    expectedValues: { 'D2': 100, 'D3': 124.67 }
-  },
-  {
-    name: 'NORM.S.DIST',
-    category: '統計',
-    description: '標準正規分布',
-    data: [
-      ['値', '累積', '確率'],
-      [0, 'TRUE', '=NORM.S.DIST(A2,B2)'],
-      [1.96, 'TRUE', '=NORM.S.DIST(A3,B3)']
-    ],
-    expectedValues: { 'C2': 0.5, 'C3': 0.975 }
-  },
-  {
-    name: 'NORM.S.INV',
-    category: '統計',
-    description: '標準正規分布の逆関数',
-    data: [
-      ['確率', '値'],
-      [0.5, '=NORM.S.INV(A2)'],
-      [0.975, '=NORM.S.INV(A3)']
-    ],
-    expectedValues: { 'B2': 0, 'B3': 1.96 }
-  },
-  {
-    name: 'T.DIST',
-    category: '統計',
-    description: 'T分布（左側）',
-    data: [
-      ['値', '自由度', '確率'],
-      [2, 10, '=T.DIST(A2,B2,TRUE)']
-    ]
-  },
-  {
-    name: 'T.DIST.2T',
-    category: '統計',
-    description: 'T分布（両側）',
-    data: [
-      ['値', '自由度', '確率'],
-      [2, 10, '=T.DIST.2T(A2,B2)']
-    ]
-  },
-  {
-    name: 'T.INV',
-    category: '統計',
-    description: 'T分布の逆関数（左側）',
-    data: [
-      ['確率', '自由度', '値'],
-      [0.95, 10, '=T.INV(A2,B2)']
-    ],
-    expectedValues: { 'C2': 1.812 }
-  },
-  {
-    name: 'T.INV.2T',
-    category: '統計',
-    description: 'T分布の逆関数（両側）',
-    data: [
-      ['確率', '自由度', '値'],
-      [0.05, 10, '=T.INV.2T(A2,B2)']
-    ],
-    expectedValues: { 'C2': 2.228 }
-  },
-  {
-    name: 'CHISQ.DIST',
-    category: '統計',
-    description: 'カイ二乗分布',
-    data: [
-      ['値', '自由度', '累積', '確率'],
-      [10, 5, 'TRUE', '=CHISQ.DIST(A2,B2,C2)']
-    ]
-  },
-  {
-    name: 'CHISQ.INV',
-    category: '統計',
-    description: 'カイ二乗分布の逆関数',
-    data: [
-      ['確率', '自由度', '値'],
-      [0.95, 5, '=CHISQ.INV(A2,B2)']
-    ],
-    expectedValues: { 'C2': 11.07 }
-  },
-  {
-    name: 'F.DIST',
-    category: '統計',
-    description: 'F分布',
-    data: [
-      ['値', '自由度1', '自由度2', '累積', '確率'],
-      [2, 5, 10, 'TRUE', '=F.DIST(A2,B2,C2,D2)']
-    ]
-  },
-  {
-    name: 'F.INV',
-    category: '統計',
-    description: 'F分布の逆関数',
-    data: [
-      ['確率', '自由度1', '自由度2', '値'],
-      [0.95, 5, 10, '=F.INV(A2,B2,C2)']
-    ],
-    expectedValues: { 'D2': 3.326 }
+    expectedValues: { 'D2': 0.8647 }
   },
   {
     name: 'COVARIANCE.P',
@@ -4212,26 +4004,6 @@ export const engineeringFunctionTests: IndividualFunctionTest[] = [
     ]
   },
   {
-    name: 'IMLOG10',
-    category: 'エンジニアリング',
-    description: '複素数の常用対数',
-    data: [
-      ['複素数', '常用対数'],
-      ['10+10i', '=IMLOG10(A2)'],
-      ['100', '=IMLOG10(A3)']
-    ]
-  },
-  {
-    name: 'IMLOG2',
-    category: 'エンジニアリング',
-    description: '複素数の2を底とする対数',
-    data: [
-      ['複素数', '対数'],
-      ['8+8i', '=IMLOG2(A2)'],
-      ['16', '=IMLOG2(A3)']
-    ]
-  },
-  {
     name: 'IMSIN',
     category: 'エンジニアリング',
     description: '複素数の正弦',
@@ -4445,21 +4217,6 @@ export const dynamicArrayFunctionTests: IndividualFunctionTest[] = [
       ['行数', '列数', '最小', '最大', '整数', 'ランダム配列'],
       [3, 3, 1, 10, 'TRUE', '=RANDARRAY(A2,B2,C2,D2,E2)']
     ]
-  },
-  {
-    name: 'XLOOKUP',
-    category: '動的配列',
-    description: '柔軟な検索',
-    data: [
-      ['商品名', '価格'],
-      ['りんご', 100],
-      ['バナナ', 150],
-      ['オレンジ', 200],
-      ['', ''],
-      ['検索値', '結果'],
-      ['バナナ', '=XLOOKUP(A7,A2:A4,B2:B4)']
-    ],
-    expectedValues: { 'B7': 150 }
   },
   {
     name: 'LAMBDA',

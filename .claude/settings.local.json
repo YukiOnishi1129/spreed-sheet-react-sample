@@ -51,7 +51,8 @@
       "Bash(git checkout:*)",
       "Bash(npm start)",
       "Bash(open http://localhost:5174/)",
-      "Bash(open http://localhost:5173/demo)"
+      "Bash(open http://localhost:5173/demo)",
+      "Bash(npx esbuild:*)"
     ],
     "deny": []
   }
