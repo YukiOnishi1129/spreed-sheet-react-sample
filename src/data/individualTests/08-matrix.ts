@@ -9,7 +9,8 @@ export const matrixTests: IndividualFunctionTest[] = [
       ['行列A', '', '行列B', '', '積'],
       [1, 2, 5, 6, '=MMULT(A2:B3,C2:D3)'],
       [3, 4, 7, 8, '']
-    ]
+    ],
+    expectedValues: { 'E2': 19, 'E3': 43 }
   },
   {
     name: 'MDETERM',
@@ -30,7 +31,8 @@ export const matrixTests: IndividualFunctionTest[] = [
       ['行列', '', '逆行列'],
       [3, 2, '=MINVERSE(A2:B3)'],
       [1, 4, '']
-    ]
+    ],
+    expectedValues: { 'C2': 0.4, 'C3': -0.1 }
   },
   {
     name: 'MUNIT',
@@ -39,6 +41,7 @@ export const matrixTests: IndividualFunctionTest[] = [
     data: [
       ['サイズ', '単位行列'],
       [3, '=MUNIT(A2)']
-    ]
+    ],
+    expectedValues: { 'B2': 1 }
   }
 ];

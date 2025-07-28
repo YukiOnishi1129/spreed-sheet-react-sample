@@ -10,7 +10,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['田中', 25, '=FILTER(A2:B4,B2:B4>25)'],
       ['佐藤', 30, ''],
       ['鈴木', 28, '']
-    ]
+    ],
+    expectedValues: { 'C2': '佐藤' }
   },
   {
     name: 'SORT',
@@ -21,7 +22,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['田中', 85, '=SORT(A2:B4,2,-1)'],
       ['佐藤', 92, ''],
       ['鈴木', 78, '']
-    ]
+    ],
+    expectedValues: { 'C2': '佐藤' }
   },
   {
     name: 'UNIQUE',
@@ -34,7 +36,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['A', ''],
       ['C', ''],
       ['B', '']
-    ]
+    ],
+    expectedValues: { 'B2': 'A', 'B3': 'B', 'B4': 'C' }
   },
   {
     name: 'TRANSPOSE',
@@ -46,7 +49,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['2', 4, 5, 6],
       ['', '', '', ''],
       ['転置', '=TRANSPOSE(B2:D3)', '', '']
-    ]
+    ],
+    expectedValues: { 'B5': 1, 'C5': 4 }
   },
   {
     name: 'SEQUENCE',
@@ -55,7 +59,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
     data: [
       ['行数', '列数', '開始', 'ステップ', '連続値'],
       [5, 1, 1, 2, '=SEQUENCE(A2,B2,C2,D2)']
-    ]
+    ],
+    expectedValues: { 'E2': 1, 'E3': 3, 'E4': 5, 'E5': 7, 'E6': 9 }
   },
   {
     name: 'RANDARRAY',
@@ -64,7 +69,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
     data: [
       ['行数', '列数', '最小', '最大', '整数', 'ランダム配列'],
       [3, 3, 1, 10, 'TRUE', '=RANDARRAY(A2,B2,C2,D2,E2)']
-    ]
+    ],
+    expectedValues: { 'F2': 5 }
   },
   {
     name: 'LAMBDA',
@@ -96,7 +102,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['配列1', '', '配列2', '', '結合結果'],
       [1, 2, 'A', 'B', '=HSTACK(A2:B3,C2:D3)'],
       [3, 4, 'C', 'D', '']
-    ]
+    ],
+    expectedValues: { 'E2': 1, 'F2': 2, 'G2': 'A', 'H2': 'B' }
   },
   {
     name: 'VSTACK',
@@ -109,7 +116,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['', '', ''],
       [5, 6, ''],
       [7, 8, '']
-    ]
+    ],
+    expectedValues: { 'C2': 1, 'D2': 2, 'C3': 3, 'D3': 4, 'C4': 5, 'D4': 6, 'C5': 7, 'D5': 8 }
   },
   {
     name: 'BYROW',
@@ -144,7 +152,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
     data: [
       ['行数', '列数', '配列'],
       [3, 4, '=MAKEARRAY(A2,B2,LAMBDA(r,c,r*c))']
-    ]
+    ],
+    expectedValues: { 'C2': 1, 'D2': 2, 'E2': 3, 'F2': 4 }
   },
   {
     name: 'MAP',
@@ -195,7 +204,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['バナナ', 100, ''],
       ['オレンジ', 400, ''],
       ['ぶどう', 200, '']
-    ]
+    ],
+    expectedValues: { 'C2': 'バナナ', 'C3': 'ぶどう', 'C4': 'りんご', 'C5': 'オレンジ' }
   },
   {
     name: 'TAKE',
@@ -209,7 +219,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       [400, ''],
       [500, ''],
       [600, '']
-    ]
+    ],
+    expectedValues: { 'B2': 100, 'B3': 200, 'B4': 300 }
   },
   {
     name: 'DROP',
@@ -223,7 +234,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       [400, ''],
       [500, ''],
       [600, '']
-    ]
+    ],
+    expectedValues: { 'B2': 300, 'B3': 400, 'B4': 500, 'B5': 600 }
   },
   {
     name: 'EXPAND',
@@ -235,7 +247,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       [3, 4, ''],
       ['', '', ''],
       ['', '', '']
-    ]
+    ],
+    expectedValues: { 'C2': 1, 'D2': 2, 'E2': '-', 'C3': 3, 'D3': 4, 'E3': '-', 'C4': '-', 'D4': '-', 'E4': '-', 'C5': '-', 'D5': '-', 'E5': '-' }
   },
   {
     name: 'TOCOL',
@@ -245,7 +258,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['配列', '', '1列変換'],
       [1, 2, '=TOCOL(A2:B3)'],
       [3, 4, '']
-    ]
+    ],
+    expectedValues: { 'C2': 1, 'C3': 3, 'C4': 2, 'C5': 4 }
   },
   {
     name: 'TOROW',
@@ -255,7 +269,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['配列', '', '', '1行変換'],
       [1, 2, '', '=TOROW(A2:B3)'],
       [3, 4, '', '']
-    ]
+    ],
+    expectedValues: { 'D2': 1, 'E2': 3, 'F2': 2, 'G2': 4 }
   },
   {
     name: 'CHOOSEROWS',
@@ -267,7 +282,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['B', 2, ''],
       ['C', 3, ''],
       ['D', 4, '']
-    ]
+    ],
+    expectedValues: { 'C2': 'A', 'D2': 1, 'C3': 'C', 'D3': 3 }
   },
   {
     name: 'CHOOSECOLS',
@@ -278,7 +294,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       [1, 2, 3, '=CHOOSECOLS(A2:C4,1,3)'],
       [4, 5, 6, ''],
       [7, 8, 9, '']
-    ]
+    ],
+    expectedValues: { 'D2': 1, 'E2': 3, 'D3': 4, 'E3': 6, 'D4': 7, 'E4': 9 }
   },
   {
     name: 'WRAPROWS',
@@ -288,7 +305,8 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       ['データ', '', '', '折り返し結果'],
       [1, 2, 3, '=WRAPROWS(A2:C3,3)'],
       [4, 5, 6, '']
-    ]
+    ],
+    expectedValues: { 'D2': 1, 'E2': 2, 'F2': 3, 'D3': 4, 'E3': 5, 'F3': 6 }
   },
   {
     name: 'WRAPCOLS',
@@ -299,6 +317,7 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
       [1, 2, '=WRAPCOLS(A2:B4,2)'],
       [3, 4, ''],
       [5, 6, '']
-    ]
+    ],
+    expectedValues: { 'C2': 1, 'D2': 3, 'C3': 2, 'D3': 4, 'C4': 5, 'D4': 6 }
   }
 ];

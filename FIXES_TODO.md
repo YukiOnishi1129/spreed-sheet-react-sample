@@ -6,7 +6,7 @@
 
 ### 完全に成功したカテゴリ
 - 00. 基本演算子 - 全て成功 ✓
-- 02. 統計関数 - 全て成功 ✓
+- 02. 統計関数 - 全て成功 ✓ (注: 一部の関数で実装に問題がある可能性)
 
 ### 部分的に成功しているカテゴリ
 1. **01. 数学・三角関数** - SUMPRODUCT以外は成功
@@ -18,7 +18,7 @@
 5. **06. 検索・参照** - XLOOKUP/OFFSET/INDIRECT/FORMULATEXTにエラー
 
 ### 部分的に成功しているカテゴリ（続き）
-6. **07. 財務** - ほぼ全てexpectedValues未定義
+6. **07. 財務** - expectedValues追加済み、51関数中33成功、18失敗
 7. **08. 行列** - 1/4成功（MDETERMのみ成功）
 8. **09. 情報** - 8/16失敗（ISERROR/ISNA/ISTEXT/ISNUMBER/N/ERROR.TYPE/ISFORMULA/ISBETWEENにエラー）
 
@@ -35,24 +35,24 @@
 ### カテゴリ別エラー数
 - 00. 基本演算子: 0エラー ✓
 - 01. 数学・三角: 1エラー（SUMPRODUCT）
-- 02. 統計: 0エラー ✓
+- 02. 統計: 実装されているが一部で計算エラー
 - 03. テキスト: 4エラー（TEXTJOIN, TEXTAFTER, UNICHAR, FIXED）
 - 04. 日付: 1エラー（WEEKDAY）
 - 05. 論理: 5エラー（IF, NOT, XOR, IFERROR, IFNA）
 - 06. 検索・参照: 4エラー（XLOOKUP, OFFSET, INDIRECT, FORMULATEXT）
-- 07. 財務: ほぼ全て未実装
-- 08. 行列: 3/4未実装
+- 07. 財務: 18エラー（PMT, RATE, NPER, IPMT, PPMT, XNPV, XIRR, MIRR, SLN, NPV, DDB, VDB, 債券関連関数など）
+- 08. 行列: expectedValues追加済み
 - 09. 情報: 8エラー
 - 10. データベース: 8エラー
 - 11. エンジニアリング: 多数のエラー
-- 12. 動的配列: 2エラー（ARRAYTOTEXT, TOROW）
-- 13. キューブ: 全て未実装
+- 12. 動的配列: expectedValues追加済み（ARRAYTOTEXT, TOROW）
+- 13. キューブ: expectedValues追加済み
 - 14. Web・インポート: 2エラー（ENCODEURL, JOIN）
-- 15. その他: 全て未実装
+- 15. その他: expectedValues追加済み
 
 ### 総計
-- 実装済み関数でエラー: 約35関数
-- expectedValues未定義: 約100関数以上
+- 実装済み関数でエラー: 約50関数以上
+- expectedValues未定義: 0関数（全て追加済み）
 
 ## 優先度：高（基本的な関数でエラーが出ているもの）
 
@@ -100,8 +100,30 @@
 
 ## 調査中の問題
 
-### PMT関数とSLN関数が#VALUE!/#NUM!エラーを返す
-- PMT関数：数式は認識されているが、計算時に#VALUE!エラー
-- SLN関数：数式は認識されているが、計算時に#NUM!エラー
-- 両方とも関数のcalculateメソッドが呼ばれていない可能性あり
-- matchFormula()は正しく関数を認識しているが、実行段階で問題が発生
+### 財務関数の実装に関する問題
+多くの財務関数が#VALUE!や#NUM!エラーを返している。関数は認識されているが、計算段階で失敗している模様。
+
+## 財務関数の実装状況（07. 財務）
+
+### エラーが発生している関数（18/51）
+1. **PMT** - #VALUE!エラー（デバッグログ追加済み、関数は認識されているが計算に失敗）
+2. **RATE** - #VALUE!エラー
+3. **NPER** - #VALUE!エラー
+4. **NPV** - 計算結果が期待値と異なる（-3456.05 vs -4131.53）
+5. **XNPV** - #VALUE!エラー
+6. **XIRR** - #NUM!エラー
+7. **IPMT** - #VALUE!エラー
+8. **PPMT** - #VALUE!エラー
+9. **MIRR** - #NUM!エラー
+10. **SLN** - #NUM!エラー（デバッグログ追加済み）
+11. **DDB** - 計算結果が期待値と異なる
+12. **VDB** - 計算結果が期待値と異なる
+13. **DURATION** - #NUM!エラー
+14. **MDURATION** - #NUM!エラー
+15. **PRICE** - #NUM!エラー
+16. **YIELD** - #NUM!エラー
+17. **債券関連関数** - 多数がエラー
+18. **PRICEMAT/YIELDMAT** - 引数リストを返している
+
+### 成功している関数（33/51）
+- FV, PV, IRR, SYD, DB, ACCRINT, ACCRINTM, DISC, COUPDAYS, AMORLINC, CUMIPMT, CUMPRINC, ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD, TBILLEQ, TBILLPRICE, TBILLYIELD, NOMINAL, PRICEDISC, RECEIVED, INTRATE, PDURATION, RRI, ISPMT など
