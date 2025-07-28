@@ -245,8 +245,6 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     if (matchResult) {
       // 関数を実行
       const result = matchResult.function.calculate(matchResult.matches, context);
-      
-      
       return result;
     } else {
       // 評価済みの式が単純な値の場合

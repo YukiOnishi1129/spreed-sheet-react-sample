@@ -72,6 +72,13 @@ export async function getCellValue(page: any, row: number, col: number): Promise
 export function generateTestsForCategory(categoryName: string, testDataArray: IndividualFunctionTest[]) {
   test.describe(categoryName, () => {
     test.beforeEach(async ({ page }) => {
+      // ブラウザコンソールログを監視
+      page.on('console', msg => {
+        if (msg.type() === 'log' || msg.type() === 'error') {
+          console.log(`Browser [${msg.type()}]:`, msg.text());
+        }
+      });
+      
       await page.goto('/demo');
       await page.click('text=個別関数デモ');
       await page.waitForLoadState('networkidle');

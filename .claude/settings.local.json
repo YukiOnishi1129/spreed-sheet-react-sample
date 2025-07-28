@@ -64,7 +64,8 @@
       "Bash(true)",
       "Bash(open /tmp/test-mround.html)",
       "Bash(open:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(kill:*)"
     ],
     "deny": []
   }

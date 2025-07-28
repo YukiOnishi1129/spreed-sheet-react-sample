@@ -336,6 +336,7 @@ export const matchFormula = (formula: string): { function: CustomFormula; matche
       return { function: func, matches };
     }
   }
+  
   return null;
 };
 

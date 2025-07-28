@@ -7,7 +7,7 @@ import { getCellValue, getCellRangeValues } from '../shared/utils';
 // PMT関数の実装（定期支払額）
 export const PMT: CustomFormula = {
   name: 'PMT',
-  pattern: /PMT\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  pattern: /PMT\(([^,)]+),\s*([^,)]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, rateRef, nperRef, pvRef, fvRef, typeRef] = matches;
     
@@ -32,8 +32,6 @@ export const PMT: CustomFormula = {
       const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
       const type = typeRef ? parseFloat(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
-      
-      // console.log('PMT values:', { rate, nper, pv, fv, type });
       
       if (isNaN(rate) || isNaN(nper) || isNaN(pv)) {
         return FormulaError.VALUE;
