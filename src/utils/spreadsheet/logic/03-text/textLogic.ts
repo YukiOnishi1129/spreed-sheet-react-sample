@@ -1082,7 +1082,7 @@ export const CLEAN: CustomFormula = {
 // T関数の実装（文字列を返す）
 export const T: CustomFormula = {
   name: 'T',
-  pattern: /T\(([^)]+)\)/i,
+  pattern: /\bT\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, valueRef] = matches;
     

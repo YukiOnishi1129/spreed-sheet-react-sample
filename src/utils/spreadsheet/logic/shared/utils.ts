@@ -189,3 +189,64 @@ export const evaluateExpression = (expression: string, context: FormulaContext):
     return expression;
   }
 };
+
+// 式を評価してエラーをチェックする関数
+export const evaluateFormulaWithErrorCheck = (expression: string, context: FormulaContext): string | number => {
+  try {
+    // セル参照を値に置換
+    const cellRefPattern = /[A-Z]+\d+/g;
+    let evaluatedExpr = expression;
+    const replacements: Array<{ref: string, value: number}> = [];
+    
+    const cellRefs = expression.match(cellRefPattern);
+    if (cellRefs) {
+      for (const cellRef of cellRefs) {
+        const value = getCellValue(cellRef, context);
+        if (typeof value === 'number') {
+          replacements.push({ref: cellRef, value});
+          evaluatedExpr = evaluatedExpr.replace(cellRef, value.toString());
+        } else if (value === null || value === undefined || value === '') {
+          evaluatedExpr = evaluatedExpr.replace(cellRef, '0');
+          replacements.push({ref: cellRef, value: 0});
+        } else {
+          // 数値でない場合はVALUEエラー
+          return '#VALUE!';
+        }
+      }
+    }
+    
+    // 除算をチェック
+    if (evaluatedExpr.includes('/')) {
+      // 除算部分を抽出してゼロ除算をチェック
+      const divisionParts = evaluatedExpr.split('/');
+      for (let i = 1; i < divisionParts.length; i++) {
+        // 次の演算子までの部分を取得
+        const divisorMatch = divisionParts[i].match(/^[\s]*(\d+(?:\.\d+)?)/);
+        if (divisorMatch && parseFloat(divisorMatch[1]) === 0) {
+          return '#DIV/0!';
+        }
+      }
+    }
+    
+    // 基本的な算術演算子のみを許可（セキュリティのため）
+    if (!/^[\d\s+\-*/().,]+$/.test(evaluatedExpr)) {
+      return '#NAME?'; // 安全でない文字が含まれている場合はNAMEエラー
+    }
+    
+    // 算術式を評価
+    const result = Function('"use strict"; return (' + evaluatedExpr + ')')();
+    
+    // 無限大やNaNのチェック
+    if (!isFinite(result)) {
+      return '#DIV/0!';
+    }
+    if (isNaN(result)) {
+      return '#VALUE!';
+    }
+    
+    return typeof result === 'number' ? result : '#VALUE!';
+  } catch (error) {
+    // エラーの場合は#VALUE!エラーを返す
+    return '#VALUE!';
+  }
+};

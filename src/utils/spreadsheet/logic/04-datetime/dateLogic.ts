@@ -181,7 +181,7 @@ export const MONTH: CustomFormula = {
 // DAY関数の実装（日を抽出）
 export const DAY: CustomFormula = {
   name: 'DAY',
-  pattern: /DAY\(([^)]+)\)/i,
+  pattern: /\bDAY\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, dateRef] = matches;
     

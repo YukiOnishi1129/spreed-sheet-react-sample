@@ -935,7 +935,7 @@ export const AVERAGEIFS: CustomFormula = {
 // PRODUCT関数の実装（積を計算）
 export const PRODUCT: CustomFormula = {
   name: 'PRODUCT',
-  pattern: /PRODUCT\(([^)]+)\)/i,
+  pattern: /\bPRODUCT\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, args] = matches;
     const numbers = parseArgumentsToNumbers(args, context);
@@ -1156,7 +1156,6 @@ export const SUMPRODUCT: CustomFormula = {
       
       // 各範囲の値を取得
       const rangeValues = ranges.map(range => getCellRangeValues(range, context));
-      
       
       // 範囲が1つの場合は、その値の合計を返す
       if (rangeValues.length === 1) {
