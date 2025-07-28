@@ -447,3 +447,55 @@ export const PERCENTRANK: CustomFormula = {
     return Math.round(percentRank * Math.pow(10, significance)) / Math.pow(10, significance);
   }
 };
+
+// GAMMALN関数（ガンマ関数の自然対数）
+export const GAMMALN: CustomFormula = {
+  name: 'GAMMALN',
+  pattern: /GAMMALN\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, xRef] = matches;
+    
+    const x = Number(getCellValue(xRef.trim(), context) ?? xRef);
+    
+    if (isNaN(x)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (x <= 0) {
+      return FormulaError.NUM;
+    }
+    
+    // Lanczos近似を使用してガンマ関数の自然対数を計算
+    const g = 7;
+    const n = 9;
+    const coef = [
+      0.99999999999980993,
+      676.5203681218851,
+      -1259.1392167224028,
+      771.32342877765313,
+      -176.61502916214059,
+      12.507343278686905,
+      -0.13857109526572012,
+      9.9843695780195716e-6,
+      1.5056327351493116e-7
+    ];
+    
+    if (x < 0.5) {
+      // 反射公式を使用: ln(Γ(x)) = ln(π / sin(πx)) - ln(Γ(1-x))
+      return Math.log(Math.PI / Math.sin(Math.PI * x)) - lnGamma(1 - x);
+    }
+    
+    function lnGamma(z: number): number {
+      z = z - 1;
+      let base = coef[0];
+      for (let i = 1; i < n; i++) {
+        base += coef[i] / (z + i);
+      }
+      
+      const tmp = z + g + 0.5;
+      return Math.log(Math.sqrt(2 * Math.PI)) + Math.log(base) + (z + 0.5) * Math.log(tmp) - tmp;
+    }
+    
+    return lnGamma(x);
+  }
+};
