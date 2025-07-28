@@ -109,7 +109,7 @@ function getMatchingRows(
 // DSTDEV関数の実装（条件付き標準偏差：標本）
 export const DSTDEV: CustomFormula = {
   name: 'DSTDEV',
-  pattern: /DSTDEV\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
+  pattern: /\bDSTDEV\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, databaseRef, field, criteriaRef] = matches;
     
@@ -178,7 +178,7 @@ export const DSTDEV: CustomFormula = {
 // DSTDEVP関数の実装（条件付き標準偏差：母集団）
 export const DSTDEVP: CustomFormula = {
   name: 'DSTDEVP',
-  pattern: /DSTDEVP\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
+  pattern: /\bDSTDEVP\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, databaseRef, field, criteriaRef] = matches;
     
@@ -247,7 +247,7 @@ export const DSTDEVP: CustomFormula = {
 // DVAR関数の実装（条件付き分散：標本）
 export const DVAR: CustomFormula = {
   name: 'DVAR',
-  pattern: /DVAR\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
+  pattern: /\bDVAR\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, databaseRef, field, criteriaRef] = matches;
     
@@ -316,7 +316,7 @@ export const DVAR: CustomFormula = {
 // DVARP関数の実装（条件付き分散：母集団）
 export const DVARP: CustomFormula = {
   name: 'DVARP',
-  pattern: /DVARP\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
+  pattern: /\bDVARP\(([^,]+),\s*"?([^",]+)"?,\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, databaseRef, field, criteriaRef] = matches;
     

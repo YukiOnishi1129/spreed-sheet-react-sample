@@ -143,7 +143,7 @@ function matchesCriteria(row: unknown[], headers: unknown[], criteria: unknown[]
 // DSUM関数（条件付き合計）
 export const DSUM: CustomFormula = {
   name: 'DSUM',
-  pattern: /\bDSUM\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DSUM\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     
@@ -184,7 +184,7 @@ export const DSUM: CustomFormula = {
 // DAVERAGE関数（条件付き平均）
 export const DAVERAGE: CustomFormula = {
   name: 'DAVERAGE',
-  pattern: /\bDAVERAGE\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DAVERAGE\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     
@@ -227,7 +227,7 @@ export const DAVERAGE: CustomFormula = {
 // DCOUNT関数（条件付きカウント）
 export const DCOUNT: CustomFormula = {
   name: 'DCOUNT',
-  pattern: /\bDCOUNT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DCOUNT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     
@@ -268,7 +268,7 @@ export const DCOUNT: CustomFormula = {
 // DCOUNTA関数（条件付きカウント、空白以外）
 export const DCOUNTA: CustomFormula = {
   name: 'DCOUNTA',
-  pattern: /\bDCOUNTA\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DCOUNTA\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     
@@ -309,7 +309,7 @@ export const DCOUNTA: CustomFormula = {
 // DMAX関数（条件付き最大値）
 export const DMAX: CustomFormula = {
   name: 'DMAX',
-  pattern: /\bDMAX\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DMAX\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     
@@ -352,7 +352,7 @@ export const DMAX: CustomFormula = {
 // DMIN関数（条件付き最小値）
 export const DMIN: CustomFormula = {
   name: 'DMIN',
-  pattern: /\bDMIN\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DMIN\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     
@@ -395,7 +395,7 @@ export const DMIN: CustomFormula = {
 // DPRODUCT関数（条件付き積）
 export const DPRODUCT: CustomFormula = {
   name: 'DPRODUCT',
-  pattern: /\bDPRODUCT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DPRODUCT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     
@@ -438,7 +438,7 @@ export const DPRODUCT: CustomFormula = {
 // DGET関数（条件に一致する値を取得）
 export const DGET: CustomFormula = {
   name: 'DGET',
-  pattern: /\bDGET\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /DGET\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, databaseRef, fieldRef, criteriaRef] = matches;
     

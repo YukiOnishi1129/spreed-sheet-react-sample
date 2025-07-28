@@ -179,7 +179,7 @@ export const FV: CustomFormula = {
 // NPV関数の実装（正味現在価値）
 export const NPV: CustomFormula = {
   name: 'NPV',
-  pattern: /NPV\(([^,]+),\s*(.+)\)/i,
+  pattern: /\bNPV\(([^,]+),\s*(.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, rateRef, valuesRef] = matches;
     

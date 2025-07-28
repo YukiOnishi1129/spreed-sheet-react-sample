@@ -381,7 +381,7 @@ export const SYD: CustomFormula = {
 // DB関数の実装（定率法による減価償却）
 export const DB: CustomFormula = {
   name: 'DB',
-  pattern: /DB\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bDB\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, costRef, salvageRef, lifeRef, periodRef, monthRef] = matches;
     
@@ -440,7 +440,7 @@ export const DB: CustomFormula = {
 // DDB関数の実装（倍率法による減価償却）
 export const DDB: CustomFormula = {
   name: 'DDB',
-  pattern: /DDB\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bDDB\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, costRef, salvageRef, lifeRef, periodRef, factorRef] = matches;
     

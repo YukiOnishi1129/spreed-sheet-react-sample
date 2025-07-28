@@ -59,7 +59,7 @@ export const financialTests: IndividualFunctionTest[] = [
       ['割引率', 'CF1', 'CF2', 'CF3', 'NPV'],
       [0.1, -10000, 3000, 4200, '=NPV(A2,B2:D2)']
     ],
-    expectedValues: { 'E2': -4131.53 }
+    expectedValues: { 'E2': -3456.05 }
   },
   {
     name: 'IRR',
