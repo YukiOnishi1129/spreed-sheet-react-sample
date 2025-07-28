@@ -235,7 +235,7 @@ export const ISFORMULA: CustomFormula = {
       const cellData = context.data[row];
       if (!cellData || colIndex < 0 || colIndex >= cellData.length) return false;
       
-      const cell = cellData[colIndex];
+      const cell = cellData[colIndex] as unknown;
       
       // Check if the cell is a string that starts with '=' (formula)
       if (typeof cell === 'string' && cell.startsWith('=')) {
