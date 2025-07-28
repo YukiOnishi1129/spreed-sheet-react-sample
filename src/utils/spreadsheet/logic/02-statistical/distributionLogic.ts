@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue } from '../shared/utils';
+import { getCellValue, getCellRangeValues, parseCellRange } from '../shared/utils';
 
 // 数学定数とヘルパー関数
 const SQRT_2PI = Math.sqrt(2 * Math.PI);
@@ -29,6 +29,30 @@ function gamma(z: number): number {
   
   const t = z + coefficients.length - 0.5;
   return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * result;
+}
+
+// ガンマ関数の対数
+function logGamma(z: number): number {
+  if (z < 0.5) {
+    return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
+  }
+  
+  z -= 1;
+  const x = 0.99999999999980993;
+  const coefficients = [
+    676.5203681218851, -1259.1392167224028, 771.32342877765313,
+    -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+    9.9843695780195716e-6, 1.5056327351493116e-7
+  ];
+  
+  let sum = x;
+  for (let i = 0; i < coefficients.length; i++) {
+    sum += coefficients[i] / (z + i + 1);
+  }
+  
+  const t = z + coefficients.length - 0.5;
+  
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(sum);
 }
 
 // 標準正規分布の累積分布関数（誤差関数を使用）
@@ -120,6 +144,52 @@ function incompleteGamma(a: number, x: number): number {
   }
   
   return Math.pow(x, a) * Math.exp(-x) * sum;
+}
+
+// t分布の累積分布関数
+function tCDF(t: number, df: number): number {
+  const x = df / (df + t * t);
+  return 0.5 + 0.5 * (t > 0 ? 1 : -1) * (1 - incompleteBeta(x, df / 2, 0.5));
+}
+
+// t分布の逆関数
+function inverseTDistribution(p: number, df: number): number {
+  if (p <= 0 || p >= 1) return NaN;
+  if (df <= 0) return NaN;
+  
+  // 初期推定値（正規分布の逆関数を使用）
+  let x = inverseStandardNormal(p);
+  
+  // Newton-Raphson法で精度を上げる
+  const maxIter = 100;
+  const tol = 1e-8;
+  
+  for (let i = 0; i < maxIter; i++) {
+    const cdf = tCDF(x, df);
+    
+    // t分布のPDF
+    const pdf = Math.exp(logGamma((df + 1) / 2) - logGamma(df / 2)) / 
+                Math.sqrt(Math.PI * df) * Math.pow(1 + x * x / df, -(df + 1) / 2);
+    
+    // Newton-Raphson更新
+    const error = cdf - p;
+    if (Math.abs(error) < tol) break;
+    
+    x = x - error / pdf;
+  }
+  
+  return x;
+}
+
+// F分布の累積分布関数
+function fCDF(f: number, df1: number, df2: number): number {
+  const x = (df1 * f) / (df1 * f + df2);
+  return incompleteBeta(x, df1 / 2, df2 / 2);
+}
+
+// カイ二乗分布の累積分布関数
+function chiSquareCDF(chi: number, df: number): number {
+  return incompleteGamma(df / 2, chi / 2) / gamma(df / 2);
 }
 
 // NORM.DIST関数（正規分布）
@@ -844,40 +914,284 @@ export const HYPGEOM_DIST: CustomFormula = {
 export const CONFIDENCE_NORM: CustomFormula = {
   name: 'CONFIDENCE.NORM',
   pattern: /CONFIDENCE\.NORM\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, alphaRef, stdDevRef, sizeRef] = matches;
+    
+    const alpha = Number(getCellValue(alphaRef.trim(), context) ?? alphaRef);
+    const stdDev = Number(getCellValue(stdDevRef.trim(), context) ?? stdDevRef);
+    const size = Number(getCellValue(sizeRef.trim(), context) ?? sizeRef);
+    
+    if (isNaN(alpha) || isNaN(stdDev) || isNaN(size)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (alpha <= 0 || alpha >= 1 || stdDev <= 0 || size < 1 || !Number.isInteger(size)) {
+      return FormulaError.NUM;
+    }
+    
+    // 標準正規分布の逆関数を使用
+    const z = Math.abs(inverseStandardNormal(1 - alpha / 2));
+    
+    // 信頼区間の幅
+    return z * stdDev / Math.sqrt(size);
+  }
 };
 
 // CONFIDENCE.T関数（信頼区間・t分布）
 export const CONFIDENCE_T: CustomFormula = {
   name: 'CONFIDENCE.T',
   pattern: /CONFIDENCE\.T\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, alphaRef, stdDevRef, sizeRef] = matches;
+    
+    const alpha = Number(getCellValue(alphaRef.trim(), context) ?? alphaRef);
+    const stdDev = Number(getCellValue(stdDevRef.trim(), context) ?? stdDevRef);
+    const size = Number(getCellValue(sizeRef.trim(), context) ?? sizeRef);
+    
+    if (isNaN(alpha) || isNaN(stdDev) || isNaN(size)) {
+      return FormulaError.VALUE;
+    }
+    
+    if (alpha <= 0 || alpha >= 1 || stdDev <= 0 || size < 1 || !Number.isInteger(size)) {
+      return FormulaError.NUM;
+    }
+    
+    // 自由度
+    const df = size - 1;
+    
+    // t分布の逆関数を使用 (両側確率)
+    const t = inverseTDistribution(1 - alpha / 2, df);
+    
+    // 信頼区間の幅
+    return t * stdDev / Math.sqrt(size);
+  }
 };
 
 // Z.TEST関数（z検定）
 export const Z_TEST: CustomFormula = {
   name: 'Z.TEST',
   pattern: /Z\.TEST\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, arrayRef, muRef, sigmaRef] = matches;
+    
+    // データ範囲から値を取得
+    const values = getCellRangeValues(arrayRef.trim(), context);
+    const numbers = values.filter(v => typeof v === 'number' && !isNaN(v) && isFinite(v)) as number[];
+    
+    if (numbers.length === 0) {
+      return FormulaError.NUM;
+    }
+    
+    const mu = Number(getCellValue(muRef.trim(), context) ?? muRef);
+    if (isNaN(mu)) {
+      return FormulaError.VALUE;
+    }
+    
+    // 標本平均を計算
+    const sampleMean = numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
+    
+    // 標準偏差を計算または取得
+    let sigma: number;
+    if (sigmaRef) {
+      sigma = Number(getCellValue(sigmaRef.trim(), context) ?? sigmaRef);
+      if (isNaN(sigma) || sigma <= 0) {
+        return FormulaError.NUM;
+      }
+    } else {
+      // 標本標準偏差を計算
+      const variance = numbers.reduce((sum, n) => sum + Math.pow(n - sampleMean, 2), 0) / numbers.length;
+      sigma = Math.sqrt(variance);
+      if (sigma === 0) {
+        return FormulaError.DIV0;
+      }
+    }
+    
+    // z統計量を計算
+    const z = (sampleMean - mu) / (sigma / Math.sqrt(numbers.length));
+    
+    // 片側p値を返す（上側確率）
+    return 1 - standardNormalCDF(z);
+  }
 };
 
 // T.TEST関数（t検定）
 export const T_TEST: CustomFormula = {
   name: 'T.TEST',
   pattern: /T\.TEST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, array1Ref, array2Ref, tailsRef, typeRef] = matches;
+    
+    // データ範囲から値を取得
+    const values1 = getCellRangeValues(array1Ref.trim(), context);
+    const values2 = getCellRangeValues(array2Ref.trim(), context);
+    
+    const numbers1 = values1.filter(v => typeof v === 'number' && !isNaN(v) && isFinite(v)) as number[];
+    const numbers2 = values2.filter(v => typeof v === 'number' && !isNaN(v) && isFinite(v)) as number[];
+    
+    if (numbers1.length < 2 || numbers2.length < 2) {
+      return FormulaError.NUM;
+    }
+    
+    const tails = Number(getCellValue(tailsRef.trim(), context) ?? tailsRef);
+    const type = Number(getCellValue(typeRef.trim(), context) ?? typeRef);
+    
+    if (isNaN(tails) || isNaN(type) || ![1, 2].includes(tails) || ![1, 2, 3].includes(type)) {
+      return FormulaError.VALUE;
+    }
+    
+    // 平均を計算
+    const mean1 = numbers1.reduce((sum, n) => sum + n, 0) / numbers1.length;
+    const mean2 = numbers2.reduce((sum, n) => sum + n, 0) / numbers2.length;
+    
+    // 分散を計算
+    const var1 = numbers1.reduce((sum, n) => sum + Math.pow(n - mean1, 2), 0) / (numbers1.length - 1);
+    const var2 = numbers2.reduce((sum, n) => sum + Math.pow(n - mean2, 2), 0) / (numbers2.length - 1);
+    
+    let t: number;
+    let df: number;
+    
+    if (type === 1) {
+      // 対応のあるt検定
+      if (numbers1.length !== numbers2.length) {
+        return FormulaError.NA;
+      }
+      
+      const differences = numbers1.map((n, i) => n - numbers2[i]);
+      const meanDiff = differences.reduce((sum, d) => sum + d, 0) / differences.length;
+      const varDiff = differences.reduce((sum, d) => sum + Math.pow(d - meanDiff, 2), 0) / (differences.length - 1);
+      
+      t = meanDiff / (Math.sqrt(varDiff / differences.length));
+      df = differences.length - 1;
+      
+    } else if (type === 2) {
+      // 等分散を仮定した独立標本t検定
+      const pooledVar = ((numbers1.length - 1) * var1 + (numbers2.length - 1) * var2) / 
+                        (numbers1.length + numbers2.length - 2);
+      t = (mean1 - mean2) / Math.sqrt(pooledVar * (1 / numbers1.length + 1 / numbers2.length));
+      df = numbers1.length + numbers2.length - 2;
+      
+    } else {
+      // 等分散を仮定しない独立標本t検定（Welchのt検定）
+      t = (mean1 - mean2) / Math.sqrt(var1 / numbers1.length + var2 / numbers2.length);
+      
+      // Welch-Satterthwaiteの自由度
+      const num = Math.pow(var1 / numbers1.length + var2 / numbers2.length, 2);
+      const denom = Math.pow(var1 / numbers1.length, 2) / (numbers1.length - 1) + 
+                    Math.pow(var2 / numbers2.length, 2) / (numbers2.length - 1);
+      df = num / denom;
+    }
+    
+    // t分布の累積分布関数を使用してp値を計算
+    const p = tCDF(Math.abs(t), df);
+    
+    // tailsに応じてp値を調整
+    return tails === 1 ? (1 - p) : 2 * (1 - p);
+  }
 };
 
 // F.TEST関数（F検定）
 export const F_TEST: CustomFormula = {
   name: 'F.TEST',
   pattern: /F\.TEST\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, array1Ref, array2Ref] = matches;
+    
+    // データ範囲から値を取得
+    const values1 = getCellRangeValues(array1Ref.trim(), context);
+    const values2 = getCellRangeValues(array2Ref.trim(), context);
+    
+    const numbers1 = values1.filter(v => typeof v === 'number' && !isNaN(v) && isFinite(v)) as number[];
+    const numbers2 = values2.filter(v => typeof v === 'number' && !isNaN(v) && isFinite(v)) as number[];
+    
+    if (numbers1.length < 2 || numbers2.length < 2) {
+      return FormulaError.DIV0;
+    }
+    
+    // 平均を計算
+    const mean1 = numbers1.reduce((sum, n) => sum + n, 0) / numbers1.length;
+    const mean2 = numbers2.reduce((sum, n) => sum + n, 0) / numbers2.length;
+    
+    // 分散を計算
+    const var1 = numbers1.reduce((sum, n) => sum + Math.pow(n - mean1, 2), 0) / (numbers1.length - 1);
+    const var2 = numbers2.reduce((sum, n) => sum + Math.pow(n - mean2, 2), 0) / (numbers2.length - 1);
+    
+    if (var1 === 0 || var2 === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    // F統計量を計算（大きい分散を分子に）
+    const f = var1 > var2 ? var1 / var2 : var2 / var1;
+    const df1 = var1 > var2 ? numbers1.length - 1 : numbers2.length - 1;
+    const df2 = var1 > var2 ? numbers2.length - 1 : numbers1.length - 1;
+    
+    // F分布の累積分布関数を使用してp値を計算（両側検定）
+    const p = 1 - fCDF(f, df1, df2);
+    
+    return 2 * Math.min(p, 1 - p);
+  }
 };
 
 // CHISQ.TEST関数（カイ二乗検定）
 export const CHISQ_TEST: CustomFormula = {
   name: 'CHISQ.TEST',
   pattern: /CHISQ\.TEST\(([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaが処理
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, actualRef, expectedRef] = matches;
+    
+    // 観測値と期待値の範囲を取得
+    const actualRange = parseCellRange(actualRef.trim());
+    const expectedRange = parseCellRange(expectedRef.trim());
+    
+    if (!actualRange || !expectedRange) {
+      return FormulaError.REF;
+    }
+    
+    // 範囲のサイズが一致するか確認
+    if ((actualRange.end.row - actualRange.start.row) !== (expectedRange.end.row - expectedRange.start.row) ||
+        (actualRange.end.col - actualRange.start.col) !== (expectedRange.end.col - expectedRange.start.col)) {
+      return FormulaError.NA;
+    }
+    
+    let chiSquare = 0;
+    let count = 0;
+    
+    // カイ二乗統計量を計算
+    for (let row = 0; row <= actualRange.end.row - actualRange.start.row; row++) {
+      for (let col = 0; col <= actualRange.end.col - actualRange.start.col; col++) {
+        const actualCell = context.data[actualRange.start.row + row]?.[actualRange.start.col + col];
+        const expectedCell = context.data[expectedRange.start.row + row]?.[expectedRange.start.col + col];
+        
+        const actual = typeof actualCell === 'object' && actualCell !== null && 'value' in actualCell
+          ? actualCell.value
+          : actualCell;
+        const expected = typeof expectedCell === 'object' && expectedCell !== null && 'value' in expectedCell
+          ? expectedCell.value
+          : expectedCell;
+        
+        const actualNum = Number(actual);
+        const expectedNum = Number(expected);
+        
+        if (isNaN(actualNum) || isNaN(expectedNum)) {
+          return FormulaError.VALUE;
+        }
+        
+        if (expectedNum <= 0) {
+          return FormulaError.DIV0;
+        }
+        
+        chiSquare += Math.pow(actualNum - expectedNum, 2) / expectedNum;
+        count++;
+      }
+    }
+    
+    // 自由度（セル数 - 1）
+    const df = count - 1;
+    
+    if (df <= 0) {
+      return FormulaError.NUM;
+    }
+    
+    // カイ二乗分布の累積分布関数を使用してp値を計算
+    return 1 - chiSquareCDF(chiSquare, df);
+  }
 };

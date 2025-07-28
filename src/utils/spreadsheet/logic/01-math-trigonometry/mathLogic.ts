@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue, getCellRangeValues } from '../shared/utils';
+import { getCellValue, getCellRangeValues, parseCellRange } from '../shared/utils';
 
 // 引数を数値の配列に変換するユーティリティ関数
 function parseArgumentsToNumbers(args: string, context: FormulaContext): number[] {
@@ -921,15 +921,177 @@ export const SUMIFS: CustomFormula = {
 // COUNTIFS関数の実装（複数条件でのカウント）
 export const COUNTIFS: CustomFormula = {
   name: 'COUNTIFS',
-  pattern: /COUNTIFS\(([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /COUNTIFS\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, argsStr] = matches;
+    
+    // 引数を分割（範囲,条件,範囲,条件...の形式）
+    const args = argsStr.split(/,(?![^"]*"(?:[^"]*"[^"]*")*[^"]*$)/);
+    
+    if (args.length < 2 || args.length % 2 !== 0) {
+      return FormulaError.VALUE;
+    }
+    
+    // 範囲と条件のペアを抽出
+    const pairs: Array<{ range: string; criteria: string }> = [];
+    for (let i = 0; i < args.length; i += 2) {
+      pairs.push({
+        range: args[i].trim(),
+        criteria: args[i + 1].trim().replace(/^["']|["']$/g, '') // 引用符を除去
+      });
+    }
+    
+    // 最初の範囲から値を取得
+    const firstRange = parseCellRange(pairs[0].range);
+    if (!firstRange) {
+      return FormulaError.REF;
+    }
+    
+    let count = 0;
+    
+    // 各セルをチェック
+    for (let row = firstRange.start.row; row <= firstRange.end.row; row++) {
+      for (let col = firstRange.start.col; col <= firstRange.end.col; col++) {
+        let allCriteriaMet = true;
+        
+        // 各条件をチェック
+        for (let i = 0; i < pairs.length; i++) {
+          const range = parseCellRange(pairs[i].range);
+          if (!range) {
+            return FormulaError.REF;
+          }
+          
+          // 相対位置を計算
+          const relRow = row - firstRange.start.row + range.start.row;
+          const relCol = col - firstRange.start.col + range.start.col;
+          
+          if (relRow > range.end.row || relCol > range.end.col) {
+            allCriteriaMet = false;
+            break;
+          }
+          
+          const cellValue = context.data[relRow]?.[relCol];
+          const value = typeof cellValue === 'object' && cellValue !== null && 'value' in cellValue
+            ? cellValue.value
+            : cellValue;
+          
+          // 条件を評価
+          if (!evaluateCondition(value, pairs[i].criteria)) {
+            allCriteriaMet = false;
+            break;
+          }
+        }
+        
+        if (allCriteriaMet) {
+          count++;
+        }
+      }
+    }
+    
+    return count;
+  }
 };
 
 // AVERAGEIFS関数の実装（複数条件での平均）
 export const AVERAGEIFS: CustomFormula = {
   name: 'AVERAGEIFS',
-  pattern: /AVERAGEIFS\(([^,]+),\s*([^,]+),\s*"([^"]+)"(?:,\s*([^,]+),\s*"([^"]+)")*\)/i,
-  calculate: () => null // HyperFormulaが処理
+  pattern: /AVERAGEIFS\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, argsStr] = matches;
+    
+    // 引数を分割（平均範囲,条件範囲,条件,条件範囲,条件...の形式）
+    const args = argsStr.split(/,(?![^"]*"(?:[^"]*"[^"]*")*[^"]*$)/);
+    
+    if (args.length < 3 || args.length % 2 === 0) {
+      return FormulaError.VALUE;
+    }
+    
+    const averageRange = args[0].trim();
+    
+    // 条件範囲と条件のペアを抽出
+    const pairs: Array<{ range: string; criteria: string }> = [];
+    for (let i = 1; i < args.length; i += 2) {
+      pairs.push({
+        range: args[i].trim(),
+        criteria: args[i + 1].trim().replace(/^["']|["']$/g, '') // 引用符を除去
+      });
+    }
+    
+    // 平均対象の範囲を取得
+    const avgRange = parseCellRange(averageRange);
+    if (!avgRange) {
+      return FormulaError.REF;
+    }
+    
+    // 最初の条件範囲を取得
+    const firstCondRange = parseCellRange(pairs[0].range);
+    if (!firstCondRange) {
+      return FormulaError.REF;
+    }
+    
+    let sum = 0;
+    let count = 0;
+    
+    // 各セルをチェック
+    for (let row = firstCondRange.start.row; row <= firstCondRange.end.row; row++) {
+      for (let col = firstCondRange.start.col; col <= firstCondRange.end.col; col++) {
+        let allCriteriaMet = true;
+        
+        // 各条件をチェック
+        for (let i = 0; i < pairs.length; i++) {
+          const range = parseCellRange(pairs[i].range);
+          if (!range) {
+            return FormulaError.REF;
+          }
+          
+          // 相対位置を計算
+          const relRow = row - firstCondRange.start.row + range.start.row;
+          const relCol = col - firstCondRange.start.col + range.start.col;
+          
+          if (relRow > range.end.row || relCol > range.end.col) {
+            allCriteriaMet = false;
+            break;
+          }
+          
+          const cellValue = context.data[relRow]?.[relCol];
+          const value = typeof cellValue === 'object' && cellValue !== null && 'value' in cellValue
+            ? cellValue.value
+            : cellValue;
+          
+          // 条件を評価
+          if (!evaluateCondition(value, pairs[i].criteria)) {
+            allCriteriaMet = false;
+            break;
+          }
+        }
+        
+        if (allCriteriaMet) {
+          // 平均対象範囲の対応するセルの値を取得
+          const avgRelRow = row - firstCondRange.start.row + avgRange.start.row;
+          const avgRelCol = col - firstCondRange.start.col + avgRange.start.col;
+          
+          if (avgRelRow <= avgRange.end.row && avgRelCol <= avgRange.end.col) {
+            const avgCellValue = context.data[avgRelRow]?.[avgRelCol];
+            const avgValue = typeof avgCellValue === 'object' && avgCellValue !== null && 'value' in avgCellValue
+              ? avgCellValue.value
+              : avgCellValue;
+            
+            const num = Number(avgValue);
+            if (!isNaN(num) && isFinite(num)) {
+              sum += num;
+              count++;
+            }
+          }
+        }
+      }
+    }
+    
+    if (count === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    return sum / count;
+  }
 };
 
 // PRODUCT関数の実装（積を計算）
@@ -2000,47 +2162,76 @@ export const SUBTOTAL: CustomFormula = {
 // MAXIFS関数（条件付き最大値）
 export const MAXIFS: CustomFormula = {
   name: 'MAXIFS',
-  pattern: /MAXIFS\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+),\s*([^,]+))*\)/i,
+  pattern: /MAXIFS\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, maxRange, ...criteriaArgs] = matches;
+    const [, argsStr] = matches;
     
     try {
-      // 最大値を求める範囲の値を取得
-      const maxRangeValues = getCellRangeValues(maxRange.trim(), context);
+      // 引数を解析
+      const args: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      let depth = 0;
       
-      // 条件をペアに分ける
-      const conditions: Array<{range: string, criteria: string}> = [];
-      for (let i = 0; i < criteriaArgs.length; i += 2) {
-        if (criteriaArgs[i] && criteriaArgs[i + 1]) {
-          conditions.push({
-            range: criteriaArgs[i].trim(),
-            criteria: criteriaArgs[i + 1].replace(/^["']|["']$/g, '')
-          });
+      for (let i = 0; i < argsStr.length; i++) {
+        const char = argsStr[i];
+        
+        if (char === '"') {
+          inQuotes = !inQuotes;
+          current += char;
+        } else if (!inQuotes && char === '(') {
+          depth++;
+          current += char;
+        } else if (!inQuotes && char === ')') {
+          depth--;
+          current += char;
+        } else if (!inQuotes && depth === 0 && char === ',') {
+          args.push(current.trim());
+          current = '';
+        } else {
+          current += char;
         }
       }
+      if (current) {
+        args.push(current.trim());
+      }
       
-      if (conditions.length === 0) {
+      if (args.length < 3 || args.length % 2 === 0) {
         return FormulaError.VALUE;
       }
       
-      const validValues: number[] = [];
+      // 最初の引数は最大値を求める範囲
+      const maxRangeValues = getCellRangeValues(args[0], context);
       
-      // 各値に対して条件をチェック
+      // 条件範囲と条件のペアを処理
+      const conditionPairs: Array<{values: unknown[], criteria: string}> = [];
+      for (let i = 1; i < args.length; i += 2) {
+        const rangeValues = getCellRangeValues(args[i], context);
+        const criteria = args[i + 1].replace(/^["']|["']$/g, '');
+        
+        if (rangeValues.length !== maxRangeValues.length) {
+          return FormulaError.VALUE;
+        }
+        
+        conditionPairs.push({ values: rangeValues, criteria });
+      }
+      
+      // すべての条件を満たす行の最大値を計算
+      const validValues: number[] = [];
       for (let i = 0; i < maxRangeValues.length; i++) {
         let allConditionsMet = true;
         
-        for (const condition of conditions) {
-          const conditionRangeValues = getCellRangeValues(condition.range, context);
-          if (i >= conditionRangeValues.length || !evaluateCondition(conditionRangeValues[i], condition.criteria)) {
+        for (const pair of conditionPairs) {
+          if (!evaluateCondition(pair.values[i], pair.criteria)) {
             allConditionsMet = false;
             break;
           }
         }
         
         if (allConditionsMet) {
-          const num = Number(maxRangeValues[i]);
-          if (!isNaN(num)) {
-            validValues.push(num);
+          const value = Number(maxRangeValues[i]);
+          if (!isNaN(value)) {
+            validValues.push(value);
           }
         }
       }
@@ -2059,47 +2250,76 @@ export const MAXIFS: CustomFormula = {
 // MINIFS関数（条件付き最小値）
 export const MINIFS: CustomFormula = {
   name: 'MINIFS',
-  pattern: /MINIFS\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,]+),\s*([^,]+))*\)/i,
+  pattern: /MINIFS\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, minRange, ...criteriaArgs] = matches;
+    const [, argsStr] = matches;
     
     try {
-      // 最小値を求める範囲の値を取得
-      const minRangeValues = getCellRangeValues(minRange.trim(), context);
+      // 引数を解析
+      const args: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      let depth = 0;
       
-      // 条件をペアに分ける
-      const conditions: Array<{range: string, criteria: string}> = [];
-      for (let i = 0; i < criteriaArgs.length; i += 2) {
-        if (criteriaArgs[i] && criteriaArgs[i + 1]) {
-          conditions.push({
-            range: criteriaArgs[i].trim(),
-            criteria: criteriaArgs[i + 1].replace(/^["']|["']$/g, '')
-          });
+      for (let i = 0; i < argsStr.length; i++) {
+        const char = argsStr[i];
+        
+        if (char === '"') {
+          inQuotes = !inQuotes;
+          current += char;
+        } else if (!inQuotes && char === '(') {
+          depth++;
+          current += char;
+        } else if (!inQuotes && char === ')') {
+          depth--;
+          current += char;
+        } else if (!inQuotes && depth === 0 && char === ',') {
+          args.push(current.trim());
+          current = '';
+        } else {
+          current += char;
         }
       }
+      if (current) {
+        args.push(current.trim());
+      }
       
-      if (conditions.length === 0) {
+      if (args.length < 3 || args.length % 2 === 0) {
         return FormulaError.VALUE;
       }
       
-      const validValues: number[] = [];
+      // 最初の引数は最小値を求める範囲
+      const minRangeValues = getCellRangeValues(args[0], context);
       
-      // 各値に対して条件をチェック
+      // 条件範囲と条件のペアを処理
+      const conditionPairs: Array<{values: unknown[], criteria: string}> = [];
+      for (let i = 1; i < args.length; i += 2) {
+        const rangeValues = getCellRangeValues(args[i], context);
+        const criteria = args[i + 1].replace(/^["']|["']$/g, '');
+        
+        if (rangeValues.length !== minRangeValues.length) {
+          return FormulaError.VALUE;
+        }
+        
+        conditionPairs.push({ values: rangeValues, criteria });
+      }
+      
+      // すべての条件を満たす行の最小値を計算
+      const validValues: number[] = [];
       for (let i = 0; i < minRangeValues.length; i++) {
         let allConditionsMet = true;
         
-        for (const condition of conditions) {
-          const conditionRangeValues = getCellRangeValues(condition.range, context);
-          if (i >= conditionRangeValues.length || !evaluateCondition(conditionRangeValues[i], condition.criteria)) {
+        for (const pair of conditionPairs) {
+          if (!evaluateCondition(pair.values[i], pair.criteria)) {
             allConditionsMet = false;
             break;
           }
         }
         
         if (allConditionsMet) {
-          const num = Number(minRangeValues[i]);
-          if (!isNaN(num)) {
-            validValues.push(num);
+          const value = Number(minRangeValues[i]);
+          if (!isNaN(value)) {
+            validValues.push(value);
           }
         }
       }
