@@ -148,13 +148,14 @@ function DemoSpreadsheet() {
             const cellObj = cell as any;
             let value = cellObj.value ?? '';
             
-            // 数値文字列を数値に変換
-            if (typeof value === 'string' && value !== '') {
-              const num = parseFloat(value);
-              if (!isNaN(num) && num.toString() === (value as string).trim()) {
-                value = num;
-              }
-            }
+            // 数値文字列はそのまま保持（Excel関数の動作に合わせる）
+            // String numbers should remain as strings for proper Excel function behavior
+            // if (typeof value === 'string' && value !== '') {
+            //   const num = parseFloat(value);
+            //   if (!isNaN(num) && num.toString() === (value as string).trim()) {
+            //     value = num;
+            //   }
+            // }
             
             const formula = cellObj.formula || cellObj['data-formula'];
             
@@ -165,13 +166,14 @@ function DemoSpreadsheet() {
             };
           }
           
-          // 単純な値の場合も数値変換を試みる
-          if (typeof cell === 'string' && cell !== '') {
-            const num = parseFloat(cell);
-            if (!isNaN(num) && num.toString() === (cell as string).trim()) {
-              return { value: num };
-            }
-          }
+          // 単純な値の場合は元の型を保持（Excel関数の動作に合わせる）
+          // Keep original types for proper Excel function behavior
+          // if (typeof cell === 'string' && cell !== '') {
+          //   const num = parseFloat(cell);
+          //   if (!isNaN(num) && num.toString() === (cell as string).trim()) {
+          //     return { value: num };
+          //   }
+          // }
           
           return { value: cell };
         })

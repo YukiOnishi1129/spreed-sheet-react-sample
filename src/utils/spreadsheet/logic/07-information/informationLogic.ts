@@ -36,6 +36,7 @@ export const ISNA: CustomFormula = {
     const valueRef = matches[1].trim();
     const value = getCellValue(valueRef, context);
     
+    
     // Check the error constant - FormulaError.NA is '#N/A' (without !)
     return value === FormulaError.NA || value === '#N/A';
   }
@@ -115,7 +116,7 @@ export const ISODD: CustomFormula = {
 // TYPE関数の実装（データ型を返す）
 export const TYPE: CustomFormula = {
   name: 'TYPE',
-  pattern: /\bTYPE\(([^)]+)\)/i,
+  pattern: /(?<!ERROR\.)\bTYPE\(([^)]+)\)/i,
   calculate: (matches, context) => {
     const valueRef = matches[1].trim();
     let value: unknown;

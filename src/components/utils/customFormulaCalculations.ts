@@ -130,6 +130,7 @@ function calculateAllFormulas(data: CellData[][]): CellData[][] {
           const calculatedValue = calculateSingleFormula(cell.formula, result, rowIndex, colIndex);
           
           
+          
           // 常に計算結果を設定する
           cell.value = calculatedValue;
           hasChanges = true;
@@ -176,6 +177,7 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
       if (matchResult) {
         try {
           const result = matchResult.function.calculate(matchResult.matches, context);
+          
           
           // 結果を文字列に変換して置換
           let resultStr: string;
@@ -224,6 +226,11 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     // ネストされた関数を評価
     const evaluatedFormula = evaluateNestedFormula(cleanFormula, context);
     
+    // 評価後の式がエラー値の場合は、直接返す
+    if (evaluatedFormula !== cleanFormula && typeof evaluatedFormula === 'string' && evaluatedFormula.startsWith('#')) {
+      return evaluatedFormula as FormulaResult;
+    }
+    
     // 評価後の式が引用符で囲まれた文字列の場合は、直接返す
     if (evaluatedFormula !== cleanFormula && evaluatedFormula.startsWith('"') && evaluatedFormula.endsWith('"')) {
       return evaluatedFormula.slice(1, -1);
@@ -267,6 +274,12 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     }
   } catch (error) {
     console.error(`数式計算エラー: ${formula}`, error);
+    
+    // If the error itself is a valid formula error, preserve it
+    if (typeof error === 'string' && error.startsWith('#')) {
+      return error as FormulaResult;
+    }
+    
     return `#VALUE!`; // 計算エラー
   }
 }

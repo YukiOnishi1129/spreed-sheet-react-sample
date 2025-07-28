@@ -51,6 +51,7 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
   
   const cellData = context.data[row][col];
   
+  
   // 配列データの場合、セルは直接値として格納されている
   // 文字列、数値、null、undefinedの場合はそのまま返す
   if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {
@@ -70,7 +71,6 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
     }
     return cellData;
   }
-  
   return cellData;
 };
 
