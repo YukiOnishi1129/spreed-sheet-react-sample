@@ -177,7 +177,6 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
         try {
           const result = matchResult.function.calculate(matchResult.matches, context);
           
-          
           // 結果を文字列に変換して置換
           let resultStr: string;
           if (result === null || result === undefined) {
@@ -215,7 +214,6 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     // 先頭の = を除去
     const cleanFormula = formula.startsWith('=') ? formula.substring(1) : formula;
     
-    
     // FormulaContextを作成
     const context: FormulaContext = {
       data,
@@ -226,7 +224,10 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     // ネストされた関数を評価
     const evaluatedFormula = evaluateNestedFormula(cleanFormula, context);
     
-    
+    // 評価後の式が引用符で囲まれた文字列の場合は、直接返す
+    if (evaluatedFormula !== cleanFormula && evaluatedFormula.startsWith('"') && evaluatedFormula.endsWith('"')) {
+      return evaluatedFormula.slice(1, -1);
+    }
     
     // カスタム関数のマッチングを試行
     let matchResult = matchFormula(evaluatedFormula);

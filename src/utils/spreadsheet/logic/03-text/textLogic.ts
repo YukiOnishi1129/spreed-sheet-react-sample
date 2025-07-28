@@ -692,88 +692,92 @@ export const SEARCH: CustomFormula = {
 // TEXTJOIN関数の実装（手動実装が必要）
 export const TEXTJOIN: CustomFormula = {
   name: 'TEXTJOIN',
-  pattern: /TEXTJOIN\(([^)]+)\)/i,
+  pattern: /\bTEXTJOIN\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [fullMatch, args] = matches;
-    
-    // 引数を手動で解析
-    let argIndex = 0;
-    let currentArg = '';
-    let inQuotes = false;
-    let parenDepth = 0;
-    const parsedArgs: string[] = [];
-    
-    for (let i = 0; i < args.length; i++) {
-      const char = args[i];
+    try {
+      const [fullMatch, args] = matches;
       
-      if (char === '"' && (i === 0 || args[i-1] !== '\\')) {
-        inQuotes = !inQuotes;
-        currentArg += char;
-      } else if (!inQuotes) {
-        if (char === '(') {
-          parenDepth++;
-          currentArg += char;
-        } else if (char === ')') {
-          parenDepth--;
-          currentArg += char;
-        } else if (char === ',' && parenDepth === 0) {
+      // 引数を手動で解析
+      let argIndex = 0;
+      let currentArg = '';
+      let inQuotes = false;
+      let parenDepth = 0;
+      const parsedArgs: string[] = [];
+      
+      for (let i = 0; i < args.length; i++) {
+        const char = args[i];
+        
+        if (char === '"' && (i === 0 || args[i-1] !== '\\')) {
+          inQuotes = !inQuotes;
+        }
+        
+        if (!inQuotes && char === ',' && parenDepth === 0) {
           parsedArgs.push(currentArg.trim());
           currentArg = '';
+        } else if (!inQuotes && char === '(') {
+          parenDepth++;
+          currentArg += char;
+        } else if (!inQuotes && char === ')') {
+          parenDepth--;
+          currentArg += char;
         } else {
           currentArg += char;
         }
-      } else {
-        currentArg += char;
       }
-    }
-    
-    if (currentArg) {
-      parsedArgs.push(currentArg.trim());
-    }
-    
-    if (parsedArgs.length < 3) {
-      return FormulaError.VALUE;
-    }
-    
-    const [delimiterArg, ignoreEmpty, rangeOrValues] = parsedArgs;
-    
-    // 区切り文字を取得（引用符がある場合は除去）
-    let delimiter = delimiterArg;
-    if (delimiter.startsWith('"') && delimiter.endsWith('"')) {
-      delimiter = delimiter.slice(1, -1);
-    }
-    
-    const shouldIgnoreEmpty = ignoreEmpty.toUpperCase() === 'TRUE';
-    
-    
-    let values: unknown[] = [];
-    
-    // セル範囲の場合
-    if (rangeOrValues.match(/^[A-Z]+\d+:[A-Z]+\d+$/)) {
-      values = getCellRangeValues(rangeOrValues, context);
-    } else {
-      // 個別のセル参照や値の場合
-      const parts = rangeOrValues.split(',');
-      for (const part of parts) {
-        const trimmed = part.trim();
-        if (trimmed.match(/^[A-Z]+\d+$/)) {
-          const cellValue = getCellValue(trimmed, context);
+      
+      if (currentArg) {
+        parsedArgs.push(currentArg.trim());
+      }
+      
+      if (parsedArgs.length < 3) {
+        return FormulaError.VALUE;
+      }
+      
+      const [delimiterArg, ignoreEmptyArg, ...valueArgs] = parsedArgs;
+      
+      // 区切り文字を取得（引用符がある場合は除去）
+      let delimiter = delimiterArg;
+      if (delimiter.startsWith('"') && delimiter.endsWith('"')) {
+        delimiter = delimiter.slice(1, -1);
+      }
+      
+      const shouldIgnoreEmpty = ignoreEmptyArg.toUpperCase() === 'TRUE';
+      
+      let values: unknown[] = [];
+      
+      // 各引数を処理
+      for (const arg of valueArgs) {
+        // セル範囲の場合
+        if (arg.match(/^[A-Z]+\d+:[A-Z]+\d+$/)) {
+          const rangeValues = getCellRangeValues(arg, context);
+          values.push(...rangeValues);
+        } 
+        // 個別のセル参照の場合
+        else if (arg.match(/^[A-Z]+\d+$/)) {
+          const cellValue = getCellValue(arg, context);
           values.push(cellValue);
-        } else if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-          values.push(trimmed.slice(1, -1));
-        } else {
-          values.push(trimmed);
+        } 
+        // 引用符付き文字列の場合
+        else if (arg.startsWith('"') && arg.endsWith('"')) {
+          values.push(arg.slice(1, -1));
+        } 
+        // その他の値
+        else {
+          values.push(arg);
         }
       }
+      
+      // 空の値を除外するかどうか
+      if (shouldIgnoreEmpty) {
+        values = values.filter(v => v !== null && v !== undefined && v !== '');
+      }
+      
+      // 文字列に変換して結合
+      const result = values.map(v => String(v)).join(delimiter);
+      return result;
+    } catch (error) {
+      return FormulaError.VALUE;
     }
-    
-    // 空の値を除外するかどうか
-    if (shouldIgnoreEmpty) {
-      values = values.filter(v => v !== null && v !== undefined && v !== '');
-    }
-    
-    // 文字列に変換して結合
-    return values.map(v => String(v)).join(delimiter);
   }
 };
 
@@ -841,7 +845,7 @@ export const VALUE: CustomFormula = {
 // TEXT関数の実装（数値を書式付き文字列に変換） - stringFunctions.tsから移動
 export const TEXT: CustomFormula = {
   name: 'TEXT',
-  pattern: /TEXT\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /\bTEXT\(([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, valueRef, formatRef] = matches;
     

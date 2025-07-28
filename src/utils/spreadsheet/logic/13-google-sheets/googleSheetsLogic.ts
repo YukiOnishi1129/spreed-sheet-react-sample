@@ -7,7 +7,7 @@ import { getCellValue, getCellRangeValues } from '../shared/utils';
 // JOIN関数の実装（配列を文字列に結合）
 export const JOIN: CustomFormula = {
   name: 'JOIN',
-  pattern: /JOIN\(([^,]+),\s*(.+)\)/i,
+  pattern: /\bJOIN\(([^,]+),\s*(.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, delimiterRef, valuesRef] = matches;
     

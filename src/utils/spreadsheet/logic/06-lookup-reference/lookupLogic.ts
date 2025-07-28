@@ -391,7 +391,7 @@ export const MATCH: CustomFormula = {
 // LOOKUP関数の実装
 export const LOOKUP: CustomFormula = {
   name: 'LOOKUP',
-  pattern: /LOOKUP\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bLOOKUP\(([^,]+),\s*([^,]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, lookupValue, lookupVector, resultVector] = matches;
     
@@ -448,7 +448,7 @@ export const LOOKUP: CustomFormula = {
 // XLOOKUP関数の実装（手動実装が必要）
 export const XLOOKUP: CustomFormula = {
   name: 'XLOOKUP',
-  pattern: /XLOOKUP\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  pattern: /\bXLOOKUP\(([^,]+),\s*([^,]+),\s*([^,]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, lookupValue, lookupArray, returnArray, ifNotFound] = matches;
     
@@ -490,15 +490,31 @@ export const XLOOKUP: CustomFormula = {
 // OFFSET関数の実装
 export const OFFSET: CustomFormula = {
   name: 'OFFSET',
-  pattern: /OFFSET\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  pattern: /\bOFFSET\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, referenceRef, rowsRef, colsRef, heightRef, widthRef] = matches;
     
     try {
       // 基準セル参照を取得
       const reference = referenceRef.trim();
-      const rows = parseInt(getCellValue(rowsRef.trim(), context)?.toString() ?? rowsRef.trim());
-      const cols = parseInt(getCellValue(colsRef.trim(), context)?.toString() ?? colsRef.trim());
+      let rowsValue = rowsRef.trim();
+      let colsValue = colsRef.trim();
+      
+      // セル参照の場合のみ値を取得
+      if (rowsRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(rowsRef.trim(), context);
+        if (cellValue !== FormulaError.REF) {
+          rowsValue = cellValue;
+        }
+      }
+      if (colsRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(colsRef.trim(), context);
+        if (cellValue !== FormulaError.REF) {
+          colsValue = cellValue;
+        }
+      }
+      const rows = typeof rowsValue === 'number' ? rowsValue : parseInt(rowsValue.toString());
+      const cols = typeof colsValue === 'number' ? colsValue : parseInt(colsValue.toString());
       const height = heightRef ? parseInt(getCellValue(heightRef.trim(), context)?.toString() ?? heightRef.trim()) : 1;
       const width = widthRef ? parseInt(getCellValue(widthRef.trim(), context)?.toString() ?? widthRef.trim()) : 1;
       
@@ -563,13 +579,18 @@ export const OFFSET: CustomFormula = {
 // INDIRECT関数の実装
 export const INDIRECT: CustomFormula = {
   name: 'INDIRECT',
-  pattern: /INDIRECT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bINDIRECT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, refTextRef, a1Ref] = matches;
     
     try {
       // 参照テキストを取得
-      const refText = getCellValue(refTextRef.trim(), context) ?? refTextRef.trim().replace(/^['"]|['"]$/g, '');
+      let refText = getCellValue(refTextRef.trim(), context) ?? refTextRef.trim();
+      
+      // 文字列の引用符を除去
+      if (typeof refText === 'string') {
+        refText = refText.replace(/^['"]|['"]$/g, '');
+      }
       
       // A1形式かどうか（デフォルトはTRUE）
       const a1Style = a1Ref ? (a1Ref.trim().toUpperCase() !== 'FALSE' && a1Ref.trim() !== '0') : true;
