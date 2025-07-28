@@ -191,7 +191,7 @@ function convertTemperature(value: number, fromUnit: string, toUnit: string): nu
 // CONVERT関数の実装
 export const CONVERT: CustomFormula = {
   name: 'CONVERT',
-  pattern: /CONVERT\(([^,]+),\s*"([^"]+)",\s*"([^"]+)"\)/i,
+  pattern: /\bCONVERT\(([^,]+),\s*"?([^",]+)"?,\s*"?([^",)]+)"?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, valueRef, fromUnit, toUnit] = matches;
     
@@ -243,7 +243,7 @@ export const CONVERT: CustomFormula = {
 // BIN2DEC関数の実装（2進数から10進数）
 export const BIN2DEC: CustomFormula = {
   name: 'BIN2DEC',
-  pattern: /BIN2DEC\(([^)]+)\)/i,
+  pattern: /\bBIN2DEC\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, binaryRef] = matches;
     
@@ -285,7 +285,7 @@ export const BIN2DEC: CustomFormula = {
 // DEC2BIN関数の実装（10進数から2進数）
 export const DEC2BIN: CustomFormula = {
   name: 'DEC2BIN',
-  pattern: /DEC2BIN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bDEC2BIN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, decimalRef, placesRef] = matches;
     
@@ -349,7 +349,7 @@ export const DEC2BIN: CustomFormula = {
 // HEX2DEC関数の実装（16進数から10進数）
 export const HEX2DEC: CustomFormula = {
   name: 'HEX2DEC',
-  pattern: /HEX2DEC\(([^)]+)\)/i,
+  pattern: /\bHEX2DEC\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, hexRef] = matches;
     
@@ -389,7 +389,7 @@ export const HEX2DEC: CustomFormula = {
 // DEC2HEX関数の実装（10進数から16進数）
 export const DEC2HEX: CustomFormula = {
   name: 'DEC2HEX',
-  pattern: /DEC2HEX\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bDEC2HEX\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, decimalRef, placesRef] = matches;
     
@@ -439,7 +439,7 @@ export const DEC2HEX: CustomFormula = {
 // BIN2HEX関数の実装（2進数から16進数）
 export const BIN2HEX: CustomFormula = {
   name: 'BIN2HEX',
-  pattern: /BIN2HEX\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bBIN2HEX\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, binaryRef, placesRef] = matches;
     
@@ -465,7 +465,7 @@ export const BIN2HEX: CustomFormula = {
 // HEX2BIN関数の実装（16進数から2進数）
 export const HEX2BIN: CustomFormula = {
   name: 'HEX2BIN',
-  pattern: /HEX2BIN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bHEX2BIN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, hexRef, placesRef] = matches;
     
@@ -497,7 +497,7 @@ export const HEX2BIN: CustomFormula = {
 // OCT2DEC関数の実装（8進数から10進数）
 export const OCT2DEC: CustomFormula = {
   name: 'OCT2DEC',
-  pattern: /OCT2DEC\(([^)]+)\)/i,
+  pattern: /\bOCT2DEC\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, octRef] = matches;
     
@@ -537,7 +537,7 @@ export const OCT2DEC: CustomFormula = {
 // DEC2OCT関数の実装（10進数から8進数）
 export const DEC2OCT: CustomFormula = {
   name: 'DEC2OCT',
-  pattern: /DEC2OCT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bDEC2OCT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, decimalRef, placesRef] = matches;
     
@@ -587,7 +587,7 @@ export const DEC2OCT: CustomFormula = {
 // BIN2OCT関数の実装（2進数から8進数）
 export const BIN2OCT: CustomFormula = {
   name: 'BIN2OCT',
-  pattern: /BIN2OCT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bBIN2OCT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, binaryRef, placesRef] = matches;
     
@@ -613,7 +613,7 @@ export const BIN2OCT: CustomFormula = {
 // HEX2OCT関数の実装（16進数から8進数）
 export const HEX2OCT: CustomFormula = {
   name: 'HEX2OCT',
-  pattern: /HEX2OCT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bHEX2OCT\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, hexRef, placesRef] = matches;
     
@@ -639,7 +639,7 @@ export const HEX2OCT: CustomFormula = {
 // OCT2BIN関数の実装（8進数から2進数）
 export const OCT2BIN: CustomFormula = {
   name: 'OCT2BIN',
-  pattern: /OCT2BIN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bOCT2BIN\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, octRef, placesRef] = matches;
     
@@ -671,7 +671,7 @@ export const OCT2BIN: CustomFormula = {
 // OCT2HEX関数の実装（8進数から16進数）
 export const OCT2HEX: CustomFormula = {
   name: 'OCT2HEX',
-  pattern: /OCT2HEX\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bOCT2HEX\(([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, octRef, placesRef] = matches;
     

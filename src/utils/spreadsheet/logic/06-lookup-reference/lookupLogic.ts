@@ -658,7 +658,7 @@ export const CHOOSE: CustomFormula = {
 // TRANSPOSE関数の実装
 export const TRANSPOSE: CustomFormula = {
   name: 'TRANSPOSE',
-  pattern: /TRANSPOSE\(([^)]+)\)/i,
+  pattern: /\bTRANSPOSE\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, arrayRef] = matches;
     
@@ -725,7 +725,7 @@ export const TRANSPOSE: CustomFormula = {
 // FILTER関数の実装
 export const FILTER: CustomFormula = {
   name: 'FILTER',
-  pattern: /FILTER\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bFILTER\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, arrayRef, includeRef, ifEmptyRef] = matches;
     
@@ -769,7 +769,7 @@ export const FILTER: CustomFormula = {
 // SORT関数の実装
 export const SORT: CustomFormula = {
   name: 'SORT',
-  pattern: /SORT\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  pattern: /\bSORT\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, arrayRef, sortIndexRef, sortOrderRef, byColRef] = matches;
     
@@ -880,7 +880,7 @@ export const SORT: CustomFormula = {
 // UNIQUE関数の実装
 export const UNIQUE: CustomFormula = {
   name: 'UNIQUE',
-  pattern: /UNIQUE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  pattern: /\bUNIQUE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, arrayRef, byColRef, exactlyOnceRef] = matches;
     
