@@ -53,7 +53,7 @@ export const ISTEXT: CustomFormula = {
   }
 };
 
-// ISNUMBER関数の実装（数値か判定）
+// ISNUMBER関数の実装（数値か判定）  
 export const ISNUMBER: CustomFormula = {
   name: 'ISNUMBER',
   pattern: /\bISNUMBER\(([^)]+)\)/i,
@@ -61,7 +61,8 @@ export const ISNUMBER: CustomFormula = {
     const valueRef = matches[1].trim();
     const value = getCellValue(valueRef, context);
     
-    return typeof value === 'number' && !isNaN(value);
+    // Excel ISNUMBER: only returns true for actual numeric values, not string numbers
+    return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
 };
 
@@ -219,18 +220,20 @@ export const ISFORMULA: CustomFormula = {
       const cellData = context.data[row];
       if (!cellData || colIndex < 0 || colIndex >= cellData.length) return false;
       
-      const cell = cellData[colIndex] as unknown;
+      const cell = cellData[colIndex];
       
-      // Check if the cell is a string that starts with '=' (formula)
-      if (typeof cell === 'string' && cell.startsWith('=')) {
+      // Check if cell has a formula property and is not just a value
+      if (cell && typeof cell === 'object' && 'formula' in cell && cell.formula) {
         return true;
       }
       
-      // Check if the cell is an object with a formula property
-      if (typeof cell === 'object' && cell !== null && ('formula' in cell || 'f' in cell)) {
-        return true;
+      // For raw cell values, check if it's a string that starts with '='
+      if (typeof cell === 'object' && cell && 'value' in cell && !('formula' in cell)) {
+        const value = (cell as any).value;
+        return typeof value === 'string' && value.startsWith('=');
       }
       
+      // If it's just a plain value (number, string, etc.), it's not a formula
       return false;
     }
     
@@ -255,11 +258,12 @@ export const ERROR_TYPE: CustomFormula = {
     const valueRef = matches[1].trim();
     const value = getCellValue(valueRef, context);
     
+    // Check if the value is an error
     if (typeof value !== 'string' || !value.startsWith('#')) {
       return FormulaError.NA;
     }
     
-    // Excelのエラータイプ番号
+    // Excel ERROR.TYPE function return values
     switch (value) {
       case FormulaError.NULL:
       case '#NULL!': return 1;
@@ -271,11 +275,11 @@ export const ERROR_TYPE: CustomFormula = {
       case '#REF!': return 4;
       case FormulaError.NAME:
       case '#NAME!':
-      case '#NAME?!': return 5;
+      case '#NAME?': return 5;
       case FormulaError.NUM:
       case '#NUM!': return 6;
       case FormulaError.NA:
-      case '#N/A!': return 7;
+      case '#N/A': return 7;
       default: return FormulaError.NA;
     }
   }
