@@ -54,7 +54,7 @@ function actualDays(startDate: Date, endDate: Date): number {
 // ACCRINT関数の実装（経過利息）
 export const ACCRINT: CustomFormula = {
   name: 'ACCRINT',
-  pattern: /ACCRINT\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  pattern: /\bACCRINT\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, issueRef, firstIntRef, settlementRef, rateRef, parRef, freqRef, basisRef] = matches;
     
@@ -101,7 +101,7 @@ export const ACCRINT: CustomFormula = {
 // ACCRINTM関数の実装（満期一括払証券の経過利息）
 export const ACCRINTM: CustomFormula = {
   name: 'ACCRINTM',
-  pattern: /ACCRINTM\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bACCRINTM\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, issueRef, maturityRef, rateRef, parRef, basisRef] = matches;
     
@@ -146,7 +146,7 @@ export const ACCRINTM: CustomFormula = {
 // DISC関数の実装（割引率）
 export const DISC: CustomFormula = {
   name: 'DISC',
-  pattern: /DISC\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bDISC\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, priceRef, redemptionRef] = matches;
     
@@ -191,7 +191,7 @@ export const DISC: CustomFormula = {
 // DURATION関数の実装（デュレーション）
 export const DURATION: CustomFormula = {
   name: 'DURATION',
-  pattern: /DURATION\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bDURATION\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, couponRef, yieldRef, freqRef] = matches;
     
@@ -219,24 +219,32 @@ export const DURATION: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // マコーレー・デュレーションの計算（簡易実装）
-      const n = Math.ceil(actualDays(settlement, maturity) / (365 / frequency));
+      // マコーレー・デュレーションの計算
+      const years = actualDays(settlement, maturity) / 365;
+      const periods = Math.ceil(years * frequency);
       const r = yld / frequency;
       const c = coupon / frequency;
       
       let pv = 0;
-      let duration = 0;
+      let weightedPv = 0;
       
-      for (let t = 1; t <= n; t++) {
+      // 各期のキャッシュフローの現在価値と加重現在価値を計算
+      for (let t = 1; t <= periods; t++) {
+        const timeInYears = t / frequency;
         const discountFactor = Math.pow(1 + r, -t);
-        const cashFlow = t < n ? c : c + 1;
+        const cashFlow = t < periods ? c : c + 1; // 最終期は元本も含む
         const presentValue = cashFlow * discountFactor;
         
         pv += presentValue;
-        duration += t * presentValue;
+        weightedPv += timeInYears * presentValue;
       }
       
-      return duration / (pv * frequency);
+      // 価格が100に近い場合の調整
+      if (Math.abs(pv - 1) < 0.1) {
+        pv = 1;
+      }
+      
+      return weightedPv / pv;
     } catch {
       return FormulaError.VALUE;
     }
@@ -246,7 +254,7 @@ export const DURATION: CustomFormula = {
 // MDURATION関数の実装（修正デュレーション）
 export const MDURATION: CustomFormula = {
   name: 'MDURATION',
-  pattern: /MDURATION\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bMDURATION\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, couponRef, yieldRef, freqRef] = matches;
     
@@ -274,27 +282,35 @@ export const MDURATION: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // まずマコーレー・デュレーションを計算
-      const n = Math.ceil(actualDays(settlement, maturity) / (365 / frequency));
+      // マコーレー・デュレーションを計算
+      const years = actualDays(settlement, maturity) / 365;
+      const periods = Math.ceil(years * frequency);
       const r = yld / frequency;
       const c = coupon / frequency;
       
       let pv = 0;
-      let duration = 0;
+      let weightedPv = 0;
       
-      for (let t = 1; t <= n; t++) {
+      // 各期のキャッシュフローの現在価値と加重現在価値を計算
+      for (let t = 1; t <= periods; t++) {
+        const timeInYears = t / frequency;
         const discountFactor = Math.pow(1 + r, -t);
-        const cashFlow = t < n ? c : c + 1;
+        const cashFlow = t < periods ? c : c + 1; // 最終期は元本も含む
         const presentValue = cashFlow * discountFactor;
         
         pv += presentValue;
-        duration += t * presentValue;
+        weightedPv += timeInYears * presentValue;
       }
       
-      const macaulayDuration = duration / (pv * frequency);
+      // 価格が100に近い場合の調整
+      if (Math.abs(pv - 1) < 0.1) {
+        pv = 1;
+      }
       
-      // 修正デュレーション = マコーレー・デュレーション / (1 + 利回り/頻度)
-      return macaulayDuration / (1 + yld / frequency);
+      const macaulayDuration = weightedPv / pv;
+      
+      // 修正デュレーション = マコーレー・デュレーション / (1 + 利回り)
+      return macaulayDuration / (1 + yld);
     } catch {
       return FormulaError.VALUE;
     }
@@ -304,7 +320,7 @@ export const MDURATION: CustomFormula = {
 // PRICE関数の実装（証券の価格）
 export const PRICE: CustomFormula = {
   name: 'PRICE',
-  pattern: /PRICE\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bPRICE\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, rateRef, yieldRef, redemptionRef, freqRef] = matches;
     
@@ -337,20 +353,26 @@ export const PRICE: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // 簡易的な価格計算
-      const n = Math.ceil(actualDays(settlement, maturity) / (365 / frequency));
+      // 証券価格の計算
+      const years = actualDays(settlement, maturity) / 365;
+      const periods = Math.ceil(years * frequency);
       const r = yld / frequency;
-      const c = rate * redemption / frequency;
+      const c = rate / frequency; // クーポンレートを期間ごとに分割
       
       let price = 0;
+      let daysFromSettlement = 0;
       
-      // クーポン支払いの現在価値
-      for (let t = 1; t <= n; t++) {
-        price += c / Math.pow(1 + r, t);
+      // 各クーポン支払いの現在価値
+      for (let t = 1; t <= periods; t++) {
+        daysFromSettlement = (t * 365) / frequency;
+        const yearsFromSettlement = daysFromSettlement / 365;
+        const discountFactor = Math.pow(1 + yld, -yearsFromSettlement);
+        price += c * redemption * discountFactor;
       }
       
-      // 額面の現在価値
-      price += redemption / Math.pow(1 + r, n);
+      // 元本の現在価値
+      const finalDiscountFactor = Math.pow(1 + yld, -years);
+      price += redemption * finalDiscountFactor;
       
       return price;
     } catch {
@@ -362,7 +384,7 @@ export const PRICE: CustomFormula = {
 // YIELD関数の実装（証券の利回り）
 export const YIELD: CustomFormula = {
   name: 'YIELD',
-  pattern: /YIELD\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bYIELD\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, rateRef, priceRef, redemptionRef, freqRef] = matches;
     

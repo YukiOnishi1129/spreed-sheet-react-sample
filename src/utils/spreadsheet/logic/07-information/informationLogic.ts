@@ -37,7 +37,7 @@ export const ISNA: CustomFormula = {
     const value = getCellValue(valueRef, context);
     
     // Check both the error constant and the string representation
-    return value === FormulaError.NA || value === '#N/A';
+    return value === FormulaError.NA || value === '#N/A!' || value === '#N/A';
   }
 };
 
@@ -276,24 +276,22 @@ export const ERROR_TYPE: CustomFormula = {
     }
     
     // Excelのエラータイプ番号
-    // Check both the constant and the string representation
-    const errorValue = value.replace('!', '');
-    switch (errorValue) {
-      case FormulaError.NULL.replace('!', ''):
-      case '#NULL': return 1;
-      case FormulaError.DIV0.replace('!', ''):
-      case '#DIV/0': return 2;
-      case FormulaError.VALUE.replace('!', ''):
-      case '#VALUE': return 3;
-      case FormulaError.REF.replace('!', ''):
-      case '#REF': return 4;
-      case FormulaError.NAME.replace('!', ''):
-      case '#NAME?':
-      case '#NAME': return 5;
-      case FormulaError.NUM.replace('!', ''):
-      case '#NUM': return 6;
-      case FormulaError.NA.replace('!', ''):
-      case '#N/A': return 7;
+    switch (value) {
+      case FormulaError.NULL:
+      case '#NULL!': return 1;
+      case FormulaError.DIV0:
+      case '#DIV/0!': return 2;
+      case FormulaError.VALUE:
+      case '#VALUE!': return 3;
+      case FormulaError.REF:
+      case '#REF!': return 4;
+      case FormulaError.NAME:
+      case '#NAME!':
+      case '#NAME?!': return 5;
+      case FormulaError.NUM:
+      case '#NUM!': return 6;
+      case FormulaError.NA:
+      case '#N/A!': return 7;
       default: return FormulaError.NA;
     }
   }

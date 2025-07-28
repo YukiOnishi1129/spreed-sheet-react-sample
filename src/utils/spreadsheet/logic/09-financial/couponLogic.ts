@@ -78,7 +78,7 @@ function getPreviousCouponDate(settlement: Date, maturity: Date, frequency: numb
 // COUPDAYBS関数の実装（直前利払日から受渡日までの日数）
 export const COUPDAYBS: CustomFormula = {
   name: 'COUPDAYBS',
-  pattern: /COUPDAYBS\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bCOUPDAYBS\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, freqRef, basisRef] = matches;
     
@@ -118,7 +118,7 @@ export const COUPDAYBS: CustomFormula = {
 // COUPDAYS関数の実装（利払期間の日数）
 export const COUPDAYS: CustomFormula = {
   name: 'COUPDAYS',
-  pattern: /COUPDAYS\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bCOUPDAYS\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, freqRef, basisRef] = matches;
     
@@ -153,7 +153,7 @@ export const COUPDAYS: CustomFormula = {
 // COUPDAYSNC関数の実装（受渡日から次回利払日までの日数）
 export const COUPDAYSNC: CustomFormula = {
   name: 'COUPDAYSNC',
-  pattern: /COUPDAYSNC\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bCOUPDAYSNC\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, freqRef, basisRef] = matches;
     
@@ -193,7 +193,7 @@ export const COUPDAYSNC: CustomFormula = {
 // COUPNCD関数の実装（次回利払日）
 export const COUPNCD: CustomFormula = {
   name: 'COUPNCD',
-  pattern: /COUPNCD\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bCOUPNCD\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, freqRef] = matches;
     
@@ -236,7 +236,7 @@ export const COUPNCD: CustomFormula = {
 // COUPNUM関数の実装（利払回数）
 export const COUPNUM: CustomFormula = {
   name: 'COUPNUM',
-  pattern: /COUPNUM\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bCOUPNUM\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, freqRef] = matches;
     
@@ -278,7 +278,7 @@ export const COUPNUM: CustomFormula = {
 // COUPPCD関数の実装（直前利払日）
 export const COUPPCD: CustomFormula = {
   name: 'COUPPCD',
-  pattern: /COUPPCD\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bCOUPPCD\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, settlementRef, maturityRef, freqRef] = matches;
     
