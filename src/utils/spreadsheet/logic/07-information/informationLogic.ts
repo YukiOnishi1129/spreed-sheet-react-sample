@@ -36,8 +36,8 @@ export const ISNA: CustomFormula = {
     const valueRef = matches[1].trim();
     const value = getCellValue(valueRef, context);
     
-    // Check both the error constant and the string representation
-    return value === FormulaError.NA || value === '#N/A!' || value === '#N/A';
+    // Check the error constant - FormulaError.NA is '#N/A' (without !)
+    return value === FormulaError.NA || value === '#N/A';
   }
 };
 
@@ -153,28 +153,12 @@ export const N: CustomFormula = {
   pattern: /\bN\(([^)]+)\)/i,
   calculate: (matches, context) => {
     const valueRef = matches[1].trim();
-    let value: unknown;
-    
-    // セル参照の場合
-    if (valueRef.match(/^[A-Z]+\d+$/)) {
-      value = getCellValue(valueRef, context);
-    } else {
-      // 直接値の場合
-      if (valueRef.startsWith('"') && valueRef.endsWith('"')) {
-        value = valueRef.slice(1, -1);
-      } else {
-        value = valueRef;
-      }
-    }
+    const value = getCellValue(valueRef, context);
     
     // 数値変換 - Excel N関数の仕様に従う
     if (typeof value === 'number') return value;
     if (typeof value === 'boolean') return value ? 1 : 0;
     // 文字列の場合は常に0を返す（Excel仕様）
-    if (typeof value === 'string') {
-      return 0;
-    }
-    
     return 0;
   }
 };
