@@ -1,4 +1,4 @@
-import type { CustomFormula, CellData, FormulaContext } from '../shared/types';
+import type { CustomFormula, FormulaContext } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 
 // 基本的な算術演算子

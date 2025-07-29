@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue, getCellRangeValues, parseCellRange } from '../shared/utils';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // セル範囲から数値のみを抽出するヘルパー関数
 function extractNumbersFromRange(rangeRef: string, context: FormulaContext): number[] {

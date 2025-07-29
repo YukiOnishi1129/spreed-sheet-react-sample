@@ -356,7 +356,6 @@ export const PRICE: CustomFormula = {
       // 証券価格の計算
       const years = actualDays(settlement, maturity) / 365;
       const periods = Math.ceil(years * frequency);
-      const r = yld / frequency;
       const c = rate / frequency; // クーポンレートを期間ごとに分割
       
       let price = 0;

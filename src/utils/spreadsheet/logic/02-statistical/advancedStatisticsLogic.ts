@@ -325,12 +325,15 @@ export const PERCENTILE_EXC: CustomFormula = {
     
     numbers.sort((a, b) => a - b);
     
-    const index = k * (numbers.length + 1) - 1;
+    // PERCENTILE.EXC uses (n+1)*k formula
+    const position = k * (numbers.length + 1);
     
-    if (index < 0 || index >= numbers.length) {
+    // Check if position is valid for exclusive method
+    if (position < 1 || position > numbers.length) {
       return FormulaError.NUM;
     }
     
+    const index = position - 1; // Convert to 0-based index
     const lower = Math.floor(index);
     const upper = Math.ceil(index);
     const weight = index - lower;
@@ -480,22 +483,14 @@ export const GAMMALN: CustomFormula = {
       1.5056327351493116e-7
     ];
     
-    if (x < 0.5) {
-      // 反射公式を使用: ln(Γ(x)) = ln(π / sin(πx)) - ln(Γ(1-x))
-      return Math.log(Math.PI / Math.sin(Math.PI * x)) - lnGamma(1 - x);
+    // Lanczos近似による計算
+    const z = x - 1;
+    let base = coef[0];
+    for (let i = 1; i < n; i++) {
+      base += coef[i] / (z + i);
     }
     
-    function lnGamma(z: number): number {
-      z = z - 1;
-      let base = coef[0];
-      for (let i = 1; i < n; i++) {
-        base += coef[i] / (z + i);
-      }
-      
-      const tmp = z + g + 0.5;
-      return Math.log(Math.sqrt(2 * Math.PI)) + Math.log(base) + (z + 0.5) * Math.log(tmp) - tmp;
-    }
-    
-    return lnGamma(x);
+    const tmp = z + g + 0.5;
+    return Math.log(Math.sqrt(2 * Math.PI)) + Math.log(base) + (z + 0.5) * Math.log(tmp) - tmp;
   }
 };

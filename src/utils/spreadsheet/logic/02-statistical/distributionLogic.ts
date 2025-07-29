@@ -149,11 +149,15 @@ function incompleteGamma(a: number, x: number): number {
 // t分布の累積分布関数
 function tCDF(t: number, df: number): number {
   const x = df / (df + t * t);
-  return 0.5 + 0.5 * (t > 0 ? 1 : -1) * (1 - incompleteBeta(x, df / 2, 0.5));
+  if (t >= 0) {
+    return 1 - 0.5 * incompleteBeta(x, df / 2, 0.5);
+  } else {
+    return 0.5 * incompleteBeta(x, df / 2, 0.5);
+  }
 }
 
 // t分布の逆関数
-function inverseTDistribution(p: number, df: number): number {
+export function inverseTDistribution(p: number, df: number): number {
   if (p <= 0 || p >= 1) return NaN;
   if (df <= 0) return NaN;
   
@@ -539,24 +543,48 @@ function beta(a: number, b: number): number {
 
 // 不完全ベータ関数の近似
 function incompleteBeta(x: number, a: number, b: number): number {
+  if (x < 0 || x > 1) return NaN;
   if (x === 0) return 0;
   if (x === 1) return 1;
   
-  // 連続分数による近似
-  const lnBeta = Math.log(beta(a, b));
-  let result = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lnBeta) / a;
+  const lbeta = logGamma(a) + logGamma(b) - logGamma(a + b);
   
-  let term = result;
-  for (let m = 1; m < 100; m++) {
-    const numerator = m * (b - m) * x;
-    const denominator = (a + 2 * m - 1) * (a + 2 * m);
-    term *= numerator / denominator;
-    result += term;
-    
-    if (Math.abs(term) < 1e-15) break;
+  // xが(a+1)/(a+b+2)より大きい場合は、対称性を使用
+  if (x > (a + 1) / (a + b + 2)) {
+    return 1 - incompleteBeta(1 - x, b, a);
   }
   
-  return result;
+  const front = Math.exp(Math.log(x) * a + Math.log(1 - x) * b - lbeta) / a;
+  
+  // 連分数展開
+  const TINY = 1e-30;
+  let f = 1, c = 1, d = 0;
+  
+  for (let m = 0; m <= 200; m++) {
+    let numerator;
+    if (m === 0) {
+      numerator = 1;
+    } else if (m % 2 === 0) {
+      const mm = m / 2;
+      numerator = (mm * (b - mm) * x) / ((a + 2 * mm - 1) * (a + 2 * mm));
+    } else {
+      const mm = (m - 1) / 2;
+      numerator = -((a + mm) * (a + b + mm) * x) / ((a + 2 * mm) * (a + 2 * mm + 1));
+    }
+    
+    d = 1 + numerator * d;
+    if (Math.abs(d) < TINY) d = TINY;
+    d = 1 / d;
+    
+    c = 1 + numerator / c;
+    if (Math.abs(c) < TINY) c = TINY;
+    
+    f *= c * d;
+    
+    if (Math.abs(1 - c * d) < 1e-8) break;
+  }
+  
+  return front * (f - 1);
 }
 
 // T.DIST関数（t分布・左側）
@@ -1124,9 +1152,11 @@ export const F_TEST: CustomFormula = {
     const df1 = var1 > var2 ? numbers1.length - 1 : numbers2.length - 1;
     const df2 = var1 > var2 ? numbers2.length - 1 : numbers1.length - 1;
     
-    // F分布の累積分布関数を使用してp値を計算（両側検定）
-    const p = 1 - fCDF(f, df1, df2);
+    // F分布の累積分布関数を使用してp値を計算
+    // ExcelのF.TESTは両側検定のp値を返す
+    const p = fCDF(f, df1, df2);
     
+    // 両側検定のp値を返す
     return 2 * Math.min(p, 1 - p);
   }
 };

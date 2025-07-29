@@ -3,58 +3,59 @@
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
+import { inverseTDistribution as inverseTDist } from './distributionLogic';
 // 標準正規分布の逆関数（近似）
-function normSInv(p: number): number {
-  if (p <= 0 || p >= 1) return NaN;
-  
-  // Abramowitz and Stegun approximation
-  const a1 = -3.969683028665376e+01;
-  const a2 = 2.209460984245205e+02;
-  const a3 = -2.759285104469687e+02;
-  const a4 = 1.383577518672690e+02;
-  const a5 = -3.066479806614716e+01;
-  const a6 = 2.506628277459239e+00;
-  
-  const b1 = -5.447609879822406e+01;
-  const b2 = 1.615858368580409e+02;
-  const b3 = -1.556989798598866e+02;
-  const b4 = 6.680131188771972e+01;
-  const b5 = -1.328068155288572e+01;
-  
-  const c1 = -7.784894002430293e-03;
-  const c2 = -3.223964580411365e-01;
-  const c3 = -2.400758277161838e+00;
-  const c4 = -2.549732539343734e+00;
-  const c5 = 4.374664141464968e+00;
-  const c6 = 2.938163982698783e+00;
-  
-  const d1 = 7.784695709041462e-03;
-  const d2 = 3.224671290700398e-01;
-  const d3 = 2.445134137142996e+00;
-  const d4 = 3.754408661907416e+00;
-  
-  const p_low = 0.02425;
-  const p_high = 1 - p_low;
-  
-  let x: number;
-  
-  if (p < p_low) {
-    const q = Math.sqrt(-2 * Math.log(p));
-    x = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
-        ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
-  } else if (p <= p_high) {
-    const q = p - 0.5;
-    const r = q * q;
-    x = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q /
-        (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1);
-  } else {
-    const q = Math.sqrt(-2 * Math.log(1 - p));
-    x = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
-         ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
-  }
-  
-  return x;
-}
+// function normSInv(p: number): number {
+//   if (p <= 0 || p >= 1) return NaN;
+//   
+//   // Abramowitz and Stegun approximation
+//   const a1 = -3.969683028665376e+01;
+//   const a2 = 2.209460984245205e+02;
+//   const a3 = -2.759285104469687e+02;
+//   const a4 = 1.383577518672690e+02;
+//   const a5 = -3.066479806614716e+01;
+//   const a6 = 2.506628277459239e+00;
+//   
+//   const b1 = -5.447609879822406e+01;
+//   const b2 = 1.615858368580409e+02;
+//   const b3 = -1.556989798598866e+02;
+//   const b4 = 6.680131188771972e+01;
+//   const b5 = -1.328068155288572e+01;
+//   
+//   const c1 = -7.784894002430293e-03;
+//   const c2 = -3.223964580411365e-01;
+//   const c3 = -2.400758277161838e+00;
+//   const c4 = -2.549732539343734e+00;
+//   const c5 = 4.374664141464968e+00;
+//   const c6 = 2.938163982698783e+00;
+//   
+//   const d1 = 7.784695709041462e-03;
+//   const d2 = 3.224671290700398e-01;
+//   const d3 = 2.445134137142996e+00;
+//   const d4 = 3.754408661907416e+00;
+//   
+//   const p_low = 0.02425;
+//   const p_high = 1 - p_low;
+//   
+//   let x: number;
+//   
+//   if (p < p_low) {
+//     const q = Math.sqrt(-2 * Math.log(p));
+//     x = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
+//         ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
+//   } else if (p <= p_high) {
+//     const q = p - 0.5;
+//     const r = q * q;
+//     x = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q /
+//         (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1);
+//   } else {
+//     const q = Math.sqrt(-2 * Math.log(1 - p));
+//     x = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
+//          ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
+//   }
+//   
+//   return x;
+// }
 
 // ガンマ関数の対数（高精度計算用）
 function logGamma(x: number): number {
@@ -110,45 +111,45 @@ function betaIncomplete(a: number, b: number, x: number): number {
   return front * (f - 1);
 }
 
-// T分布の逆関数（Newton-Raphson法）
-function tInv(p: number, df: number): number {
-  if (p <= 0 || p >= 1) return NaN;
-  if (df <= 0) return NaN;
-  
-  // 初期推定値（正規分布の逆関数を使用）
-  let x = normSInv(p);
-  
-  // Newton-Raphson法で精度を上げる
-  const maxIter = 100;
-  const tol = 1e-8;
-  
-  for (let i = 0; i < maxIter; i++) {
-    // T分布のCDF
-    const t = x;
-    const a = 0.5;
-    const b = df / 2;
-    const x2 = df / (df + t * t);
-    
-    let cdf;
-    if (t < 0) {
-      cdf = 0.5 * betaIncomplete(b, a, x2);
-    } else {
-      cdf = 1 - 0.5 * betaIncomplete(b, a, x2);
-    }
-    
-    // T分布のPDF
-    const pdf = Math.exp(logGamma((df + 1) / 2) - logGamma(df / 2)) / 
-                Math.sqrt(Math.PI * df) * Math.pow(1 + t * t / df, -(df + 1) / 2);
-    
-    // Newton-Raphson更新
-    const error = cdf - p;
-    if (Math.abs(error) < tol) break;
-    
-    x = x - error / pdf;
-  }
-  
-  return x;
-}
+// T分布の逆関数（Newton-Raphson法） - 未使用のため削除
+// function tInv(p: number, df: number): number {
+//   if (p <= 0 || p >= 1) return NaN;
+//   if (df <= 0) return NaN;
+//   
+//   // 初期推定値（正規分布の逆関数を使用）
+//   let x = normSInv(p);
+//   
+//   // Newton-Raphson法で精度を上げる
+//   const maxIter = 100;
+//   const tol = 1e-8;
+//   
+//   for (let i = 0; i < maxIter; i++) {
+//     // T分布のCDF
+//     const t = x;
+//     const a = 0.5;
+//     const b = df / 2;
+//     const x2 = df / (df + t * t);
+//     
+//     let cdf;
+//     if (t < 0) {
+//       cdf = 0.5 * betaIncomplete(b, a, x2);
+//     } else {
+//       cdf = 1 - 0.5 * betaIncomplete(b, a, x2);
+//     }
+//     
+//     // T分布のPDF
+//     const pdf = Math.exp(logGamma((df + 1) / 2) - logGamma(df / 2)) / 
+//                 Math.sqrt(Math.PI * df) * Math.pow(1 + t * t / df, -(df + 1) / 2);
+//     
+//     // Newton-Raphson更新
+//     const error = cdf - p;
+//     if (Math.abs(error) < tol) break;
+//     
+//     x = x - error / pdf;
+//   }
+//   
+//   return x;
+// }
 
 // カイ二乗分布の逆関数
 function chiSquareInv(p: number, df: number): number {
@@ -228,33 +229,56 @@ function fInv(p: number, df1: number, df2: number): number {
   if (p <= 0 || p >= 1) return NaN;
   if (df1 <= 0 || df2 <= 0) return NaN;
   
-  // 初期推定値
-  let x = 1;
-  
-  // Newton-Raphson法
-  const maxIter = 100;
+  // ビセクション法で実装（より安定）
+  let low = 0.001;
+  let high = 10;
   const tol = 1e-8;
+  const maxIter = 100;
   
-  for (let i = 0; i < maxIter; i++) {
-    // F分布のCDF（ベータ分布を使用）
-    const w = df2 / (df2 + df1 * x);
-    const cdf = 1 - betaIncomplete(df2 / 2, df1 / 2, w);
-    
-    // F分布のPDF
-    const pdf = Math.exp(logGamma((df1 + df2) / 2) - logGamma(df1 / 2) - logGamma(df2 / 2)) *
-                Math.pow(df1 / df2, df1 / 2) * Math.pow(x, df1 / 2 - 1) /
-                Math.pow(1 + df1 * x / df2, (df1 + df2) / 2);
-    
-    const error = cdf - p;
-    if (Math.abs(error) < tol) break;
-    
-    x = x - error / pdf;
-    
-    // 負の値を防ぐ
-    if (x < 0) x = 0.01;
+  // 初期範囲の調整
+  // まず適切な範囲を見つける
+  let w = df1 * high / (df1 * high + df2);
+  let cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+  
+  // 上限を探す
+  while (cdf < p && high < 1e6) {
+    low = high;
+    high = high * 2;
+    w = df1 * high / (df1 * high + df2);
+    cdf = betaIncomplete(df1 / 2, df2 / 2, w);
   }
   
-  return x;
+  // 下限を探す
+  if (cdf >= p) {
+    w = df1 * low / (df1 * low + df2);
+    cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+    
+    while (cdf > p && low > 1e-6) {
+      high = low;
+      low = low / 2;
+      w = df1 * low / (df1 * low + df2);
+      cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+    }
+  }
+  
+  // ビセクション法
+  for (let iter = 0; iter < maxIter; iter++) {
+    const mid = (low + high) / 2;
+    w = df1 * mid / (df1 * mid + df2);
+    cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+    
+    if (Math.abs(cdf - p) < tol || (high - low) / mid < tol) {
+      return mid;
+    }
+    
+    if (cdf < p) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+  
+  return (low + high) / 2;
 }
 
 // T.INV関数の実装（T分布の逆関数）
@@ -280,7 +304,7 @@ export const T_INV: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      return tInv(probability, degreesOfFreedom);
+      return inverseTDist(probability, degreesOfFreedom);
     } catch {
       return FormulaError.VALUE;
     }
@@ -311,7 +335,7 @@ export const T_INV_2T: CustomFormula = {
       }
       
       // 両側検定なので、片側の確率は半分
-      return Math.abs(tInv(probability / 2, degreesOfFreedom));
+      return Math.abs(inverseTDist(1 - probability / 2, degreesOfFreedom));
     } catch {
       return FormulaError.VALUE;
     }

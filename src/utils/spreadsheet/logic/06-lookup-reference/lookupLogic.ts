@@ -497,20 +497,20 @@ export const OFFSET: CustomFormula = {
     try {
       // 基準セル参照を取得
       const reference = referenceRef.trim();
-      let rowsValue = rowsRef.trim();
-      let colsValue = colsRef.trim();
+      let rowsValue: string | number = rowsRef.trim();
+      let colsValue: string | number = colsRef.trim();
       
       // セル参照の場合のみ値を取得
       if (rowsRef.match(/^[A-Z]+\d+$/)) {
         const cellValue = getCellValue(rowsRef.trim(), context);
         if (cellValue !== FormulaError.REF) {
-          rowsValue = cellValue;
+          rowsValue = cellValue as string | number;
         }
       }
       if (colsRef.match(/^[A-Z]+\d+$/)) {
         const cellValue = getCellValue(colsRef.trim(), context);
         if (cellValue !== FormulaError.REF) {
-          colsValue = cellValue;
+          colsValue = cellValue as string | number;
         }
       }
       const rows = typeof rowsValue === 'number' ? rowsValue : parseInt(rowsValue.toString());

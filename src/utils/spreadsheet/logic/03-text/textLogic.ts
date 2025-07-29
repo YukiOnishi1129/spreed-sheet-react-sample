@@ -8,7 +8,12 @@ import { getCellValue, getCellRangeValues } from '../shared/utils';
 const evaluateExpression = (expression: string, context: FormulaContext): FormulaResult => {
   // セル参照の場合
   if (expression.match(/^[A-Z]+\d+$/)) {
-    return getCellValue(expression, context) ?? '';
+    const value = getCellValue(expression, context);
+    if (value === undefined || value === null) {
+      return '';
+    }
+    // FormulaErrorやその他の値をそのまま返す
+    return value as FormulaResult;
   }
   
   // 文字列リテラルの場合
@@ -695,10 +700,9 @@ export const TEXTJOIN: CustomFormula = {
   pattern: /\bTEXTJOIN\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     try {
-      const [fullMatch, args] = matches;
+      const [, args] = matches;
       
       // 引数を手動で解析
-      let argIndex = 0;
       let currentArg = '';
       let inQuotes = false;
       let parenDepth = 0;

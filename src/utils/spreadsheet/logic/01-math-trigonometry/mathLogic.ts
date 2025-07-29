@@ -1,6 +1,6 @@
 // 数学関数の実装
 
-import type { CustomFormula, FormulaContext } from '../shared/types';
+import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue, getCellRangeValues, parseCellRange } from '../shared/utils';
 
@@ -1115,7 +1115,7 @@ export const MROUND: CustomFormula = {
   name: 'MROUND',
   pattern: /MROUND\(([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [fullMatch, numberRef, multipleRef] = matches;
+    const [, numberRef, multipleRef] = matches;
     
     const numberValue = getCellValue(numberRef.trim(), context);
     const multipleValue = getCellValue(multipleRef.trim(), context);
@@ -1305,8 +1305,8 @@ export const SUMSQ: CustomFormula = {
 export const SUMPRODUCT: CustomFormula = {
   name: 'SUMPRODUCT',
   pattern: /SUMPRODUCT\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [fullMatch, argsStr] = matches;
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, argsStr] = matches;
     
     try {
       // 引数を解析（範囲を分割）
@@ -1321,7 +1321,7 @@ export const SUMPRODUCT: CustomFormula = {
       
       // 範囲が1つの場合は、その値の合計を返す
       if (rangeValues.length === 1) {
-        return rangeValues[0].reduce((sum, val) => {
+        return rangeValues[0].reduce((sum: number, val) => {
           const num = Number(val);
           return sum + (isNaN(num) ? 0 : num);
         }, 0);
