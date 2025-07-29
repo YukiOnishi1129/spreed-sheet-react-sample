@@ -339,7 +339,7 @@ export const MID: CustomFormula = {
     // FIND関数 + 演算の場合
     if (startNumRef.includes('FIND') && (startNumRef.includes('+') || startNumRef.includes('-'))) {
       // FIND("@",A7)+1 のような式を処理
-      const parts = startNumRef.split(/([+\-])/);
+      const parts = startNumRef.split(/([+-])/);
       if (parts.length >= 3) {
         let baseValue = 0;
         
