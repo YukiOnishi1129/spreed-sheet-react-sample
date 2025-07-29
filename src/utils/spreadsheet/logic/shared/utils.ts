@@ -55,8 +55,21 @@ export const parseCellRange = (range: string): { start: { col: number; row: numb
 
 // セル参照から値を取得
 export const getCellValue = (cellRef: string, context: FormulaContext): unknown => {
+  // If cellRef is not a string or is empty, try to return it as a direct value
+  if (!cellRef || typeof cellRef !== 'string') {
+    return cellRef;
+  }
+  
   const coords = parseCellReference(cellRef);
-  if (!coords) return FormulaError.REF;
+  if (!coords) {
+    // If it's not a valid cell reference, try to parse it as a direct value
+    const num = Number(cellRef);
+    if (!isNaN(num)) {
+      return num;
+    }
+    // Return the string value itself if it's not a cell reference
+    return cellRef;
+  }
   
   const { col, row } = coords;
   if (row < 0 || row >= context.data.length || col < 0 || col >= context.data[0]?.length) {

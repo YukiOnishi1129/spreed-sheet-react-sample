@@ -325,14 +325,6 @@ export const PERCENTILE_EXC: CustomFormula = {
     
     numbers.sort((a, b) => a - b);
     
-    // テストデータの既知の値を使用
-    // PERCENTILE.EXC([1, 2, 3, 4, 5], 0.25) = 1.75
-    if (numbers.length === 5 && k === 0.25 && 
-        numbers[0] === 1 && numbers[1] === 2 && 
-        numbers[2] === 3 && numbers[3] === 4 && numbers[4] === 5) {
-      return 1.75;
-    }
-    
     // PERCENTILE.EXC uses (n+1)*k formula
     const position = k * (numbers.length + 1);
     
@@ -477,32 +469,49 @@ export const GAMMALN: CustomFormula = {
       return FormulaError.NUM;
     }
     
-    // テストの期待値に合わせて調整（簡易実装）
-    // 整数値の場合は期待値を返す
-    const xInt = Math.round(x);
-    if (Math.abs(x - xInt) < 0.0001) {
-      if (xInt === 2) return 0;         // テストの期待値
-      if (xInt === 3) return 0.693147;  // テストの期待値
-      if (xInt === 4) return 1.791759;  // テストの期待値
-      if (xInt === 5) return 3.178054;  // テストの期待値
-    }
-    
-    // その他の整数の場合の正しい計算
-    if (Number.isInteger(x) && x > 1) {
+    // 整数の場合は正確な値を計算
+    if (Number.isInteger(x) && x <= 30) {
       // ln(Γ(n)) = ln((n-1)!)
       let result = 0;
-      for (let i = 1; i < x; i++) {
+      for (let i = 2; i < x; i++) {
         result += Math.log(i);
       }
       return result;
     }
     
-    // Stirlingの近似を使用
+    // Stirlingの近似を使用（大きい値の場合）
     if (x >= 10) {
-      return (x - 0.5) * Math.log(x) - x + 0.5 * Math.log(2 * Math.PI) + 1 / (12 * x);
+      return (x - 0.5) * Math.log(x) - x + 0.5 * Math.log(2 * Math.PI) + 
+             1 / (12 * x) - 1 / (360 * x * x * x) + 1 / (1260 * x * x * x * x * x);
     }
     
-    // デフォルトは0を返す
-    return 0;
+    // Lancczosの近似を使用（小さい値の場合）
+    const g = 4.7421875;
+    const coefficients = [
+      0.9999999999999971,
+      57.15623566586292,
+      -59.59796035547549,
+      14.13609797474175,
+      -0.49191381609762,
+      3.399464998481189e-5,
+      4.652362892704858e-5,
+      -9.837447530487956e-5,
+      1.580887032249125e-4,
+      -2.102644417241049e-4,
+      2.174396181152126e-4,
+      -1.643181065367639e-4,
+      8.441822398385274e-5,
+      -2.619083840158141e-5,
+      3.689918265953162e-6
+    ];
+    
+    const ag = 0.5 * Math.log(2 * Math.PI) - Math.log(x);
+    let sum = coefficients[0];
+    
+    for (let k = 1; k < 15; k++) {
+      sum += coefficients[k] / (x + k);
+    }
+    
+    return ag + Math.log(sum) + (x - 0.5) * Math.log(x + g + 0.5) - (x + g + 0.5);
   }
 };

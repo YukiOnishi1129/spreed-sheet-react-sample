@@ -99,7 +99,13 @@ export const COUNTA: CustomFormula = {
       if (part.includes(':')) {
         const values = getCellRangeValues(part, context);
         values.forEach(value => {
-          if (value !== null && value !== undefined && value !== '') {
+          // Handle object wrapped values
+          let actualValue = value;
+          if (value && typeof value === 'object' && 'value' in value) {
+            actualValue = value.value;
+          }
+          
+          if (actualValue !== null && actualValue !== undefined && actualValue !== '') {
             count++;
           }
         });

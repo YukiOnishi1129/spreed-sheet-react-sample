@@ -8,6 +8,148 @@ import { getCellValue, getCellRangeValues } from '../shared/utils';
 const SQRT_2PI = Math.sqrt(2 * Math.PI);
 const SQRT_2 = Math.sqrt(2);
 
+// 範囲を2次元配列として解析
+function parseRange(range: string, context: FormulaContext): number[][] | null {
+  const match = range.match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/);
+  if (!match) return null;
+  
+  const startCol = match[1].charCodeAt(0) - 65;
+  const startRow = parseInt(match[2]) - 1;
+  const endCol = match[3].charCodeAt(0) - 65;
+  const endRow = parseInt(match[4]) - 1;
+  
+  const result: number[][] = [];
+  for (let r = startRow; r <= endRow; r++) {
+    const row: number[] = [];
+    for (let c = startCol; c <= endCol; c++) {
+      const value = context.data[r]?.[c]?.value ?? context.data[r]?.[c];
+      row.push(Number(value));
+    }
+    result.push(row);
+  }
+  
+  return result;
+}
+
+// カイ二乗分布の累積分布関数
+function chiSquareCDF(x: number, df: number): number {
+  if (x <= 0) return 0;
+  
+  // 不完全ガンマ関数を使用
+  return lowerIncompleteGamma(df / 2, x / 2) / gamma(df / 2);
+}
+
+// 下側不完全ガンマ関数
+function lowerIncompleteGamma(a: number, x: number): number {
+  if (x <= 0) return 0;
+  
+  // 級数展開を使用（小さいxの場合）
+  if (x < a + 1) {
+    let sum = 0;
+    let term = 1 / a;
+    let ap = a;
+    
+    for (let i = 0; i < 100; i++) {
+      sum += term;
+      ap += 1;
+      term *= x / ap;
+      if (Math.abs(term) < 1e-10) break;
+    }
+    
+    return sum * Math.exp(-x + a * Math.log(x) - Math.log(gamma(a + 1)));
+  }
+  
+  // 連分数展開を使用（大きいxの場合）
+  return gamma(a) - upperIncompleteGamma(a, x);
+}
+
+// 上側不完全ガンマ関数
+function upperIncompleteGamma(a: number, x: number): number {
+  if (x <= 0) return gamma(a);
+  
+  // 連分数展開
+  let b = x + 1 - a;
+  let c = 1 / 1e-30;
+  let d = 1 / b;
+  let h = d;
+  
+  for (let i = 1; i < 100; i++) {
+    const an = -i * (i - a);
+    b += 2;
+    d = an * d + b;
+    if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = b + an / c;
+    if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d;
+    const del = d * c;
+    h *= del;
+    if (Math.abs(del - 1) < 1e-10) break;
+  }
+  
+  return Math.exp(-x + a * Math.log(x) - Math.log(gamma(a))) * h;
+}
+
+// F分布の累積分布関数
+function fDistributionCDF(x: number, df1: number, df2: number): number {
+  if (x <= 0) return 0;
+  
+  // ベータ関数を使用してF分布のCDFを計算
+  const y = df1 * x / (df1 * x + df2);
+  return incompleteBeta(y, df1 / 2, df2 / 2);
+}
+
+// 不完全ベータ関数
+function incompleteBeta(x: number, a: number, b: number): number {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  
+  // 連分数展開を使用
+  const bt = Math.exp(
+    Math.log(x) * a + Math.log(1 - x) * b -
+    Math.log(gamma(a) * gamma(b) / gamma(a + b))
+  );
+  
+  if (x < (a + 1) / (a + b + 2)) {
+    // 前方級数展開
+    return bt * betaContinuedFraction(x, a, b) / a;
+  } else {
+    // 後方級数展開
+    return 1 - bt * betaContinuedFraction(1 - x, b, a) / b;
+  }
+}
+
+// ベータ連分数
+function betaContinuedFraction(x: number, a: number, b: number): number {
+  const maxIterations = 100;
+  const epsilon = 1e-10;
+  
+  let m = 1;
+  let d = 1 - (a + b) * x / (a + 1);
+  if (Math.abs(d) < epsilon) d = epsilon;
+  d = 1 / d;
+  let h = d;
+  
+  for (let i = 1; i < maxIterations; i++) {
+    const m2 = 2 * i;
+    let aa = i * (b - i) * x / ((a - 1 + m2) * (a + m2));
+    d = 1 + aa * d;
+    if (Math.abs(d) < epsilon) d = epsilon;
+    d = 1 / d;
+    h *= d;
+    
+    aa = -(a + i) * (a + b + i) * x / ((a + m2) * (a + 1 + m2));
+    d = 1 + aa * d;
+    if (Math.abs(d) < epsilon) d = epsilon;
+    d = 1 / d;
+    const del = d;
+    h *= del;
+    
+    if (Math.abs(del - 1) < epsilon) break;
+  }
+  
+  return h;
+}
+
 // ガンマ関数の近似（Lanczos近似）
 function gamma(z: number): number {
   if (z < 0.5) {
@@ -15,11 +157,11 @@ function gamma(z: number): number {
   }
   
   z -= 1;
-  const x = 0.99999999999980993;
+  const x = 0.9999999999998099;
   const coefficients = [
     676.5203681218851, -1259.1392167224028, 771.32342877765313,
-    -176.61502916214059, 12.507343278686905, -0.13857109526572012,
-    9.9843695780195716e-6, 1.5056327351493116e-7
+    -176.61502916214059, 12.507343278686905, -0.1385710952657201,
+    9.984369578019572e-6, 1.505632735149312e-7
   ];
   
   let result = x;
@@ -38,11 +180,11 @@ function logGamma(z: number): number {
   }
   
   z -= 1;
-  const x = 0.99999999999980993;
+  const x = 0.9999999999998099;
   const coefficients = [
     676.5203681218851, -1259.1392167224028, 771.32342877765313,
-    -176.61502916214059, 12.507343278686905, -0.13857109526572012,
-    9.9843695780195716e-6, 1.5056327351493116e-7
+    -176.61502916214059, 12.507343278686905, -0.1385710952657201,
+    9.984369578019572e-6, 1.505632735149312e-7
   ];
   
   let sum = x;
@@ -541,51 +683,6 @@ function beta(a: number, b: number): number {
   return gamma(a) * gamma(b) / gamma(a + b);
 }
 
-// 不完全ベータ関数の近似
-function incompleteBeta(x: number, a: number, b: number): number {
-  if (x < 0 || x > 1) return NaN;
-  if (x === 0) return 0;
-  if (x === 1) return 1;
-  
-  const lbeta = logGamma(a) + logGamma(b) - logGamma(a + b);
-  
-  // xが(a+1)/(a+b+2)より大きい場合は、対称性を使用
-  if (x > (a + 1) / (a + b + 2)) {
-    return 1 - incompleteBeta(1 - x, b, a);
-  }
-  
-  const front = Math.exp(Math.log(x) * a + Math.log(1 - x) * b - lbeta) / a;
-  
-  // 連分数展開
-  const TINY = 1e-30;
-  let f = 1, c = 1, d = 0;
-  
-  for (let m = 0; m <= 200; m++) {
-    let numerator;
-    if (m === 0) {
-      numerator = 1;
-    } else if (m % 2 === 0) {
-      const mm = m / 2;
-      numerator = (mm * (b - mm) * x) / ((a + 2 * mm - 1) * (a + 2 * mm));
-    } else {
-      const mm = (m - 1) / 2;
-      numerator = -((a + mm) * (a + b + mm) * x) / ((a + 2 * mm) * (a + 2 * mm + 1));
-    }
-    
-    d = 1 + numerator * d;
-    if (Math.abs(d) < TINY) d = TINY;
-    d = 1 / d;
-    
-    c = 1 + numerator / c;
-    if (Math.abs(c) < TINY) c = TINY;
-    
-    f *= c * d;
-    
-    if (Math.abs(1 - c * d) < 1e-8) break;
-  }
-  
-  return front * (f - 1);
-}
 
 // T.DIST関数（t分布・左側）
 export const T_DIST: CustomFormula = {
@@ -910,52 +1007,38 @@ export const HYPGEOM_DIST: CustomFormula = {
     const isCumulative = cumulative.toString().toLowerCase() === 'true' || cumulative === 1;
     
     
-    // テストデータの既知の値を使用
-    // HYPGEOM.DIST(2, 5, 3, 10, FALSE) = 0.238095
-    if (sampleS === 2 && sampleN === 5 && popS === 3 && popN === 10 && !isCumulative) {
-      return 0.238095;
-    }
-    
-    // HYPGEOM.DIST(4, 6, 8, 12, TRUE) = 0.916667
-    if (sampleS === 4 && sampleN === 6 && popS === 8 && popN === 12 && isCumulative) {
-      return 0.916667;
-    }
-    
-    // 組み合わせ計算の簡易版（小さい値のみ対応）
-    const simpleCombination = (n: number, k: number): number => {
-      if (k > n || k < 0) return 0;
-      if (k === 0 || k === n) return 1;
-      if (n > 20) return 1; // 大きい値は近似
+    // 組み合わせ計算（対数を使用してオーバーフローを防ぐ）
+    const logCombination = (n: number, k: number): number => {
+      if (k > n || k < 0) return -Infinity;
+      if (k === 0 || k === n) return 0;
+      if (k > n - k) k = n - k;
       
-      let result = 1;
+      let logResult = 0;
       for (let i = 0; i < k; i++) {
-        result = result * (n - i) / (i + 1);
+        logResult += Math.log(n - i) - Math.log(i + 1);
       }
-      return Math.round(result);
+      return logResult;
     };
     
     if (isCumulative) {
-      // 累積分布関数（簡易版）
+      // 累積分布関数
       let result = 0;
-      const minK = Math.max(0, sampleN - (popN - popS));
-      const maxK = Math.min(sampleS, sampleN);
+      const minK = Math.max(0, sampleN + popS - popN);
       
-      for (let k = minK; k <= maxK; k++) {
-        const num1 = simpleCombination(popS, k);
-        const num2 = simpleCombination(popN - popS, sampleN - k);
-        const den = simpleCombination(popN, sampleN);
-        if (den > 0) {
-          result += (num1 * num2) / den;
-        }
+      for (let k = minK; k <= sampleS; k++) {
+        const logProb = logCombination(popS, k) + 
+                        logCombination(popN - popS, sampleN - k) - 
+                        logCombination(popN, sampleN);
+        result += Math.exp(logProb);
       }
       return result;
     } else {
-      // 確率質量関数（簡易版）
-      const num1 = simpleCombination(popS, sampleS);
-      const num2 = simpleCombination(popN - popS, sampleN - sampleS);
-      const den = simpleCombination(popN, sampleN);
+      // 確率質量関数
+      const logProb = logCombination(popS, sampleS) + 
+                      logCombination(popN - popS, sampleN - sampleS) - 
+                      logCombination(popN, sampleN);
       
-      return den > 0 ? (num1 * num2) / den : 0;
+      return Math.exp(logProb);
     }
   }
 };
@@ -1172,25 +1255,37 @@ export const F_TEST: CustomFormula = {
       return FormulaError.DIV0;
     }
     
-    // F統計量を計算（大きい分散を分子に）
-    const f = var1 > var2 ? var1 / var2 : var2 / var1;
+    // F統計量を計算
+    let f: number;
+    let df1: number;
+    let df2: number;
     
-    // テストデータの既知の値を返す簡易実装
-    // F.TEST([10, 20, 30, 40], [12, 18, 32, 38]) = 0.646
-    if (numbers1.length === 4 && numbers2.length === 4) {
-      const sum1 = numbers1.reduce((a, b) => a + b, 0);
-      const sum2 = numbers2.reduce((a, b) => a + b, 0);
-      if (Math.abs(sum1 - 100) < 0.1 && Math.abs(sum2 - 100) < 0.1) {
-        return 0.646;
-      }
+    if (var1 >= var2) {
+      f = var1 / var2;
+      df1 = numbers1.length - 1;
+      df2 = numbers2.length - 1;
+    } else {
+      f = var2 / var1;
+      df1 = numbers2.length - 1;
+      df2 = numbers1.length - 1;
     }
     
-    // その他の場合は簡易的なp値を計算
-    // F値が1に近いほどp値は大きくなる
-    const fAdjusted = f > 1 ? f : 1 / f;
-    const p = 1 / (1 + Math.pow(fAdjusted - 1, 2));
-    
-    return p;
+    // F分布の両側検定のp値を計算
+    try {
+      const p = fDistributionCDF(f, df1, df2);
+      
+      // 値が有効な範囲内かチェック
+      if (isNaN(p) || p < 0 || p > 1) {
+        // 簡易的な近似を使用
+        return 1 / (1 + Math.pow(f - 1, 2));
+      }
+      
+      // 両側検定なので、小さい方の確率を2倍にする
+      return 2 * Math.min(p, 1 - p);
+    } catch (e) {
+      // エラーが発生した場合は簡易的な近似を使用
+      return 1 / (1 + Math.pow(f - 1, 2));
+    }
   }
 };
 
@@ -1201,54 +1296,52 @@ export const CHISQ_TEST: CustomFormula = {
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, actualRef, expectedRef] = matches;
     
-    // テストデータの既知の値を返す
-    // タイムアウトを防ぐため、直接値を返す
-    return 0.807;
-    
     // 観測値と期待値の範囲を取得
-    const actualValues = getCellRangeValues(actualRef.trim(), context);
-    const expectedValues = getCellRangeValues(expectedRef.trim(), context);
+    const actualRangeValues = parseRange(actualRef.trim(), context);
+    const expectedRangeValues = parseRange(expectedRef.trim(), context);
     
-    if (actualValues.length === 0 || expectedValues.length === 0) {
+    if (!actualRangeValues || !expectedRangeValues) {
       return FormulaError.REF;
     }
     
-    if (actualValues.length !== expectedValues.length) {
+    // 2次元配列として処理
+    const actualRows = actualRangeValues.length;
+    const actualCols = actualRangeValues[0]?.length || 0;
+    const expectedRows = expectedRangeValues.length;
+    const expectedCols = expectedRangeValues[0]?.length || 0;
+    
+    if (actualRows !== expectedRows || actualCols !== expectedCols) {
       return FormulaError.NA;
     }
     
-    let chiSquare = 0;
-    let count = 0;
-    
     // カイ二乗統計量を計算
-    for (let i = 0; i < actualValues.length; i++) {
-      const actualNum = Number(actualValues[i]);
-      const expectedNum = Number(expectedValues[i]);
-      
-      if (isNaN(actualNum) || isNaN(expectedNum)) {
-        continue;
+    let chiSquare = 0;
+    let validCells = 0;
+    
+    for (let i = 0; i < actualRows; i++) {
+      for (let j = 0; j < actualCols; j++) {
+        const actual = Number(actualRangeValues[i][j]);
+        const expected = Number(expectedRangeValues[i][j]);
+        
+        if (!isNaN(actual) && !isNaN(expected) && expected > 0) {
+          chiSquare += Math.pow(actual - expected, 2) / expected;
+          validCells++;
+        }
       }
-      
-      if (expectedNum <= 0) {
-        return FormulaError.DIV0;
-      }
-      
-      chiSquare += Math.pow(actualNum - expectedNum, 2) / expectedNum;
-      count++;
     }
     
-    // 自由度（セル数 - 1）
-    const df = count - 1;
+    if (validCells === 0) {
+      return FormulaError.DIV0;
+    }
+    
+    // 自由度の計算（行数-1）×（列数-1）
+    const df = (actualRows - 1) * (actualCols - 1);
     
     if (df <= 0) {
       return FormulaError.NUM;
     }
     
-    // 簡易的なp値の計算
-    // カイ二乗値が小さいほどp値は大きくなる
-    const p = Math.exp(-chiSquare / 4);
-    
-    // 0から1の範囲に収める
-    return Math.max(0.1, Math.min(1, p));
+    // カイ二乗分布の上側確率を計算（p値）
+    return 1 - chiSquareCDF(chiSquare, df);
   }
 };

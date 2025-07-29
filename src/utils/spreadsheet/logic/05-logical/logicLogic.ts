@@ -136,28 +136,28 @@ export const IF: CustomFormula = {
       let rightValue: any;
       
       // 左辺の値を取得（セル参照またはリテラル）
-      const leftCellValue = getCellValue(leftExpr.trim(), context);
-      if (leftCellValue === FormulaError.REF) {
-        // セル参照でない場合はリテラルとして扱う
-        leftValue = isNaN(Number(leftExpr.trim())) ? leftExpr.trim() : Number(leftExpr.trim());
+      const leftTrimmed = leftExpr.trim();
+      // セル参照パターンのチェック
+      if (leftTrimmed.match(/^[A-Z]+\d+$/)) {
+        leftValue = getCellValue(leftTrimmed, context);
       } else {
-        leftValue = leftCellValue;
+        // リテラルとして扱う
+        leftValue = isNaN(Number(leftTrimmed)) ? leftTrimmed : Number(leftTrimmed);
       }
       
       // 右辺の値を取得（セル参照またはリテラル）
-      const rightCellValue = getCellValue(rightExpr.trim(), context);
-      if (rightCellValue === FormulaError.REF) {
-        // セル参照でない場合はリテラルとして扱う
-        const trimmedRight = rightExpr.trim();
-        // 引用符を除去
-        if ((trimmedRight.startsWith('"') && trimmedRight.endsWith('"')) || 
-            (trimmedRight.startsWith("'") && trimmedRight.endsWith("'"))) {
-          rightValue = trimmedRight.slice(1, -1);
-        } else {
-          rightValue = isNaN(Number(trimmedRight)) ? trimmedRight : Number(trimmedRight);
-        }
+      const rightTrimmed = rightExpr.trim();
+      // セル参照パターンのチェック
+      if (rightTrimmed.match(/^[A-Z]+\d+$/)) {
+        rightValue = getCellValue(rightTrimmed, context);
       } else {
-        rightValue = rightCellValue;
+        // 引用符を除去
+        if ((rightTrimmed.startsWith('"') && rightTrimmed.endsWith('"')) || 
+            (rightTrimmed.startsWith("'") && rightTrimmed.endsWith("'"))) {
+          rightValue = rightTrimmed.slice(1, -1);
+        } else {
+          rightValue = isNaN(Number(rightTrimmed)) ? rightTrimmed : Number(rightTrimmed);
+        }
       }
       
       // 数値に変換を試みる
