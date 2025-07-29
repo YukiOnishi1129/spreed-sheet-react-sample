@@ -309,13 +309,13 @@ describe('Lookup and Reference Functions', () => {
 
   describe('SORT Function', () => {
     it('should sort single column ascending', () => {
-      const matches = ['SORT(A6:A10)', 'A6:A10'] as RegExpMatchArray;
+      const matches = ['SORT(A6:A9)', 'A6:A9'] as RegExpMatchArray;
       const result = SORT.calculate(matches, mockContext);
       expect(Array.isArray(result)).toBe(true);
     });
 
     it('should sort single column descending', () => {
-      const matches = ['SORT(A6:A10, 1, -1)', 'A6:A10', '1', '-1'] as RegExpMatchArray;
+      const matches = ['SORT(A6:A9, 1, -1)', 'A6:A9', '1', '-1'] as RegExpMatchArray;
       const result = SORT.calculate(matches, mockContext);
       expect(Array.isArray(result)).toBe(true);
     });

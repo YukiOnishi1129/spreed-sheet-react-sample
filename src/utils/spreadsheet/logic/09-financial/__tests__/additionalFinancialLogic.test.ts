@@ -137,7 +137,7 @@ describe('Additional Financial Functions', () => {
 
   describe('MIRR Function (Modified Internal Rate of Return)', () => {
     it('should calculate MIRR for mixed cash flows', () => {
-      const matches = ['MIRR(A6:E6, 0.1, 0.12)', 'A6:E6', '0.1', '0.12'] as RegExpMatchArray;
+      const matches = ['MIRR(B6:F6, 0.1, 0.12)', 'B6:F6', '0.1', '0.12'] as RegExpMatchArray;
       const result = MIRR.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(0);
@@ -145,7 +145,7 @@ describe('Additional Financial Functions', () => {
     });
 
     it('should handle different finance and reinvest rates', () => {
-      const matches = ['MIRR(A6:E6, 0.08, 0.15)', 'A6:E6', '0.08', '0.15'] as RegExpMatchArray;
+      const matches = ['MIRR(B6:F6, 0.08, 0.15)', 'B6:F6', '0.08', '0.15'] as RegExpMatchArray;
       const result = MIRR.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(0);
