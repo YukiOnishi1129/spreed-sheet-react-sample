@@ -224,41 +224,119 @@ function gammaIncomplete(a: number, x: number): number {
   }
 }
 
-// F分布の逆関数（簡易実装）
+// F分布の逆関数（正確な実装）
 function fInv(p: number, df1: number, df2: number): number {
   if (p <= 0 || p >= 1) return NaN;
   if (df1 <= 0 || df2 <= 0) return NaN;
   
-  // 既知の分位点データ（よく使われる値）
-  // F(0.95, 5, 10) ≈ 3.326
-  // F(0.95, 10, 10) ≈ 2.978
-  // F(0.95, 2, 10) ≈ 4.103
-  
-  // 簡易的な近似式を使用
-  if (p === 0.95 && df1 === 5 && df2 === 10) {
-    return 3.3258;  // 既知の正確な値
-  }
-  
-  // より一般的な近似（Wilson-Hilferty変換に基づく）
+  // Newton-Raphson法を使用してF分布の逆関数を計算
+  // 初期推定値はWilson-Hilferty変換を使用
   const alpha = 2 / (9 * df1);
   const beta = 2 / (9 * df2);
   
-  // 標準正規分布の分位点（簡易版）
-  const z = p > 0.5 ? 
-    Math.sqrt(-2 * Math.log(2 * (1 - p))) :
-    -Math.sqrt(-2 * Math.log(2 * p));
+  // 標準正規分布の逆関数を使用（より正確な版）
+  const z = inverseNormalCDF(p);
   
-  // F分布の分位点の近似
-  const num = Math.pow(1 - beta + z * Math.sqrt(beta), 3);
-  const den = 1 - alpha - z * Math.sqrt(alpha);
+  // Wilson-Hilferty変換による初期推定値
+  const h = 2 / (df1 + df2);
+  const w = z * Math.sqrt(h) + 0.5 * h;
+  let x = df2 / (df2 - 2 * w * Math.sqrt(df2));
   
-  let result = num / den;
+  // 初期値の範囲チェック
+  if (x <= 0 || !isFinite(x)) {
+    x = 1; // 安全な初期値
+  }
   
-  // 結果の調整
-  if (result < 0) result = 0.1;
-  if (result > 100) result = 100;
+  // Newton-Raphson法で精度を上げる
+  const maxIter = 100;
+  const tol = 1e-10;
   
-  return result;
+  for (let i = 0; i < maxIter; i++) {
+    // F分布のCDF（ベータ分布を使用）
+    const u = (df1 * x) / (df1 * x + df2);
+    const cdf = betaIncomplete(df1 / 2, df2 / 2, u);
+    
+    // F分布のPDF
+    const B = Math.exp(logGamma(df1 / 2) + logGamma(df2 / 2) - logGamma((df1 + df2) / 2));
+    const pdf = Math.pow(df1 / df2, df1 / 2) * Math.pow(x, df1 / 2 - 1) / 
+                (B * Math.pow(1 + (df1 / df2) * x, (df1 + df2) / 2));
+    
+    const error = cdf - p;
+    if (Math.abs(error) < tol) break;
+    
+    // Newton-Raphson更新
+    const delta = error / pdf;
+    x = x - delta;
+    
+    // 範囲を制限（負の値を防ぐ）
+    if (x < 0) x = Math.abs(delta) / 2;
+  }
+  
+  return x;
+}
+
+// 正規分布の逆関数（より正確な実装）
+function inverseNormalCDF(p: number): number {
+  if (p <= 0 || p >= 1) return NaN;
+  
+  // Rational approximation (Abramowitz and Stegun 26.2.23)
+  const a = [
+    -3.969683028665376e+01,
+     2.209460984245205e+02,
+    -2.759285104469687e+02,
+     1.383577518672690e+02,
+    -3.066479806614716e+01,
+     2.506628277459239e+00
+  ];
+  
+  const b = [
+    -5.447609879822406e+01,
+     1.615858368580409e+02,
+    -1.556989798598866e+02,
+     6.680131188771972e+01,
+    -1.328068155288572e+01
+  ];
+  
+  const c = [
+    -7.784894002430293e-03,
+    -3.223964580411365e-01,
+    -2.400758277161838e+00,
+    -2.549732539343734e+00,
+     4.374664141464968e+00,
+     2.938163982698783e+00
+  ];
+  
+  const d = [
+    7.784695709041462e-03,
+    3.224671290700398e-01,
+    2.445134137142996e+00,
+    3.754408661907416e+00
+  ];
+  
+  const pLow = 0.02425;
+  const pHigh = 1 - pLow;
+  
+  let q, r, x;
+  
+  if (p < pLow) {
+    // Lower region
+    q = Math.sqrt(-2 * Math.log(p));
+    x = (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+        ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  } else if (p <= pHigh) {
+    // Central region
+    q = p - 0.5;
+    r = q * q;
+    x = (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+        (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+  } else {
+    // Upper region
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    x = -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+         ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  }
+  
+  return x;
 }
 
 // T.INV関数の実装（T分布の逆関数）
@@ -438,8 +516,8 @@ export const F_INV_RT: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // F.INVは左側累積分布
-      return fInv(probability, df1, df2);
+      // F.INV.RTは右側累積分布なので、1-probabilityを使用
+      return fInv(1 - probability, df1, df2);
     } catch {
       return FormulaError.VALUE;
     }

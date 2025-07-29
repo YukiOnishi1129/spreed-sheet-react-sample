@@ -39,7 +39,7 @@ function chiSquareCDF(x: number, df: number): number {
   return lowerIncompleteGamma(df / 2, x / 2) / gamma(df / 2);
 }
 
-// 下側不完全ガンマ関数
+// 下側不完全ガンマ関数（改良版）
 function lowerIncompleteGamma(a: number, x: number): number {
   if (x <= 0) return 0;
   
@@ -48,45 +48,54 @@ function lowerIncompleteGamma(a: number, x: number): number {
     let sum = 0;
     let term = 1 / a;
     let ap = a;
+    const maxIter = 200; // 反復限界を増加
+    const tolerance = 1e-15; // より厳密な収束判定
     
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < maxIter; i++) {
       sum += term;
       ap += 1;
       term *= x / ap;
-      if (Math.abs(term) < 1e-10) break;
+      // 相対誤差で判定
+      if (Math.abs(term) < Math.abs(sum) * tolerance) break;
     }
     
-    return sum * Math.exp(-x + a * Math.log(x) - Math.log(gamma(a + 1)));
+    return sum * Math.exp(-x + a * Math.log(x) - logGamma(a + 1));
   }
   
   // 連分数展開を使用（大きいxの場合）
   return gamma(a) - upperIncompleteGamma(a, x);
 }
 
-// 上側不完全ガンマ関数
+// 上側不完全ガンマ関数（改良版）
 function upperIncompleteGamma(a: number, x: number): number {
   if (x <= 0) return gamma(a);
   
-  // 連分数展開
+  // 連分数展開（Lentz's algorithm）
+  const fpmin = 1e-30;
+  const maxIter = 200; // 反復限界を増加
+  const tolerance = 1e-15; // より厳密な収束判定
+  
   let b = x + 1 - a;
-  let c = 1 / 1e-30;
+  let c = 1 / fpmin;
   let d = 1 / b;
   let h = d;
   
-  for (let i = 1; i < 100; i++) {
+  for (let i = 1; i < maxIter; i++) {
     const an = -i * (i - a);
     b += 2;
     d = an * d + b;
-    if (Math.abs(d) < 1e-30) d = 1e-30;
+    if (Math.abs(d) < fpmin) d = fpmin;
     c = b + an / c;
-    if (Math.abs(c) < 1e-30) c = 1e-30;
+    if (Math.abs(c) < fpmin) c = fpmin;
     d = 1 / d;
     const del = d * c;
     h *= del;
-    if (Math.abs(del - 1) < 1e-10) break;
+    
+    // 相対誤差で判定
+    if (Math.abs(del - 1) < tolerance) break;
   }
   
-  return Math.exp(-x + a * Math.log(x) - Math.log(gamma(a))) * h;
+  return Math.exp(-x + a * Math.log(x) - logGamma(a)) * h;
 }
 
 // F分布の累積分布関数
@@ -201,22 +210,58 @@ function standardNormalCDF(z: number): number {
   return 0.5 * (1 + erf(z / SQRT_2));
 }
 
-// 誤差関数の近似
+// 誤差関数の高精度実装
 function erf(x: number): number {
-  const a1 =  0.254829592;
-  const a2 = -0.284496736;
-  const a3 =  1.421413741;
-  const a4 = -1.453152027;
-  const a5 =  1.061405429;
-  const p  =  0.3275911;
-
+  // 小さい値に対しては級数展開を使用
+  if (Math.abs(x) < 1.5) {
+    return erfSmall(x);
+  }
+  
+  // 大きい値に対しては相補誤差関数を使用
   const sign = x >= 0 ? 1 : -1;
-  x = Math.abs(x);
+  return sign * (1 - erfc(Math.abs(x)));
+}
 
-  const t = 1.0 / (1.0 + p * x);
-  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+// 小さい値用の誤差関数（Maclaurin級数）
+function erfSmall(x: number): number {
+  const x2 = x * x;
+  let sum = x;
+  let term = x;
+  
+  for (let n = 1; n < 30; n++) {
+    term *= -x2 * (2 * n - 1) / (n * (2 * n + 1));
+    sum += term;
+    if (Math.abs(term) < Math.abs(sum) * 1e-15) break;
+  }
+  
+  return (2 / Math.sqrt(Math.PI)) * sum;
+}
 
-  return sign * y;
+// 相補誤差関数の高精度実装
+function erfc(x: number): number {
+  if (x < 0) return 2 - erfc(-x);
+  
+  // Abramowitz and Stegun 7.1.26の有理近似
+  const a = [
+    -1.26551223,
+     1.00002368,
+     0.37409196,
+     0.09678418,
+    -0.18628806,
+     0.27886807,
+    -1.13520398,
+     1.48851587,
+    -0.82215223,
+     0.17087277
+  ];
+  
+  const z = 1 / (1 + 0.5 * x);
+  
+  const t = z * Math.exp(-x * x + 
+    a[0] + z * (a[1] + z * (a[2] + z * (a[3] + z * (a[4] + 
+    z * (a[5] + z * (a[6] + z * (a[7] + z * (a[8] + z * a[9])))))))));
+  
+  return t;
 }
 
 // 標準正規分布の確率密度関数
@@ -297,17 +342,28 @@ function tCDF(t: number, df: number): number {
   }
 }
 
-// t分布の逆関数
+// t分布の逆関数（改良版）
 export function inverseTDistribution(p: number, df: number): number {
   if (p <= 0 || p >= 1) return NaN;
   if (df <= 0) return NaN;
   
-  // 初期推定値（正規分布の逆関数を使用）
-  let x = inverseStandardNormal(p);
+  // 改良された初期推定値
+  const z = inverseStandardNormal(p);
+  let x;
+  
+  if (df > 30) {
+    // 大きい自由度の場合は正規分布に近似
+    x = z;
+  } else {
+    // Cornish-Fisher展開による初期推定値
+    const g1 = 0.25 * (1 + z * z) / df;
+    const g2 = (1 / 96) * z * (3 + z * z) * (1 + 3 * z * z) / (df * df);
+    x = z + g1 * z + g2;
+  }
   
   // Newton-Raphson法で精度を上げる
-  const maxIter = 100;
-  const tol = 1e-8;
+  const maxIter = 50; // 良い初期値なので反復回数を減らせる
+  const tol = 1e-12; // より高精度
   
   for (let i = 0; i < maxIter; i++) {
     const cdf = tCDF(x, df);
@@ -320,7 +376,14 @@ export function inverseTDistribution(p: number, df: number): number {
     const error = cdf - p;
     if (Math.abs(error) < tol) break;
     
-    x = x - error / pdf;
+    // 更新量を制限して安定性を向上
+    const delta = error / pdf;
+    const maxDelta = Math.abs(x) + 1;
+    if (Math.abs(delta) > maxDelta) {
+      x = x - Math.sign(delta) * maxDelta;
+    } else {
+      x = x - delta;
+    }
   }
   
   return x;
@@ -706,8 +769,18 @@ export const T_DIST: CustomFormula = {
     
     if (isCumulative) {
       // 累積分布関数（不完全ベータ関数を使用）
-      const t = (x + Math.sqrt(x * x + degFreedom)) / (2 * Math.sqrt(x * x + degFreedom));
-      return incompleteBeta(t, 0.5, degFreedom / 2);
+      // t分布のCDF: P(T ≤ x) = I_{x/(√(x²+ν))}(ν/2, 1/2) for x ≥ 0
+      const sign = x < 0 ? -1 : 1;
+      const absX = Math.abs(x);
+      const z = degFreedom / (degFreedom + absX * absX);
+      
+      if (x < 0) {
+        // 負の値の場合: P(T ≤ x) = 1/2 * I_z(ν/2, 1/2)
+        return 0.5 * incompleteBeta(z, degFreedom / 2, 0.5);
+      } else {
+        // 正の値の場合: P(T ≤ x) = 1 - 1/2 * I_z(ν/2, 1/2)
+        return 1 - 0.5 * incompleteBeta(z, degFreedom / 2, 0.5);
+      }
     } else {
       // 確率密度関数
       const coefficient = gamma((degFreedom + 1) / 2) / (Math.sqrt(degFreedom * Math.PI) * gamma(degFreedom / 2));
@@ -734,10 +807,9 @@ export const T_DIST_2T: CustomFormula = {
       return FormulaError.NUM;
     }
     
-    // 両側確率 = 2 * (1 - 左側確率)
-    const t = (x + Math.sqrt(x * x + degFreedom)) / (2 * Math.sqrt(x * x + degFreedom));
-    const leftTail = incompleteBeta(t, 0.5, degFreedom / 2);
-    return 2 * (1 - leftTail);
+    // 両側確率 = 2 * P(T > |x|)
+    const z = degFreedom / (degFreedom + x * x);
+    return incompleteBeta(z, degFreedom / 2, 0.5);
   }
 };
 
@@ -759,10 +831,16 @@ export const T_DIST_RT: CustomFormula = {
       return FormulaError.NUM;
     }
     
-    // 右側確率 = 1 - 左側確率
-    const t = (x + Math.sqrt(x * x + degFreedom)) / (2 * Math.sqrt(x * x + degFreedom));
-    const leftTail = incompleteBeta(t, 0.5, degFreedom / 2);
-    return 1 - leftTail;
+    // 右側確率 = P(T > x)
+    const z = degFreedom / (degFreedom + x * x);
+    
+    if (x < 0) {
+      // 負の値の場合: P(T > x) = 1 - 1/2 * I_z(ν/2, 1/2)
+      return 1 - 0.5 * incompleteBeta(z, degFreedom / 2, 0.5);
+    } else {
+      // 正の値の場合: P(T > x) = 1/2 * I_z(ν/2, 1/2)
+      return 0.5 * incompleteBeta(z, degFreedom / 2, 0.5);
+    }
   }
 };
 
@@ -1270,21 +1348,10 @@ export const F_TEST: CustomFormula = {
     }
     
     // F分布の両側検定のp値を計算
-    try {
-      const p = fDistributionCDF(f, df1, df2);
-      
-      // 値が有効な範囲内かチェック
-      if (isNaN(p) || p < 0 || p > 1) {
-        // 簡易的な近似を使用
-        return 1 / (1 + Math.pow(f - 1, 2));
-      }
-      
-      // 両側検定なので、小さい方の確率を2倍にする
-      return 2 * Math.min(p, 1 - p);
-    } catch {
-      // エラーが発生した場合は簡易的な近似を使用
-      return 1 / (1 + Math.pow(f - 1, 2));
-    }
+    const p = fDistributionCDF(f, df1, df2);
+    
+    // 両側検定なので、小さい方の確率を2倍にする
+    return 2 * Math.min(p, 1 - p);
   }
 };
 
