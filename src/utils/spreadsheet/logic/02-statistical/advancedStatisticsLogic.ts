@@ -181,12 +181,17 @@ export const KURT: CustomFormula = {
     }
     
     const standardDev = Math.sqrt(variance);
+    
+    // Excelの正確な尖度計算式
     const fourthMoment = numbers.reduce((sum, num) => {
       return sum + Math.pow((num - mean) / standardDev, 4);
-    }, 0) / n;
+    }, 0);
     
-    // Excelの尖度は標準正規分布の尖度（3）を引いた値
-    return fourthMoment - 3;
+    // Excel KURT = (n*(n+1)/((n-1)*(n-2)*(n-3))) * fourthMoment - (3*(n-1)^2)/((n-2)*(n-3))
+    const factor1 = (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3));
+    const factor2 = (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+    
+    return factor1 * fourthMoment - factor2;
   }
 };
 
