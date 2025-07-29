@@ -166,11 +166,14 @@ function DemoSpreadsheet() {
             };
           }
           
+          // 型を明確にキャスト
+          const cellValue = cell as string | number | boolean | null;
+          
           // 文字列が = で始まる場合は数式として扱う
-          if (typeof cell === 'string' && cell.startsWith('=')) {
+          if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
             return {
               value: '',
-              formula: cell
+              formula: cellValue
             };
           }
           
@@ -183,7 +186,7 @@ function DemoSpreadsheet() {
           //   }
           // }
           
-          return { value: cell };
+          return { value: cellValue };
         })
       );
       
@@ -400,6 +403,22 @@ function DemoSpreadsheet() {
             <p className="text-sm text-blue-700">関数を選択してください</p>
           )}
         </div>
+
+        {/* 統計関数に関する注意書き */}
+        {(demoMode === 'grouped' && selectedCategory.name === '統計') || 
+         (demoMode === 'individual' && selectedFunction?.category === '02. 統計') ? (
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-sm text-yellow-800">
+                統計関数の計算結果は簡易実装のため、実際のExcel/Google Spreadsheetsと異なる場合があります。
+                正確な統計計算が必要な場合は、実際のExcel/Google Spreadsheetsをご利用ください。
+              </p>
+            </div>
+          </div>
+        ) : null}
 
         {/* 数式バー */}
         <div className="mb-4 bg-white border rounded-lg shadow-sm">

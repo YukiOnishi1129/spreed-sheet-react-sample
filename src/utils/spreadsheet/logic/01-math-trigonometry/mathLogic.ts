@@ -1600,8 +1600,8 @@ export const PERMUTATIONA: CustomFormula = {
     const kValue = getCellValue(kRef.trim(), context);
     
     // 数値の取得
-    const n = parseFloat(nValue ?? nRef);
-    const k = parseFloat(kValue ?? kRef);
+    const n = parseFloat(String(nValue ?? nRef));
+    const k = parseFloat(String(kValue ?? kRef));
     
     // 数値型チェック
     if (isNaN(n) || isNaN(k)) {
