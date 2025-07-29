@@ -229,56 +229,87 @@ function fInv(p: number, df1: number, df2: number): number {
   if (p <= 0 || p >= 1) return NaN;
   if (df1 <= 0 || df2 <= 0) return NaN;
   
-  // ビセクション法で実装（より安定）
-  let low = 0.001;
-  let high = 10;
+  // Newton-Raphson法とビセクション法の組み合わせ
   const tol = 1e-8;
   const maxIter = 100;
   
-  // 初期範囲の調整
-  // まず適切な範囲を見つける
-  let w = df1 * high / (df1 * high + df2);
-  let cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+  // 初期推定値の改善
+  // F分布の平均値付近から開始
+  let x = df2 > 2 ? df2 / (df2 - 2) : 1;
+  
+  // 適切な初期範囲を見つける
+  let low = 0;
+  let high = x * 10;
+  
+  // F分布のCDFを計算する関数
+  const fCDF = (f: number): number => {
+    const w = (df1 * f) / (df1 * f + df2);
+    return betaIncomplete(df1 / 2, df2 / 2, w);
+  };
   
   // 上限を探す
-  while (cdf < p && high < 1e6) {
+  while (fCDF(high) < p && high < 1e6) {
     low = high;
-    high = high * 2;
-    w = df1 * high / (df1 * high + df2);
-    cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+    high *= 2;
   }
   
   // 下限を探す
-  if (cdf >= p) {
-    w = df1 * low / (df1 * low + df2);
-    cdf = betaIncomplete(df1 / 2, df2 / 2, w);
-    
-    while (cdf > p && low > 1e-6) {
+  low = 0;
+  while (fCDF(low) < p * 0.01 && low < high) {
+    low = high / 100;
+    if (fCDF(low) > p) {
       high = low;
-      low = low / 2;
-      w = df1 * low / (df1 * low + df2);
-      cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+      low = 0;
+      break;
     }
   }
   
-  // ビセクション法
+  // Newton-Raphson法（高速収束）
   for (let iter = 0; iter < maxIter; iter++) {
-    const mid = (low + high) / 2;
-    w = df1 * mid / (df1 * mid + df2);
-    cdf = betaIncomplete(df1 / 2, df2 / 2, w);
+    const cdf = fCDF(x);
     
-    if (Math.abs(cdf - p) < tol || (high - low) / mid < tol) {
-      return mid;
+    if (Math.abs(cdf - p) < tol) {
+      return x;
     }
     
-    if (cdf < p) {
-      low = mid;
+    // F分布のPDFを計算
+    const logBeta = logGamma(df1 / 2) + logGamma(df2 / 2) - logGamma((df1 + df2) / 2);
+    const pdf = Math.exp(
+      Math.log(Math.pow(df1 / df2, df1 / 2)) +
+      ((df1 / 2) - 1) * Math.log(x) -
+      ((df1 + df2) / 2) * Math.log(1 + (df1 / df2) * x) -
+      logBeta
+    );
+    
+    // Newton-Raphson更新
+    const delta = (cdf - p) / pdf;
+    const newX = x - delta;
+    
+    // 範囲外の場合はビセクション法にフォールバック
+    if (newX <= low || newX >= high || isNaN(newX)) {
+      // ビセクション法の1ステップ
+      const mid = (low + high) / 2;
+      const midCDF = fCDF(mid);
+      
+      if (midCDF < p) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+      x = (low + high) / 2;
     } else {
-      high = mid;
+      x = newX;
+      
+      // 範囲を更新
+      if (cdf < p) {
+        low = Math.max(low, x - Math.abs(delta) * 2);
+      } else {
+        high = Math.min(high, x + Math.abs(delta) * 2);
+      }
     }
   }
   
-  return (low + high) / 2;
+  return x;
 }
 
 // T.INV関数の実装（T分布の逆関数）

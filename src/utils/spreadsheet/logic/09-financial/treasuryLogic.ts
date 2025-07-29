@@ -141,7 +141,7 @@ export const DOLLARDE: CustomFormula = {
       const fractionalPart = Math.abs(fractionalDollar) - integerPart;
       
       // 分数表記を小数に変換
-      const decimalPart = fractionalPart * 10 / fraction;
+      const decimalPart = fractionalPart * 100 / fraction;
       
       const result = integerPart + decimalPart;
       
@@ -180,7 +180,7 @@ export const DOLLARFR: CustomFormula = {
       const decimalPart = Math.abs(decimalDollar) - integerPart;
       
       // 小数を分数表記に変換
-      const fractionalPart = decimalPart * fraction / 10;
+      const fractionalPart = decimalPart * fraction / 100;
       
       const result = integerPart + fractionalPart;
       
