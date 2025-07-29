@@ -230,7 +230,8 @@ export const ISFORMULA: CustomFormula = {
       
       // For raw cell values, check if it's a string that starts with '='
       if (typeof cell === 'object' && cell && 'value' in cell && !('formula' in cell)) {
-        const value = (cell as any).value;
+        const cellData = cell as { value: unknown };
+        const value = cellData.value;
         return typeof value === 'string' && value.startsWith('=');
       }
       
