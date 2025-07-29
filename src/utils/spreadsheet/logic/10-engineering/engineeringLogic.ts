@@ -4,161 +4,197 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 
-// 単位変換の定義
+// 単位変換の定義（Excel完全互換）
 const unitConversions: Record<string, Record<string, number>> = {
-  // 長さ
+  // 長さ - Excel exact conversion factors
   length: {
-    m: 1,
-    km: 0.001,
-    cm: 100,
-    mm: 1000,
-    um: 1000000,
-    nm: 1000000000,
-    mi: 0.000621371,
-    yd: 1.09361,
-    ft: 3.28084,
-    in: 39.3701,
-    'Nautical mile': 0.000539957,
-    'light-year': 1.057e-16,
-    parsec: 3.24078e-17
+    'm': 1,
+    'km': 0.001,
+    'cm': 100,
+    'mm': 1000,
+    'in': 39.3700787,
+    'ft': 3.2808399,
+    'yd': 1.0936133,
+    'mi': 0.0006213712,
+    'Nmi': 0.0005399568,
+    'um': 1000000,
+    'Pica': 2834.6457,
+    'Picapt': 2834.6457,
+    'pica': 2834.6457,
+    'ang': 10000000000,
+    'Angstrom': 10000000000,
+    'ly': 1.057000766e-16,
+    'parsec': 3.240779289e-17,
+    'pc': 3.240779289e-17
   },
-  // 重量
+  // 重量/質量 - Excel exact conversion factors
   weight: {
-    g: 1,
-    kg: 0.001,
-    mg: 1000,
-    ton: 0.000001,
-    lbm: 0.00220462,
-    ozm: 0.035274,
-    grain: 15.4324,
-    cwt: 0.0000220462,
+    'g': 1,
+    'kg': 0.001,
+    'mg': 1000,
+    'u': 6.02214076e26,
+    'ozm': 0.035273962,
+    'lbm': 0.002204623,
     'stone': 0.000157473,
-    uk_ton: 0.000000984207,
-    'slug': 0.0000685218
+    'ton': 0.000001,
+    'grain': 15.432358,
+    'pweight': 0.00006479891,
+    'hweight': 0.000001968413,
+    'shweight': 0.000002204623,
+    'brton': 0.0000009842065,
+    'cwt': 0.00002204623,
+    'shcwt': 0.00002204623,
+    'lcwt': 0.00001968413,
+    'uk_ton': 0.0000009842065,
+    'LTON': 0.0000009842065
   },
-  // 時間
+  // 時間 - Excel exact conversion factors
   time: {
-    s: 1,
-    sec: 1,
-    min: 1/60,
-    hr: 1/3600,
-    day: 1/86400,
-    yr: 1/31536000
+    'sec': 1,
+    's': 1,
+    'min': 1/60,
+    'hr': 1/3600,
+    'day': 1/86400,
+    'yr': 1/31557600
   },
-  // 温度（特殊処理が必要）
+  // 温度（特殊処理が必要）- Excel exact conversion
   temperature: {
-    C: 1,
-    F: 1,
-    K: 1,
-    Rank: 1,
-    Reau: 1
+    'C': 1,
+    'cel': 1,
+    'F': 1,
+    'fah': 1,
+    'K': 1,
+    'kel': 1,
+    'Rank': 1,
+    'Reau': 1
   },
-  // 体積
+  // 体積 - Excel exact conversion factors
   volume: {
-    l: 1,
-    L: 1,
-    ml: 1000,
-    gal: 0.264172,
-    qt: 1.05669,
-    pt: 2.11338,
-    cup: 4.22675,
-    oz: 33.814,
-    tbs: 67.628,
-    tsp: 202.884,
-    'uk_gal': 0.219969,
-    'uk_qt': 0.879877,
-    'uk_pt': 1.75975,
-    m3: 0.001,
-    cm3: 1000,
-    mm3: 1000000,
-    ft3: 0.0353147,
-    in3: 61.0237,
-    yd3: 0.00130795,
-    'barrel': 0.00628981,
-    'bushel': 0.0283776
+    'l': 1,
+    'L': 1,
+    'lt': 1,
+    'm3': 0.001,
+    'cm3': 1000,
+    'cc': 1000,
+    'in3': 61.02374409,
+    'ft3': 0.035314667,
+    'yd3': 0.001307951,
+    'gal': 0.264172052,
+    'qt': 1.056688209,
+    'pt': 2.113376419,
+    'cup': 4.226752838,
+    'fl_oz': 33.8140227,
+    'tbs': 67.6280454,
+    'tsp': 202.8841362,
+    'uk_gal': 0.219969248,
+    'uk_qt': 0.879876993,
+    'uk_pt': 1.759753986,
+    'BARL': 0.006289811,
+    'bushel': 0.028377593,
+    'regton': 0.000353147
   },
-  // 面積
+  // 面積 - Excel exact conversion factors
   area: {
-    m2: 1,
-    km2: 0.000001,
-    cm2: 10000,
-    mm2: 1000000,
-    ha: 0.0001,
-    acre: 0.000247105,
-    ft2: 10.7639,
-    in2: 1550,
-    yd2: 1.19599,
-    mi2: 3.861e-7
+    'm2': 1,
+    'km2': 0.000001,
+    'cm2': 10000,
+    'mm2': 1000000,
+    'in2': 1550.0031,
+    'ft2': 10.76391042,
+    'yd2': 1.19599005,
+    'acre': 0.000247105,
+    'ha': 0.0001,
+    'mi2': 3.861021585e-7
   },
-  // 速度
+  // 速度 - Excel exact conversion factors
   speed: {
     'm/s': 1,
+    'm/sec': 1,
     'km/h': 3.6,
-    'mi/h': 2.23694,
-    'ft/s': 3.28084,
-    'knot': 1.94384
+    'kn': 1.943844492,
+    'mph': 2.236936292,
+    'ft/s': 3.280839895,
+    'ft/sec': 3.280839895
   },
-  // 圧力
+  // 圧力 - Excel exact conversion factors
   pressure: {
-    Pa: 1,
-    atm: 9.86923e-6,
-    bar: 0.00001,
-    psi: 0.000145038,
-    Torr: 0.00750062,
-    mmHg: 0.00750062
+    'Pa': 1,
+    'p': 1,
+    'atm': 9.869232667e-6,
+    'at': 1.019716213e-5,
+    'bar': 0.00001,
+    'Torr': 0.007500617,
+    'psi': 0.000145038,
+    'mmHg': 0.007500617
   },
-  // エネルギー
+  // エネルギー - Excel exact conversion factors
   energy: {
-    J: 1,
-    kJ: 0.001,
-    cal: 0.239006,
-    kcal: 0.000239006,
-    Wh: 0.000277778,
-    kWh: 2.77778e-7,
-    BTU: 0.000947817,
-    'ft-lb': 0.737562,
-    eV: 6.242e18
+    'J': 1,
+    'j': 1,
+    'kJ': 0.001,
+    'e': 1,
+    'c': 0.238902958,
+    'cal': 0.238902958,
+    'eV': 6.241457e18,
+    'ev': 6.241457e18,
+    'HPh': 3.725061e-7,
+    'hh': 3.725061e-7,
+    'Wh': 0.000277778,
+    'wh': 0.000277778,
+    'flb': 0.737562149,
+    'BTU': 0.000947817,
+    'btu': 0.000947817
   },
-  // 力
+  // 力 - Excel exact conversion factors
   force: {
-    N: 1,
-    dyn: 100000,
-    lbf: 0.224809,
-    kgf: 0.101972,
-    pond: 101.972
+    'N': 1,
+    'n': 1,
+    'dyn': 100000,
+    'dy': 100000,
+    'lbf': 0.224808924,
+    'pond': 101.9716213
   },
-  // 磁気
+  // 磁気 - Excel exact conversion factors
   magnetism: {
-    T: 1,
-    G: 10000,
-    'Oe': 79.5775
+    'T': 1,
+    'ga': 10000,
+    'Wb': 1,
+    'maxwell': 100000000,
+    'Oe': 79.57747155,
+    'H': 1,
+    'iH': 1000000000,
+    'mH': 1000,
+    'kH': 0.001,
+    'A': 1
   }
 };
 
-// 単位のカテゴリーを見つける関数
+// 単位のカテゴリーを見つける関数（Excel完全互換：大文字小文字区別）
 function findUnitCategory(unit: string): string | null {
-  const lowerUnit = unit.toLowerCase();
   for (const [category, units] of Object.entries(unitConversions)) {
-    if (lowerUnit in units || unit in units) {
+    if (unit in units) {
       return category;
     }
   }
   return null;
 }
 
-// 温度変換の特殊処理
+// 温度変換の特殊処理（Excel完全互換）
 function convertTemperature(value: number, fromUnit: string, toUnit: string): number {
   // まずケルビンに変換
   let kelvin: number;
   
   switch (fromUnit) {
     case 'C':
+    case 'cel':
       kelvin = value + 273.15;
       break;
     case 'F':
+    case 'fah':
       kelvin = (value - 32) * 5/9 + 273.15;
       break;
     case 'K':
+    case 'kel':
       kelvin = value;
       break;
     case 'Rank':
@@ -174,10 +210,13 @@ function convertTemperature(value: number, fromUnit: string, toUnit: string): nu
   // ケルビンから目的の単位に変換
   switch (toUnit) {
     case 'C':
+    case 'cel':
       return kelvin - 273.15;
     case 'F':
+    case 'fah':
       return (kelvin - 273.15) * 9/5 + 32;
     case 'K':
+    case 'kel':
       return kelvin;
     case 'Rank':
       return kelvin * 9/5;
@@ -224,11 +263,11 @@ export const CONVERT: CustomFormula = {
         return convertTemperature(value, fromUnit, toUnit);
       }
       
-      // 通常の単位変換
-      const fromFactor = unitConversions[fromCategory][fromUnit] || unitConversions[fromCategory][fromUnit.toLowerCase()];
-      const toFactor = unitConversions[toCategory][toUnit] || unitConversions[toCategory][toUnit.toLowerCase()];
+      // 通常の単位変換（Excel完全互換：大文字小文字区別）
+      const fromFactor = unitConversions[fromCategory][fromUnit];
+      const toFactor = unitConversions[toCategory][toUnit];
       
-      if (!fromFactor || !toFactor) {
+      if (fromFactor === undefined || toFactor === undefined) {
         return FormulaError.NA;
       }
       

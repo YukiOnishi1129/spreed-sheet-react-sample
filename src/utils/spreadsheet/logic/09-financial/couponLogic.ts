@@ -5,49 +5,99 @@ import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 import { parseDate } from '../shared/dateUtils';
 
-// 日付ベースの日数計算
-function getDayCountBasis(basis: number = 0): { daysInYear: number; daysInMonth: number } {
+// 日数計算規約（統一版）
+function calculateDaysFraction(startDate: Date, endDate: Date, basis: number = 0): number {
+  const earlier = startDate <= endDate ? startDate : endDate;
+  const later = startDate <= endDate ? endDate : startDate;
+  
   switch (basis) {
-    case 0: // 30/360 US
+    case 0: // 30/360 US (NASD)
+      return days30_360US(earlier, later);
+    case 1: // Actual/actual - 実際の日数を返す
+      return Math.floor((later.getTime() - earlier.getTime()) / (24 * 60 * 60 * 1000));
+    case 2: // Actual/360 - 実際の日数を返す
+      return Math.floor((later.getTime() - earlier.getTime()) / (24 * 60 * 60 * 1000));
+    case 3: // Actual/365 - 実際の日数を返す
+      return Math.floor((later.getTime() - earlier.getTime()) / (24 * 60 * 60 * 1000));
     case 4: // 30/360 European
-      return { daysInYear: 360, daysInMonth: 30 };
-    case 1: // Actual/actual
-      return { daysInYear: 365, daysInMonth: 0 }; // 実際の日数
-    case 2: // Actual/360
-      return { daysInYear: 360, daysInMonth: 0 };
-    case 3: // Actual/365
-      return { daysInYear: 365, daysInMonth: 0 };
+      return days30_360European(earlier, later);
     default:
-      return { daysInYear: 360, daysInMonth: 30 };
+      return days30_360US(earlier, later);
   }
 }
 
-// 30/360方式での日数計算
-function days360(startDate: Date, endDate: Date, european: boolean = false): number {
+// 30/360 US (NASD) 方式の日数計算
+function days30_360US(startDate: Date, endDate: Date): number {
+  let startYear = startDate.getFullYear();
+  let startMonth = startDate.getMonth() + 1;
   let startDay = startDate.getDate();
-  const startMonth = startDate.getMonth() + 1;
-  const startYear = startDate.getFullYear();
+  
+  let endYear = endDate.getFullYear();
+  let endMonth = endDate.getMonth() + 1;
   let endDay = endDate.getDate();
-  const endMonth = endDate.getMonth() + 1;
-  const endYear = endDate.getFullYear();
-
-  if (!european) {
-    // US方式
-    if (startDay === 31) startDay = 30;
-    if (endDay === 31 && startDay === 30) endDay = 30;
-  } else {
-    // European方式
-    if (startDay === 31) startDay = 30;
-    if (endDay === 31) endDay = 30;
+  
+  // US 30/360の特殊ルール
+  if (startDay === getDaysInMonth(startYear, startMonth)) {
+    startDay = 30;
   }
-
+  
+  if (endDay === getDaysInMonth(endYear, endMonth) && startDay < 30) {
+    endDay = getDaysInMonth(endYear, endMonth);
+  } else if (endDay === getDaysInMonth(endYear, endMonth) && startDay === 30) {
+    endDay = 30;
+  }
+  
+  if (startDay === 31 || (startMonth === 2 && startDay === getDaysInMonth(startYear, startMonth))) {
+    startDay = 30;
+  }
+  
+  if (endDay === 31 && startDay === 30) {
+    endDay = 30;
+  }
+  
   return (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
 }
 
-// 実際の日数計算
-function actualDays(startDate: Date, endDate: Date): number {
-  const diffTime = endDate.getTime() - startDate.getTime();
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+// 30/360 European方式の日数計算
+function days30_360European(startDate: Date, endDate: Date): number {
+  let startYear = startDate.getFullYear();
+  let startMonth = startDate.getMonth() + 1;
+  let startDay = startDate.getDate();
+  
+  let endYear = endDate.getFullYear();
+  let endMonth = endDate.getMonth() + 1;
+  let endDay = endDate.getDate();
+  
+  // European 30/360のルール
+  if (startDay === 31) startDay = 30;
+  if (endDay === 31) endDay = 30;
+  
+  return (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
+}
+
+// ヘルパー関数：月の日数を取得
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
+}
+
+// 年間日数を取得
+function getDaysInYear(basis: number, year?: number): number {
+  switch (basis) {
+    case 0: // 30/360 US
+    case 4: // 30/360 European
+      return 360;
+    case 1: // Actual/actual
+      if (year) {
+        return ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)) ? 366 : 365;
+      }
+      return 365; // デフォルト
+    case 2: // Actual/360
+      return 360;
+    case 3: // Actual/365
+      return 365;
+    default:
+      return 360;
+  }
 }
 
 // 次の利払日を計算
@@ -102,13 +152,7 @@ export const COUPDAYBS: CustomFormula = {
       
       const previousCouponDate = getPreviousCouponDate(settlement, maturity, frequency);
       
-      if (basis === 0 || basis === 4) {
-        // 30/360方式
-        return days360(previousCouponDate, settlement, basis === 4);
-      } else {
-        // 実際の日数
-        return actualDays(previousCouponDate, settlement);
-      }
+      return calculateDaysFraction(previousCouponDate, settlement, basis);
     } catch {
       return FormulaError.VALUE;
     }
@@ -140,7 +184,7 @@ export const COUPDAYS: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      const { daysInYear } = getDayCountBasis(basis);
+      const daysInYear = getDaysInYear(basis, maturity.getFullYear());
       
       // 利払期間の日数 = 年間日数 / 頻度
       return daysInYear / frequency;
@@ -177,13 +221,7 @@ export const COUPDAYSNC: CustomFormula = {
       
       const nextCouponDate = getNextCouponDate(settlement, maturity, frequency);
       
-      if (basis === 0 || basis === 4) {
-        // 30/360方式
-        return days360(settlement, nextCouponDate, basis === 4);
-      } else {
-        // 実際の日数
-        return actualDays(settlement, nextCouponDate);
-      }
+      return calculateDaysFraction(settlement, nextCouponDate, basis);
     } catch {
       return FormulaError.VALUE;
     }

@@ -5,10 +5,9 @@ import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 import { parseDate } from '../shared/dateUtils';
 
-// 実際の日数計算
+// 実際の日数計算（Excel互換）
 function actualDays(startDate: Date, endDate: Date): number {
-  const diffTime = endDate.getTime() - startDate.getTime();
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  return Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
 }
 
 // TBILLEQ関数の実装（米国短期国債の債券換算利回り）

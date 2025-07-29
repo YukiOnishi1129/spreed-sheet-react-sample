@@ -380,7 +380,12 @@ export const ROUND: CustomFormula = {
     }
     
     const factor = Math.pow(10, digits);
-    return Math.round(number * factor) / factor;
+    // Excel式の丸め（round half away from zero）を実装
+    const scaled = number * factor;
+    const rounded = scaled >= 0 
+      ? Math.floor(scaled + 0.5)
+      : Math.ceil(scaled - 0.5);
+    return rounded / factor;
   }
 };
 

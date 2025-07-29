@@ -67,6 +67,70 @@ function toLogical(value: unknown): boolean {
   return Boolean(value);
 }
 
+// IF関数の結果を評価する改善された関数
+function evaluateFormulaResult(resultStr: string, context: FormulaContext): FormulaResult {
+  const trimmed = resultStr.trim();
+  
+  // 引用符付き文字列の場合
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+  
+  // エスケープされた引用符の場合
+  if (trimmed.startsWith('\\"') && trimmed.endsWith('\\"')) {
+    return trimmed.slice(2, -2);
+  }
+  
+  // セル参照の場合
+  if (trimmed.match(/^[A-Z]+\d+$/)) {
+    const cellValue = getCellValue(trimmed, context);
+    return cellValue as FormulaResult;
+  }
+  
+  // 数値の場合
+  const num = parseFloat(trimmed);
+  if (!isNaN(num) && /^[+-]?\d*\.?\d*([eE][+-]?\d+)?$/.test(trimmed)) {
+    return num;
+  }
+  
+  // 論理値の場合
+  if (trimmed.toLowerCase() === 'true') return true;
+  if (trimmed.toLowerCase() === 'false') return false;
+  
+  // 関数呼び出しの場合（ネストされた関数）
+  if (trimmed.match(/^[A-Z_]+\s*\(/i)) {
+    try {
+      const result = matchFormula(trimmed, context);
+      return result;
+    } catch (error) {
+      // 関数評価エラーの場合、エラーを伝播
+      if (typeof error === 'object' && error !== null && 'toString' in error) {
+        const errorStr = error.toString();
+        if (errorStr.includes('VALUE')) return FormulaError.VALUE;
+        if (errorStr.includes('REF')) return FormulaError.REF;
+        if (errorStr.includes('NUM')) return FormulaError.NUM;
+        if (errorStr.includes('DIV')) return FormulaError.DIV0;
+        if (errorStr.includes('NA')) return FormulaError.NA;
+      }
+      throw error;
+    }
+  }
+  
+  // 算術式の場合
+  if (trimmed.match(/[+\-*/()]/)) {
+    try {
+      const result = evaluateExpression(trimmed, context);
+      return result;
+    } catch (error) {
+      throw FormulaError.VALUE;
+    }
+  }
+  
+  // その他の場合は文字列として返す
+  return trimmed;
+}
+
 // IF関数の実装
 export const IF: CustomFormula = {
   name: 'IF',
@@ -135,29 +199,17 @@ export const IF: CustomFormula = {
       let leftValue: string | number | unknown;
       let rightValue: string | number | unknown;
       
-      // 左辺の値を取得（セル参照またはリテラル）
-      const leftTrimmed = leftExpr.trim();
-      // セル参照パターンのチェック
-      if (leftTrimmed.match(/^[A-Z]+\d+$/)) {
-        leftValue = getCellValue(leftTrimmed, context);
-      } else {
-        // リテラルとして扱う
-        leftValue = isNaN(Number(leftTrimmed)) ? leftTrimmed : Number(leftTrimmed);
+      // 左辺と右辺の値を改善された方法で取得
+      try {
+        leftValue = evaluateFormulaResult(leftExpr.trim(), context);
+      } catch (error) {
+        leftValue = leftExpr.trim();
       }
       
-      // 右辺の値を取得（セル参照またはリテラル）
-      const rightTrimmed = rightExpr.trim();
-      // セル参照パターンのチェック
-      if (rightTrimmed.match(/^[A-Z]+\d+$/)) {
-        rightValue = getCellValue(rightTrimmed, context);
-      } else {
-        // 引用符を除去
-        if ((rightTrimmed.startsWith('"') && rightTrimmed.endsWith('"')) || 
-            (rightTrimmed.startsWith("'") && rightTrimmed.endsWith("'"))) {
-          rightValue = rightTrimmed.slice(1, -1);
-        } else {
-          rightValue = isNaN(Number(rightTrimmed)) ? rightTrimmed : Number(rightTrimmed);
-        }
+      try {
+        rightValue = evaluateFormulaResult(rightExpr.trim(), context);
+      } catch (error) {
+        rightValue = rightExpr.trim();
       }
       
       // 数値に変換を試みる
@@ -189,46 +241,30 @@ export const IF: CustomFormula = {
           condition = false;
       }
     } else {
-      // 比較演算子がない場合は、値を論理値として評価
-      const conditionValue = getCellValue(conditionStr, context) ?? conditionStr;
-      condition = toLogical(conditionValue);
+      // 比較演算子がない場合は、より包括的に評価
+      try {
+        const conditionResult = evaluateFormulaResult(conditionStr, context);
+        condition = toLogical(conditionResult);
+      } catch (error) {
+        // エラーの場合はfalseとして扱う
+        condition = false;
+      }
     }
     
-    // 結果の値を取得
+    // 結果の値を取得（改善された処理）
     const resultStr = condition ? trueValueStr : falseValueStr;
     
-    // 引用符付き文字列の場合は直接処理
-    if (resultStr.startsWith('"') && resultStr.endsWith('"')) {
-      return resultStr.slice(1, -1);
-    }
-    
-    // エスケープされた引用符の場合
-    if (resultStr.startsWith('\\"') && resultStr.endsWith('\\"')) {
-      return resultStr.slice(2, -2);
-    }
-    
-    // セル参照の場合
-    if (resultStr.match(/^[A-Z]+\d+$/)) {
-      const cellValue = getCellValue(resultStr, context);
-      if (cellValue === FormulaError.REF) {
-        return FormulaError.REF;
+    try {
+      // より包括的な結果評価
+      return evaluateFormulaResult(resultStr, context);
+    } catch (error) {
+      // エラーが発生した場合、元の文字列を返すかFormulaErrorを返す
+      if (error === FormulaError.VALUE || error === FormulaError.REF || error === FormulaError.NUM || 
+          error === FormulaError.DIV0 || error === FormulaError.NA || error === FormulaError.CALC) {
+        return error;
       }
-      return cellValue as FormulaResult;
+      return resultStr as FormulaResult;
     }
-    
-    // その他の場合（数値または式）
-    const num = parseFloat(resultStr);
-    if (!isNaN(num)) {
-      return num;
-    }
-    
-    // 算術式の可能性をチェック
-    if (resultStr.includes('*') || resultStr.includes('/') || resultStr.includes('+') || resultStr.includes('-')) {
-      const evaluated = evaluateExpression(resultStr, context);
-      return evaluated;
-    }
-    
-    return resultStr as FormulaResult;
   }
 };
 

@@ -5,65 +5,101 @@ import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 import { parseDate } from '../shared/dateUtils';
 
-// 実際の日数計算
-function actualDays(startDate: Date, endDate: Date): number {
-  const diffTime = endDate.getTime() - startDate.getTime();
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+// 日数計算規約（統一版）
+function calculateDaysFraction(startDate: Date, endDate: Date, basis: number = 0): number {
+  const earlier = startDate <= endDate ? startDate : endDate;
+  const later = startDate <= endDate ? endDate : startDate;
+  
+  switch (basis) {
+    case 0: // 30/360 US (NASD)
+      return days30_360US(earlier, later);
+    case 1: // Actual/actual - 実際の日数を返す
+      return Math.floor((later.getTime() - earlier.getTime()) / (24 * 60 * 60 * 1000));
+    case 2: // Actual/360 - 実際の日数を返す
+      return Math.floor((later.getTime() - earlier.getTime()) / (24 * 60 * 60 * 1000));
+    case 3: // Actual/365 - 実際の日数を返す
+      return Math.floor((later.getTime() - earlier.getTime()) / (24 * 60 * 60 * 1000));
+    case 4: // 30/360 European
+      return days30_360European(earlier, later);
+    default:
+      return days30_360US(earlier, later);
+  }
 }
 
-// 30/360方式での日数計算
-function days360(startDate: Date, endDate: Date, european: boolean = false): number {
+// 30/360 US (NASD) 方式の日数計算
+function days30_360US(startDate: Date, endDate: Date): number {
+  let startYear = startDate.getFullYear();
+  let startMonth = startDate.getMonth() + 1;
   let startDay = startDate.getDate();
-  const startMonth = startDate.getMonth() + 1;
-  const startYear = startDate.getFullYear();
+  
+  let endYear = endDate.getFullYear();
+  let endMonth = endDate.getMonth() + 1;
   let endDay = endDate.getDate();
-  const endMonth = endDate.getMonth() + 1;
-  const endYear = endDate.getFullYear();
-
-  if (!european) {
-    // US方式
-    if (startDay === 31) startDay = 30;
-    if (endDay === 31 && startDay === 30) endDay = 30;
-  } else {
-    // European方式
-    if (startDay === 31) startDay = 30;
-    if (endDay === 31) endDay = 30;
+  
+  // US 30/360の特殊ルール
+  if (startDay === getDaysInMonth(startYear, startMonth)) {
+    startDay = 30;
   }
-
+  
+  if (endDay === getDaysInMonth(endYear, endMonth) && startDay < 30) {
+    endDay = getDaysInMonth(endYear, endMonth);
+  } else if (endDay === getDaysInMonth(endYear, endMonth) && startDay === 30) {
+    endDay = 30;
+  }
+  
+  if (startDay === 31 || (startMonth === 2 && startDay === getDaysInMonth(startYear, startMonth))) {
+    startDay = 30;
+  }
+  
+  if (endDay === 31 && startDay === 30) {
+    endDay = 30;
+  }
+  
   return (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
 }
 
-// 日付ベースの日数計算
-function getDayCount(startDate: Date, endDate: Date, basis: number): number {
-  switch (basis) {
-    case 0: // 30/360 US
-      return days360(startDate, endDate, false);
-    case 1: // Actual/actual
-    case 2: // Actual/360
-    case 3: // Actual/365
-      return actualDays(startDate, endDate);
-    case 4: // 30/360 European
-      return days360(startDate, endDate, true);
-    default:
-      return days360(startDate, endDate, false);
-  }
+// 30/360 European方式の日数計算
+function days30_360European(startDate: Date, endDate: Date): number {
+  let startYear = startDate.getFullYear();
+  let startMonth = startDate.getMonth() + 1;
+  let startDay = startDate.getDate();
+  
+  let endYear = endDate.getFullYear();
+  let endMonth = endDate.getMonth() + 1;
+  let endDay = endDate.getDate();
+  
+  // European 30/360のルール
+  if (startDay === 31) startDay = 30;
+  if (endDay === 31) endDay = 30;
+  
+  return (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
+}
+
+// ヘルパー関数：月の日数を取得
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
 }
 
 // 年間日数を取得
-function getYearDays(basis: number): number {
+function getDaysInYear(basis: number, year?: number): number {
   switch (basis) {
     case 0: // 30/360 US
     case 4: // 30/360 European
       return 360;
     case 1: // Actual/actual
-    case 3: // Actual/365
-      return 365;
+      if (year) {
+        return ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)) ? 366 : 365;
+      }
+      return 365; // デフォルト
     case 2: // Actual/360
       return 360;
+    case 3: // Actual/365
+      return 365;
     default:
       return 360;
   }
 }
+
 
 // ODDFPRICE関数の実装（変則初回期の価格）
 export const ODDFPRICE: CustomFormula = {
@@ -104,13 +140,13 @@ export const ODDFPRICE: CustomFormula = {
       }
       
       // 簡易実装：変則初回期の価格計算
-      const yearDays = getYearDays(basis);
+      const yearDays = getDaysInYear(basis, settlement.getFullYear());
       const r = yld / frequency;
       const coupon = rate * redemption / frequency;
       
       // 変則初回期のクーポン計算
-      const daysIF = getDayCount(issue, firstCoupon, basis);
-      const daysSF = getDayCount(settlement, firstCoupon, basis);
+      const daysIF = calculateDaysFraction(issue, firstCoupon, basis);
+      const daysSF = calculateDaysFraction(settlement, firstCoupon, basis);
       const normalPeriod = yearDays / frequency;
       
       let price = 0;
@@ -120,7 +156,7 @@ export const ODDFPRICE: CustomFormula = {
       price += oddCoupon / Math.pow(1 + r, daysSF / normalPeriod);
       
       // 通常期のクーポンと償還額
-      const n = Math.ceil((actualDays(firstCoupon, maturity) / 365) * frequency);
+      const n = Math.ceil((calculateDaysFraction(firstCoupon, maturity, 1) / 365) * frequency);
       for (let i = 1; i <= n; i++) {
         const discountFactor = Math.pow(1 + r, i + daysSF / normalPeriod);
         if (i < n) {
@@ -180,10 +216,10 @@ export const ODDFYIELD: CustomFormula = {
       const maxIterations = 100;
       const tolerance = 0.0000001;
       
-      const yearDays = getYearDays(basis);
+      const yearDays = getDaysInYear(basis);
       const coupon = rate * redemption / frequency;
-      const daysIF = getDayCount(issue, firstCoupon, basis);
-      const daysSF = getDayCount(settlement, firstCoupon, basis);
+      const daysIF = calculateDaysFraction(issue, firstCoupon, basis);
+      const daysSF = calculateDaysFraction(settlement, firstCoupon, basis);
       const normalPeriod = yearDays / frequency;
       const oddCoupon = coupon * daysIF / normalPeriod;
       const n = Math.ceil((actualDays(firstCoupon, maturity) / 365) * frequency);
@@ -258,13 +294,13 @@ export const ODDLPRICE: CustomFormula = {
       }
       
       // 簡易実装：変則最終期の価格計算
-      const yearDays = getYearDays(basis);
+      const yearDays = getDaysInYear(basis);
       const r = yld / frequency;
       const coupon = rate * redemption / frequency;
       
       // 変則最終期のクーポン計算
-      const daysLM = getDayCount(lastCoupon, maturity, basis);
-      const daysSM = getDayCount(settlement, maturity, basis);
+      const daysLM = calculateDaysFraction(lastCoupon, maturity, basis);
+      const daysSM = calculateDaysFraction(settlement, maturity, basis);
       const normalPeriod = yearDays / frequency;
       
       // 変則最終期のクーポンと償還額
@@ -316,10 +352,10 @@ export const ODDLYIELD: CustomFormula = {
       }
       
       // 簡易実装：利回りを直接計算
-      const yearDays = getYearDays(basis);
+      const yearDays = getDaysInYear(basis);
       const coupon = rate * redemption / frequency;
-      const daysLM = getDayCount(lastCoupon, maturity, basis);
-      const daysSM = getDayCount(settlement, maturity, basis);
+      const daysLM = calculateDaysFraction(lastCoupon, maturity, basis);
+      const daysSM = calculateDaysFraction(settlement, maturity, basis);
       const normalPeriod = yearDays / frequency;
       
       // 変則最終期のクーポン

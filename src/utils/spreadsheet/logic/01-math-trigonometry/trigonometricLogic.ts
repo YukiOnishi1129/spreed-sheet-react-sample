@@ -1,8 +1,200 @@
-// 三角関数の実装
+// 三角関数の実装（高精度版）
 
 import type { CustomFormula, FormulaContext } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
+
+// 高精度三角関数のためのユーティリティ
+const HALF_PI = Math.PI / 2;
+const TWO_PI = Math.PI * 2;
+
+// 角度を[-π, π]の範囲に正規化
+function normalizeAngle(angle: number): number {
+  // 非常に大きな値の場合、modulo演算で精度を保つ
+  if (Math.abs(angle) > 1e8) {
+    angle = angle % TWO_PI;
+  }
+  
+  // [-π, π]の範囲に調整
+  while (angle > Math.PI) {
+    angle -= TWO_PI;
+  }
+  while (angle < -Math.PI) {
+    angle += TWO_PI;
+  }
+  
+  return angle;
+}
+
+// 高精度sin計算（極端な値での精度向上）
+function preciseSin(angle: number): number {
+  // 無限大やNaNのチェック
+  if (!isFinite(angle)) {
+    return NaN;
+  }
+  
+  // 角度を正規化
+  const normalizedAngle = normalizeAngle(angle);
+  
+  // 特殊値の処理
+  if (Math.abs(normalizedAngle) < Number.EPSILON) return 0;
+  if (Math.abs(normalizedAngle - Math.PI) < Number.EPSILON) return 0;
+  if (Math.abs(normalizedAngle - HALF_PI) < Number.EPSILON) return 1;
+  if (Math.abs(normalizedAngle + HALF_PI) < Number.EPSILON) return -1;
+  
+  return Math.sin(normalizedAngle);
+}
+
+// 高精度cos計算
+function preciseCos(angle: number): number {
+  if (!isFinite(angle)) {
+    return NaN;
+  }
+  
+  const normalizedAngle = normalizeAngle(angle);
+  
+  // 特殊値の処理
+  if (Math.abs(normalizedAngle) < Number.EPSILON) return 1;
+  if (Math.abs(normalizedAngle - Math.PI) < Number.EPSILON) return -1;
+  if (Math.abs(normalizedAngle - HALF_PI) < Number.EPSILON) return 0;
+  if (Math.abs(normalizedAngle + HALF_PI) < Number.EPSILON) return 0;
+  
+  return Math.cos(normalizedAngle);
+}
+
+// 高精度tan計算
+function preciseTan(angle: number): number {
+  if (!isFinite(angle)) {
+    return NaN;
+  }
+  
+  const normalizedAngle = normalizeAngle(angle);
+  
+  // π/2 + nπ付近での特殊処理（無限大になる点）
+  const halfPiCheck = Math.abs(Math.abs(normalizedAngle) - HALF_PI);
+  if (halfPiCheck < 1e-15) {
+    // Excel準拠：非常に大きな値を返すが無限大ではない
+    return normalizedAngle > 0 ? 1e308 : -1e308;
+  }
+  
+  // 特殊値の処理
+  if (Math.abs(normalizedAngle) < Number.EPSILON) return 0;
+  if (Math.abs(normalizedAngle - Math.PI) < Number.EPSILON) return 0;
+  
+  return Math.tan(normalizedAngle);
+}
+
+// 高精度逆三角関数
+function preciseAsin(value: number): number {
+  // 定義域チェック
+  if (value < -1 || value > 1) {
+    return NaN;
+  }
+  
+  // 特殊値の処理
+  if (Math.abs(value) < Number.EPSILON) return 0;
+  if (Math.abs(value - 1) < Number.EPSILON) return HALF_PI;
+  if (Math.abs(value + 1) < Number.EPSILON) return -HALF_PI;
+  
+  // 精度向上のため、1に近い値では別の計算方法を使用
+  if (Math.abs(value) > 0.9) {
+    if (value > 0) {
+      return HALF_PI - Math.acos(value);
+    } else {
+      return -HALF_PI + Math.acos(-value);
+    }
+  }
+  
+  return Math.asin(value);
+}
+
+function preciseAcos(value: number): number {
+  // 定義域チェック
+  if (value < -1 || value > 1) {
+    return NaN;
+  }
+  
+  // 特殊値の処理
+  if (Math.abs(value - 1) < Number.EPSILON) return 0;
+  if (Math.abs(value + 1) < Number.EPSILON) return Math.PI;
+  if (Math.abs(value) < Number.EPSILON) return HALF_PI;
+  
+  // 精度向上のため、1に近い値では別の計算方法を使用
+  if (Math.abs(value) > 0.9) {
+    if (value > 0) {
+      return Math.asin(Math.sqrt(1 - value * value));
+    } else {
+      return Math.PI - Math.asin(Math.sqrt(1 - value * value));
+    }
+  }
+  
+  return Math.acos(value);
+}
+
+function preciseAtan(value: number): number {
+  if (!isFinite(value)) {
+    if (value > 0) return HALF_PI;
+    if (value < 0) return -HALF_PI;
+    return NaN;
+  }
+  
+  // 特殊値の処理
+  if (Math.abs(value) < Number.EPSILON) return 0;
+  
+  return Math.atan(value);
+}
+
+// 高精度双曲線関数（オーバーフロー対策）
+function preciseSinh(value: number): number {
+  if (!isFinite(value)) {
+    return value;
+  }
+  
+  // 大きな値でのオーバーフロー対策
+  if (Math.abs(value) > 700) {
+    const sign = value > 0 ? 1 : -1;
+    return sign * Infinity;
+  }
+  
+  // 非常に小さな値での精度向上
+  if (Math.abs(value) < 1e-10) {
+    return value; // sinh(x) ≈ x for small x
+  }
+  
+  return Math.sinh(value);
+}
+
+function preciseCosh(value: number): number {
+  if (!isFinite(value)) {
+    return Math.abs(value) === Infinity ? Infinity : NaN;
+  }
+  
+  // 大きな値でのオーバーフロー対策
+  if (Math.abs(value) > 700) {
+    return Infinity;
+  }
+  
+  return Math.cosh(value);
+}
+
+function preciseTanh(value: number): number {
+  if (!isFinite(value)) {
+    if (value > 0) return 1;
+    if (value < 0) return -1;
+    return NaN;
+  }
+  
+  // 大きな値では飽和値を返す
+  if (value > 20) return 1;
+  if (value < -20) return -1;
+  
+  // 非常に小さな値での精度向上
+  if (Math.abs(value) < 1e-10) {
+    return value; // tanh(x) ≈ x for small x
+  }
+  
+  return Math.tanh(value);
+}
 
 // SIN関数（正弦）
 export const SIN: CustomFormula = {
@@ -17,7 +209,7 @@ export const SIN: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.sin(angle);
+    return preciseSin(angle);
   }
 };
 
@@ -34,7 +226,7 @@ export const COS: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.cos(angle);
+    return preciseCos(angle);
   }
 };
 
@@ -51,7 +243,7 @@ export const TAN: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.tan(angle);
+    return preciseTan(angle);
   }
 };
 
@@ -68,7 +260,8 @@ export const ASIN: CustomFormula = {
       return FormulaError.NUM;
     }
     
-    return Math.asin(value);
+    const result = preciseAsin(value);
+    return isNaN(result) ? FormulaError.NUM : result;
   }
 };
 
@@ -85,7 +278,8 @@ export const ACOS: CustomFormula = {
       return FormulaError.NUM;
     }
     
-    return Math.acos(value);
+    const result = preciseAcos(value);
+    return isNaN(result) ? FormulaError.NUM : result;
   }
 };
 
@@ -102,7 +296,7 @@ export const ATAN: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.atan(value);
+    return preciseAtan(value);
   }
 };
 
@@ -141,7 +335,7 @@ export const SINH: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.sinh(value);
+    return preciseSinh(value);
   }
 };
 
@@ -158,7 +352,7 @@ export const COSH: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.cosh(value);
+    return preciseCosh(value);
   }
 };
 
@@ -175,7 +369,7 @@ export const TANH: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.tanh(value);
+    return preciseTanh(value);
   }
 };
 

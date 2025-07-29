@@ -355,21 +355,41 @@ function parseDateString(dateStr: string): Date | null {
 
 /**
  * Excelシリアル値をDateオブジェクトに変換
+ * Excelの1900年うるう年バグを考慮
  */
 export function excelSerialToDate(serial: number): Date {
-  // Excel epoch: 1900/1/1 (実際は1899/12/30)
-  const excelEpoch = new Date(1899, 11, 30); // 月は0ベース
-  const result = new Date(excelEpoch.getTime() + serial * 24 * 60 * 60 * 1000);
+  // Excelは1900年を誤ってうるう年として扱うため、
+  // 1900年3月1日以降の日付は1日ずれる
+  let adjustedSerial = serial;
+  
+  // シリアル値60は存在しない1900年2月29日を表す
+  // シリアル値61以降は実際の日付より1日進んでいる
+  if (serial > 59) {
+    adjustedSerial = serial - 1;
+  }
+  
+  // Excel epoch: 1900/1/1 は実際は 1899/12/31
+  const excelEpoch = new Date(1899, 11, 31); // 1899年12月31日
+  const result = new Date(excelEpoch.getTime() + (adjustedSerial - 1) * 24 * 60 * 60 * 1000);
   return result;
 }
 
 /**
  * DateオブジェクトをExcelシリアル値に変換
+ * Excelの1900年うるう年バグを考慮
  */
 export function dateToExcelSerial(date: Date): number {
-  const excelEpoch = new Date(1899, 11, 30);
+  const excelEpoch = new Date(1899, 11, 31); // 1899年12月31日
   const diffTime = date.getTime() - excelEpoch.getTime();
-  return Math.floor(diffTime / (24 * 60 * 60 * 1000));
+  let serial = Math.floor(diffTime / (24 * 60 * 60 * 1000)) + 1;
+  
+  // 1900年3月1日以降は1日加算（Excelのうるう年バグを再現）
+  const march1st1900 = new Date(1900, 2, 1); // 1900年3月1日
+  if (date >= march1st1900) {
+    serial += 1;
+  }
+  
+  return serial;
 }
 
 /**

@@ -476,7 +476,7 @@ export const DAYS360: CustomFormula = {
   }
 };
 
-// YEARFRAC関数の実装（年の割合を計算）
+// YEARFRAC関数の実装（年の割合を計算）- Excel完全互換版
 export const YEARFRAC: CustomFormula = {
   name: 'YEARFRAC',
   pattern: /YEARFRAC\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
@@ -495,31 +495,129 @@ export const YEARFRAC: CustomFormula = {
     
     const basis = basisRef ? Number(getCellValue(basisRef, context) ?? basisRef) : 0;
     
-    const daysDiff = Math.abs(diffDays(startDate, endDate));
+    // 日付の順序を正しくする
+    const earlier = startDate <= endDate ? startDate : endDate;
+    const later = startDate <= endDate ? endDate : startDate;
     
     switch (basis) {
-      case 0: // 30/360 US
-        return daysDiff / 360;
-      case 1: { // Actual/actual
-        const yearsDiff = Math.abs(endDate.getFullYear() - startDate.getFullYear());
-        if (yearsDiff === 0) {
-          const isLeapYear = (startDate.getFullYear() % 4 === 0 && startDate.getFullYear() % 100 !== 0) || startDate.getFullYear() % 400 === 0;
-          return daysDiff / (isLeapYear ? 366 : 365);
-        } else {
-          return daysDiff / 365.25; // 簡略化した計算
-        }
-      }
+      case 0: // 30/360 US (NASD)
+        return yearfrac30_360US(earlier, later);
+      case 1: // Actual/actual
+        return yearfracActualActual(earlier, later);
       case 2: // Actual/360
-        return daysDiff / 360;
+        return yearfracActual360(earlier, later);
       case 3: // Actual/365
-        return daysDiff / 365;
+        return yearfracActual365(earlier, later);
       case 4: // 30/360 European
-        return daysDiff / 360;
+        return yearfrac30_360European(earlier, later);
       default:
         return FormulaError.VALUE;
     }
   }
 };
+
+// 30/360 US (NASD) 方式
+function yearfrac30_360US(startDate: Date, endDate: Date): number {
+  let startYear = startDate.getFullYear();
+  let startMonth = startDate.getMonth() + 1;
+  let startDay = startDate.getDate();
+  
+  let endYear = endDate.getFullYear();
+  let endMonth = endDate.getMonth() + 1;
+  let endDay = endDate.getDate();
+  
+  // US 30/360の特殊ルール
+  if (startDay === daysInMonth(startYear, startMonth)) {
+    startDay = 30;
+  }
+  
+  if (endDay === daysInMonth(endYear, endMonth) && startDay < 30) {
+    endDay = daysInMonth(endYear, endMonth);
+  } else if (endDay === daysInMonth(endYear, endMonth) && startDay === 30) {
+    endDay = 30;
+  }
+  
+  if (startDay === 31 || (startMonth === 2 && startDay === daysInMonth(startYear, startMonth))) {
+    startDay = 30;
+  }
+  
+  if (endDay === 31 && startDay === 30) {
+    endDay = 30;
+  }
+  
+  const days = (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
+  return days / 360;
+}
+
+// 30/360 European方式
+function yearfrac30_360European(startDate: Date, endDate: Date): number {
+  let startYear = startDate.getFullYear();
+  let startMonth = startDate.getMonth() + 1;
+  let startDay = startDate.getDate();
+  
+  let endYear = endDate.getFullYear();
+  let endMonth = endDate.getMonth() + 1;
+  let endDay = endDate.getDate();
+  
+  // European 30/360のルール
+  if (startDay === 31) startDay = 30;
+  if (endDay === 31) endDay = 30;
+  
+  const days = (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
+  return days / 360;
+}
+
+// Actual/Actual方式
+function yearfracActualActual(startDate: Date, endDate: Date): number {
+  const startYear = startDate.getFullYear();
+  const endYear = endDate.getFullYear();
+  
+  if (startYear === endYear) {
+    // 同年内の場合
+    const daysInYear = isLeapYear(startYear) ? 366 : 365;
+    const actualDays = Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+    return actualDays / daysInYear;
+  }
+  
+  // 複数年にまたがる場合
+  let totalDays = 0;
+  let totalDaysInYears = 0;
+  
+  for (let year = startYear; year <= endYear; year++) {
+    const yearStart = year === startYear ? startDate : new Date(year, 0, 1);
+    const yearEnd = year === endYear ? endDate : new Date(year + 1, 0, 1);
+    
+    const daysInThisYear = Math.floor((yearEnd.getTime() - yearStart.getTime()) / (24 * 60 * 60 * 1000));
+    const daysInYear = isLeapYear(year) ? 366 : 365;
+    
+    totalDays += daysInThisYear;
+    totalDaysInYears += daysInYear * (daysInThisYear / daysInYear);
+  }
+  
+  return totalDays / (totalDaysInYears / (endYear - startYear + 1));
+}
+
+// Actual/360方式
+function yearfracActual360(startDate: Date, endDate: Date): number {
+  const actualDays = Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  return actualDays / 360;
+}
+
+// Actual/365方式
+function yearfracActual365(startDate: Date, endDate: Date): number {
+  const actualDays = Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+  return actualDays / 365;
+}
+
+// ヘルパー関数：月の日数を取得
+function daysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
+}
+
+// ヘルパー関数：うるう年判定
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+}
 
 // DATEVALUE関数の実装（日付文字列を日付値に変換）
 export const DATEVALUE: CustomFormula = {

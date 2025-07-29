@@ -69,20 +69,62 @@ export const VLOOKUP: CustomFormula = {
               return resultCell as FormulaResult;
             }
           }
-        } else {
-          // 近似一致検索（簡略化版）
-          if (compareValue !== null && compareValue !== undefined && compareValue !== '' && compareValue <= searchValue) {
-            const targetCol = start.col + columnIndex - 1;
-            const resultCell = context.data[row]?.[targetCol];
-            
-            // Handle both direct values and object values
-            if (typeof resultCell === 'string' || typeof resultCell === 'number' || resultCell === null || resultCell === undefined) {
-              return resultCell as FormulaResult;
-            } else if (resultCell && typeof resultCell === 'object') {
-              return (resultCell.value ?? resultCell.v ?? resultCell._ ?? resultCell) as FormulaResult;
-            } else {
-              return resultCell as FormulaResult;
+        }
+      }
+      
+      // 近似一致検索（Excelの正確な動作）
+      if (!exactMatch) {
+        let bestMatch: { row: number; value: unknown } | null = null;
+        
+        // データを昇順でソートされていると仮定し、最大の≤値を見つける
+        for (let row = start.row; row <= end.row; row++) {
+          const firstColValue = context.data[row]?.[start.col];
+          let compareValue: unknown;
+          
+          // Handle both direct values and object values
+          if (typeof firstColValue === 'string' || typeof firstColValue === 'number' || firstColValue === null || firstColValue === undefined) {
+            compareValue = firstColValue;
+          } else if (firstColValue && typeof firstColValue === 'object') {
+            compareValue = firstColValue.value ?? firstColValue.v ?? firstColValue._ ?? firstColValue;
+          } else {
+            compareValue = firstColValue;
+          }
+          
+          // 数値比較を試行
+          const numericCompare = Number(compareValue);
+          const numericSearch = Number(searchValue);
+          
+          if (!isNaN(numericCompare) && !isNaN(numericSearch)) {
+            // 数値比較
+            if (numericCompare <= numericSearch) {
+              if (!bestMatch || Number(bestMatch.value) < numericCompare) {
+                bestMatch = { row, value: compareValue };
+              }
             }
+          } else {
+            // 文字列比較
+            const stringCompare = String(compareValue);
+            const stringSearch = String(searchValue);
+            
+            if (stringCompare <= stringSearch) {
+              if (!bestMatch || String(bestMatch.value) < stringCompare) {
+                bestMatch = { row, value: compareValue };
+              }
+            }
+          }
+        }
+        
+        if (bestMatch) {
+          const targetCol = start.col + columnIndex - 1;
+          const resultCell = context.data[bestMatch.row]?.[targetCol];
+          
+          // Handle both direct values and object values  
+          if (typeof resultCell === 'string' || typeof resultCell === 'number' || resultCell === null || resultCell === undefined) {
+            return resultCell as FormulaResult;
+          } else if (resultCell && typeof resultCell === 'object') {
+            return (resultCell.value ?? resultCell.v ?? resultCell._ ?? resultCell) as FormulaResult;
+          } else {
+            return resultCell as FormulaResult;
           }
         }
       }

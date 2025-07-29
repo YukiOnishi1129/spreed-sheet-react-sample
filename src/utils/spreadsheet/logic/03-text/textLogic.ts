@@ -4,6 +4,130 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 import { FormulaError } from '../shared/types';
 import { getCellValue, getCellRangeValues } from '../shared/utils';
 
+// Unicode-aware string operations (for proper handling of multi-byte characters, emojis, etc.)
+const getStringLength = (str: string): number => {
+  // Use Intl.Segmenter if available for proper grapheme cluster counting
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+    return Array.from(segmenter.segment(str)).length;
+  }
+  
+  // Fallback: use spread operator to handle surrogate pairs
+  return [...str].length;
+};
+
+const getStringSubstring = (str: string, start: number, length?: number): string => {
+  // Use Intl.Segmenter if available for proper grapheme cluster handling
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+    const segments = Array.from(segmenter.segment(str));
+    const endIndex = length !== undefined ? start + length : segments.length;
+    return segments.slice(start, endIndex).map(s => s.segment).join('');
+  }
+  
+  // Fallback: use array operations on spread string
+  const chars = [...str];
+  const endIndex = length !== undefined ? start + length : chars.length;
+  return chars.slice(start, endIndex).join('');
+};
+
+const getStringLeft = (str: string, numChars: number): string => {
+  return getStringSubstring(str, 0, numChars);
+};
+
+const getStringRight = (str: string, numChars: number): string => {
+  const len = getStringLength(str);
+  const startPos = Math.max(0, len - numChars);
+  return getStringSubstring(str, startPos);
+};
+
+const getStringMid = (str: string, startPos: number, numChars: number): string => {
+  return getStringSubstring(str, startPos - 1, numChars); // Excel uses 1-based indexing
+};
+
+const findStringPosition = (findText: string, withinText: string, startPos: number = 1): number => {
+  // Use Intl.Segmenter for Unicode-aware searching if available
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+    const withinSegments = Array.from(segmenter.segment(withinText));
+    const findSegments = Array.from(segmenter.segment(findText));
+    
+    const startIndex = startPos - 1; // Convert to 0-based
+    for (let i = startIndex; i <= withinSegments.length - findSegments.length; i++) {
+      let match = true;
+      for (let j = 0; j < findSegments.length; j++) {
+        if (withinSegments[i + j]?.segment !== findSegments[j].segment) {
+          match = false;
+          break;
+        }
+      }
+      if (match) {
+        return i + 1; // Convert back to 1-based
+      }
+    }
+    return -1;
+  }
+  
+  // Fallback: use array-based operations
+  const withinChars = [...withinText];
+  const findChars = [...findText];
+  const startIndex = startPos - 1;
+  
+  for (let i = startIndex; i <= withinChars.length - findChars.length; i++) {
+    let match = true;
+    for (let j = 0; j < findChars.length; j++) {
+      if (withinChars[i + j] !== findChars[j]) {
+        match = false;
+        break;
+      }
+    }
+    if (match) {
+      return i + 1; // Convert back to 1-based
+    }
+  }
+  return -1;
+};
+
+const toProperCase = (str: string): string => {
+  // Use Intl.Segmenter for proper Unicode word boundaries if available
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const wordSegmenter = new Intl.Segmenter('en', { granularity: 'word' });
+    let result = '';
+    let isFirstLetterOfWord = true;
+    
+    for (const segment of wordSegmenter.segment(str)) {
+      if (segment.isWordLike) {
+        const graphemeSegmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const graphemes = Array.from(graphemeSegmenter.segment(segment.segment));
+        
+        let wordResult = '';
+        for (let i = 0; i < graphemes.length; i++) {
+          const char = graphemes[i].segment;
+          if (i === 0) {
+            wordResult += char.toLocaleUpperCase();
+          } else {
+            wordResult += char.toLocaleLowerCase();
+          }
+        }
+        result += wordResult;
+        isFirstLetterOfWord = false;
+      } else {
+        result += segment.segment;
+        isFirstLetterOfWord = true;
+      }
+    }
+    return result;
+  }
+  
+  // Fallback: simple implementation
+  return str.replace(/\b\w+/g, (word) => {
+    const chars = [...word];
+    return chars.map((char, i) => 
+      i === 0 ? char.toLocaleUpperCase() : char.toLocaleLowerCase()
+    ).join('');
+  });
+};
+
 // 式を評価するヘルパー関数（循環参照を避けるため）
 const evaluateExpression = (expression: string, context: FormulaContext): FormulaResult => {
   // セル参照の場合
@@ -40,7 +164,7 @@ const evaluateExpression = (expression: string, context: FormulaContext): Formul
         text = text.slice(1, -1);
       }
       
-      return text.substring(0, numChars);
+      return getStringLeft(text, numChars);
     }
   }
   
@@ -57,7 +181,7 @@ const evaluateExpression = (expression: string, context: FormulaContext): Formul
         text = text.slice(1, -1);
       }
       
-      return text.substring(Math.max(0, text.length - numChars));
+      return getStringRight(text, numChars);
     }
   }
   
@@ -243,8 +367,8 @@ export const LEFT: CustomFormula = {
                   withinText = String(getCellValue(withinText, context) ?? '');
                 }
                 
-                const index = withinText.indexOf(findText);
-                leftValue = index !== -1 ? index + 1 : 0;
+                const index = findStringPosition(findText, withinText);
+                leftValue = index !== -1 ? index : 0;
               } else {
                 leftValue = 0;
               }
@@ -280,7 +404,7 @@ export const LEFT: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return text.substring(0, numChars);
+    return getStringLeft(text, numChars);
   }
 };
 
@@ -314,7 +438,7 @@ export const RIGHT: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return text.substring(Math.max(0, text.length - numChars));
+    return getStringRight(text, numChars);
   }
 };
 
@@ -408,7 +532,7 @@ export const MID: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return text.substring(startNum - 1, startNum - 1 + numChars);
+    return getStringMid(text, startNum, numChars);
   }
 };
 
@@ -428,7 +552,7 @@ export const LEN: CustomFormula = {
       text = String(textRef);
     }
     
-    return text.length;
+    return getStringLength(text);
   }
 };
 
@@ -448,7 +572,8 @@ export const UPPER: CustomFormula = {
       text = String(textRef);
     }
     
-    return text.toUpperCase();
+    // Use locale-specific case conversion for better Unicode support
+    return text.toLocaleUpperCase();
   }
 };
 
@@ -468,7 +593,8 @@ export const LOWER: CustomFormula = {
       text = String(textRef);
     }
     
-    return text.toLowerCase();
+    // Use locale-specific case conversion for better Unicode support
+    return text.toLocaleLowerCase();
   }
 };
 
@@ -545,18 +671,37 @@ export const SUBSTITUTE: CustomFormula = {
     if (instanceNum) {
       // 特定のインスタンスのみ置換
       let count = 0;
-      let pos = 0;
-      while ((pos = text.indexOf(oldText, pos)) !== -1) {
+      let searchPos = 1; // 1-based for findStringPosition
+      
+      while (true) {
+        const foundPos = findStringPosition(oldText, text, searchPos);
+        if (foundPos === -1) break;
+        
         count++;
         if (count === instanceNum) {
-          return text.substring(0, pos) + newText + text.substring(pos + oldText.length);
+          // Use Unicode-aware substring operations
+          const beforePart = getStringSubstring(text, 0, foundPos - 1);
+          const afterPart = getStringSubstring(text, foundPos - 1 + getStringLength(oldText));
+          return beforePart + newText + afterPart;
         }
-        pos += oldText.length;
+        searchPos = foundPos + getStringLength(oldText);
       }
       return text; // 特定のインスタンスが見つからない場合
     } else {
-      // すべて置換
-      return text.replaceAll(oldText, newText);
+      // すべて置換 - Unicode-aware replacement
+      let result = text;
+      let searchPos = 1;
+      
+      while (true) {
+        const foundPos = findStringPosition(oldText, result, searchPos);
+        if (foundPos === -1) break;
+        
+        const beforePart = getStringSubstring(result, 0, foundPos - 1);
+        const afterPart = getStringSubstring(result, foundPos - 1 + getStringLength(oldText));
+        result = beforePart + newText + afterPart;
+        searchPos = foundPos + getStringLength(newText);
+      }
+      return result;
     }
   }
 };
@@ -628,12 +773,12 @@ export const FIND: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    const index = withinText.indexOf(findText, startNum - 1);
+    const index = findStringPosition(findText, withinText, startNum);
     if (index === -1) {
       return FormulaError.VALUE;
     }
     
-    return index + 1; // 1ベースで返す
+    return index; // already 1-based from findStringPosition
   }
 };
 
@@ -828,8 +973,8 @@ export const PROPER: CustomFormula = {
       text = String(textRef);
     }
     
-    // 各単語の先頭を大文字に、他を小文字に変換
-    return text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+    // Unicode-aware proper case conversion
+    return toProperCase(text);
   }
 };
 
