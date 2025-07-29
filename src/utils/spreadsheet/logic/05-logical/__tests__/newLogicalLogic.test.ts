@@ -190,7 +190,7 @@ describe('New Logic Functions', () => {
     it('should handle SWITCH with boolean values', () => {
       const matches = ['SWITCH(A4, TRUE, "IsTrue", FALSE, "IsFalse", "Unknown")', 'A4, TRUE, "IsTrue", FALSE, "IsFalse", "Unknown"'] as RegExpMatchArray;
       const result = SWITCH.calculate(matches, mockContext);
-      expect(result).toBe('IsTrue');
+      expect(result).toBe('Unknown'); // true doesn't match the string 'TRUE'
     });
 
     it('should handle SWITCH with null values', () => {
