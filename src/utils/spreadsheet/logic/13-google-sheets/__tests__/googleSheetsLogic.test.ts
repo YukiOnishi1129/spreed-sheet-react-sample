@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
-  ARRAYFORMULA, GOOGLEFINANCE, GOOGLETRANSLATE, QUERY, SPARKLINE
+  JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN
 } from '../googleSheetsLogic';
-import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext
@@ -14,270 +13,236 @@ const createContext = (data: (string | number | boolean | null)[][]): FormulaCon
 
 describe('Google Sheets Functions', () => {
   const mockContext = createContext([
-    ['AAPL', 'GOOGL', 'MSFT', 'AMZN'], // stock symbols
-    ['Hello World', 'Good Morning', 'Thank You'], // text to translate
-    ['en', 'es', 'fr', 'de', 'ja'], // language codes
-    [100, 150, 120, 180, 160, 200], // data for sparkline
-    ['Name', 'Age', 'City', 'Country'], // headers
-    ['John', 25, 'New York', 'USA'], // data row 1
-    ['Maria', 30, 'Madrid', 'Spain'], // data row 2
-    ['Yuki', 28, 'Tokyo', 'Japan'], // data row 3
+    ['Apple', 'Banana', 'Cherry', 'Date'], // fruits
+    ['Red', 'Yellow', 'Red', 'Brown'], // colors
+    [100, 150, 120, 80], // quantities
+    ['A1', 'B2', 'C3', 'D4'], // codes
+    ['apple@example.com', 'banana@test.com', 'cherry@domain.org'], // emails
+    ['Phone: 123-456-7890', 'Tel: 987-654-3210', 'Mobile: 555-0123'], // phone numbers
+    ['2024-01-15', '2024-02-20', '2024-03-25'], // dates
   ]);
 
+  describe('JOIN Function', () => {
+    it('should join values with delimiter', () => {
+      const matches = ['JOIN(",", A1:D1)', '","', 'A1:D1'] as RegExpMatchArray;
+      const result = JOIN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should join with custom delimiter', () => {
+      const matches = ['JOIN(" - ", B1:B4)', '" - "', 'B1:B4'] as RegExpMatchArray;
+      const result = JOIN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should handle multiple arguments', () => {
+      const matches = ['JOIN(" ", "Hello", "World")', '" "', '"Hello", "World"'] as RegExpMatchArray;
+      const result = JOIN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+  });
+
   describe('ARRAYFORMULA Function', () => {
-    it('should apply formula to array', () => {
-      const matches = ['ARRAYFORMULA(A1:A4 & " Stock")', 'A1:A4 & " Stock"'] as RegExpMatchArray;
+    it('should apply formula to range', () => {
+      const matches = ['ARRAYFORMULA(A1:D1)', 'A1:D1'] as RegExpMatchArray;
       const result = ARRAYFORMULA.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
     it('should handle mathematical operations', () => {
-      const matches = ['ARRAYFORMULA(B4:G4 * 2)', 'B4:G4 * 2'] as RegExpMatchArray;
+      const matches = ['ARRAYFORMULA(C1:C4 * 2)', 'C1:C4 * 2'] as RegExpMatchArray;
       const result = ARRAYFORMULA.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
     it('should handle complex expressions', () => {
-      const matches = ['ARRAYFORMULA(IF(A1:A4="AAPL", "Apple", "Other"))', 
-        'IF(A1:A4="AAPL", "Apple", "Other")'] as RegExpMatchArray;
+      const matches = ['ARRAYFORMULA(IF(C1:C4>100, "High", "Low"))', 
+        'IF(C1:C4>100, "High", "Low")'] as RegExpMatchArray;
       const result = ARRAYFORMULA.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should handle array addition', () => {
-      const matches = ['ARRAYFORMULA(A1:C1 + A2:C2)', 'A1:C1 + A2:C2'] as RegExpMatchArray;
+    it('should handle array operations', () => {
+      const matches = ['ARRAYFORMULA(A1:D1 & " - " & B1:B4)', 'A1:D1 & " - " & B1:B4'] as RegExpMatchArray;
       const result = ARRAYFORMULA.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle text functions on arrays', () => {
-      const matches = ['ARRAYFORMULA(UPPER(B2:D2))', 'UPPER(B2:D2)'] as RegExpMatchArray;
-      const result = ARRAYFORMULA.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle nested array formulas', () => {
-      const matches = ['ARRAYFORMULA(SUM(A1:D4 * 2))', 'SUM(A1:D4 * 2)'] as RegExpMatchArray;
-      const result = ARRAYFORMULA.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-  });
-
-  describe('GOOGLEFINANCE Function', () => {
-    it('should fetch current stock price', () => {
-      const matches = ['GOOGLEFINANCE("AAPL")', '"AAPL"'] as RegExpMatchArray;
-      const result = GOOGLEFINANCE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should fetch specific attribute', () => {
-      const matches = ['GOOGLEFINANCE("GOOGL", "price")', '"GOOGL"', '"price"'] as RegExpMatchArray;
-      const result = GOOGLEFINANCE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should fetch historical data', () => {
-      const matches = ['GOOGLEFINANCE("MSFT", "close", DATE(2024,1,1), DATE(2024,1,31))', 
-        '"MSFT"', '"close"', 'DATE(2024,1,1)', 'DATE(2024,1,31)'] as RegExpMatchArray;
-      const result = GOOGLEFINANCE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should fetch with interval', () => {
-      const matches = ['GOOGLEFINANCE("AMZN", "close", DATE(2024,1,1), DATE(2024,12,31), "WEEKLY")', 
-        '"AMZN"', '"close"', 'DATE(2024,1,1)', 'DATE(2024,12,31)', '"WEEKLY"'] as RegExpMatchArray;
-      const result = GOOGLEFINANCE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should fetch currency exchange rate', () => {
-      const matches = ['GOOGLEFINANCE("CURRENCY:USDJPY")', '"CURRENCY:USDJPY"'] as RegExpMatchArray;
-      const result = GOOGLEFINANCE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should fetch mutual fund data', () => {
-      const matches = ['GOOGLEFINANCE("MUTF:VFINX", "nav")', '"MUTF:VFINX"', '"nav"'] as RegExpMatchArray;
-      const result = GOOGLEFINANCE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle market attributes', () => {
-      const matches = ['GOOGLEFINANCE("AAPL", "marketcap")', '"AAPL"', '"marketcap"'] as RegExpMatchArray;
-      const result = GOOGLEFINANCE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-  });
-
-  describe('GOOGLETRANSLATE Function', () => {
-    it('should translate text', () => {
-      const matches = ['GOOGLETRANSLATE("Hello World", "en", "es")', 
-        '"Hello World"', '"en"', '"es"'] as RegExpMatchArray;
-      const result = GOOGLETRANSLATE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should auto-detect source language', () => {
-      const matches = ['GOOGLETRANSLATE("Bonjour", "auto", "en")', 
-        '"Bonjour"', '"auto"', '"en"'] as RegExpMatchArray;
-      const result = GOOGLETRANSLATE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should translate to Japanese', () => {
-      const matches = ['GOOGLETRANSLATE("Thank You", "en", "ja")', 
-        '"Thank You"', '"en"', '"ja"'] as RegExpMatchArray;
-      const result = GOOGLETRANSLATE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle cell references', () => {
-      const matches = ['GOOGLETRANSLATE(B2, "en", "fr")', 'B2', '"en"', '"fr"'] as RegExpMatchArray;
-      const result = GOOGLETRANSLATE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should translate with simplified syntax', () => {
-      const matches = ['GOOGLETRANSLATE("Hello", "es")', '"Hello"', '"es"'] as RegExpMatchArray;
-      const result = GOOGLETRANSLATE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle long text', () => {
-      const longText = 'This is a very long text that needs translation. It contains multiple sentences and should be handled properly by the translation service.';
-      const matches = ['GOOGLETRANSLATE("' + longText + '", "en", "de")', 
-        '"' + longText + '"', '"en"', '"de"'] as RegExpMatchArray;
-      const result = GOOGLETRANSLATE.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
   });
 
   describe('QUERY Function', () => {
-    it('should execute simple select query', () => {
-      const matches = ['QUERY(A5:D8, "SELECT A, B WHERE B > 25")', 
-        'A5:D8', '"SELECT A, B WHERE B > 25"'] as RegExpMatchArray;
+    it('should query with select statement', () => {
+      const matches = ['QUERY(A1:C4, "SELECT A, C WHERE C > 100")', 
+        'A1:C4', '"SELECT A, C WHERE C > 100"'] as RegExpMatchArray;
       const result = QUERY.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should handle column headers', () => {
-      const matches = ['QUERY(A5:D8, "SELECT * WHERE C = \'Tokyo\'", 1)', 
-        'A5:D8', '"SELECT * WHERE C = \'Tokyo\'"', '1'] as RegExpMatchArray;
+    it('should query with order by', () => {
+      const matches = ['QUERY(A1:C4, "SELECT * ORDER BY C DESC")', 
+        'A1:C4', '"SELECT * ORDER BY C DESC"'] as RegExpMatchArray;
       const result = QUERY.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should support ORDER BY', () => {
-      const matches = ['QUERY(A5:D8, "SELECT A, B ORDER BY B DESC")', 
-        'A5:D8', '"SELECT A, B ORDER BY B DESC"'] as RegExpMatchArray;
+    it('should query with group by', () => {
+      const matches = ['QUERY(B1:C4, "SELECT B, SUM(C) GROUP BY B")', 
+        'B1:C4', '"SELECT B, SUM(C) GROUP BY B"'] as RegExpMatchArray;
       const result = QUERY.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should support GROUP BY', () => {
-      const matches = ['QUERY(A5:D8, "SELECT D, COUNT(A) GROUP BY D")', 
-        'A5:D8', '"SELECT D, COUNT(A) GROUP BY D"'] as RegExpMatchArray;
-      const result = QUERY.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should support PIVOT', () => {
-      const matches = ['QUERY(A5:D8, "SELECT B, SUM(B) GROUP BY A PIVOT C")', 
-        'A5:D8', '"SELECT B, SUM(B) GROUP BY A PIVOT C"'] as RegExpMatchArray;
-      const result = QUERY.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should support LIMIT and OFFSET', () => {
-      const matches = ['QUERY(A5:D8, "SELECT * LIMIT 2 OFFSET 1")', 
-        'A5:D8', '"SELECT * LIMIT 2 OFFSET 1"'] as RegExpMatchArray;
-      const result = QUERY.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should support date functions', () => {
-      const matches = ['QUERY(A1:D10, "SELECT A WHERE B > date \'2024-01-01\'")', 
-        'A1:D10', '"SELECT A WHERE B > date \'2024-01-01\'"'] as RegExpMatchArray;
+    it('should query with headers parameter', () => {
+      const matches = ['QUERY(A1:C4, "SELECT A, B", 1)', 
+        'A1:C4', '"SELECT A, B"', '1'] as RegExpMatchArray;
       const result = QUERY.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
   });
 
-  describe('SPARKLINE Function', () => {
-    it('should create basic line chart', () => {
-      const matches = ['SPARKLINE(A4:F4)', 'A4:F4'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
+  describe('REGEXMATCH Function', () => {
+    it('should match email pattern', () => {
+      const matches = ['REGEXMATCH(A5, "[a-z]+@[a-z]+\\.[a-z]+")', 
+        'A5', '"[a-z]+@[a-z]+\\\\.[a-z]+"'] as RegExpMatchArray;
+      const result = REGEXMATCH.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should create column chart', () => {
-      const matches = ['SPARKLINE(A4:F4, {"charttype", "column"})', 
-        'A4:F4', '{"charttype", "column"}'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
+    it('should match phone pattern', () => {
+      const matches = ['REGEXMATCH(A6, "\\d{3}-\\d{3}-\\d{4}")', 
+        'A6', '"\\\\d{3}-\\\\d{3}-\\\\d{4}"'] as RegExpMatchArray;
+      const result = REGEXMATCH.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should create bar chart', () => {
-      const matches = ['SPARKLINE(A4:F4, {"charttype", "bar"})', 
-        'A4:F4', '{"charttype", "bar"}'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
+    it('should handle case insensitive match', () => {
+      const matches = ['REGEXMATCH("Hello World", "hello", "i")', 
+        '"Hello World"', '"hello"', '"i"'] as RegExpMatchArray;
+      const result = REGEXMATCH.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should create win/loss chart', () => {
-      const matches = ['SPARKLINE(A4:F4, {"charttype", "winloss"})', 
-        'A4:F4', '{"charttype", "winloss"}'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle color options', () => {
-      const matches = ['SPARKLINE(A4:F4, {"color", "red"; "linewidth", 2})', 
-        'A4:F4', '{"color", "red"; "linewidth", 2}'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle min/max options', () => {
-      const matches = ['SPARKLINE(A4:F4, {"max", 250; "min", 50})', 
-        'A4:F4', '{"max", 250; "min", 50}'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle empty cells option', () => {
-      const matches = ['SPARKLINE(A4:F4, {"empty", "zero"})', 
-        'A4:F4', '{"empty", "zero"}'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
+    it('should return false for no match', () => {
+      const matches = ['REGEXMATCH(A1, "\\d+")', 'A1', '"\\\\d+"'] as RegExpMatchArray;
+      const result = REGEXMATCH.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
   });
 
-  describe('Edge Cases and Integration', () => {
-    it('should handle nested Google functions', () => {
-      const matches = ['GOOGLETRANSLATE(GOOGLEFINANCE("AAPL", "name"), "en", "ja")', 
-        'GOOGLEFINANCE("AAPL", "name")', '"en"', '"ja"'] as RegExpMatchArray;
-      const result = GOOGLETRANSLATE.calculate(matches, mockContext);
+  describe('REGEXEXTRACT Function', () => {
+    it('should extract email domain', () => {
+      const matches = ['REGEXEXTRACT(A5, "@([a-z]+\\.[a-z]+)")', 
+        'A5', '"@([a-z]+\\\\.[a-z]+)"'] as RegExpMatchArray;
+      const result = REGEXEXTRACT.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
-    it('should handle QUERY with dynamic ranges', () => {
-      const matches = ['QUERY(ARRAYFORMULA(A1:D10), "SELECT * WHERE Col2 > 100")', 
-        'ARRAYFORMULA(A1:D10)', '"SELECT * WHERE Col2 > 100"'] as RegExpMatchArray;
+    it('should extract phone area code', () => {
+      const matches = ['REGEXEXTRACT(A6, "(\\d{3})-")', 
+        'A6', '"(\\\\d{3})-"'] as RegExpMatchArray;
+      const result = REGEXEXTRACT.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should extract year from date', () => {
+      const matches = ['REGEXEXTRACT(A7, "(\\d{4})")', 
+        'A7', '"(\\\\d{4})"'] as RegExpMatchArray;
+      const result = REGEXEXTRACT.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should handle multiple capture groups', () => {
+      const matches = ['REGEXEXTRACT("John Doe", "(\\w+) (\\w+)")', 
+        '"John Doe"', '"(\\\\w+) (\\\\w+)"'] as RegExpMatchArray;
+      const result = REGEXEXTRACT.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+  });
+
+  describe('REGEXREPLACE Function', () => {
+    it('should replace phone format', () => {
+      const matches = ['REGEXREPLACE(A6, "(\\d{3})-(\\d{3})-(\\d{4})", "($1) $2-$3")', 
+        'A6', '"(\\\\d{3})-(\\\\d{3})-(\\\\d{4})"', '"($1) $2-$3"'] as RegExpMatchArray;
+      const result = REGEXREPLACE.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should replace email domain', () => {
+      const matches = ['REGEXREPLACE(A5, "@[a-z]+\\.[a-z]+", "@newdomain.com")', 
+        'A5', '"@[a-z]+\\\\.[a-z]+"', '"@newdomain.com"'] as RegExpMatchArray;
+      const result = REGEXREPLACE.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should replace all occurrences', () => {
+      const matches = ['REGEXREPLACE("abc123def456", "\\d+", "X")', 
+        '"abc123def456"', '"\\\\d+"', '"X"'] as RegExpMatchArray;
+      const result = REGEXREPLACE.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should handle backreferences', () => {
+      const matches = ['REGEXREPLACE("FirstName LastName", "(\\w+) (\\w+)", "$2, $1")', 
+        '"FirstName LastName"', '"(\\\\w+) (\\\\w+)"', '"$2, $1"'] as RegExpMatchArray;
+      const result = REGEXREPLACE.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+  });
+
+  describe('FLATTEN Function', () => {
+    it('should flatten 2D range', () => {
+      const matches = ['FLATTEN(A1:C4)', 'A1:C4'] as RegExpMatchArray;
+      const result = FLATTEN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should flatten single column', () => {
+      const matches = ['FLATTEN(A1:A7)', 'A1:A7'] as RegExpMatchArray;
+      const result = FLATTEN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should flatten single row', () => {
+      const matches = ['FLATTEN(A1:D1)', 'A1:D1'] as RegExpMatchArray;
+      const result = FLATTEN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should handle multiple ranges', () => {
+      const matches = ['FLATTEN(A1:B2, C3:D4)', 'A1:B2, C3:D4'] as RegExpMatchArray;
+      const result = FLATTEN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle empty ranges', () => {
+      const matches = ['JOIN(",", A10:D10)', '","', 'A10:D10'] as RegExpMatchArray;
+      const result = JOIN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should handle invalid regex patterns', () => {
+      const matches = ['REGEXMATCH(A1, "[invalid")', 'A1', '"[invalid"'] as RegExpMatchArray;
+      const result = REGEXMATCH.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should handle null values in JOIN', () => {
+      const matches = ['JOIN(",", A1:D1)', '","', 'A1:D1'] as RegExpMatchArray;
+      const result = JOIN.calculate(matches, mockContext);
+      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
+    });
+
+    it('should handle complex QUERY', () => {
+      const matches = ['QUERY(A1:C7, "SELECT A, B, AVG(C) WHERE B CONTAINS \'Red\' GROUP BY A, B PIVOT D")', 
+        'A1:C7', '"SELECT A, B, AVG(C) WHERE B CONTAINS \'Red\' GROUP BY A, B PIVOT D"'] as RegExpMatchArray;
       const result = QUERY.calculate(matches, mockContext);
-      expect(result).toBe('#N/A - Google Sheets specific functions not supported');
-    });
-
-    it('should handle SPARKLINE with GOOGLEFINANCE data', () => {
-      const matches = ['SPARKLINE(GOOGLEFINANCE("AAPL", "price", TODAY()-30, TODAY()))', 
-        'GOOGLEFINANCE("AAPL", "price", TODAY()-30, TODAY())'] as RegExpMatchArray;
-      const result = SPARKLINE.calculate(matches, mockContext);
       expect(result).toBe('#N/A - Google Sheets specific functions not supported');
     });
 
     it('should handle all functions returning consistent error', () => {
       const functions = [
-        ARRAYFORMULA, GOOGLEFINANCE, GOOGLETRANSLATE, QUERY, SPARKLINE
+        JOIN, ARRAYFORMULA, QUERY, REGEXMATCH, REGEXEXTRACT, REGEXREPLACE, FLATTEN
       ];
       
       for (const func of functions) {

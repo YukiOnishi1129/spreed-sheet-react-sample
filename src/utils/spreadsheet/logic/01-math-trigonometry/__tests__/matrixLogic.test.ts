@@ -4,9 +4,9 @@ import { MDETERM, MINVERSE, MMULT, MUNIT } from '../matrixLogic';
 import { FormulaError } from '../../shared/types';
 
 // Helper function to create FormulaContext
-function createContext(data: any[][]): FormulaContext {
+function createContext(data: (string | number | boolean | null)[][]): FormulaContext {
   return {
-    data,
+    data: data.map(row => row.map(cell => ({ value: cell }))),
     row: 0,
     col: 0
   };

@@ -21,35 +21,6 @@ describe('Workday Functions', () => {
     ['text', '', null, true, false],
   ]);
 
-  // セル参照をエミュレート
-  mockContext.cells = {
-    A1: { value: '2024-01-15' },
-    A2: { value: '2024-02-01' },
-    A3: { value: '2024-03-01' },
-    A4: { value: '2024-06-01' },
-    A5: { value: 'text' },
-    B1: { value: '2024-01-31' },
-    B2: { value: '2024-02-29' },
-    B3: { value: '2024-03-15' },
-    B4: { value: '2024-06-30' },
-    B5: { value: '' },
-    C1: { value: '2024-01-01' },
-    C2: { value: '2024-07-04' },
-    C3: { value: '2024-01-15' },
-    C4: { value: '2024-01-17' },
-    C5: { value: null },
-    D1: { value: '2024-12-25' },
-    D2: { value: '2024-11-28' },
-    D3: { value: '2024-01-16' },
-    D4: { value: '1' },
-    D5: { value: true },
-    E1: { value: 'invalid' },
-    E2: { value: 45292 }, // Excel serial for 2024-01-01
-    E3: { value: 10 },
-    E4: { value: -10 },
-    E5: { value: false },
-  };
-
   describe('NETWORKDAYS', () => {
     it('should calculate working days between dates', () => {
       const matches = ['NETWORKDAYS(A1, B1)', 'A1', 'B1'] as RegExpMatchArray;

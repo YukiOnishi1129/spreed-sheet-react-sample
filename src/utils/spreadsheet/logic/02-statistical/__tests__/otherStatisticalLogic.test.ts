@@ -8,9 +8,9 @@ import {
 import { FormulaError } from '../../shared/types';
 
 // Helper function to create FormulaContext
-function createContext(data: any[][]): FormulaContext {
+function createContext(data: (string | number | boolean | null)[][]): FormulaContext {
   return {
-    data,
+    data: data.map(row => row.map(cell => ({ value: cell }))),
     row: 0,
     col: 0
   };
@@ -207,27 +207,25 @@ describe('Other Statistical Functions', () => {
       });
 
       it('should return NUM error for probabilities not summing to 1', () => {
-        const mockContextBadProb = {
-          cells: {
-            ...mockContext.cells,
-            C1: { value: 0.1 },
-            C2: { value: 0.1 },
-            C3: { value: 0.1 },
-            C4: { value: 0.1 },
-            C5: { value: 0.1 }, // sum = 0.5
-          }
-        };
+        const mockContextBadProb = createContext([
+          [0, 1, 0.1, 'text'],      // Row 1 (A1-D1)
+          [0.5, 2, 0.1, -2],        // Row 2 (A2-D2)
+          [0.75, 3, 0.1, 1.5],      // Row 3 (A3-D3)
+          [0.9, 4, 0.1, null],      // Row 4 (A4-D4)
+          [0.99, 5, 0.1, null]      // Row 5 (A5-D5) - sum = 0.5
+        ]);
         const matches = ['PROB(B1:B5, C1:C5, 2, 4)', 'B1:B5', 'C1:C5', '2', '4'] as RegExpMatchArray;
         expect(PROB.calculate(matches, mockContextBadProb)).toBe(FormulaError.NUM);
       });
 
       it('should return NUM error for invalid probabilities', () => {
-        const mockContextNegProb = {
-          cells: {
-            ...mockContext.cells,
-            C1: { value: -0.1 },
-          }
-        };
+        const mockContextNegProb = createContext([
+          [0, 1, -0.1, 'text'],     // Row 1 (A1-D1) - negative probability
+          [0.5, 2, 0.2, -2],        // Row 2 (A2-D2)
+          [0.75, 3, 0.3, 1.5],      // Row 3 (A3-D3)
+          [0.9, 4, 0.2, null],      // Row 4 (A4-D4)
+          [0.99, 5, 0.2, null]      // Row 5 (A5-D5)
+        ]);
         const matches = ['PROB(B1:B5, C1:C5, 2, 4)', 'B1:B5', 'C1:C5', '2', '4'] as RegExpMatchArray;
         expect(PROB.calculate(matches, mockContextNegProb)).toBe(FormulaError.NUM);
       });

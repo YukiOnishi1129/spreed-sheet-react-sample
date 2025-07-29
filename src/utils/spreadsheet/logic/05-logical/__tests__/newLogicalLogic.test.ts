@@ -19,19 +19,6 @@ describe('New Logic Functions', () => {
     [0.5, 1.5, 2.5, 'X', 'Y', 'Z', 12, 18, 24, 500]
   ]);
 
-  // セル参照をエミュレート
-  mockContext.cells = {
-    A1: { value: 1 }, B1: { value: 2 }, C1: { value: 3 }, D1: { value: 'A' }, E1: { value: 'B' },
-    F1: { value: 'C' }, G1: { value: 10 }, H1: { value: 20 }, I1: { value: 30 }, J1: { value: 100 },
-    A2: { value: 'Apple' }, B2: { value: 'Banana' }, C2: { value: 'Cherry' }, D2: { value: 'Dog' },
-    E2: { value: 'Cat' }, F2: { value: 'Bird' }, G2: { value: 5 }, H2: { value: 15 }, I2: { value: 25 }, J2: { value: 200 },
-    A3: { value: 'Red' }, B3: { value: 'Green' }, C3: { value: 'Blue' }, D3: { value: 'Sunday' },
-    E3: { value: 'Monday' }, F3: { value: 'Tuesday' }, G3: { value: 0 }, H3: { value: -5 }, I3: { value: 50 }, J3: { value: 300 },
-    A4: { value: true }, B4: { value: false }, C4: { value: null }, D4: { value: '' }, E4: { value: 'text' },
-    F4: { value: 'data' }, G4: { value: 7 }, H4: { value: 8 }, I4: { value: 9 }, J4: { value: 400 },
-    A5: { value: 0.5 }, B5: { value: 1.5 }, C5: { value: 2.5 }, D5: { value: 'X' }, E5: { value: 'Y' },
-    F5: { value: 'Z' }, G5: { value: 12 }, H5: { value: 18 }, I5: { value: 24 }, J5: { value: 500 }
-  };
 
   describe('SWITCH Function', () => {
     it('should return matching case value', () => {

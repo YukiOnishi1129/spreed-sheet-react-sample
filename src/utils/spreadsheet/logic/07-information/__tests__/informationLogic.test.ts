@@ -9,7 +9,7 @@ import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext
-const createContext = (data: any[][], row = 0, col = 0): FormulaContext => ({
+const createContext = (data: (string | number | boolean | null | { value: string | number | boolean | null; formula?: string })[][], row = 0, col = 0): FormulaContext => ({
   data: data.map(row => row.map(cell => {
     if (typeof cell === 'object' && cell !== null) {
       return cell;

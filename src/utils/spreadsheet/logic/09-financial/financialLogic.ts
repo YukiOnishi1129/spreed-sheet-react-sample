@@ -58,7 +58,7 @@ export const PMT: CustomFormula = {
       }
       
       return pmt;
-    } catch (error) {
+    } catch {
       return FormulaError.VALUE;
     }
   }

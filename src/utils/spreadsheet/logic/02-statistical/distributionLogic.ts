@@ -123,7 +123,6 @@ function betaContinuedFraction(x: number, a: number, b: number): number {
   const maxIterations = 100;
   const epsilon = 1e-10;
   
-  let m = 1;
   let d = 1 - (a + b) * x / (a + 1);
   if (Math.abs(d) < epsilon) d = epsilon;
   d = 1 / d;
@@ -1282,7 +1281,7 @@ export const F_TEST: CustomFormula = {
       
       // 両側検定なので、小さい方の確率を2倍にする
       return 2 * Math.min(p, 1 - p);
-    } catch (e) {
+    } catch {
       // エラーが発生した場合は簡易的な近似を使用
       return 1 / (1 + Math.pow(f - 1, 2));
     }

@@ -272,10 +272,6 @@ export const INDEX: CustomFormula = {
           targetCol >= 0 && targetCol < context.data[0]?.length) {
         const cellData = context.data[targetRow][targetCol];
         
-        // INDEXの結果だけログ出力
-        if (context.row === 12) {
-        }
-        
         // Handle both direct values and object values
         let result: FormulaResult;
         if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {

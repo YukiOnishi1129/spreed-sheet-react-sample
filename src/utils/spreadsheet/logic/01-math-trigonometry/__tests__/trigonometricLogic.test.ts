@@ -10,9 +10,9 @@ import {
 import { FormulaError } from '../../shared/types';
 
 // Helper function to create FormulaContext
-function createContext(data: any[][]): FormulaContext {
+function createContext(data: (string | number | boolean | null)[][]): FormulaContext {
   return {
-    data,
+    data: data.map(row => row.map(cell => ({ value: cell }))),
     row: 0,
     col: 0
   };
@@ -20,7 +20,7 @@ function createContext(data: any[][]): FormulaContext {
 
 describe('Trigonometric Functions', () => {
   const mockContext = createContext([
-    [0, Math.PI / 2, Math.PI, 0.5, 1, -1, 'text', 2, 3, 4, 45, 90, 180]  // Row 1 (A1-A13)
+    [0, Math.PI / 2, Math.PI, 0.5, 1, -1, 'text', 2, 3, 4, 45, 90, 180]  // Row 1 (A1-M1)
   ]);
 
   describe('Basic Trigonometric Functions', () => {
@@ -29,15 +29,15 @@ describe('Trigonometric Functions', () => {
         const matches = ['SIN(A1)', 'A1'] as RegExpMatchArray;
         expect(SIN.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['SIN(A2)', 'A2'] as RegExpMatchArray;
+        const matches2 = ['SIN(B1)', 'B1'] as RegExpMatchArray;
         expect(SIN.calculate(matches2, mockContext)).toBeCloseTo(1);
         
-        const matches3 = ['SIN(A3)', 'A3'] as RegExpMatchArray;
+        const matches3 = ['SIN(C1)', 'C1'] as RegExpMatchArray;
         expect(SIN.calculate(matches3, mockContext)).toBeCloseTo(0);
       });
 
       it('should return VALUE error for non-numeric input', () => {
-        const matches = ['SIN(A7)', 'A7'] as RegExpMatchArray;
+        const matches = ['SIN(G1)', 'G1'] as RegExpMatchArray;
         expect(SIN.calculate(matches, mockContext)).toBe(FormulaError.VALUE);
       });
     });
@@ -47,15 +47,15 @@ describe('Trigonometric Functions', () => {
         const matches = ['COS(A1)', 'A1'] as RegExpMatchArray;
         expect(COS.calculate(matches, mockContext)).toBe(1);
         
-        const matches2 = ['COS(A2)', 'A2'] as RegExpMatchArray;
+        const matches2 = ['COS(B1)', 'B1'] as RegExpMatchArray;
         expect(COS.calculate(matches2, mockContext)).toBeCloseTo(0);
         
-        const matches3 = ['COS(A3)', 'A3'] as RegExpMatchArray;
+        const matches3 = ['COS(C1)', 'C1'] as RegExpMatchArray;
         expect(COS.calculate(matches3, mockContext)).toBeCloseTo(-1);
       });
 
       it('should return VALUE error for non-numeric input', () => {
-        const matches = ['COS(A7)', 'A7'] as RegExpMatchArray;
+        const matches = ['COS(G1)', 'G1'] as RegExpMatchArray;
         expect(COS.calculate(matches, mockContext)).toBe(FormulaError.VALUE);
       });
     });
@@ -70,7 +70,7 @@ describe('Trigonometric Functions', () => {
       });
 
       it('should return VALUE error for non-numeric input', () => {
-        const matches = ['TAN(A7)', 'A7'] as RegExpMatchArray;
+        const matches = ['TAN(G1)', 'G1'] as RegExpMatchArray;
         expect(TAN.calculate(matches, mockContext)).toBe(FormulaError.VALUE);
       });
     });
@@ -82,20 +82,20 @@ describe('Trigonometric Functions', () => {
         const matches = ['ASIN(A1)', 'A1'] as RegExpMatchArray;
         expect(ASIN.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['ASIN(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['ASIN(E1)', 'E1'] as RegExpMatchArray;
         expect(ASIN.calculate(matches2, mockContext)).toBeCloseTo(Math.PI / 2);
         
-        const matches3 = ['ASIN(A6)', 'A6'] as RegExpMatchArray;
+        const matches3 = ['ASIN(F1)', 'F1'] as RegExpMatchArray;
         expect(ASIN.calculate(matches3, mockContext)).toBeCloseTo(-Math.PI / 2);
       });
 
       it('should return NUM error for values outside [-1, 1]', () => {
-        const matches = ['ASIN(A8)', 'A8'] as RegExpMatchArray;
+        const matches = ['ASIN(H1)', 'H1'] as RegExpMatchArray;
         expect(ASIN.calculate(matches, mockContext)).toBe(FormulaError.NUM);
       });
 
       it('should return NUM error for non-numeric input', () => {
-        const matches = ['ASIN(A7)', 'A7'] as RegExpMatchArray;
+        const matches = ['ASIN(G1)', 'G1'] as RegExpMatchArray;
         expect(ASIN.calculate(matches, mockContext)).toBe(FormulaError.NUM);
       });
     });
@@ -105,15 +105,15 @@ describe('Trigonometric Functions', () => {
         const matches = ['ACOS(A1)', 'A1'] as RegExpMatchArray;
         expect(ACOS.calculate(matches, mockContext)).toBeCloseTo(Math.PI / 2);
         
-        const matches2 = ['ACOS(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['ACOS(E1)', 'E1'] as RegExpMatchArray;
         expect(ACOS.calculate(matches2, mockContext)).toBe(0);
         
-        const matches3 = ['ACOS(A6)', 'A6'] as RegExpMatchArray;
+        const matches3 = ['ACOS(F1)', 'F1'] as RegExpMatchArray;
         expect(ACOS.calculate(matches3, mockContext)).toBeCloseTo(Math.PI);
       });
 
       it('should return NUM error for values outside [-1, 1]', () => {
-        const matches = ['ACOS(A8)', 'A8'] as RegExpMatchArray;
+        const matches = ['ACOS(H1)', 'H1'] as RegExpMatchArray;
         expect(ACOS.calculate(matches, mockContext)).toBe(FormulaError.NUM);
       });
     });
@@ -123,23 +123,23 @@ describe('Trigonometric Functions', () => {
         const matches = ['ATAN(A1)', 'A1'] as RegExpMatchArray;
         expect(ATAN.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['ATAN(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['ATAN(E1)', 'E1'] as RegExpMatchArray;
         expect(ATAN.calculate(matches2, mockContext)).toBeCloseTo(Math.PI / 4);
       });
 
       it('should return VALUE error for non-numeric input', () => {
-        const matches = ['ATAN(A7)', 'A7'] as RegExpMatchArray;
+        const matches = ['ATAN(G1)', 'G1'] as RegExpMatchArray;
         expect(ATAN.calculate(matches, mockContext)).toBe(FormulaError.VALUE);
       });
     });
 
     describe('ATAN2', () => {
       it('should calculate atan2', () => {
-        const matches = ['ATAN2(A5, A5)', 'A5', 'A5'] as RegExpMatchArray;
+        const matches = ['ATAN2(E1, E1)', 'E1', 'E1'] as RegExpMatchArray;
         expect(ATAN2.calculate(matches, mockContext)).toBeCloseTo(Math.PI / 4);
         
-        const matches2 = ['ATAN2(A1, A5)', 'A1', 'A5'] as RegExpMatchArray;
-        expect(ATAN2.calculate(matches2, mockContext)).toBe(0);
+        const matches2 = ['ATAN2(A1, E1)', 'A1', 'E1'] as RegExpMatchArray;
+        expect(ATAN2.calculate(matches2, mockContext)).toBeCloseTo(Math.PI / 2);
       });
 
       it('should return DIV0 error for both x and y being 0', () => {
@@ -148,7 +148,7 @@ describe('Trigonometric Functions', () => {
       });
 
       it('should return VALUE error for non-numeric input', () => {
-        const matches = ['ATAN2(A7, A5)', 'A7', 'A5'] as RegExpMatchArray;
+        const matches = ['ATAN2(G1, E1)', 'G1', 'E1'] as RegExpMatchArray;
         expect(ATAN2.calculate(matches, mockContext)).toBe(FormulaError.VALUE);
       });
     });
@@ -160,12 +160,12 @@ describe('Trigonometric Functions', () => {
         const matches = ['SINH(A1)', 'A1'] as RegExpMatchArray;
         expect(SINH.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['SINH(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['SINH(E1)', 'E1'] as RegExpMatchArray;
         expect(SINH.calculate(matches2, mockContext)).toBeCloseTo(Math.sinh(1));
       });
 
       it('should return VALUE error for non-numeric input', () => {
-        const matches = ['SINH(A7)', 'A7'] as RegExpMatchArray;
+        const matches = ['SINH(G1)', 'G1'] as RegExpMatchArray;
         expect(SINH.calculate(matches, mockContext)).toBe(FormulaError.VALUE);
       });
     });
@@ -175,7 +175,7 @@ describe('Trigonometric Functions', () => {
         const matches = ['COSH(A1)', 'A1'] as RegExpMatchArray;
         expect(COSH.calculate(matches, mockContext)).toBe(1);
         
-        const matches2 = ['COSH(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['COSH(E1)', 'E1'] as RegExpMatchArray;
         expect(COSH.calculate(matches2, mockContext)).toBeCloseTo(Math.cosh(1));
       });
     });
@@ -185,7 +185,7 @@ describe('Trigonometric Functions', () => {
         const matches = ['TANH(A1)', 'A1'] as RegExpMatchArray;
         expect(TANH.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['TANH(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['TANH(E1)', 'E1'] as RegExpMatchArray;
         expect(TANH.calculate(matches2, mockContext)).toBeCloseTo(Math.tanh(1));
       });
     });
@@ -197,22 +197,22 @@ describe('Trigonometric Functions', () => {
         const matches = ['ASINH(A1)', 'A1'] as RegExpMatchArray;
         expect(ASINH.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['ASINH(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['ASINH(E1)', 'E1'] as RegExpMatchArray;
         expect(ASINH.calculate(matches2, mockContext)).toBeCloseTo(Math.asinh(1));
       });
     });
 
     describe('ACOSH', () => {
       it('should calculate inverse hyperbolic cosine', () => {
-        const matches = ['ACOSH(A5)', 'A5'] as RegExpMatchArray;
+        const matches = ['ACOSH(E1)', 'E1'] as RegExpMatchArray;
         expect(ACOSH.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['ACOSH(A8)', 'A8'] as RegExpMatchArray;
+        const matches2 = ['ACOSH(H1)', 'H1'] as RegExpMatchArray;
         expect(ACOSH.calculate(matches2, mockContext)).toBeCloseTo(Math.acosh(2));
       });
 
       it('should return NUM error for values < 1', () => {
-        const matches = ['ACOSH(A4)', 'A4'] as RegExpMatchArray;
+        const matches = ['ACOSH(D1)', 'D1'] as RegExpMatchArray;
         expect(ACOSH.calculate(matches, mockContext)).toBe(FormulaError.NUM);
       });
     });
@@ -222,15 +222,15 @@ describe('Trigonometric Functions', () => {
         const matches = ['ATANH(A1)', 'A1'] as RegExpMatchArray;
         expect(ATANH.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['ATANH(A4)', 'A4'] as RegExpMatchArray;
+        const matches2 = ['ATANH(D1)', 'D1'] as RegExpMatchArray;
         expect(ATANH.calculate(matches2, mockContext)).toBeCloseTo(Math.atanh(0.5));
       });
 
       it('should return NUM error for values outside (-1, 1)', () => {
-        const matches = ['ATANH(A5)', 'A5'] as RegExpMatchArray;
+        const matches = ['ATANH(E1)', 'E1'] as RegExpMatchArray;
         expect(ATANH.calculate(matches, mockContext)).toBe(FormulaError.NUM);
         
-        const matches2 = ['ATANH(A6)', 'A6'] as RegExpMatchArray;
+        const matches2 = ['ATANH(F1)', 'F1'] as RegExpMatchArray;
         expect(ATANH.calculate(matches2, mockContext)).toBe(FormulaError.NUM);
       });
     });
@@ -242,15 +242,15 @@ describe('Trigonometric Functions', () => {
         const matches = ['DEGREES(A1)', 'A1'] as RegExpMatchArray;
         expect(DEGREES.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['DEGREES(A2)', 'A2'] as RegExpMatchArray;
+        const matches2 = ['DEGREES(B1)', 'B1'] as RegExpMatchArray;
         expect(DEGREES.calculate(matches2, mockContext)).toBeCloseTo(90);
         
-        const matches3 = ['DEGREES(A3)', 'A3'] as RegExpMatchArray;
+        const matches3 = ['DEGREES(C1)', 'C1'] as RegExpMatchArray;
         expect(DEGREES.calculate(matches3, mockContext)).toBeCloseTo(180);
       });
 
       it('should return VALUE error for non-numeric input', () => {
-        const matches = ['DEGREES(A7)', 'A7'] as RegExpMatchArray;
+        const matches = ['DEGREES(G1)', 'G1'] as RegExpMatchArray;
         expect(DEGREES.calculate(matches, mockContext)).toBe(FormulaError.VALUE);
       });
     });
@@ -260,10 +260,10 @@ describe('Trigonometric Functions', () => {
         const matches = ['RADIANS(A1)', 'A1'] as RegExpMatchArray;
         expect(RADIANS.calculate(matches, mockContext)).toBe(0);
         
-        const matches2 = ['RADIANS(A12)', 'A12'] as RegExpMatchArray;
+        const matches2 = ['RADIANS(L1)', 'L1'] as RegExpMatchArray;
         expect(RADIANS.calculate(matches2, mockContext)).toBeCloseTo(Math.PI / 2);
         
-        const matches3 = ['RADIANS(A13)', 'A13'] as RegExpMatchArray;
+        const matches3 = ['RADIANS(M1)', 'M1'] as RegExpMatchArray;
         expect(RADIANS.calculate(matches3, mockContext)).toBeCloseTo(Math.PI);
       });
     });
@@ -281,7 +281,7 @@ describe('Trigonometric Functions', () => {
   describe('Reciprocal Trigonometric Functions', () => {
     describe('CSC', () => {
       it('should calculate cosecant', () => {
-        const matches = ['CSC(A2)', 'A2'] as RegExpMatchArray;
+        const matches = ['CSC(B1)', 'B1'] as RegExpMatchArray;
         expect(CSC.calculate(matches, mockContext)).toBeCloseTo(1); // csc(π/2) = 1
       });
 
@@ -296,12 +296,12 @@ describe('Trigonometric Functions', () => {
         const matches = ['SEC(A1)', 'A1'] as RegExpMatchArray;
         expect(SEC.calculate(matches, mockContext)).toBe(1); // sec(0) = 1
         
-        const matches2 = ['SEC(A3)', 'A3'] as RegExpMatchArray;
+        const matches2 = ['SEC(C1)', 'C1'] as RegExpMatchArray;
         expect(SEC.calculate(matches2, mockContext)).toBeCloseTo(-1); // sec(π) = -1
       });
 
       it('should return DIV0 error when cos is zero', () => {
-        const matches = ['SEC(A2)', 'A2'] as RegExpMatchArray;
+        const matches = ['SEC(B1)', 'B1'] as RegExpMatchArray;
         expect(SEC.calculate(matches, mockContext)).toBe(FormulaError.DIV0);
       });
     });
@@ -320,7 +320,7 @@ describe('Trigonometric Functions', () => {
 
     describe('ACOT', () => {
       it('should calculate inverse cotangent', () => {
-        const matches = ['ACOT(A5)', 'A5'] as RegExpMatchArray;
+        const matches = ['ACOT(E1)', 'E1'] as RegExpMatchArray;
         expect(ACOT.calculate(matches, mockContext)).toBeCloseTo(Math.PI / 4);
         
         const matches2 = ['ACOT(A1)', 'A1'] as RegExpMatchArray;
@@ -332,7 +332,7 @@ describe('Trigonometric Functions', () => {
   describe('Hyperbolic Reciprocal Functions', () => {
     describe('CSCH', () => {
       it('should calculate hyperbolic cosecant', () => {
-        const matches = ['CSCH(A5)', 'A5'] as RegExpMatchArray;
+        const matches = ['CSCH(E1)', 'E1'] as RegExpMatchArray;
         expect(CSCH.calculate(matches, mockContext)).toBeCloseTo(1 / Math.sinh(1));
       });
 
@@ -347,14 +347,14 @@ describe('Trigonometric Functions', () => {
         const matches = ['SECH(A1)', 'A1'] as RegExpMatchArray;
         expect(SECH.calculate(matches, mockContext)).toBe(1);
         
-        const matches2 = ['SECH(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['SECH(E1)', 'E1'] as RegExpMatchArray;
         expect(SECH.calculate(matches2, mockContext)).toBeCloseTo(1 / Math.cosh(1));
       });
     });
 
     describe('COTH', () => {
       it('should calculate hyperbolic cotangent', () => {
-        const matches = ['COTH(A5)', 'A5'] as RegExpMatchArray;
+        const matches = ['COTH(E1)', 'E1'] as RegExpMatchArray;
         expect(COTH.calculate(matches, mockContext)).toBeCloseTo(1 / Math.tanh(1));
       });
 
@@ -366,16 +366,16 @@ describe('Trigonometric Functions', () => {
 
     describe('ACOTH', () => {
       it('should calculate inverse hyperbolic cotangent', () => {
-        const matches = ['ACOTH(A8)', 'A8'] as RegExpMatchArray;
+        const matches = ['ACOTH(H1)', 'H1'] as RegExpMatchArray;
         const expected = 0.5 * Math.log(3); // 0.5 * ln((2+1)/(2-1))
         expect(ACOTH.calculate(matches, mockContext)).toBeCloseTo(expected);
       });
 
       it('should return NUM error for values in [-1, 1]', () => {
-        const matches = ['ACOTH(A4)', 'A4'] as RegExpMatchArray;
+        const matches = ['ACOTH(D1)', 'D1'] as RegExpMatchArray;
         expect(ACOTH.calculate(matches, mockContext)).toBe(FormulaError.NUM);
         
-        const matches2 = ['ACOTH(A5)', 'A5'] as RegExpMatchArray;
+        const matches2 = ['ACOTH(E1)', 'E1'] as RegExpMatchArray;
         expect(ACOTH.calculate(matches2, mockContext)).toBe(FormulaError.NUM);
       });
     });

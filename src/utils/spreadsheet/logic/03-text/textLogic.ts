@@ -779,7 +779,7 @@ export const TEXTJOIN: CustomFormula = {
       // 文字列に変換して結合
       const result = values.map(v => String(v)).join(delimiter);
       return result;
-    } catch (error) {
+    } catch {
       return FormulaError.VALUE;
     }
   }

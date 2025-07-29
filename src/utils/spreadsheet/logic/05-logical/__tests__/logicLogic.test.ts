@@ -15,25 +15,11 @@ const createContext = (data: (string | number | boolean | null)[][]): FormulaCon
 describe('Logic Functions', () => {
   const mockContext = createContext([
     [true, false, 1, 0, 'TRUE', 'FALSE', '', 'text', 10, 5],
-    [20, 15, 'Hello', 'World', 25, '#N/A', '#VALUE!', '#DIV/0!', null, undefined],
+    [20, 15, 'Hello', 'World', 25, '#N/A', '#VALUE!', '#DIV/0!', null, null], // Changed undefined to null
     [100, 50, 30, 40, 60, 70, 80, 90, 'Yes', 'No'],
     ['Apple', 'Banana', 'Cherry', 1, 2, 3, 0, -5, true, false],
     [0.5, 1.5, 2.5, 'TRUE', 'FALSE', '1', '0', '', 'data', 'test']
   ]);
-
-  // セル参照をエミュレート
-  mockContext.cells = {
-    A1: { value: true }, A2: { value: 20 }, A3: { value: 100 }, A4: { value: 'Apple' }, A5: { value: 0.5 },
-    B1: { value: false }, B2: { value: 15 }, B3: { value: 50 }, B4: { value: 'Banana' }, B5: { value: 1.5 },
-    C1: { value: 1 }, C2: { value: 'Hello' }, C3: { value: 30 }, C4: { value: 'Cherry' }, C5: { value: 2.5 },
-    D1: { value: 0 }, D2: { value: 'World' }, D3: { value: 40 }, D4: { value: 1 }, D5: { value: 'TRUE' },
-    E1: { value: 'TRUE' }, E2: { value: 25 }, E3: { value: 60 }, E4: { value: 2 }, E5: { value: 'FALSE' },
-    F1: { value: 'FALSE' }, F2: { value: '#N/A' }, F3: { value: 70 }, F4: { value: 3 }, F5: { value: '1' },
-    G1: { value: '' }, G2: { value: '#VALUE!' }, G3: { value: 80 }, G4: { value: 0 }, G5: { value: '0' },
-    H1: { value: 'text' }, H2: { value: '#DIV/0!' }, H3: { value: 90 }, H4: { value: -5 }, H5: { value: '' },
-    I1: { value: 10 }, I2: { value: null }, I3: { value: 'Yes' }, I4: { value: true }, I5: { value: 'data' },
-    J1: { value: 5 }, J2: { value: undefined }, J3: { value: 'No' }, J4: { value: false }, J5: { value: 'test' }
-  };
 
   describe('IF Function', () => {
     it('should return true value when condition is true', () => {
@@ -310,7 +296,7 @@ describe('Logic Functions', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle null and undefined values', () => {
+    it('should handle null values', () => {
       const matches = ['IF(I2, "HasValue", "NoValue")', 'I2, "HasValue", "NoValue"'] as RegExpMatchArray;
       const result = IF.calculate(matches, mockContext);
       expect(result).toBe('NoValue');

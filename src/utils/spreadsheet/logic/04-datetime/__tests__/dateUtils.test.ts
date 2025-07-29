@@ -348,8 +348,8 @@ describe('Date Utils', () => {
     it('should reject invalid dates', () => {
       expect(isValidDate(new Date('invalid'))).toBe(false);
       expect(isValidDate(new Date(NaN))).toBe(false);
-      expect(isValidDate('not a date' as any)).toBe(false);
-      expect(isValidDate(null as any)).toBe(false);
+      expect(isValidDate('not a date' as unknown as Date)).toBe(false);
+      expect(isValidDate(null as unknown as Date)).toBe(false);
     });
   });
 

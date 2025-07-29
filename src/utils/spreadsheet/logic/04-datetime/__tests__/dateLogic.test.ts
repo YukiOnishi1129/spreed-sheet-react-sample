@@ -25,34 +25,6 @@ describe('Date Functions', () => {
     ['text', '', null, true, false],
   ]);
 
-  // セル参照をエミュレート
-  mockContext.cells = {
-    A1: { value: '2024-01-15' },
-    A2: { value: '2025-01-15' },
-    A3: { value: new Date('2024-01-15') },
-    A4: { value: '1/15/2024' },
-    A5: { value: 'text' },
-    B1: { value: '2024-12-31' },
-    B2: { value: '2024-01-01' },
-    B3: { value: new Date('2024-12-31') },
-    B4: { value: '12/31/2024' },
-    B5: { value: '' },
-    C1: { value: '2023-01-01' },
-    C2: { value: '2024-03-01' },
-    C3: { value: '15:30:45' },
-    C4: { value: '2024' },
-    C5: { value: null },
-    D1: { value: '2024-02-29' },
-    D2: { value: '2024-04-30' },
-    D3: { value: '23:59:59' },
-    D4: { value: '1' },
-    D5: { value: true },
-    E1: { value: 'invalid' },
-    E2: { value: 45292 }, // Excel serial for 2024-01-01
-    E3: { value: '00:00:01' },
-    E4: { value: '15' },
-    E5: { value: false },
-  };
 
   describe('DATEDIF', () => {
     it('should calculate difference in days', () => {
