@@ -3,6 +3,7 @@
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue, evaluateExpression, evaluateFormulaWithErrorCheck } from '../shared/utils';
+import { matchFormula } from '../index';
 
 // 引数を論理値に変換するユーティリティ関数
 function parseArgumentsToLogical(args: string, context: FormulaContext): boolean[] {
@@ -147,7 +148,14 @@ export const IF: CustomFormula = {
       const rightCellValue = getCellValue(rightExpr.trim(), context);
       if (rightCellValue === FormulaError.REF) {
         // セル参照でない場合はリテラルとして扱う
-        rightValue = isNaN(Number(rightExpr.trim())) ? rightExpr.trim() : Number(rightExpr.trim());
+        const trimmedRight = rightExpr.trim();
+        // 引用符を除去
+        if ((trimmedRight.startsWith('"') && trimmedRight.endsWith('"')) || 
+            (trimmedRight.startsWith("'") && trimmedRight.endsWith("'"))) {
+          rightValue = trimmedRight.slice(1, -1);
+        } else {
+          rightValue = isNaN(Number(trimmedRight)) ? trimmedRight : Number(trimmedRight);
+        }
       } else {
         rightValue = rightCellValue;
       }
@@ -324,6 +332,12 @@ export const IFS: CustomFormula = {
       if (conditionArg.toUpperCase() === 'TRUE') {
         conditionResult = true;
       } else if (conditionArg.toUpperCase() === 'FALSE') {
+        conditionResult = false;
+      }
+      // "1"や"0"の場合
+      else if (conditionArg === '"1"' || conditionArg === '1') {
+        conditionResult = true;
+      } else if (conditionArg === '"0"' || conditionArg === '0') {
         conditionResult = false;
       }
       // セル参照の場合
@@ -506,13 +520,7 @@ export const IFERROR: CustomFormula = {
     }
     
     // 値を評価
-    // A2/B2のような式を評価する必要がある
-    const result = evaluateFormulaWithErrorCheck(valueExpr, context);
-    
-    // エラーチェック
-    if (typeof result === 'string' && result.startsWith('#')) {
-      return errorValue;
-    }
+    let result: FormulaResult;
     
     // セル参照だけの場合の処理
     if (valueExpr.match(/^[A-Z]+\d+$/)) {
@@ -523,6 +531,24 @@ export const IFERROR: CustomFormula = {
       return cellValue as FormulaResult;
     }
     
+    // 関数を含む式の場合
+    const nestedMatch = matchFormula(valueExpr);
+    if (nestedMatch) {
+      result = nestedMatch.function.calculate(nestedMatch.matches, context);
+      if (typeof result === 'string' && result.startsWith('#')) {
+        return errorValue;
+      }
+      return result;
+    }
+    
+    // A2/B2のような式を評価する必要がある
+    result = evaluateFormulaWithErrorCheck(valueExpr, context);
+    
+    // エラーチェック
+    if (typeof result === 'string' && result.startsWith('#')) {
+      return errorValue;
+    }
+    
     return result;
   }
 };
@@ -530,7 +556,7 @@ export const IFERROR: CustomFormula = {
 // IFNA関数の実装（#N/Aエラー時の値）
 export const IFNA: CustomFormula = {
   name: 'IFNA',
-  pattern: /IFNA\((.*)\)$/i,
+  pattern: /IFNA\s*\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const fullArgs = matches[1];
     
@@ -539,12 +565,20 @@ export const IFNA: CustomFormula = {
     let currentArg = '';
     let parenDepth = 0;
     let inQuotes = false;
+    let quoteChar = '';
     
     for (let i = 0; i < fullArgs.length; i++) {
       const char = fullArgs[i];
+      const prevChar = i > 0 ? fullArgs[i - 1] : '';
       
-      if (char === '"' && fullArgs[i - 1] !== '\\') {
-        inQuotes = !inQuotes;
+      // エスケープされた引用符を処理
+      if ((char === '"' || char === "'") && prevChar !== '\\') {
+        if (!inQuotes) {
+          inQuotes = true;
+          quoteChar = char;
+        } else if (char === quoteChar) {
+          inQuotes = false;
+        }
       }
       
       if (!inQuotes) {
@@ -581,12 +615,8 @@ export const IFNA: CustomFormula = {
       naValue = !isNaN(num) ? num : naValueExpr;
     }
     
-    // 値を評価 - VLOOKUPなどの関数の場合は#N/Aを返すことがある
-    // ただし、VLOOKUPが実装されていない場合は単純に#N/Aを返す
-    if (valueExpr.includes('VLOOKUP')) {
-      // VLOOKUPが実装されていない場合のテスト用
-      return naValue;
-    }
+    // 値を評価
+    let result: FormulaResult;
     
     // セル参照だけの場合の処理
     if (valueExpr.match(/^[A-Z]+\d+$/)) {
@@ -597,8 +627,18 @@ export const IFNA: CustomFormula = {
       return cellValue as FormulaResult;
     }
     
+    // 関数を含む式の場合（VLOOKUP、MATCH、INDEX等）
+    const nestedMatch = matchFormula(valueExpr);
+    if (nestedMatch) {
+      result = nestedMatch.function.calculate(nestedMatch.matches, context);
+      if (result === '#N/A' || result === FormulaError.NA) {
+        return naValue;
+      }
+      return result;
+    }
+    
     // その他の式の評価
-    const result = evaluateFormulaWithErrorCheck(valueExpr, context);
+    result = evaluateFormulaWithErrorCheck(valueExpr, context);
     if (result === '#N/A' || result === FormulaError.NA) {
       return naValue;
     }

@@ -103,10 +103,12 @@ export const logicalTests: IndividualFunctionTest[] = [
     category: '05. 論理',
     description: '#N/Aエラー時の値',
     data: [
-      ['検索値', '結果'],
-      ['存在しない', '=IFNA(VLOOKUP(A2,D:E,2,FALSE),"見つかりません")']
+      ['検索値', '結果', 'NA関数', 'キー', '値'],
+      ['存在しない', '=IFNA(VLOOKUP(A2,D:E,2,FALSE),"見つかりません")', '=IFNA(NA(),"NAエラー")', 'Item1', 'Value1'],
+      ['Item2', '=IFNA(VLOOKUP(A3,D:E,2,FALSE),"見つかりません")', '', 'Item2', 'Value2'],
+      ['', '', '', 'Item3', 'Value3']
     ],
-    expectedValues: { 'B2': '見つかりません' }
+    expectedValues: { 'B2': '見つかりません', 'B3': 'Value2', 'C2': 'NAエラー' }
   },
   {
     name: 'SWITCH',

@@ -153,6 +153,13 @@ function evaluateNestedFormula(formula: string, context: FormulaContext): string
   let iterations = 0;
   const maxIterations = 10;
   
+  // Check if this is IFNA or IFERROR - they need to evaluate their first argument themselves
+  const isErrorHandlingFunction = /^(IFNA|IFERROR)\s*\(/i.test(formula);
+  if (isErrorHandlingFunction) {
+    // Don't evaluate nested functions for IFNA/IFERROR
+    return formula;
+  }
+  
   
   while (hasChanges && iterations < maxIterations) {
     hasChanges = false;
@@ -226,6 +233,7 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
     // ネストされた関数を評価
     const evaluatedFormula = evaluateNestedFormula(cleanFormula, context);
     
+    
     // 評価後の式がエラー値の場合は、直接返す
     if (evaluatedFormula !== cleanFormula && typeof evaluatedFormula === 'string' && evaluatedFormula.startsWith('#')) {
       return evaluatedFormula as FormulaResult;
@@ -256,10 +264,7 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
       return result;
     } else {
       // 評価済みの式が単純な値の場合
-      const num = parseFloat(evaluatedFormula);
-      if (!isNaN(num)) {
-        return num;
-      }
+      // 引用符で囲まれた文字列の場合は、その値を返す
       if (evaluatedFormula.startsWith('"') && evaluatedFormula.endsWith('"')) {
         return evaluatedFormula.slice(1, -1);
       }
@@ -267,6 +272,19 @@ export function calculateSingleFormula(formula: string, data: CellData[][], curr
       // エラー値の場合はそのまま返す
       if (evaluatedFormula.startsWith('#')) {
         return evaluatedFormula as FormulaResult;
+      }
+      
+      // 数値の場合（カンマを含む数値文字列は文字列として扱う）
+      if (!evaluatedFormula.includes(',')) {
+        const num = parseFloat(evaluatedFormula);
+        if (!isNaN(num)) {
+          return num;
+        }
+      }
+      
+      // それ以外は文字列として返す
+      if (evaluatedFormula !== cleanFormula) {
+        return evaluatedFormula;
       }
       
       console.warn(`未対応の数式: ${evaluatedFormula} (original: ${cleanFormula})`);

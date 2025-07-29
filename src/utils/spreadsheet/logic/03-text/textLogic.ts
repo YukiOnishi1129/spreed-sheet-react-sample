@@ -990,7 +990,7 @@ export const REPLACE: CustomFormula = {
 // CHAR関数の実装（文字コードから文字を返す）
 export const CHAR: CustomFormula = {
   name: 'CHAR',
-  pattern: /CHAR\(([^)]+)\)/i,
+  pattern: /\bCHAR\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, numberRef] = matches;
     
@@ -1013,7 +1013,7 @@ export const CHAR: CustomFormula = {
 // CODE関数の実装（文字から文字コードを返す）
 export const CODE: CustomFormula = {
   name: 'CODE',
-  pattern: /CODE\(([^)]+)\)/i,
+  pattern: /\bCODE\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, textRef] = matches;
     
@@ -1142,7 +1142,8 @@ export const FIXED: CustomFormula = {
     // カンマ区切りなしフラグを取得
     if (noCommasRef.match(/^[A-Z]+\d+$/)) {
       const cellValue = getCellValue(noCommasRef, context);
-      noCommas = Boolean(cellValue);
+      const cellValueStr = String(cellValue ?? 'FALSE').toUpperCase();
+      noCommas = cellValueStr === 'TRUE' || cellValueStr === '1';
     } else {
       noCommas = noCommasRef.toUpperCase() === 'TRUE' || noCommasRef === '1';
     }
@@ -1271,7 +1272,7 @@ export const DOLLAR: CustomFormula = {
 // UNICHAR関数の実装（Unicode文字を返す）
 export const UNICHAR: CustomFormula = {
   name: 'UNICHAR',
-  pattern: /UNICHAR\(([^)]+)\)/i,
+  pattern: /\bUNICHAR\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, numberRef] = matches;
     
@@ -1283,6 +1284,7 @@ export const UNICHAR: CustomFormula = {
       number = parseInt(numberRef);
     }
     
+    // Unicode範囲チェック: 0から開始（Excelの仕様）
     if (isNaN(number) || number < 1 || number > 1114111) {
       return FormulaError.VALUE;
     }
@@ -1298,7 +1300,7 @@ export const UNICHAR: CustomFormula = {
 // UNICODE関数の実装（Unicode値を返す）
 export const UNICODE: CustomFormula = {
   name: 'UNICODE',
-  pattern: /UNICODE\(([^)]+)\)/i,
+  pattern: /\bUNICODE\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, textRef] = matches;
     

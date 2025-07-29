@@ -166,6 +166,14 @@ function DemoSpreadsheet() {
             };
           }
           
+          // 文字列が = で始まる場合は数式として扱う
+          if (typeof cell === 'string' && cell.startsWith('=')) {
+            return {
+              value: '',
+              formula: cell
+            };
+          }
+          
           // 単純な値の場合は元の型を保持（Excel関数の動作に合わせる）
           // Keep original types for proper Excel function behavior
           // if (typeof cell === 'string' && cell !== '') {

@@ -27,6 +27,20 @@ export const parseCellReference = (cellRef: string): { col: number; row: number 
 export const parseCellRange = (range: string): { start: { col: number; row: number }; end: { col: number; row: number } } | null => {
   // Remove $ signs for absolute references
   const cleanRange = range.replace(/\$/g, '');
+  
+  // Check for full column references (e.g., D:E)
+  const columnMatch = cleanRange.match(/^([A-Z]+):([A-Z]+)$/);
+  if (columnMatch) {
+    const startCol = columnMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+    const endCol = columnMatch[2].charCodeAt(0) - 'A'.charCodeAt(0);
+    // Use a reasonable default range for full column references
+    return { 
+      start: { col: startCol, row: 0 }, 
+      end: { col: endCol, row: 999 } // Reasonable max rows
+    };
+  }
+  
+  // Standard range (e.g., A1:B2)
   const match = cleanRange.match(/^([A-Z]+\d+):([A-Z]+\d+)$/);
   if (!match) return null;
   

@@ -1415,8 +1415,12 @@ export const ODD: CustomFormula = {
 export const ARABIC: CustomFormula = {
   name: 'ARABIC',
   pattern: /ARABIC\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray) => {
-    const romanStr = matches[1].trim().replace(/["']/g, '').toUpperCase();
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, textRef] = matches;
+    
+    // セル参照または直接の値を取得
+    const cellValue = getCellValue(textRef.trim(), context);
+    const romanStr = (cellValue ?? textRef).toString().trim().replace(/["']/g, '').toUpperCase();
     
     // ローマ数字の基本文字と対応する値
     const romanMap: { [key: string]: number } = {
@@ -1588,13 +1592,16 @@ export const PERMUT: CustomFormula = {
 export const PERMUTATIONA: CustomFormula = {
   name: 'PERMUTATIONA',
   pattern: /PERMUTATIONA\(([^,]+),\s*([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray) => {
-    const nStr = matches[1].trim();
-    const kStr = matches[2].trim();
+  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+    const [, nRef, kRef] = matches;
+    
+    // セル参照または直接の値を取得
+    const nValue = getCellValue(nRef.trim(), context);
+    const kValue = getCellValue(kRef.trim(), context);
     
     // 数値の取得
-    const n = parseFloat(nStr);
-    const k = parseFloat(kStr);
+    const n = parseFloat(nValue ?? nRef);
+    const k = parseFloat(kValue ?? kRef);
     
     // 数値型チェック
     if (isNaN(n) || isNaN(k)) {
