@@ -132,8 +132,8 @@ export const IF: CustomFormula = {
       const [, leftExpr, operator, rightExpr] = comparisonMatch;
       
       // 左辺と右辺の値を取得
-      let leftValue: any;
-      let rightValue: any;
+      let leftValue: string | number | unknown;
+      let rightValue: string | number | unknown;
       
       // 左辺の値を取得（セル参照またはリテラル）
       const leftTrimmed = leftExpr.trim();

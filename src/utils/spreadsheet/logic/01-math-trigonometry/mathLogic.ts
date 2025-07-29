@@ -310,7 +310,6 @@ export const ROUND: CustomFormula = {
     const digitsRef = args[1];
     
     let number: number;
-    let digits: number;
     
     // 数値の取得（演算式の場合も考慮）
     if (numberRef.includes('/') || numberRef.includes('*') || numberRef.includes('+') || numberRef.includes('-')) {
@@ -372,7 +371,7 @@ export const ROUND: CustomFormula = {
     
     // 桁数の取得
     const digitsValue = getCellValue(digitsRef, context);
-    digits = digitsValue !== null && digitsValue !== undefined && digitsValue !== FormulaError.REF
+    const digits = digitsValue !== null && digitsValue !== undefined && digitsValue !== FormulaError.REF
       ? Number(digitsValue)
       : Number(digitsRef);
     
@@ -1350,7 +1349,7 @@ export const SUMPRODUCT: CustomFormula = {
       }
       
       return sum;
-    } catch (error) {
+    } catch {
       return FormulaError.VALUE;
     }
   }
