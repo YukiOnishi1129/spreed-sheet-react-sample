@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import ChatGPTSpreadsheet from './components/ChatGPTSpreadsheet';
 import DemoSpreadsheet from './components/DemoSpreadsheet';
+import TestSpreadsheet from './components/TestSpreadsheet';
 
 function HomePage() {
   return (
@@ -38,6 +39,12 @@ function HomePage() {
               >
                 関数デモモード
               </Link>
+              <Link 
+                to="/test" 
+                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-lg"
+              >
+                テストモード
+              </Link>
             </div>
           </div>
           
@@ -53,6 +60,7 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/demo" element={<DemoSpreadsheet />} />
+      <Route path="/test" element={<TestSpreadsheet />} />
     </Routes>
   );
 }

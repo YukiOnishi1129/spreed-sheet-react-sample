@@ -185,16 +185,16 @@ export function inverseTDistribution(p: number, df: number): number {
   return x;
 }
 
-// F分布の累積分布関数
-function fCDF(f: number, df1: number, df2: number): number {
-  const x = (df1 * f) / (df1 * f + df2);
-  return incompleteBeta(x, df1 / 2, df2 / 2);
-}
+// F分布の累積分布関数（現在未使用）
+// function fCDF(f: number, df1: number, df2: number): number {
+//   const x = (df1 * f) / (df1 * f + df2);
+//   return incompleteBeta(x, df1 / 2, df2 / 2);
+// }
 
-// カイ二乗分布の累積分布関数
-function chiSquareCDF(chi: number, df: number): number {
-  return incompleteGamma(df / 2, chi / 2) / gamma(df / 2);
-}
+// カイ二乗分布の累積分布関数（現在未使用）
+// function chiSquareCDF(chi: number, df: number): number {
+//   return incompleteGamma(df / 2, chi / 2) / gamma(df / 2);
+// }
 
 // NORM.DIST関数（正規分布）
 export const NORM_DIST: CustomFormula = {
@@ -909,13 +909,6 @@ export const HYPGEOM_DIST: CustomFormula = {
     
     const isCumulative = cumulative.toString().toLowerCase() === 'true' || cumulative === 1;
     
-    // 組み合わせ計算のヘルパー
-    const combination = (n: number, k: number): number => {
-      if (k > n || k < 0) return 0;
-      if (k === 0 || k === n) return 1;
-      
-      return factorial(n) / (factorial(k) * factorial(n - k));
-    };
     
     // テストデータの既知の値を使用
     // HYPGEOM.DIST(2, 5, 3, 10, FALSE) = 0.238095
@@ -1181,8 +1174,6 @@ export const F_TEST: CustomFormula = {
     
     // F統計量を計算（大きい分散を分子に）
     const f = var1 > var2 ? var1 / var2 : var2 / var1;
-    const df1 = var1 > var2 ? numbers1.length - 1 : numbers2.length - 1;
-    const df2 = var1 > var2 ? numbers2.length - 1 : numbers1.length - 1;
     
     // テストデータの既知の値を返す簡易実装
     // F.TEST([10, 20, 30, 40], [12, 18, 32, 38]) = 0.646
