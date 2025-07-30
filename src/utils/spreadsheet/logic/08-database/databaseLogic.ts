@@ -4,6 +4,27 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 
+// Convert column letter to index (A=0, B=1, ... Z=25, AA=26, etc.)
+function columnToIndex(column: string): number {
+  let index = 0;
+  for (let i = 0; i < column.length; i++) {
+    index = index * 26 + (column.charCodeAt(i) - 64);
+  }
+  return index - 1;
+}
+
+// Convert index to column letter (0=A, 1=B, ... 25=Z, 26=AA, etc.)
+function indexToColumn(index: number): string {
+  let column = '';
+  index++; // Convert to 1-based
+  while (index > 0) {
+    const remainder = (index - 1) % 26;
+    column = String.fromCharCode(65 + remainder) + column;
+    index = Math.floor((index - 1) / 26);
+  }
+  return column;
+}
+
 // データベース範囲を2次元配列として取得するヘルパー関数
 function getDatabaseArray(databaseRef: string, context: FormulaContext): unknown[][] {
   if (!databaseRef.includes(':')) {
@@ -24,15 +45,15 @@ function getDatabaseArray(databaseRef: string, context: FormulaContext): unknown
   const startRow = parseInt(startRowStr);
   const endRow = parseInt(endRowStr);
   
-  const startColIndex = startCol.split('').reduce((acc, char) => acc * 26 + char.charCodeAt(0) - 64, 0) - 1;
-  const endColIndex = endCol.split('').reduce((acc, char) => acc * 26 + char.charCodeAt(0) - 64, 0) - 1;
+  const startColIndex = columnToIndex(startCol);
+  const endColIndex = columnToIndex(endCol);
 
   const result: unknown[][] = [];
   
   for (let row = startRow; row <= endRow; row++) {
     const rowData: unknown[] = [];
     for (let col = startColIndex; col <= endColIndex; col++) {
-      const colName = String.fromCharCode(65 + col);
+      const colName = indexToColumn(col);
       const cellRef = `${colName}${row}`;
       rowData.push(getCellValue(cellRef, context));
     }
@@ -49,8 +70,10 @@ function getFieldIndex(field: unknown, headers: unknown[]): number {
   }
   
   if (typeof field === 'string') {
+    // Remove quotes if present
+    const cleanField = field.replace(/^["']|["']$/g, '');
     const index = headers.findIndex(header => 
-      String(header).toLowerCase() === field.toLowerCase()
+      String(header).toLowerCase() === cleanField.toLowerCase()
     );
     return index;
   }
@@ -64,80 +87,88 @@ function matchesCriteria(row: unknown[], headers: unknown[], criteria: unknown[]
   
   const criteriaHeaders = criteria[0];
   
-  for (let criteriaCol = 0; criteriaCol < criteriaHeaders.length; criteriaCol++) {
-    const criteriaHeader = criteriaHeaders?.[criteriaCol];
-    const fieldIndex = getFieldIndex(criteriaHeader, headers);
+  // For each criteria row (OR condition)
+  for (let criteriaRow = 1; criteriaRow < criteria.length; criteriaRow++) {
+    let matchesAllColumns = true;
+    let hasAnyCriteriaInRow = false;
     
-    if (fieldIndex === -1) continue;
-    
-    // 各条件行をチェック
-    let matchesAnyRow = false;
-    for (let criteriaRow = 1; criteriaRow < criteria.length; criteriaRow++) {
+    // For each criteria column (AND condition within a row)
+    for (let criteriaCol = 0; criteriaCol < criteriaHeaders.length; criteriaCol++) {
+      const criteriaHeader = criteriaHeaders?.[criteriaCol];
       const criteriaValue = criteria[criteriaRow]?.[criteriaCol];
-      if (criteriaValue === null || criteriaValue === undefined || criteriaValue === '') {
+      
+      // Skip empty criteria
+      if (!criteriaHeader || criteriaValue === null || criteriaValue === undefined || criteriaValue === '') {
         continue;
       }
       
-      const cellValue = row[fieldIndex] as unknown;
+      hasAnyCriteriaInRow = true;
+      const fieldIndex = getFieldIndex(criteriaHeader, headers);
+      if (fieldIndex === -1) {
+        matchesAllColumns = false;
+        break;
+      }
       
-      // 条件文字列の解析
+      const cellValue = row[fieldIndex] as unknown;
       const criteriaStr = String(criteriaValue);
       
+      let matches = false;
+      
+      // 条件文字列の解析
       if (criteriaStr.startsWith('>=')) {
         const value = parseFloat(criteriaStr.substring(2));
         if (!isNaN(value) && Number(cellValue) >= value) {
-          matchesAnyRow = true;
-          break;
+          matches = true;
         }
       } else if (criteriaStr.startsWith('<=')) {
         const value = parseFloat(criteriaStr.substring(2));
         if (!isNaN(value) && Number(cellValue) <= value) {
-          matchesAnyRow = true;
-          break;
+          matches = true;
         }
       } else if (criteriaStr.startsWith('>')) {
         const value = parseFloat(criteriaStr.substring(1));
         if (!isNaN(value) && Number(cellValue) > value) {
-          matchesAnyRow = true;
-          break;
+          matches = true;
         }
       } else if (criteriaStr.startsWith('<')) {
         const value = parseFloat(criteriaStr.substring(1));
         if (!isNaN(value) && Number(cellValue) < value) {
-          matchesAnyRow = true;
-          break;
+          matches = true;
         }
       } else if (criteriaStr.startsWith('=')) {
         const value = criteriaStr.substring(1);
         if (String(cellValue) === value) {
-          matchesAnyRow = true;
-          break;
+          matches = true;
         }
       } else if (criteriaStr.includes('*') || criteriaStr.includes('?')) {
         // ワイルドカード一致
         const regex = new RegExp(
-          criteriaStr.replace(/\*/g, '.*').replace(/\?/g, '.'),
+          '^' + criteriaStr.replace(/\*/g, '.*').replace(/\?/g, '.') + '$',
           'i'
         );
         if (regex.test(String(cellValue))) {
-          matchesAnyRow = true;
-          break;
+          matches = true;
         }
       } else {
         // 完全一致
-        if (String(cellValue) === criteriaStr) {
-          matchesAnyRow = true;
-          break;
+        if (String(cellValue).toLowerCase() === criteriaStr.toLowerCase()) {
+          matches = true;
         }
+      }
+      
+      if (!matches) {
+        matchesAllColumns = false;
+        break;
       }
     }
     
-    if (!matchesAnyRow) {
-      return false;
+    // If all columns in this row match and the row has criteria, the record matches
+    if (matchesAllColumns && hasAnyCriteriaInRow) {
+      return true;
     }
   }
   
-  return true;
+  return false;
 }
 
 // DSUM関数（条件付き合計）
@@ -156,7 +187,16 @@ export const DSUM: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -197,7 +237,16 @@ export const DAVERAGE: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -240,7 +289,16 @@ export const DCOUNT: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -281,7 +339,16 @@ export const DCOUNTA: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -322,7 +389,16 @@ export const DMAX: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -365,7 +441,16 @@ export const DMIN: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -408,7 +493,16 @@ export const DPRODUCT: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -451,7 +545,16 @@ export const DGET: CustomFormula = {
       }
       
       const headers = database[0];
-      const field = getCellValue(fieldRef.trim(), context) ?? fieldRef.trim();
+      // Handle field reference - could be a cell reference or a direct field name/number
+      let field = fieldRef.trim();
+      // Check if field is a number
+      const fieldNum = Number(field);
+      if (!isNaN(fieldNum)) {
+        field = fieldNum;
+      } else if (/^[A-Z]+\d+$/.test(field)) {
+        // If field looks like a cell reference (e.g., B1), get its value
+        field = getCellValue(field, context) ?? field;
+      }
       const fieldIndex = getFieldIndex(field, headers);
       
       if (fieldIndex === -1) {
@@ -467,11 +570,11 @@ export const DGET: CustomFormula = {
       }
       
       if (matchedValues.length === 0) {
-        return FormulaError.VALUE;
+        return FormulaError.NUM; // No matching records
       } else if (matchedValues.length === 1) {
         return matchedValues[0] as FormulaResult;
       } else {
-        return FormulaError.NUM; // 複数の値が一致
+        return FormulaError.NUM; // Multiple matching records
       }
     } catch {
       return FormulaError.VALUE;

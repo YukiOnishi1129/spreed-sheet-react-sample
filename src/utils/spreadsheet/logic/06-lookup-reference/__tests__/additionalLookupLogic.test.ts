@@ -7,8 +7,15 @@ import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext
-const createContext = (data: (string | number | boolean | null)[][], row = 0, col = 0): FormulaContext => ({
-  data: data.map(row => row.map(cell => ({ value: cell }))),
+const createContext = (data: any[][], row = 0, col = 0): FormulaContext => ({
+  data: data.map(row => row.map(cell => {
+    // If cell is already an object with value property, use it as is
+    if (typeof cell === 'object' && cell !== null && 'value' in cell) {
+      return cell;
+    }
+    // Otherwise wrap it
+    return { value: cell };
+  })),
   row,
   col
 });

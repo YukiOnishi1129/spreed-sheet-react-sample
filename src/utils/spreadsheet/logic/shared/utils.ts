@@ -88,9 +88,15 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
   // セルデータがオブジェクトの場合のみプロパティを探す
   if (cellData && typeof cellData === 'object') {
     // If the object itself has a numeric or string representation, return it
-    const value = cellData.value ?? cellData.v ?? cellData._ ?? null;
-    if (value !== null && value !== undefined) {
-      return value;
+    // Check for value property (handling null as a valid value)
+    if ('value' in cellData) {
+      return cellData.value;
+    }
+    if ('v' in cellData) {
+      return cellData.v;
+    }
+    if ('_' in cellData) {
+      return cellData._;
     }
     // If we have a formula cell that hasn't been calculated yet, return empty
     if ('formula' in cellData || 'f' in cellData) {
@@ -105,6 +111,12 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
 export const getCellRangeValues = (range: string, context: FormulaContext): unknown[] => {
   const rangeCoords = parseCellRange(range);
   if (!rangeCoords) {
+    // Check if it's a single cell reference
+    const singleCell = parseCellReference(range);
+    if (singleCell) {
+      const value = getCellValue(range, context);
+      return [value];
+    }
     return [];
   }
   
@@ -124,12 +136,17 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
         if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {
           value = cellData;
         } else if (cellData && typeof cellData === 'object') {
-          value = cellData.value ?? cellData.v ?? cellData._ ?? null;
-          // Skip formula cells that haven't been calculated yet
-          if (value === null && ('formula' in cellData || 'f' in cellData)) {
+          // Check for value property (handling null as a valid value)
+          if ('value' in cellData) {
+            value = cellData.value;
+          } else if ('v' in cellData) {
+            value = cellData.v;
+          } else if ('_' in cellData) {
+            value = cellData._;
+          } else if ('formula' in cellData || 'f' in cellData) {
+            // Skip formula cells that haven't been calculated yet
             continue;
-          }
-          if (value === null) {
+          } else {
             value = cellData;
           }
         } else {

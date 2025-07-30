@@ -12,24 +12,70 @@ const createContext = (data: (string | number | boolean | null)[][]): FormulaCon
   col: 0
 });
 
+// Helper function to create a spreadsheet-like context with proper column layout
+const createSpreadsheetContext = (
+  database: (string | number | boolean | null)[][],
+  criteria: (string | number | boolean | null)[][],
+  dbRange: { startCol: number, endCol: number },
+  criteriaRange: { startCol: number, endCol: number }
+): FormulaContext => {
+  const maxRows = Math.max(database.length, criteria.length);
+  const maxCols = Math.max(dbRange.endCol, criteriaRange.endCol) + 1;
+  
+  // Initialize empty spreadsheet
+  const spreadsheet: (string | number | boolean | null)[][] = [];
+  for (let r = 0; r < maxRows; r++) {
+    spreadsheet[r] = new Array(maxCols).fill(null);
+  }
+  
+  // Place database data
+  for (let r = 0; r < database.length; r++) {
+    for (let c = 0; c < database[r].length; c++) {
+      if (c + dbRange.startCol <= dbRange.endCol) {
+        spreadsheet[r][c + dbRange.startCol] = database[r][c];
+      }
+    }
+  }
+  
+  // Place criteria data
+  for (let r = 0; r < criteria.length; r++) {
+    for (let c = 0; c < criteria[r].length; c++) {
+      if (c + criteriaRange.startCol <= criteriaRange.endCol) {
+        spreadsheet[r][c + criteriaRange.startCol] = criteria[r][c];
+      }
+    }
+  }
+  
+  return createContext(spreadsheet);
+};
+
 describe('Statistical Database Functions', () => {
   // Sample database: Test scores by subject and student
-  const mockContext = createContext([
-    // Database area (A1:D6)
+  const databaseData = [
     ['Student', 'Subject', 'Score', 'Grade'],
     ['Alice', 'Math', 85, 'B'],
     ['Bob', 'Math', 92, 'A'],
     ['Charlie', 'Math', 78, 'C'],
     ['Alice', 'English', 88, 'B'],
-    ['Bob', 'English', 95, 'A'],
-    // Criteria area (F1:G2)
+    ['Bob', 'English', 95, 'A']
+  ];
+  
+  const criteriaData = [
     ['Subject'],
     ['Math']
-  ]);
+  ];
+  
+  // Create context with database in A1:D6 and criteria in F1:F2
+  const mockContext = createSpreadsheetContext(
+    databaseData,
+    criteriaData,
+    { startCol: 0, endCol: 3 },  // A-D
+    { startCol: 5, endCol: 5 }   // F
+  );
 
   describe('DSTDEV Function (Sample Standard Deviation)', () => {
     it('should calculate standard deviation for Math scores', () => {
-      const matches = ['DSTDEV(A1:D6, "Score", F1:G2)', 'A1:D6', 'Score', 'F1:G2'] as RegExpMatchArray;
+      const matches = ['DSTDEV(A1:D6, "Score", F1:F2)', 'A1:D6', 'Score', 'F1:F2'] as RegExpMatchArray;
       const result = DSTDEV.calculate(matches, mockContext);
       
       // Manual calculation: scores are 85, 92, 78
@@ -99,7 +145,7 @@ describe('Statistical Database Functions', () => {
 
   describe('DSTDEVP Function (Population Standard Deviation)', () => {
     it('should calculate population standard deviation for Math scores', () => {
-      const matches = ['DSTDEVP(A1:D6, "Score", F1:G2)', 'A1:D6', 'Score', 'F1:G2'] as RegExpMatchArray;
+      const matches = ['DSTDEVP(A1:D6, "Score", F1:F2)', 'A1:D6', 'Score', 'F1:F2'] as RegExpMatchArray;
       const result = DSTDEVP.calculate(matches, mockContext);
       
       // Manual calculation: scores are 85, 92, 78
@@ -144,7 +190,7 @@ describe('Statistical Database Functions', () => {
 
   describe('DVAR Function (Sample Variance)', () => {
     it('should calculate sample variance for Math scores', () => {
-      const matches = ['DVAR(A1:D6, "Score", F1:G2)', 'A1:D6', 'Score', 'F1:G2'] as RegExpMatchArray;
+      const matches = ['DVAR(A1:D6, "Score", F1:F2)', 'A1:D6', 'Score', 'F1:F2'] as RegExpMatchArray;
       const result = DVAR.calculate(matches, mockContext);
       
       // Manual calculation: scores are 85, 92, 78
@@ -204,7 +250,7 @@ describe('Statistical Database Functions', () => {
 
   describe('DVARP Function (Population Variance)', () => {
     it('should calculate population variance for Math scores', () => {
-      const matches = ['DVARP(A1:D6, "Score", F1:G2)', 'A1:D6', 'Score', 'F1:G2'] as RegExpMatchArray;
+      const matches = ['DVARP(A1:D6, "Score", F1:F2)', 'A1:D6', 'Score', 'F1:F2'] as RegExpMatchArray;
       const result = DVARP.calculate(matches, mockContext);
       
       // Manual calculation: scores are 85, 92, 78
@@ -263,7 +309,7 @@ describe('Statistical Database Functions', () => {
   describe('Edge Cases and Error Handling', () => {
     it('should handle field specified by number', () => {
       // Using field index 3 instead of field name "Score"
-      const matches = ['DSTDEV(A1:D6, 3, F1:G2)', 'A1:D6', '3', 'F1:G2'] as RegExpMatchArray;
+      const matches = ['DSTDEV(A1:D6, 3, F1:F2)', 'A1:D6', '3', 'F1:F2'] as RegExpMatchArray;
       const result = DSTDEV.calculate(matches, mockContext);
       expect(result).toBeCloseTo(7, 5);
     });
@@ -305,7 +351,7 @@ describe('Statistical Database Functions', () => {
     });
 
     it('should return VALUE error for malformed input', () => {
-      const matches = ['DSTDEV(A1:D6, "Score", F1:G2)', 'A1:D6', 'Score', 'F1:G2'] as RegExpMatchArray;
+      const matches = ['DSTDEV(A1:D6, "Score", F1:F2)', 'A1:D6', 'Score', 'F1:F2'] as RegExpMatchArray;
       const malformedContext = createContext([]);
       const result = DSTDEV.calculate(matches, malformedContext);
       expect(result).toBe(FormulaError.VALUE);

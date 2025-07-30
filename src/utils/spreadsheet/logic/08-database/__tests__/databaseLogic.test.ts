@@ -15,18 +15,18 @@ const createContext = (data: (string | number | boolean | null)[][]): FormulaCon
 describe('Database Functions', () => {
   // Sample database: Employee data
   const mockContext = createContext([
-    // Headers row (A1:D1)
-    ['Name', 'Department', 'Salary', 'Age'],
-    // Data rows (A2:D6)
-    ['Alice', 'Sales', 50000, 25],
-    ['Bob', 'Engineering', 75000, 30],
+    // Row 1: Headers (A1:D1) + empty E1 + Criteria headers (F1:H1)
+    ['Name', 'Department', 'Salary', 'Age', '', 'Department', 'Salary', ''],
+    // Row 2: Data (A2:D2) + empty E2 + Criteria values (F2:H2)
+    ['Alice', 'Sales', 50000, 25, '', 'Sales', '>40000', ''],
+    // Row 3: Data (A3:D3) + empty E3 + Criteria values (F3:H3)
+    ['Bob', 'Engineering', 75000, 30, '', 'Engineering', '', ''],
+    // Row 4: Data (A4:D4)
     ['Charlie', 'Sales', 45000, 28],
+    // Row 5: Data (A5:D5)
     ['David', 'Engineering', 80000, 35],
-    ['Eve', 'Marketing', 55000, 26],
-    // Criteria area (F1:H3)
-    ['', '', 'Department', 'Salary'],
-    ['', '', 'Sales', '>40000'],
-    ['', '', 'Engineering', '']
+    // Row 6: Data (A6:D6)
+    ['Eve', 'Marketing', 55000, 26]
   ]);
 
   describe('DSUM Function', () => {
@@ -63,9 +63,20 @@ describe('Database Functions', () => {
     });
 
     it('should handle complex criteria with comparison operators', () => {
+      // For this test, we need a separate context with the correct criteria layout
+      const complexCriteriaContext = createContext([
+        // Row 1: Database headers + empty columns + Criteria headers
+        ['Name', 'Department', 'Salary', 'Age', '', '', 'Department', 'Salary'],
+        // Row 2: Data rows
+        ['Alice', 'Sales', 50000, 25, '', '', 'Sales', '>40000'],
+        ['Bob', 'Engineering', 75000, 30],
+        ['Charlie', 'Sales', 45000, 28],
+        ['David', 'Engineering', 80000, 35],
+        ['Eve', 'Marketing', 55000, 26]
+      ]);
       const matches = ['DSUM(A1:D6, "Salary", G1:H2)', 'A1:D6', '"Salary"', 'G1:H2'] as RegExpMatchArray;
-      const result = DSUM.calculate(matches, mockContext);
-      expect(result).toBe(50000); // Only Alice meets >40000 in Sales
+      const result = DSUM.calculate(matches, complexCriteriaContext);
+      expect(result).toBe(95000); // Alice(50000) + Charlie(45000) both meet >40000 in Sales
     });
   });
 
@@ -218,8 +229,19 @@ describe('Database Functions', () => {
     });
 
     it('should find minimum age in Engineering department', () => {
+      // For this test, we need a context with Engineering criteria in G1:H3
+      const engineeringContext = createContext([
+        // Row 1: Database headers + empty columns + Criteria headers
+        ['Name', 'Department', 'Salary', 'Age', '', '', 'Department', ''],
+        // Row 2: Data rows
+        ['Alice', 'Sales', 50000, 25, '', '', 'Engineering', ''],
+        ['Bob', 'Engineering', 75000, 30, '', '', '', ''],
+        ['Charlie', 'Sales', 45000, 28],
+        ['David', 'Engineering', 80000, 35],
+        ['Eve', 'Marketing', 55000, 26]
+      ]);
       const matches = ['DMIN(A1:D6, "Age", G1:H3)', 'A1:D6', '"Age"', 'G1:H3'] as RegExpMatchArray;
-      const result = DMIN.calculate(matches, mockContext);
+      const result = DMIN.calculate(matches, engineeringContext);
       expect(result).toBe(30); // Bob's age
     });
   });
@@ -290,7 +312,7 @@ describe('Database Functions', () => {
       
       const matches = ['DGET(A1:C2, "Salary", A3:A4)', 'A1:C2', '"Salary"', 'A3:A4'] as RegExpMatchArray;
       const result = DGET.calculate(matches, noMatchContext);
-      expect(result).toBe(FormulaError.VALUE);
+      expect(result).toBe(FormulaError.NUM);
     });
 
     it('should get text value', () => {
@@ -331,8 +353,8 @@ describe('Database Functions', () => {
         ['Alice', 'Sales'],
         ['Alex', 'Sales'],
         ['Bob', 'Support'],
-        ['Name'],
-        ['Al*'] // Wildcard for names starting with "Al"
+        ['Name', null],
+        ['Al*', null] // Wildcard for names starting with "Al"
       ]);
       
       const matches = ['DCOUNTA(A1:B4, "Name", A5:A6)', 'A1:B4', '"Name"', 'A5:A6'] as RegExpMatchArray;

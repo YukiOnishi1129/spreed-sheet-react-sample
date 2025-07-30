@@ -20,8 +20,13 @@ function getMatchingRows(
   // フィールドのインデックスを特定
   let fieldIndex = -1;
   if (typeof field === 'number') {
-    fieldIndex = field - 1;
+    // フィールドが数値の場合は1ベースのインデックスとして扱う
+    const numField = parseInt(String(field));
+    if (!isNaN(numField) && numField > 0) {
+      fieldIndex = numField - 1;
+    }
   } else {
+    // フィールド名で検索（大文字小文字を区別しない）
     const fieldName = String(field).toUpperCase();
     fieldIndex = headers.indexOf(fieldName);
   }
@@ -33,69 +38,84 @@ function getMatchingRows(
   // 条件に一致する行の値を収集
   const values: number[] = [];
 
+  // データベースの各行をチェック
   for (let row = 1; row < database.length; row++) {
-    let match = true;
+    let rowMatches = false;
 
-    // すべての条件をチェック
-    for (let cCol = 0; cCol < criteriaHeaders.length; cCol++) {
-      const criteriaHeader = criteriaHeaders[cCol];
-      const dbCol = headers.indexOf(criteriaHeader);
+    // 条件の各行をチェック（いずれかの条件行に一致すればOK）
+    for (let cRow = 1; cRow < criteria.length; cRow++) {
+      let allCriteriaMatch = true;
 
-      if (dbCol >= 0) {
-        for (let cRow = 1; cRow < criteria.length; cRow++) {
+      // この条件行のすべての列をチェック
+      for (let cCol = 0; cCol < criteriaHeaders.length; cCol++) {
+        const criteriaHeader = criteriaHeaders[cCol];
+        const dbCol = headers.indexOf(criteriaHeader);
+
+        if (dbCol >= 0) {
           const criteriaValue = criteria[cRow][cCol];
-          if (criteriaValue !== null && criteriaValue !== undefined && criteriaValue !== '') {
-            const dbValue = database[row][dbCol];
-            
-            // 条件の評価
-            const criteriaStr = String(criteriaValue);
-            if (criteriaStr.startsWith('>') || criteriaStr.startsWith('<') || criteriaStr.startsWith('=') || criteriaStr.startsWith('!')) {
-              // 比較演算子を含む条件
-              const operator = criteriaStr.match(/^([><=!]+)/)?.[1] ?? '';
-              const compareValue = criteriaStr.substring(operator.length);
-              const dbNum = parseFloat(String(dbValue));
-              const compareNum = parseFloat(compareValue);
+          
+          // 空の条件はスキップ（すべてに一致）
+          if (criteriaValue === null || criteriaValue === undefined || criteriaValue === '') {
+            continue;
+          }
 
-              if (!isNaN(dbNum) && !isNaN(compareNum)) {
-                switch (operator) {
-                  case '>':
-                    match = dbNum > compareNum;
-                    break;
-                  case '>=':
-                    match = dbNum >= compareNum;
-                    break;
-                  case '<':
-                    match = dbNum < compareNum;
-                    break;
-                  case '<=':
-                    match = dbNum <= compareNum;
-                    break;
-                  case '<>':
-                  case '!=':
-                    match = dbNum !== compareNum;
-                    break;
-                  case '=':
-                    match = dbNum === compareNum;
-                    break;
-                  default:
-                    match = String(dbValue).toUpperCase() === criteriaStr.toUpperCase();
-                }
-              } else {
-                match = String(dbValue).toUpperCase() === criteriaStr.toUpperCase();
+          const dbValue = database[row][dbCol];
+          const criteriaStr = String(criteriaValue);
+          let matches = false;
+
+          // 比較演算子を含む条件の処理
+          const operatorMatch = criteriaStr.match(/^([><=!]+)(.*)$/);
+          if (operatorMatch) {
+            const operator = operatorMatch[1];
+            const compareValue = operatorMatch[2];
+            const dbNum = parseFloat(String(dbValue));
+            const compareNum = parseFloat(compareValue);
+
+            if (!isNaN(dbNum) && !isNaN(compareNum)) {
+              switch (operator) {
+                case '>':
+                  matches = dbNum > compareNum;
+                  break;
+                case '>=':
+                  matches = dbNum >= compareNum;
+                  break;
+                case '<':
+                  matches = dbNum < compareNum;
+                  break;
+                case '<=':
+                  matches = dbNum <= compareNum;
+                  break;
+                case '<>':
+                case '!=':
+                  matches = dbNum !== compareNum;
+                  break;
+                case '=':
+                  matches = dbNum === compareNum;
+                  break;
               }
             } else {
-              // 完全一致
-              match = String(dbValue).toUpperCase() === criteriaStr.toUpperCase();
+              // 数値でない場合は文字列として比較
+              matches = String(dbValue).toUpperCase() === criteriaStr.toUpperCase();
             }
+          } else {
+            // 完全一致（大文字小文字を区別しない）
+            matches = String(dbValue).toUpperCase() === criteriaStr.toUpperCase();
+          }
 
-            if (!match) break;
+          if (!matches) {
+            allCriteriaMatch = false;
+            break;
           }
         }
       }
-      if (!match) break;
+
+      if (allCriteriaMatch) {
+        rowMatches = true;
+        break;
+      }
     }
 
-    if (match) {
+    if (rowMatches) {
       const value = parseFloat(String(database[row][fieldIndex]));
       if (!isNaN(value)) {
         values.push(value);
@@ -130,6 +150,11 @@ export const DSTDEV: CustomFormula = {
       const dbStartColIndex = dbStartCol.charCodeAt(0) - 65;
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
+      // コンテキストデータが空の場合のチェック
+      if (!context.data || context.data.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
       for (let row = dbStartRow; row <= dbEndRow; row++) {
         const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
@@ -156,8 +181,16 @@ export const DSTDEV: CustomFormula = {
         criteria.push(rowData);
       }
       
+      // フィールドパラメータの処理
+      let processedField: string | number = field;
+      if (field.match(/^\d+$/)) {
+        processedField = parseInt(field);
+      } else if (field.startsWith('"') && field.endsWith('"')) {
+        processedField = field.slice(1, -1);
+      }
+      
       // 条件に一致する値を取得
-      const { values } = getMatchingRows(database, field, criteria);
+      const { values } = getMatchingRows(database, processedField, criteria);
       
       if (values.length < 2) {
         return FormulaError.DIV0;
@@ -199,6 +232,11 @@ export const DSTDEVP: CustomFormula = {
       const dbStartColIndex = dbStartCol.charCodeAt(0) - 65;
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
+      // コンテキストデータが空の場合のチェック
+      if (!context.data || context.data.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
       for (let row = dbStartRow; row <= dbEndRow; row++) {
         const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
@@ -225,8 +263,16 @@ export const DSTDEVP: CustomFormula = {
         criteria.push(rowData);
       }
       
+      // フィールドパラメータの処理
+      let processedField: string | number = field;
+      if (field.match(/^\d+$/)) {
+        processedField = parseInt(field);
+      } else if (field.startsWith('"') && field.endsWith('"')) {
+        processedField = field.slice(1, -1);
+      }
+      
       // 条件に一致する値を取得
-      const { values } = getMatchingRows(database, field, criteria);
+      const { values } = getMatchingRows(database, processedField, criteria);
       
       if (values.length === 0) {
         return FormulaError.DIV0;
@@ -268,6 +314,11 @@ export const DVAR: CustomFormula = {
       const dbStartColIndex = dbStartCol.charCodeAt(0) - 65;
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
+      // コンテキストデータが空の場合のチェック
+      if (!context.data || context.data.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
       for (let row = dbStartRow; row <= dbEndRow; row++) {
         const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
@@ -294,8 +345,16 @@ export const DVAR: CustomFormula = {
         criteria.push(rowData);
       }
       
+      // フィールドパラメータの処理
+      let processedField: string | number = field;
+      if (field.match(/^\d+$/)) {
+        processedField = parseInt(field);
+      } else if (field.startsWith('"') && field.endsWith('"')) {
+        processedField = field.slice(1, -1);
+      }
+      
       // 条件に一致する値を取得
-      const { values } = getMatchingRows(database, field, criteria);
+      const { values } = getMatchingRows(database, processedField, criteria);
       
       if (values.length < 2) {
         return FormulaError.DIV0;
@@ -337,6 +396,11 @@ export const DVARP: CustomFormula = {
       const dbStartColIndex = dbStartCol.charCodeAt(0) - 65;
       const dbEndColIndex = dbEndCol.charCodeAt(0) - 65;
       
+      // コンテキストデータが空の場合のチェック
+      if (!context.data || context.data.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
       for (let row = dbStartRow; row <= dbEndRow; row++) {
         const rowData: (number | string | boolean | null)[] = [];
         for (let col = dbStartColIndex; col <= dbEndColIndex; col++) {
@@ -363,8 +427,16 @@ export const DVARP: CustomFormula = {
         criteria.push(rowData);
       }
       
+      // フィールドパラメータの処理
+      let processedField: string | number = field;
+      if (field.match(/^\d+$/)) {
+        processedField = parseInt(field);
+      } else if (field.startsWith('"') && field.endsWith('"')) {
+        processedField = field.slice(1, -1);
+      }
+      
       // 条件に一致する値を取得
-      const { values } = getMatchingRows(database, field, criteria);
+      const { values } = getMatchingRows(database, processedField, criteria);
       
       if (values.length === 0) {
         return FormulaError.DIV0;

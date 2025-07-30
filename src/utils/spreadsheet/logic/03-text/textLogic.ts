@@ -6,14 +6,9 @@ import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // Unicode-aware string operations (for proper handling of multi-byte characters, emojis, etc.)
 const getStringLength = (str: string): number => {
-  // Use Intl.Segmenter if available for proper grapheme cluster counting
-  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-    return Array.from(segmenter.segment(str)).length;
-  }
-  
-  // Fallback: use spread operator to handle surrogate pairs
-  return [...str].length;
+  // For Excel compatibility, just use standard string length
+  // Excel doesn't use grapheme clusters for LEN function
+  return str.length;
 };
 
 const getStringSubstring = (str: string, start: number, length?: number): string => {
@@ -233,7 +228,8 @@ export const CONCATENATE: CustomFormula = {
       
       // セル参照の場合
       if (part.match(/^[A-Z]+\d+$/)) {
-        value = String(getCellValue(part, context) ?? '');
+        const cellValue = getCellValue(part, context);
+        value = cellValue !== null && cellValue !== undefined ? String(cellValue) : '';
       }
       // 文字列リテラルの場合
       else if (part.startsWith('"') && part.endsWith('"')) {
@@ -270,12 +266,13 @@ export const CONCAT: CustomFormula = {
       if (part.includes(':')) {
         const rangeValues = getCellRangeValues(part, context);
         for (const value of rangeValues) {
-          result += String(value ?? '');
+          result += value !== null && value !== undefined ? String(value) : '';
         }
       } else {
         let value: string;
         if (part.match(/^[A-Z]+\d+$/)) {
-          value = String(getCellValue(part, context) ?? '');
+          const cellValue = getCellValue(part, context);
+          value = cellValue !== null && cellValue !== undefined ? String(cellValue) : '';
         } else if (part.startsWith('"') && part.endsWith('"')) {
           value = part.slice(1, -1);
         } else {
@@ -292,111 +289,32 @@ export const CONCAT: CustomFormula = {
 // LEFT関数の実装
 export const LEFT: CustomFormula = {
   name: 'LEFT',
-  pattern: /LEFT\((.+)\)/i,
+  pattern: /LEFT\(([^,]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, argsString] = matches;
+    const [, textRef, numCharsRef] = matches;
     
-    // 引数を正しく分割（括弧内のカンマは無視）
-    const args: string[] = [];
-    let currentArg = '';
-    let parenDepth = 0;
-    let inQuotes = false;
-    
-    for (let i = 0; i < argsString.length; i++) {
-      const char = argsString[i];
-      
-      if (char === '"' && argsString[i - 1] !== '\\') {
-        inQuotes = !inQuotes;
-      }
-      
-      if (!inQuotes) {
-        if (char === '(') parenDepth++;
-        else if (char === ')') parenDepth--;
-        else if (char === ',' && parenDepth === 0) {
-          args.push(currentArg.trim());
-          currentArg = '';
-          continue;
-        }
-      }
-      
-      currentArg += char;
+    if (!textRef) {
+      return FormulaError.VALUE;
     }
-    
-    if (currentArg.trim()) {
-      args.push(currentArg.trim());
-    }
-    
-    const textRef = args[0];
-    const numCharsRef = args[1];
-    
     
     let text: string;
-    if (textRef.match(/^[A-Z]+\d+$/)) {
-      text = String(getCellValue(textRef, context) ?? '');
-    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
-      text = textRef.slice(1, -1);
+    if (textRef.trim().match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef.trim(), context) ?? '');
+    } else if (textRef.trim().startsWith('"') && textRef.trim().endsWith('"')) {
+      text = textRef.trim().slice(1, -1);
     } else {
-      text = String(textRef);
+      text = String(textRef.trim());
     }
     
     let numChars = 1; // デフォルト値
     if (numCharsRef) {
-      // 演算式の場合（FIND("@",A7)-1など）
-      if (numCharsRef.includes('-') || numCharsRef.includes('+') || numCharsRef.includes('*') || numCharsRef.includes('/')) {
-        // 簡単な演算を処理（FIND("@",A7)-1のような形式）
-        const parts = numCharsRef.split(/([+\-*/])/);
-        if (parts.length === 3) {
-          const [leftPart, operator, rightPart] = parts;
-          let leftValue: number;
-          
-          // 左辺が関数呼び出しの場合
-          if (leftPart.trim().match(/^[A-Z]+\(/i)) {
-            // FIND関数の場合、直接評価
-            if (leftPart.trim().match(/^FIND\(/i)) {
-              // FIND関数を直接評価する簡易実装
-              const findMatch = leftPart.trim().match(/FIND\(([^,]+),\s*([^)]+)\)/i);
-              if (findMatch) {
-                let findText = findMatch[1];
-                let withinText = findMatch[2];
-                
-                if (findText.startsWith('"') && findText.endsWith('"')) {
-                  findText = findText.slice(1, -1);
-                }
-                
-                if (withinText.match(/^[A-Z]+\d+$/)) {
-                  withinText = String(getCellValue(withinText, context) ?? '');
-                }
-                
-                const index = findStringPosition(findText, withinText);
-                leftValue = index !== -1 ? index : 0;
-              } else {
-                leftValue = 0;
-              }
-            } else {
-              leftValue = parseInt(leftPart.trim());
-            }
-          } else {
-            leftValue = parseInt(leftPart.trim());
-          }
-          
-          const rightValue = parseInt(rightPart.trim());
-          
-          if (!isNaN(leftValue) && !isNaN(rightValue)) {
-            switch (operator) {
-              case '+': numChars = leftValue + rightValue; break;
-              case '-': numChars = leftValue - rightValue; break;
-              case '*': numChars = leftValue * rightValue; break;
-              case '/': numChars = Math.floor(leftValue / rightValue); break;
-            }
-          }
-        }
-      }
+      const trimmedRef = numCharsRef.trim();
       // セル参照の場合
-      else if (numCharsRef.match(/^[A-Z]+\d+$/)) {
-        const cellValue = getCellValue(numCharsRef, context);
+      if (trimmedRef.match(/^[A-Z]+\d+$/)) {
+        const cellValue = getCellValue(trimmedRef, context);
         numChars = parseInt(String(cellValue ?? '1'));
       } else {
-        numChars = parseInt(numCharsRef);
+        numChars = parseInt(trimmedRef);
       }
     }
     
@@ -741,6 +659,10 @@ export const FIND: CustomFormula = {
     const withinTextRef = args[1];
     const startNumRef = args[2];
     
+    if (!findTextRef || !withinTextRef) {
+      return FormulaError.VALUE;
+    }
+    
     let findText: string;
     if (findTextRef.startsWith('"') && findTextRef.endsWith('"')) {
       findText = findTextRef.slice(1, -1);
@@ -831,7 +753,7 @@ export const SEARCH: CustomFormula = {
     const searchText = withinText.substring(startNum - 1);
     const match = searchText.match(regex);
     
-    if (!match?.index) {
+    if (!match || match.index === undefined) {
       return FormulaError.VALUE;
     }
     
@@ -842,16 +764,16 @@ export const SEARCH: CustomFormula = {
 // TEXTJOIN関数の実装（手動実装が必要）
 export const TEXTJOIN: CustomFormula = {
   name: 'TEXTJOIN',
-  pattern: /\bTEXTJOIN\(([^)]+)\)/i,
+  pattern: /\bTEXTJOIN\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     try {
       const [, args] = matches;
       
-      // 引数を手動で解析
+      // Parse arguments manually
+      const parsedArgs: string[] = [];
       let currentArg = '';
       let inQuotes = false;
       let parenDepth = 0;
-      const parsedArgs: string[] = [];
       
       for (let i = 0; i < args.length; i++) {
         const char = args[i];
@@ -922,7 +844,7 @@ export const TEXTJOIN: CustomFormula = {
       }
       
       // 文字列に変換して結合
-      const result = values.map(v => String(v)).join(delimiter);
+      const result = values.map(v => v !== null && v !== undefined ? String(v) : '').join(delimiter);
       return result;
     } catch {
       return FormulaError.VALUE;
@@ -982,10 +904,30 @@ export const PROPER: CustomFormula = {
 export const VALUE: CustomFormula = {
   name: 'VALUE',
   pattern: /VALUE\(([^)]+)\)/i,
-  calculate: (matches) => {
-    const text = matches[1].replace(/"/g, '');
-    const number = parseFloat(text);
+  calculate: (matches, context) => {
+    const textRef = matches[1].trim();
     
+    let text: string;
+    if (textRef.match(/^[A-Z]+\d+$/)) {
+      text = String(getCellValue(textRef, context) ?? '');
+    } else if (textRef.startsWith('"') && textRef.endsWith('"')) {
+      text = textRef.slice(1, -1);
+    } else {
+      text = textRef;
+    }
+    
+    // Remove commas and spaces
+    text = text.replace(/,/g, '').trim();
+    
+    // Handle percentage
+    if (text.endsWith('%')) {
+      const percentValue = parseFloat(text.slice(0, -1));
+      if (!isNaN(percentValue)) {
+        return percentValue / 100;
+      }
+    }
+    
+    const number = parseFloat(text);
     if (isNaN(number)) return FormulaError.VALUE;
     return number;
   }
@@ -1028,10 +970,14 @@ export const TEXT: CustomFormula = {
         return value.toFixed(2);
       } else if (format.includes('0.0')) {
         return value.toFixed(1);
-      } else if (format.includes('0')) {
-        return Math.round(value).toString();
       } else if (format.includes('%')) {
         return (value * 100).toFixed(0) + '%';
+      } else if (format.match(/^0+$/)) {
+        // Handle padding with zeros
+        const paddingLength = format.length;
+        return Math.round(value).toString().padStart(paddingLength, '0');
+      } else if (format.includes('0')) {
+        return Math.round(value).toString();
       }
     }
     

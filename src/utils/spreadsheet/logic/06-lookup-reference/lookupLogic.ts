@@ -14,7 +14,11 @@ export const VLOOKUP: CustomFormula = {
     
     try {
       // 検索値を取得
-      const searchValue = getCellValue(lookupValue.trim(), context) ?? lookupValue.trim().replace(/^["']|["']$/g, '');
+      let searchValue = getCellValue(lookupValue.trim(), context);
+      // If it's a string literal with quotes, remove them
+      if (searchValue === lookupValue.trim()) {
+        searchValue = lookupValue.trim().replace(/^["']|["']$/g, '');
+      }
       
       // 列インデックスを数値に変換
       const columnIndex = parseInt(colIndex);
@@ -51,6 +55,11 @@ export const VLOOKUP: CustomFormula = {
           compareValue = firstColValue.value ?? firstColValue.v ?? firstColValue._ ?? firstColValue;
         } else {
           compareValue = firstColValue;
+        }
+        
+        // Skip empty cells in the lookup column
+        if (compareValue === '' || compareValue === null || compareValue === undefined) {
+          continue;
         }
         
         if (exactMatch) {
@@ -343,15 +352,23 @@ export const MATCH: CustomFormula = {
     try {
       // 検索値を取得
       let searchValue;
-      // 数値の直接入力の場合
-      const numValue = parseFloat(lookupValue.trim());
-      if (!isNaN(numValue)) {
-        searchValue = numValue;
+      const trimmedLookup = lookupValue.trim();
+      
+      // 文字列リテラル（引用符で囲まれている）の場合
+      if ((trimmedLookup.startsWith('"') && trimmedLookup.endsWith('"')) ||
+          (trimmedLookup.startsWith("'") && trimmedLookup.endsWith("'"))) {
+        searchValue = trimmedLookup.slice(1, -1);
       } else {
-        // セル参照または文字列の場合
-        searchValue = getCellValue(lookupValue.trim(), context);
-        if (searchValue === FormulaError.REF || searchValue === null || searchValue === undefined) {
-          searchValue = lookupValue.trim().replace(/^["']|["']$/g, '');
+        // 数値の直接入力の場合
+        const numValue = parseFloat(trimmedLookup);
+        if (!isNaN(numValue)) {
+          searchValue = numValue;
+        } else {
+          // セル参照の場合
+          searchValue = getCellValue(trimmedLookup, context);
+          if (searchValue === FormulaError.REF || searchValue === null || searchValue === undefined) {
+            searchValue = trimmedLookup;
+          }
         }
       }
       
@@ -388,7 +405,19 @@ export const MATCH: CustomFormula = {
         
         case 0: // 完全一致
           for (let i = 0; i < arrayValues.length; i++) {
-            if (String(arrayValues[i]) === String(searchValue)) {
+            const arrayVal = arrayValues[i];
+            // Try exact match first
+            if (arrayVal === searchValue) {
+              return i + 1; // 1ベースのインデックス
+            }
+            // Try string comparison
+            if (String(arrayVal) === String(searchValue)) {
+              return i + 1; // 1ベースのインデックス
+            }
+            // Try numeric comparison if both can be converted to numbers
+            const numArray = Number(arrayVal);
+            const numSearch = Number(searchValue);
+            if (!isNaN(numArray) && !isNaN(numSearch) && numArray === numSearch) {
               return i + 1; // 1ベースのインデックス
             }
           }
@@ -645,10 +674,24 @@ export const INDIRECT: CustomFormula = {
       // セル参照として解釈
       if (refText.includes(':')) {
         // 範囲参照
-        return getCellRangeValues(refText, context) as FormulaResult;
+        const result = getCellRangeValues(refText, context);
+        // Check if it's a valid range
+        if (!result || result.length === 0) {
+          return FormulaError.REF;
+        }
+        return result as FormulaResult;
       } else {
-        // 単一セル参照
-        return getCellValue(refText, context) as FormulaResult;
+        // 単一セル参照 - check if it's a valid cell reference
+        const cellMatch = refText.match(/^[A-Z]+\d+$/);
+        if (!cellMatch) {
+          return FormulaError.REF;
+        }
+        const result = getCellValue(refText, context);
+        // If getCellValue returns the same string, it means it's not a valid reference
+        if (result === refText) {
+          return FormulaError.REF;
+        }
+        return result as FormulaResult;
       }
     } catch {
       return FormulaError.REF;
@@ -701,17 +744,28 @@ export const TRANSPOSE: CustomFormula = {
     const [, arrayRef] = matches;
     
     try {
+      // Check for invalid reference first
+      const trimmedRef = arrayRef.trim();
+      
+      // Check if it's a string literal (should return REF error)
+      if ((trimmedRef.startsWith('"') && trimmedRef.endsWith('"')) ||
+          (trimmedRef.startsWith("'") && trimmedRef.endsWith("'"))) {
+        return FormulaError.REF;
+      }
+      
       // 配列を取得
-      const values = getCellRangeValues(arrayRef.trim(), context);
+      const values = getCellRangeValues(trimmedRef, context);
       
       if (!Array.isArray(values) || values.length === 0) {
         return FormulaError.VALUE;
       }
       
       // 範囲から行数と列数を計算
-      const rangeParts = arrayRef.trim().split(':');
+      const rangeParts = trimmedRef.split(':');
       if (rangeParts.length !== 2) {
-        return values as FormulaResult; // 単一セルの場合はそのまま返す
+        // 単一セルの場合
+        const singleValue = getCellValue(trimmedRef, context);
+        return singleValue as FormulaResult;
       }
       
       const [startCell, endCell] = rangeParts;
@@ -791,7 +845,17 @@ export const FILTER: CustomFormula = {
       // 結果が空の場合
       if (filteredValues.length === 0) {
         if (ifEmptyRef) {
-          const emptyValue = getCellValue(ifEmptyRef.trim(), context) ?? ifEmptyRef.trim().replace(/^['"]|['"]$/g, '');
+          let emptyValue = getCellValue(ifEmptyRef.trim(), context);
+          // If it's a cell reference that doesn't exist, treat as string literal
+          if (emptyValue === ifEmptyRef.trim()) {
+            emptyValue = ifEmptyRef.trim();
+          }
+          // Remove quotes from string literals
+          if (typeof emptyValue === 'string' && 
+              ((emptyValue.startsWith('"') && emptyValue.endsWith('"')) ||
+               (emptyValue.startsWith("'") && emptyValue.endsWith("'")))) {
+            emptyValue = emptyValue.slice(1, -1);
+          }
           return emptyValue as FormulaResult;
         }
         return FormulaError.CALC; // #CALC!エラー
@@ -943,7 +1007,7 @@ export const UNIQUE: CustomFormula = {
       
       // 単純な配列の場合
       const rangeParts = arrayRef.trim().split(':');
-      if (rangeParts.length !== 2) {
+      if (true) { // Always treat as single dimensional array for now
         // 単一列の場合
         const uniqueValues: unknown[] = [];
         const seen = new Map<string, number>();
@@ -972,7 +1036,7 @@ export const UNIQUE: CustomFormula = {
           }
         }
         
-        return uniqueValues.length === 1 ? uniqueValues[0] as FormulaResult : uniqueValues as FormulaResult;
+        return uniqueValues as FormulaResult;
       }
       
       // 2次元配列の場合（行での一意性判定）

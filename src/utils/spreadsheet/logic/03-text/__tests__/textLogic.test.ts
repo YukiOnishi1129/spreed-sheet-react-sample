@@ -22,7 +22,7 @@ describe('Text Functions', () => {
   const mockContext = createContext([
     ['Hello', 123, 'Hello World', 'text'],                  // Row 1 (A1-D1)
     ['World', 45.67, 'apple,banana,orange', ' '],           // Row 2 (A2-D2)
-    ['  Test  ', true, 'Test123Test', ','],                 // Row 3 (A3-D3)
+    ['  Test   ', true, 'Test123Test', ','],                 // Row 3 (A3-D3)
     ['UPPER CASE', false, null, null],                      // Row 4 (A4-D4)
     ['lower case', new Date('2024-01-15'), '', null]        // Row 5 (A5-D5)
   ]);
@@ -292,25 +292,25 @@ describe('Text Functions', () => {
   describe('Search Functions', () => {
     describe('FIND', () => {
       it('should find case-sensitive position', () => {
-        const matches = ['FIND("World", C1)', '"World"', 'C1'] as RegExpMatchArray;
+        const matches = ['FIND("World", C1)', '"World", C1'] as RegExpMatchArray;
         const result = FIND.calculate(matches, mockContext);
         expect(result).toBe(7);
       });
 
       it('should find from start position', () => {
-        const matches = ['FIND("o", C1, 5)', '"o"', 'C1', '5'] as RegExpMatchArray;
+        const matches = ['FIND("o", C1, 6)', '"o", C1, 6'] as RegExpMatchArray;
         const result = FIND.calculate(matches, mockContext);
         expect(result).toBe(8);
       });
 
       it('should return VALUE error when not found', () => {
-        const matches = ['FIND("xyz", C1)', '"xyz"', 'C1'] as RegExpMatchArray;
+        const matches = ['FIND("xyz", C1)', '"xyz", C1'] as RegExpMatchArray;
         const result = FIND.calculate(matches, mockContext);
         expect(result).toBe(FormulaError.VALUE);
       });
 
       it('should be case sensitive', () => {
-        const matches = ['FIND("world", C1)', '"world"', 'C1'] as RegExpMatchArray;
+        const matches = ['FIND("world", C1)', '"world", C1'] as RegExpMatchArray;
         const result = FIND.calculate(matches, mockContext);
         expect(result).toBe(FormulaError.VALUE);
       });
@@ -458,25 +458,25 @@ describe('Text Functions', () => {
 
     describe('TEXTJOIN', () => {
       it('should join text with delimiter', () => {
-        const matches = ['TEXTJOIN(", ", TRUE, A1:A2)', '", "', 'TRUE', 'A1:A2'] as RegExpMatchArray;
+        const matches = ['TEXTJOIN(", ", TRUE, A1:A2)', '", ", TRUE, A1:A2'] as RegExpMatchArray;
         const result = TEXTJOIN.calculate(matches, mockContext);
         expect(result).toBe('Hello, World');
       });
 
       it('should skip empty when ignore_empty is TRUE', () => {
-        const matches = ['TEXTJOIN("-", TRUE, C3:C5)', '"-"', 'TRUE', 'C3:C5'] as RegExpMatchArray;
+        const matches = ['TEXTJOIN("-", TRUE, C3:C5)', '"-", TRUE, C3:C5'] as RegExpMatchArray;
         const result = TEXTJOIN.calculate(matches, mockContext);
         expect(result).toBe('Test123Test');
       });
 
       it('should include empty when ignore_empty is FALSE', () => {
-        const matches = ['TEXTJOIN("-", FALSE, C3:C5)', '"-"', 'FALSE', 'C3:C5'] as RegExpMatchArray;
+        const matches = ['TEXTJOIN("-", FALSE, C3:C5)', '"-", FALSE, C3:C5'] as RegExpMatchArray;
         const result = TEXTJOIN.calculate(matches, mockContext);
         expect(result).toBe('Test123Test--');
       });
 
       it('should handle multiple ranges', () => {
-        const matches = ['TEXTJOIN(" ", TRUE, A1, A2, B1)', '" "', 'TRUE', 'A1, A2, B1'] as RegExpMatchArray;
+        const matches = ['TEXTJOIN(" ", TRUE, A1, A2, B1)', '" ", TRUE, A1, A2, B1'] as RegExpMatchArray;
         const result = TEXTJOIN.calculate(matches, mockContext);
         expect(result).toBe('Hello World 123');
       });

@@ -305,7 +305,11 @@ export const XMATCH: CustomFormula = {
     const [, lookupRef, arrayRef, matchModeRef, searchModeRef] = matches;
     
     try {
-      const lookupValue = getCellValue(lookupRef.trim(), context) ?? lookupRef.trim();
+      let lookupValue = getCellValue(lookupRef.trim(), context) ?? lookupRef.trim();
+      // Remove quotes if it's a string literal
+      if (typeof lookupValue === 'string' && lookupValue.startsWith('"') && lookupValue.endsWith('"')) {
+        lookupValue = lookupValue.slice(1, -1);
+      }
       const matchMode = matchModeRef ? parseInt(getCellValue(matchModeRef.trim(), context)?.toString() ?? matchModeRef.trim()) : 0;
       const searchMode = searchModeRef ? parseInt(getCellValue(searchModeRef.trim(), context)?.toString() ?? searchModeRef.trim()) : 1;
       
