@@ -394,17 +394,20 @@ export const BINOM_INV: CustomFormula = {
     const [, trialsRef, probRef, alphaRef] = matches;
     
     try {
-      const trials = parseInt(getCellValue(trialsRef.trim(), context)?.toString() ?? trialsRef.trim());
+      const trialsValue = getCellValue(trialsRef.trim(), context)?.toString() ?? trialsRef.trim();
+      const trialsNum = parseFloat(trialsValue);
       const prob = parseFloat(getCellValue(probRef.trim(), context)?.toString() ?? probRef.trim());
       const alpha = parseFloat(getCellValue(alphaRef.trim(), context)?.toString() ?? alphaRef.trim());
       
-      if (isNaN(trials) || isNaN(prob) || isNaN(alpha)) {
+      if (isNaN(trialsNum) || isNaN(prob) || isNaN(alpha)) {
         return FormulaError.VALUE;
       }
       
-      if (trials < 0 || prob < 0 || prob > 1 || alpha < 0 || alpha > 1) {
+      if (trialsNum < 0 || !Number.isInteger(trialsNum) || prob < 0 || prob > 1 || alpha < 0 || alpha > 1) {
         return FormulaError.NUM;
       }
+      
+      const trials = Math.floor(trialsNum);
       
       // 二項分布の累積分布関数を使って逆関数を計算
       let cumulativeProb = 0;

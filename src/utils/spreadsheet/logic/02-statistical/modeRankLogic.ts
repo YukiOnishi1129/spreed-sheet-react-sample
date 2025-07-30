@@ -13,7 +13,8 @@ export const MODE_SNGL: CustomFormula = {
     
     try {
       const values: number[] = [];
-      const argList = args.split(',');
+      // 複数の範囲を正しく分割する
+      const argList = args.match(/([A-Z]+\d+(?::[A-Z]+\d+)?|[^,]+)/g) || [];
       
       for (const arg of argList) {
         const trimmedArg = arg.trim();
@@ -32,8 +33,9 @@ export const MODE_SNGL: CustomFormula = {
           for (let row = startRow; row <= endRow; row++) {
             for (let col = startColIndex; col <= endColIndex; col++) {
               const cell = context.data[row]?.[col];
-              if (cell && !isNaN(Number(cell.value))) {
-                values.push(Number(cell.value));
+              const cellValue = cell?.value !== undefined ? cell.value : cell;
+              if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+                values.push(Number(cellValue));
               }
             }
           }
@@ -67,8 +69,13 @@ export const MODE_SNGL: CustomFormula = {
         }
       }
       
+      // 単一値の場合はその値を返す
+      if (values.length === 1) {
+        return values[0];
+      }
+      
       if (maxFreq === 1) {
-        return FormulaError.NA; // すべての値がユニークな場合
+        return FormulaError.NA; // 複数値ですべてがユニークな値の場合
       }
       
       return mode ?? FormulaError.NA;
@@ -87,7 +94,8 @@ export const MODE_MULT: CustomFormula = {
     
     try {
       const values: number[] = [];
-      const argList = args.split(',');
+      // 複数の範囲を正しく分割する
+      const argList = args.match(/([A-Z]+\d+(?::[A-Z]+\d+)?|[^,]+)/g) || [];
       
       for (const arg of argList) {
         const trimmedArg = arg.trim();
@@ -106,8 +114,9 @@ export const MODE_MULT: CustomFormula = {
           for (let row = startRow; row <= endRow; row++) {
             for (let col = startColIndex; col <= endColIndex; col++) {
               const cell = context.data[row]?.[col];
-              if (cell && !isNaN(Number(cell.value))) {
-                values.push(Number(cell.value));
+              const cellValue = cell?.value !== undefined ? cell.value : cell;
+              if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+                values.push(Number(cellValue));
               }
             }
           }
@@ -138,8 +147,13 @@ export const MODE_MULT: CustomFormula = {
         }
       }
       
+      // 単一値の場合はその値の配列を返す
+      if (values.length === 1) {
+        return [values[0]];
+      }
+      
       if (maxFreq === 1) {
-        return FormulaError.NA; // すべての値がユニークな場合
+        return FormulaError.NA; // 複数値ですべてがユニークな場合
       }
       
       // 最頻値をすべて収集
@@ -150,8 +164,8 @@ export const MODE_MULT: CustomFormula = {
         }
       }
       
-      // 垂直配列として返す
-      return modes.map(v => [v]);
+      // 配列として返す
+      return modes;
     } catch {
       return FormulaError.VALUE;
     }
@@ -191,11 +205,16 @@ export const RANK_AVG: CustomFormula = {
         for (let row = startRow; row <= endRow; row++) {
           for (let col = startColIndex; col <= endColIndex; col++) {
             const cell = context.data[row]?.[col];
-            if (cell && !isNaN(Number(cell.value))) {
-              values.push(Number(cell.value));
+            const cellValue = cell?.value !== undefined ? cell.value : cell;
+            if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+              values.push(Number(cellValue));
             }
           }
         }
+      }
+      
+      if (values.length === 0) {
+        return FormulaError.NUM;
       }
       
       if (!values.includes(value)) {
@@ -256,11 +275,16 @@ export const RANK_EQ: CustomFormula = {
         for (let row = startRow; row <= endRow; row++) {
           for (let col = startColIndex; col <= endColIndex; col++) {
             const cell = context.data[row]?.[col];
-            if (cell && !isNaN(Number(cell.value))) {
-              values.push(Number(cell.value));
+            const cellValue = cell?.value !== undefined ? cell.value : cell;
+            if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+              values.push(Number(cellValue));
             }
           }
         }
+      }
+      
+      if (values.length === 0) {
+        return FormulaError.NUM;
       }
       
       if (!values.includes(value)) {

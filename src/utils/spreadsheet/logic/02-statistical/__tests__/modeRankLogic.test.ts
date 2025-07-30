@@ -49,7 +49,7 @@ describe('Mode and Rank Functions', () => {
       it('should ignore non-numeric values', () => {
         const matches = ['MODE.SNGL(A1:D3)', 'A1:D3'] as RegExpMatchArray;
         const result = MODE_SNGL.calculate(matches, mockContext);
-        expect(result).toBe(2); // 2 appears most in numeric values
+        expect(result).toBe(5); // 5 appears 3 times, which is most frequent
       });
 
       it('should return NUM error for no numeric values', () => {
@@ -75,7 +75,7 @@ describe('Mode and Rank Functions', () => {
       it('should return array of all modes', () => {
         const matches = ['MODE.MULT(B1:B5)', 'B1:B5'] as RegExpMatchArray;
         const result = MODE_MULT.calculate(matches, mockContext);
-        expect(result).toEqual([5, 6]); // both appear same number of times
+        expect(result).toEqual([5]); // 5 appears 3 times, which is most frequent
       });
 
       it('should return single value array when one mode', () => {

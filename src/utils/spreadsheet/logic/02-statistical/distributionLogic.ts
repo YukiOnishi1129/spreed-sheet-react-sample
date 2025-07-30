@@ -1515,8 +1515,20 @@ export const CHISQ_TEST: CustomFormula = {
       return FormulaError.DIV0;
     }
     
-    // 自由度の計算（行数-1）×（列数-1）
-    const df = (actualRows - 1) * (actualCols - 1);
+    // 自由度の計算
+    // 1次元データの場合は、データ数-1
+    // 2次元データの場合は、(行数-1)×(列数-1)
+    let df: number;
+    if (actualCols === 1 && actualRows > 1) {
+      // 1列のデータ
+      df = actualRows - 1;
+    } else if (actualRows === 1 && actualCols > 1) {
+      // 1行のデータ
+      df = actualCols - 1;
+    } else {
+      // 2次元データ
+      df = (actualRows - 1) * (actualCols - 1);
+    }
     
     if (df <= 0) {
       return FormulaError.NUM;

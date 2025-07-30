@@ -24,6 +24,13 @@ function calculateRegression(yValues: number[], xValues: number[]): RegressionRe
     return null;
   }
   
+  // すべてのX値が同じかチェック
+  const firstX = xValues[0];
+  const allSameX = xValues.every(x => x === firstX);
+  if (allSameX) {
+    return null; // Xの分散が0
+  }
+  
   const n = yValues.length;
   let sumX = 0;
   let sumY = 0;
@@ -88,7 +95,7 @@ function parseDataRange(rangeRef: string, context: FormulaContext): number[] {
   
   for (const value of values) {
     const num = typeof value === 'string' ? parseFloat(value) : Number(value);
-    if (!isNaN(num)) {
+    if (!isNaN(num) && isFinite(num)) {
       numbers.push(num);
     }
   }
@@ -104,15 +111,27 @@ export const SLOPE: CustomFormula = {
     const [, yRangeRef, xRangeRef] = matches;
     
     try {
-      const yValues = parseDataRange(yRangeRef, context);
-      const xValues = parseDataRange(xRangeRef, context);
+      // 生データを取得
+      const yRawValues = getCellRangeValues(yRangeRef.trim(), context);
+      const xRawValues = getCellRangeValues(xRangeRef.trim(), context);
       
-      if (yValues.length === 0 || xValues.length === 0) {
-        return FormulaError.VALUE;
+      // ペアで数値を抽出
+      const yValues: number[] = [];
+      const xValues: number[] = [];
+      
+      const minLength = Math.min(yRawValues.length, xRawValues.length);
+      for (let i = 0; i < minLength; i++) {
+        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i]) : Number(yRawValues[i]);
+        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i]) : Number(xRawValues[i]);
+        
+        if (!isNaN(yNum) && isFinite(yNum) && !isNaN(xNum) && isFinite(xNum)) {
+          yValues.push(yNum);
+          xValues.push(xNum);
+        }
       }
       
-      if (yValues.length !== xValues.length) {
-        return FormulaError.NA;
+      if (yValues.length < 2) {
+        return FormulaError.DIV0;
       }
       
       const result = calculateRegression(yValues, xValues);
