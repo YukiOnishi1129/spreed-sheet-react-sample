@@ -163,7 +163,8 @@ describe('Complex Trigonometric Functions', () => {
     });
 
     it('should return NUM error for cos(z) = 0', () => {
-      const matches = ['IMSEC("1.5708")', '"1.5708"'] as RegExpMatchArray;
+      // Use a more precise value of π/2
+      const matches = ['IMSEC("1.5707963267948966")', '"1.5707963267948966"'] as RegExpMatchArray;
       const result = IMSEC.calculate(matches, mockContext);
       expect(result).toBe(FormulaError.NUM); // sec(pi/2) undefined
     });

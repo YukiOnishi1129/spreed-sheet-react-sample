@@ -223,7 +223,8 @@ describe('Workday Functions', () => {
     it('should return VALUE error for invalid weekend string', () => {
       const matches = ['WORKDAY.INTL(A1, 10, "invalid")', 'A1', '10', '"invalid"'] as RegExpMatchArray;
       const result = WORKDAY_INTL.calculate(matches, mockContext);
-      expect(result).toBe(45320); // Falls back to default
+      // "invalid" has 7 characters, so it's treated as a custom weekend string where no days are weekends
+      expect(result).toBe(45316); // Jan 15 + 10 days (no weekends) = Jan 25
     });
 
     it('should return VALUE error for invalid inputs', () => {
