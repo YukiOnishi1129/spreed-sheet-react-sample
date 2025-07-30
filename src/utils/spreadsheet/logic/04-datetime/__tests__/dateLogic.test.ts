@@ -131,7 +131,7 @@ describe('Date Functions', () => {
     it('should handle day overflow', () => {
       const matches = ['DATE(2024, 1, 32)', '2024', '1', '32'] as RegExpMatchArray;
       const result = DATE.calculate(matches, mockContext);
-      expect(result).toBe(45322); // 2024-02-01
+      expect(result).toBe(45323); // 2024-02-01
     });
 
     it('should return VALUE error for non-numeric inputs', () => {
@@ -241,19 +241,19 @@ describe('Date Functions', () => {
     it('should add months to date', () => {
       const matches = ['EDATE(A1, 3)', 'A1', '3'] as RegExpMatchArray;
       const result = EDATE.calculate(matches, mockContext);
-      expect(result).toBe(45398); // 2024-04-15
+      expect(result).toBe(45397); // 2024-04-15
     });
 
     it('should subtract months from date', () => {
       const matches = ['EDATE(A1, -3)', 'A1', '-3'] as RegExpMatchArray;
       const result = EDATE.calculate(matches, mockContext);
-      expect(result).toBe(45215); // 2023-10-15
+      expect(result).toBe(45214); // 2023-10-15
     });
 
     it('should handle month-end dates', () => {
       const matches = ['EDATE(D1, 1)', 'D1', '1'] as RegExpMatchArray;
       const result = EDATE.calculate(matches, mockContext);
-      expect(result).toBe(45413); // 2024-03-29 (Feb 29 + 1 month)
+      expect(result).toBe(45380); // 2024-03-29 (Feb 29 + 1 month)
     });
 
     it('should return VALUE error for invalid date', () => {

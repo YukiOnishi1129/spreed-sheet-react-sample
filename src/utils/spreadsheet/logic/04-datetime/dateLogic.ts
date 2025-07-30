@@ -63,7 +63,7 @@ export const DATEDIF: CustomFormula = {
     const endDate = parseDateNew(endValue);
     
     if (!startDate || !endDate) {
-      return FormulaError.VALUE;
+      return FormulaError.NUM;
     }
     
     if (startDate.getTime() > endDate.getTime()) {
@@ -266,7 +266,19 @@ export const EDATE: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    const newDate = new Date(date.getFullYear(), date.getMonth() + months, date.getDate());
+    // Excelのロジック：月末日の場合、結果も月末日にする
+    const day = date.getDate();
+    const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    const isEndOfMonth = day === lastDayOfMonth;
+    
+    // 月を加算
+    let newDate = new Date(date.getFullYear(), date.getMonth() + months, day);
+    
+    // 元の日付が月末なら、新しい日付も月末にする
+    if (isEndOfMonth) {
+      const newLastDay = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
+      newDate = new Date(newDate.getFullYear(), newDate.getMonth(), Math.min(day, newLastDay));
+    }
     
     if (!isValidDate(newDate)) {
       return FormulaError.VALUE;
@@ -303,7 +315,8 @@ export const EOMONTH: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    // 指定した月数後の月の最初の日を作成
+    // 指定した月数後の月末を取得
+    // new Date(year, month + 1, 0) は指定月の最終日を返す
     const targetMonth = new Date(date.getFullYear(), date.getMonth() + months + 1, 0);
     
     if (!isValidDate(targetMonth)) {
@@ -330,8 +343,10 @@ export const TIME: CustomFormula = {
     }
     
     // 時刻を日の割合で返す（Excel的な時刻値）
+    // オーバーフローを処理（24時間以上、60分以上、60秒以上）
     const totalSeconds = hour * 3600 + minute * 60 + second;
-    return totalSeconds / 86400; // 1日 = 86400秒
+    const normalizedSeconds = totalSeconds % 86400; // 24時間でモジュロ演算
+    return normalizedSeconds / 86400; // 1日 = 86400秒
   }
 };
 
@@ -348,6 +363,15 @@ export const HOUR: CustomFormula = {
     if (typeof timeValue === 'number') {
       const totalSeconds = Math.floor(timeValue * 86400);
       return Math.floor(totalSeconds / 3600) % 24;
+    }
+    
+    // 文字列の場合、時刻として解析を試みる
+    if (typeof timeValue === 'string') {
+      const timeDecimal = parseTimeString(timeValue);
+      if (timeDecimal !== null) {
+        const totalSeconds = Math.floor(timeDecimal * 86400);
+        return Math.floor(totalSeconds / 3600) % 24;
+      }
     }
     
     // 日付時刻の場合
@@ -375,6 +399,15 @@ export const MINUTE: CustomFormula = {
       return Math.floor((totalSeconds % 3600) / 60);
     }
     
+    // 文字列の場合、時刻として解析を試みる
+    if (typeof timeValue === 'string') {
+      const timeDecimal = parseTimeString(timeValue);
+      if (timeDecimal !== null) {
+        const totalSeconds = Math.floor(timeDecimal * 86400);
+        return Math.floor((totalSeconds % 3600) / 60);
+      }
+    }
+    
     // 日付時刻の場合
     const date = parseDateNew(timeValue);
     if (!date) {
@@ -398,6 +431,15 @@ export const SECOND: CustomFormula = {
     if (typeof timeValue === 'number') {
       const totalSeconds = Math.floor(timeValue * 86400);
       return totalSeconds % 60;
+    }
+    
+    // 文字列の場合、時刻として解析を試みる
+    if (typeof timeValue === 'string') {
+      const timeDecimal = parseTimeString(timeValue);
+      if (timeDecimal !== null) {
+        const totalSeconds = Math.floor(timeDecimal * 86400);
+        return totalSeconds % 60;
+      }
     }
     
     // 日付時刻の場合
@@ -452,7 +494,7 @@ export const DAYS360: CustomFormula = {
     }
     
     const method = methodRef ? (getCellValue(methodRef, context) ?? methodRef) : false;
-    const isEuropean = Boolean(method);
+    const isEuropean = method === true || method === 'TRUE' || method === 1 || method === '1';
     
     let startDay = startDate.getDate();
     const startMonth = startDate.getMonth() + 1;
@@ -463,16 +505,23 @@ export const DAYS360: CustomFormula = {
     const endYear = endDate.getFullYear();
     
     if (isEuropean) {
-      // ヨーロッパ式（30/360）
+      // ヨーロッパ式（30E/360）
       if (startDay === 31) startDay = 30;
       if (endDay === 31) endDay = 30;
     } else {
-      // アメリカ式（NASD 30/360）
+      // アメリカ式（30U/360）
+      const originalStartDay = startDay;
       if (startDay === 31) startDay = 30;
-      if (endDay === 31 && startDay >= 30) endDay = 30;
+      if (endDay === 31 && originalStartDay >= 30) endDay = 30;
     }
     
-    return (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
+    const days = (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
+    
+    // Only add 1 for European method to match Excel behavior
+    if (isEuropean) {
+      return days + 1;
+    }
+    return days;
   }
 };
 
@@ -511,7 +560,7 @@ export const YEARFRAC: CustomFormula = {
       case 4: // 30/360 European
         return yearfrac30_360European(earlier, later);
       default:
-        return FormulaError.VALUE;
+        return FormulaError.NUM;
     }
   }
 };
@@ -527,22 +576,23 @@ function yearfrac30_360US(startDate: Date, endDate: Date): number {
   let endDay = endDate.getDate();
   
   // US 30/360の特殊ルール
-  if (startDay === daysInMonth(startYear, startMonth)) {
+  const lastDayOfStartMonth = daysInMonth(startYear, startMonth);
+  const lastDayOfEndMonth = daysInMonth(endYear, endMonth);
+  
+  // 開始日が月末の場合は30日にする
+  if (startDay === lastDayOfStartMonth) {
     startDay = 30;
   }
   
-  if (endDay === daysInMonth(endYear, endMonth) && startDay < 30) {
-    endDay = daysInMonth(endYear, endMonth);
-  } else if (endDay === daysInMonth(endYear, endMonth) && startDay === 30) {
-    endDay = 30;
-  }
-  
-  if (startDay === 31 || (startMonth === 2 && startDay === daysInMonth(startYear, startMonth))) {
-    startDay = 30;
-  }
-  
-  if (endDay === 31 && startDay === 30) {
-    endDay = 30;
+  // 終了日の調整
+  if (endDay === lastDayOfEndMonth) {
+    if (startDay < 30) {
+      // 開始日が30日未満の場合、終了日は実際の月末日
+      endDay = lastDayOfEndMonth;
+    } else {
+      // 開始日が30日以上の場合、終了日も30日
+      endDay = 30;
+    }
   }
   
   const days = (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
@@ -564,7 +614,8 @@ function yearfrac30_360European(startDate: Date, endDate: Date): number {
   if (endDay === 31) endDay = 30;
   
   const days = (endYear - startYear) * 360 + (endMonth - startMonth) * 30 + (endDay - startDay);
-  return days / 360;
+  // Excel includes both start and end dates
+  return (days + 1) / 360;
 }
 
 // Actual/Actual方式
@@ -575,26 +626,35 @@ function yearfracActualActual(startDate: Date, endDate: Date): number {
   if (startYear === endYear) {
     // 同年内の場合
     const daysInYear = isLeapYear(startYear) ? 366 : 365;
-    const actualDays = Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-    return actualDays / daysInYear;
+    // ローカル日付を使用して計算
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    const actualDays = Math.floor((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+    // Excel includes both start and end dates
+    return (actualDays + 1) / daysInYear;
   }
   
   // 複数年にまたがる場合
-  let totalDays = 0;
-  let totalDaysInYears = 0;
+  let fraction = 0;
   
-  for (let year = startYear; year <= endYear; year++) {
-    const yearStart = year === startYear ? startDate : new Date(year, 0, 1);
-    const yearEnd = year === endYear ? endDate : new Date(year + 1, 0, 1);
-    
-    const daysInThisYear = Math.floor((yearEnd.getTime() - yearStart.getTime()) / (24 * 60 * 60 * 1000));
-    const daysInYear = isLeapYear(year) ? 366 : 365;
-    
-    totalDays += daysInThisYear;
-    totalDaysInYears += daysInYear * (daysInThisYear / daysInYear);
+  // 開始年の分
+  const endOfStartYear = new Date(startYear, 11, 31);
+  const daysInStartYear = Math.floor((endOfStartYear.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)) + 1;
+  const totalDaysInStartYear = isLeapYear(startYear) ? 366 : 365;
+  fraction += daysInStartYear / totalDaysInStartYear;
+  
+  // 中間の年の分（完全な年）
+  for (let year = startYear + 1; year < endYear; year++) {
+    fraction += 1;
   }
   
-  return totalDays / (totalDaysInYears / (endYear - startYear + 1));
+  // 終了年の分
+  const startOfEndYear = new Date(endYear, 0, 1);
+  const daysInEndYear = Math.floor((endDate.getTime() - startOfEndYear.getTime()) / (24 * 60 * 60 * 1000));
+  const totalDaysInEndYear = isLeapYear(endYear) ? 366 : 365;
+  fraction += daysInEndYear / totalDaysInEndYear;
+  
+  return fraction;
 }
 
 // Actual/360方式

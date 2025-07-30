@@ -324,7 +324,17 @@ export function parseDate(input: unknown): Date | null {
  */
 function parseDateString(dateStr: string): Date | null {
   
-  // ISO形式やYYYY-MM-DD形式を試す
+  // YYYY-MM-DD形式を特別に処理（ローカル時間として解釈）
+  const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    if (isValidDate(date)) {
+      return date;
+    }
+  }
+  
+  // その他のISO形式（時刻含む）を試す
   let date = new Date(dateStr);
   if (isValidDate(date)) {
     return date;
@@ -364,13 +374,13 @@ export function excelSerialToDate(serial: number): Date {
   
   // シリアル値60は存在しない1900年2月29日を表す
   // シリアル値61以降は実際の日付より1日進んでいる
-  if (serial > 59) {
+  if (serial > 60) {
     adjustedSerial = serial - 1;
   }
   
   // Excel epoch: 1900/1/1 は実際は 1899/12/31
   const excelEpoch = new Date(1899, 11, 31); // 1899年12月31日
-  const result = new Date(excelEpoch.getTime() + (adjustedSerial - 1) * 24 * 60 * 60 * 1000);
+  const result = new Date(excelEpoch.getTime() + adjustedSerial * 24 * 60 * 60 * 1000);
   return result;
 }
 
@@ -379,13 +389,21 @@ export function excelSerialToDate(serial: number): Date {
  * Excelの1900年うるう年バグを考慮
  */
 export function dateToExcelSerial(date: Date): number {
-  const excelEpoch = new Date(1899, 11, 31); // 1899年12月31日
-  const diffTime = date.getTime() - excelEpoch.getTime();
-  let serial = Math.floor(diffTime / (24 * 60 * 60 * 1000)) + 1;
+  // ローカル日付を使用（UTCではなく）
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+  const dateOnly = new Date(year, month, day);
   
-  // 1900年3月1日以降は1日加算（Excelのうるう年バグを再現）
-  const march1st1900 = new Date(1900, 2, 1); // 1900年3月1日
-  if (date >= march1st1900) {
+  // Excel's epoch is December 31, 1899 (serial number 1 = Jan 1, 1900)
+  const excelEpoch = new Date(1899, 11, 31); // 1899年12月31日
+  
+  const diffTime = dateOnly.getTime() - excelEpoch.getTime();
+  let serial = Math.round(diffTime / (24 * 60 * 60 * 1000));
+  
+  // 1900年2月28日より後は1日加算（Excelのうるう年バグを再現）
+  // Excel incorrectly treats 1900 as a leap year
+  if (serial > 59) {
     serial += 1;
   }
   
