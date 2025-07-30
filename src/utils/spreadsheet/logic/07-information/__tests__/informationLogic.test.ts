@@ -508,7 +508,7 @@ describe('Information Functions', () => {
     it('should return cell address', () => {
       const matches = ['CELL("address", A1)', '"address"', 'A1'] as RegExpMatchArray;
       const result = CELL.calculate(matches, mockContext);
-      expect(result).toBe('$A1');
+      expect(result).toBe('$A$1');
     });
 
     it('should return cell contents', () => {
@@ -622,7 +622,7 @@ describe('Information Functions', () => {
     it('should handle CELL with default reference', () => {
       const matches = ['CELL("address")', '"address"'] as RegExpMatchArray;
       const result = CELL.calculate(matches, mockContext);
-      expect(result).toBe('$A1');
+      expect(result).toBe('$A$1');
     });
 
     it('should handle decimal numbers in ISEVEN/ISODD', () => {

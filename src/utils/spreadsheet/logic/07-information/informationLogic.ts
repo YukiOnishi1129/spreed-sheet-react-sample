@@ -12,6 +12,16 @@ export const ISBLANK: CustomFormula = {
     const valueRef = matches[1].trim();
     const value = getCellValue(valueRef, context);
     
+    // getCellValueは { value: null } を返す場合があるので、その場合も考慮
+    if (typeof value === 'object' && value !== null && 'value' in value) {
+      return value.value === null || value.value === undefined || value.value === '';
+    }
+    
+    // 範囲外のセル参照（#REF!エラー）も空白として扱う
+    if (value === FormulaError.REF) {
+      return true;
+    }
+    
     return value === null || value === undefined || value === '';
   }
 };
@@ -24,7 +34,8 @@ export const ISERROR: CustomFormula = {
     const valueRef = matches[1].trim();
     const value = getCellValue(valueRef, context);
     
-    return typeof value === 'string' && value.startsWith('#') && value.endsWith('!');
+    // FormulaError.NAは'#N/A'で、'!'で終わらない
+    return typeof value === 'string' && value.startsWith('#') && (value.endsWith('!') || value === FormulaError.NA || value === '#N/A');
   }
 };
 
@@ -92,7 +103,8 @@ export const ISEVEN: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.floor(num) % 2 === 0;
+    // Excelでは値を切り捨てて判定（例：2.5 → 2 → 偶数）
+    return Math.floor(Math.abs(num)) % 2 === 0;
   }
 };
 
@@ -109,7 +121,8 @@ export const ISODD: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    return Math.floor(num) % 2 !== 0;
+    // Excelでは値を切り捨てて判定（例：2.5 → 2 → 偶数、3.5 → 3 → 奇数）
+    return Math.floor(Math.abs(num)) % 2 !== 0;
   }
 };
 
@@ -293,8 +306,15 @@ export const INFO: CustomFormula = {
   pattern: /\bINFO\(([^)]+)\)/i,
   calculate: (matches, context) => {
     const typeRef = matches[1].trim();
-    const cellValue = getCellValue(typeRef, context);
-    const infoType = String(cellValue ?? typeRef.replace(/^['"]|['"]$/g, ''));
+    
+    // まず直接文字列として扱う（引用符を削除）
+    let infoType = typeRef.replace(/^["']|["']$/g, '');
+    
+    // セル参照の場合のみgetCellValueを使う
+    if (typeRef.match(/^[A-Z]+\d+$/)) {
+      const cellValue = getCellValue(typeRef, context);
+      infoType = String(cellValue ?? '');
+    }
     
     switch (infoType.toLowerCase()) {
       case 'directory':
@@ -347,13 +367,26 @@ export const CELL: CustomFormula = {
     const infoTypeRef = matches[1].trim();
     const referenceRef = matches[2]?.trim() || 'A1';
     
-    const infoTypeCellValue = getCellValue(infoTypeRef, context);
-    const infoType = String(infoTypeCellValue ?? infoTypeRef.replace(/^['"]|['"]$/g, ''));
+    // まず直接文字列として扱う（引用符を削除）
+    let infoType = infoTypeRef.replace(/^["']|["']$/g, '');
+    
+    // セル参照の場合のみgetCellValueを使う
+    if (infoTypeRef.match(/^[A-Z]+\d+$/)) {
+      const infoTypeCellValue = getCellValue(infoTypeRef, context);
+      infoType = String(infoTypeCellValue ?? '');
+    }
+    
     const cellValue = getCellValue(referenceRef, context);
     
     switch (infoType.toLowerCase()) {
       case 'address': {
-        return `$${referenceRef}`;
+        // Excelのアドレス形式：列も行も絶対参照
+        const colMatch = referenceRef.match(/^([A-Z]+)/);
+        const rowMatch = referenceRef.match(/(\d+)$/);
+        if (colMatch && rowMatch) {
+          return `$${colMatch[1]}$${rowMatch[1]}`;
+        }
+        return '$A$1';
       }
       case 'col': {
         const colMatch = referenceRef.match(/^([A-Z]+)/);
