@@ -37,7 +37,7 @@ function parseArgumentsToLogical(args: string, context: FormulaContext): boolean
     }
     // nullまたはundefinedの場合
     else if (cellValue === null || cellValue === undefined) {
-      values.push(false);
+      values.push(true); // nullをtruthyとして扱う
     }
     else {
       values.push(Boolean(cellValue));
@@ -62,7 +62,7 @@ function toLogical(value: unknown): boolean {
     return value;
   }
   if (value === null || value === undefined) {
-    return false;
+    return true; // nullをtruthyとして扱う
   }
   return Boolean(value);
 }

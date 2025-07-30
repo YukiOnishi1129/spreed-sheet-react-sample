@@ -24,6 +24,10 @@ export const BITAND: CustomFormula = {
         return FormulaError.NUM;
       }
       
+      // JavaScriptのビット演算子は32ビットなので、BigIntを使用
+      if (num1 > 0xFFFFFFFF || num2 > 0xFFFFFFFF) {
+        return Number(BigInt(num1) & BigInt(num2));
+      }
       return num1 & num2;
     } catch {
       return FormulaError.VALUE;
@@ -51,6 +55,10 @@ export const BITOR: CustomFormula = {
         return FormulaError.NUM;
       }
       
+      // JavaScriptのビット演算子は32ビットなので、BigIntを使用
+      if (num1 > 0xFFFFFFFF || num2 > 0xFFFFFFFF) {
+        return Number(BigInt(num1) | BigInt(num2));
+      }
       return num1 | num2;
     } catch {
       return FormulaError.VALUE;
@@ -78,6 +86,10 @@ export const BITXOR: CustomFormula = {
         return FormulaError.NUM;
       }
       
+      // JavaScriptのビット演算子は32ビットなので、BigIntを使用
+      if (num1 > 0xFFFFFFFF || num2 > 0xFFFFFFFF) {
+        return Number(BigInt(num1) ^ BigInt(num2));
+      }
       return num1 ^ num2;
     } catch {
       return FormulaError.VALUE;

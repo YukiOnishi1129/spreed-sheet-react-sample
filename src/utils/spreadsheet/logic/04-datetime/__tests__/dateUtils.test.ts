@@ -222,7 +222,7 @@ describe('Date Utils', () => {
 
     it('should handle single digit values', () => {
       const time = parseTimeString('2:5:9');
-      expect(time).toBeCloseTo(0.086921296, 8);
+      expect(time).toBeCloseTo(0.08690972222222222, 8);
     });
 
     it('should return null for invalid format', () => {

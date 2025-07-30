@@ -11,6 +11,11 @@ function extractNumbersFromRange(rangeRef: string, context: FormulaContext): num
   if (rangeRef.includes(':')) {
     const values = getCellRangeValues(rangeRef, context);
     values.forEach(value => {
+      // Skip null, undefined, empty string
+      if (value === null || value === undefined || value === '') {
+        return;
+      }
+      
       const num = typeof value === 'string' ? parseFloat(value) : Number(value);
       if (!isNaN(num) && isFinite(num)) {
         numbers.push(num);
@@ -18,6 +23,11 @@ function extractNumbersFromRange(rangeRef: string, context: FormulaContext): num
     });
   } else if (rangeRef.match(/^[A-Z]+\d+$/)) {
     const cellValue = getCellValue(rangeRef, context);
+    // Skip null, undefined, empty string
+    if (cellValue === null || cellValue === undefined || cellValue === '') {
+      return numbers;
+    }
+    
     const num = typeof cellValue === 'string' ? parseFloat(cellValue) : Number(cellValue);
     if (!isNaN(num) && isFinite(num)) {
       numbers.push(num);
@@ -42,7 +52,13 @@ export const COVARIANCE_P: CustomFormula = {
     const numbers1 = extractNumbersFromRange(array1Ref.trim(), context);
     const numbers2 = extractNumbersFromRange(array2Ref.trim(), context);
     
-    if (numbers1.length !== numbers2.length || numbers1.length === 0) {
+    // Check for empty arrays first
+    if (numbers1.length === 0 || numbers2.length === 0) {
+      return FormulaError.NA;
+    }
+    
+    // Check for different array lengths
+    if (numbers1.length !== numbers2.length) {
       return FormulaError.NA;
     }
     
@@ -146,6 +162,7 @@ export const DEVSQ: CustomFormula = {
       numbers = numbers.concat(extractNumbersFromRange(part, context));
     }
     
+    // Check for empty array - should return NUM error
     if (numbers.length === 0) {
       return FormulaError.NUM;
     }

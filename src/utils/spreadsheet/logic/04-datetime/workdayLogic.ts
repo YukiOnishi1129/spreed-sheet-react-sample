@@ -3,6 +3,7 @@
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
+import { dateToExcelSerial } from './dateUtils';
 
 // 日付を正規化する関数
 function normalizeDate(value: unknown): Date | null {
@@ -11,25 +12,36 @@ function normalizeDate(value: unknown): Date | null {
   }
   
   if (typeof value === 'string') {
-    const date = new Date(value);
+    // 引用符を除去
+    const cleanStr = value.replace(/^["']|["']$/g, '');
+    const date = new Date(cleanStr);
     return isNaN(date.getTime()) ? null : date;
   }
   
   if (typeof value === 'number') {
     // Excelのシリアル値として扱う（1900年1月1日が1）
-    const excelEpoch = new Date(1900, 0, 1);
-    const date = new Date(excelEpoch.getTime() + (value - 1) * 24 * 60 * 60 * 1000);
+    // Excelの1900年うるう年バグを考慮
+    let adjustedSerial = value;
+    if (value > 60) {
+      adjustedSerial = value - 1;
+    }
+    
+    const excelEpoch = new Date(1899, 11, 31); // 1899年12月31日
+    const date = new Date(excelEpoch.getTime() + adjustedSerial * 24 * 60 * 60 * 1000);
     return date;
   }
   
   return null;
 }
 
-// 週末かどうかを判定（デフォルトは土日）
+// 週末かどうかを判定（デフォルトは土日） - Excel互換
 function isWeekend(date: Date, weekendDays: string = '1'): boolean {
-  const dayOfWeek = date.getDay();
+  const dayOfWeek = date.getDay(); // 0=日曜日, 1=月曜日, ..., 6=土曜日
   
-  switch (weekendDays) {
+  // 数値で渡された場合は文字列に変換
+  const weekendStr = String(weekendDays);
+  
+  switch (weekendStr) {
     case '1': // 土日（デフォルト）
       return dayOfWeek === 0 || dayOfWeek === 6;
     case '2': // 日月
@@ -60,10 +72,11 @@ function isWeekend(date: Date, weekendDays: string = '1'): boolean {
       return dayOfWeek === 6;
     default:
       // カスタム週末（7文字の文字列で各曜日を指定）
-      if (weekendDays.length === 7) {
-        return weekendDays[dayOfWeek] === '1';
+      if (weekendStr.length === 7) {
+        return weekendStr[dayOfWeek] === '1';
       }
-      return false;
+      // 無効な場合はデフォルト（土日）にフォールバック
+      return dayOfWeek === 0 || dayOfWeek === 6;
   }
 }
 
@@ -168,6 +181,7 @@ export const NETWORKDAYS: CustomFormula = {
       let workdays = 0;
       const current = new Date(start);
       
+      // Excel's NETWORKDAYS includes both start and end dates
       while (current <= end) {
         if (!isWeekend(current) && !isHoliday(current, holidays)) {
           workdays++;
@@ -285,24 +299,30 @@ export const WORKDAY: CustomFormula = {
       const holidays = holidaysRef ? parseHolidays(holidaysRef.trim(), context) : [];
       
       // 稼働日を計算
-      const current = new Date(startDate);
+      let current = new Date(startDate);
       let remainingDays = Math.abs(days);
-      const increment = days >= 0 ? 1 : -1;
+      const isForward = days >= 0;
       
+      // 0日の場合は開始日を返す
+      if (days === 0) {
+        return dateToExcelSerial(startDate);
+      }
+      
+      // ExcelのWORKDAYのロジックに合わせる
       while (remainingDays > 0) {
-        current.setDate(current.getDate() + increment);
+        if (isForward) {
+          current.setDate(current.getDate() + 1);
+        } else {
+          current.setDate(current.getDate() - 1);
+        }
         
+        // 週末や祝日でない場合のみカウントを減らす
         if (!isWeekend(current) && !isHoliday(current, holidays)) {
           remainingDays--;
         }
       }
       
-      // Excelシリアル値として返す
-      const excelEpoch = new Date(1900, 0, 1);
-      const diffTime = current.getTime() - excelEpoch.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      
-      return diffDays;
+      return dateToExcelSerial(current);
     } catch {
       return FormulaError.VALUE;
     }
@@ -354,24 +374,30 @@ export const WORKDAY_INTL: CustomFormula = {
       const holidays = holidaysRef ? parseHolidays(holidaysRef.trim(), context) : [];
       
       // 稼働日を計算
-      const current = new Date(startDate);
+      let current = new Date(startDate);
       let remainingDays = Math.abs(days);
-      const increment = days >= 0 ? 1 : -1;
+      const isForward = days >= 0;
       
+      // 0日の場合は開始日を返す
+      if (days === 0) {
+        return dateToExcelSerial(startDate);
+      }
+      
+      // ExcelのWORKDAY.INTLのロジックに合わせる
       while (remainingDays > 0) {
-        current.setDate(current.getDate() + increment);
+        if (isForward) {
+          current.setDate(current.getDate() + 1);
+        } else {
+          current.setDate(current.getDate() - 1);
+        }
         
+        // 週末や祝日でない場合のみカウントを減らす
         if (!isWeekend(current, weekendDays) && !isHoliday(current, holidays)) {
           remainingDays--;
         }
       }
       
-      // Excelシリアル値として返す
-      const excelEpoch = new Date(1900, 0, 1);
-      const diffTime = current.getTime() - excelEpoch.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      
-      return diffDays;
+      return dateToExcelSerial(current);
     } catch {
       return FormulaError.VALUE;
     }

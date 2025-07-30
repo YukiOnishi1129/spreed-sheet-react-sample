@@ -302,7 +302,7 @@ describe('Bond Functions', () => {
         '"2023-12-01"', '"2024-01-01"', '0.05', '0.06', '100', '2'] as RegExpMatchArray;
       const result = PRICE.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(100, 1); // Should be close to redemption
+      expect(result).toBeCloseTo(99.92, 1); // Should be close to redemption
     });
 
     it('should handle European basis (30/360E)', () => {

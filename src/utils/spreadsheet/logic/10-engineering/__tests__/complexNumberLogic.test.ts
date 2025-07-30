@@ -261,25 +261,25 @@ describe('Complex Number Functions', () => {
 
   describe('IMSUM Function (Complex Sum)', () => {
     it('should sum two complex numbers', () => {
-      const matches = ['IMSUM("3+4i", "1+2i")', '"3+4i"', '"1+2i"'] as RegExpMatchArray;
+      const matches = ['IMSUM("3+4i", "1+2i")', '"3+4i", "1+2i"'] as RegExpMatchArray;
       const result = IMSUM.calculate(matches, mockContext);
       expect(result).toBe('4+6i');
     });
 
     it('should sum multiple complex numbers', () => {
-      const matches = ['IMSUM("1+i", "2+2i", "3+3i")', '"1+i"', '"2+2i"', '"3+3i"'] as RegExpMatchArray;
+      const matches = ['IMSUM("1+i", "2+2i", "3+3i")', '"1+i", "2+2i", "3+3i"'] as RegExpMatchArray;
       const result = IMSUM.calculate(matches, mockContext);
       expect(result).toBe('6+6i');
     });
 
     it('should handle mixed real and complex', () => {
-      const matches = ['IMSUM("3+4i", "5")', '"3+4i"', '"5"'] as RegExpMatchArray;
+      const matches = ['IMSUM("3+4i", "5")', '"3+4i", "5"'] as RegExpMatchArray;
       const result = IMSUM.calculate(matches, mockContext);
       expect(result).toBe('8+4i');
     });
 
     it('should handle cell references', () => {
-      const matches = ['IMSUM(C1, C2)', 'C1', 'C2'] as RegExpMatchArray;
+      const matches = ['IMSUM(A3, B3)', 'A3, B3'] as RegExpMatchArray;
       const result = IMSUM.calculate(matches, mockContext);
       expect(result).toBe('8+2i'); // "3+4i" + "5-2i"
     });
@@ -301,19 +301,19 @@ describe('Complex Number Functions', () => {
 
   describe('IMPRODUCT Function (Complex Product)', () => {
     it('should multiply two complex numbers', () => {
-      const matches = ['IMPRODUCT("3+4i", "1+2i")', '"3+4i"', '"1+2i"'] as RegExpMatchArray;
+      const matches = ['IMPRODUCT("3+4i", "1+2i")', '"3+4i", "1+2i"'] as RegExpMatchArray;
       const result = IMPRODUCT.calculate(matches, mockContext);
       expect(result).toBe('-5+10i'); // (3+4i)(1+2i) = 3+6i+4i-8 = -5+10i
     });
 
     it('should multiply multiple complex numbers', () => {
-      const matches = ['IMPRODUCT("2+i", "1+i", "1-i")', '"2+i"', '"1+i"', '"1-i"'] as RegExpMatchArray;
+      const matches = ['IMPRODUCT("2+i", "1+i", "1-i")', '"2+i", "1+i", "1-i"'] as RegExpMatchArray;
       const result = IMPRODUCT.calculate(matches, mockContext);
-      expect(result).toBe('2+6i'); // (2+i)(1+i)(1-i) = (2+i)(2) = 4+2i
+      expect(result).toBe('4+2i'); // (2+i)(1+i)(1-i) = (2+i)(2) = 4+2i
     });
 
     it('should handle multiplication by i', () => {
-      const matches = ['IMPRODUCT("3+4i", "i")', '"3+4i"', '"i"'] as RegExpMatchArray;
+      const matches = ['IMPRODUCT("3+4i", "i")', '"3+4i", "i"'] as RegExpMatchArray;
       const result = IMPRODUCT.calculate(matches, mockContext);
       expect(result).toBe('-4+3i'); // (3+4i)*i = -4+3i
     });
@@ -404,7 +404,7 @@ describe('Complex Number Functions', () => {
       const conjMatches = ['IMCONJUGATE("3+4i")', '"3+4i"'] as RegExpMatchArray;
       const conj = IMCONJUGATE.calculate(conjMatches, mockContext);
       
-      const prodMatches = ['IMPRODUCT("3+4i", "' + conj + '")', '"3+4i"', '"' + conj + '"'] as RegExpMatchArray;
+      const prodMatches = ['IMPRODUCT("3+4i", "' + conj + '")', '"3+4i", "' + conj + '"'] as RegExpMatchArray;
       const product = IMPRODUCT.calculate(prodMatches, mockContext);
       
       expect(product).toBe('25'); // 3^2 + 4^2 = 25
@@ -425,7 +425,7 @@ describe('Complex Number Functions', () => {
     });
 
     it('should handle cell references in all functions', () => {
-      const matches = ['IMSUM(C1, C2)', 'C1', 'C2'] as RegExpMatchArray;
+      const matches = ['IMSUM(A3, B3)', 'A3, B3'] as RegExpMatchArray;
       const result = IMSUM.calculate(matches, mockContext);
       expect(result).toBe('8+2i');
     });

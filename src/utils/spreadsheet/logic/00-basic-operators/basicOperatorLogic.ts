@@ -10,10 +10,14 @@ export const MULTIPLY_OPERATOR: CustomFormula = {
     
     // 左辺の値を取得
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
-    // 右辺の値を取得
     const rightValue = evaluateExpression(right.trim(), context);
+    
+    // 算術演算に有効な値かチェック
+    if (!isValidForArithmetic(leftValue) || !isValidForArithmetic(rightValue)) {
+      return '#VALUE!';
+    }
+    
+    const leftNum = Number(leftValue);
     const rightNum = Number(rightValue);
     
     if (isNaN(leftNum) || isNaN(rightNum)) {
@@ -31,9 +35,14 @@ export const DIVIDE_OPERATOR: CustomFormula = {
     const [, left, right] = matches;
     
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
     const rightValue = evaluateExpression(right.trim(), context);
+    
+    // 算術演算に有効な値かチェック
+    if (!isValidForArithmetic(leftValue) || !isValidForArithmetic(rightValue)) {
+      return '#VALUE!';
+    }
+    
+    const leftNum = Number(leftValue);
     const rightNum = Number(rightValue);
     
     if (isNaN(leftNum) || isNaN(rightNum)) {
@@ -55,9 +64,14 @@ export const ADD_OPERATOR: CustomFormula = {
     const [, left, right] = matches;
     
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
     const rightValue = evaluateExpression(right.trim(), context);
+    
+    // 算術演算に有効な値かチェック
+    if (!isValidForArithmetic(leftValue) || !isValidForArithmetic(rightValue)) {
+      return '#VALUE!';
+    }
+    
+    const leftNum = Number(leftValue);
     const rightNum = Number(rightValue);
     
     if (isNaN(leftNum) || isNaN(rightNum)) {
@@ -75,9 +89,14 @@ export const SUBTRACT_OPERATOR: CustomFormula = {
     const [, left, right] = matches;
     
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
     const rightValue = evaluateExpression(right.trim(), context);
+    
+    // 算術演算に有効な値かチェック
+    if (!isValidForArithmetic(leftValue) || !isValidForArithmetic(rightValue)) {
+      return '#VALUE!';
+    }
+    
+    const leftNum = Number(leftValue);
     const rightNum = Number(rightValue);
     
     if (isNaN(leftNum) || isNaN(rightNum)) {
@@ -96,16 +115,17 @@ export const GREATER_THAN_OR_EQUAL: CustomFormula = {
     const [, left, right] = matches;
     
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
     const rightValue = evaluateExpression(right.trim(), context);
-    const rightNum = Number(rightValue);
     
-    if (isNaN(leftNum) || isNaN(rightNum)) {
-      return false;
+    // 数値比較の場合は数値として比較
+    if (isValidForArithmetic(leftValue) && isValidForArithmetic(rightValue)) {
+      const leftNum = Number(leftValue);
+      const rightNum = Number(rightValue);
+      return leftNum >= rightNum;
     }
     
-    return leftNum >= rightNum;
+    // どちらかが数値でない場合はfalseを返す
+    return false;
   }
 };
 
@@ -116,16 +136,17 @@ export const LESS_THAN_OR_EQUAL: CustomFormula = {
     const [, left, right] = matches;
     
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
     const rightValue = evaluateExpression(right.trim(), context);
-    const rightNum = Number(rightValue);
     
-    if (isNaN(leftNum) || isNaN(rightNum)) {
-      return false;
+    // 数値比較の場合は数値として比較
+    if (isValidForArithmetic(leftValue) && isValidForArithmetic(rightValue)) {
+      const leftNum = Number(leftValue);
+      const rightNum = Number(rightValue);
+      return leftNum <= rightNum;
     }
     
-    return leftNum <= rightNum;
+    // どちらかが数値でない場合はfalseを返す
+    return false;
   }
 };
 
@@ -136,16 +157,17 @@ export const GREATER_THAN: CustomFormula = {
     const [, left, right] = matches;
     
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
     const rightValue = evaluateExpression(right.trim(), context);
-    const rightNum = Number(rightValue);
     
-    if (isNaN(leftNum) || isNaN(rightNum)) {
-      return false;
+    // 数値比較の場合は数値として比較
+    if (isValidForArithmetic(leftValue) && isValidForArithmetic(rightValue)) {
+      const leftNum = Number(leftValue);
+      const rightNum = Number(rightValue);
+      return leftNum > rightNum;
     }
     
-    return leftNum > rightNum;
+    // どちらかが数値でない場合はfalseを返す
+    return false;
   }
 };
 
@@ -156,16 +178,17 @@ export const LESS_THAN: CustomFormula = {
     const [, left, right] = matches;
     
     const leftValue = evaluateExpression(left.trim(), context);
-    const leftNum = Number(leftValue);
-    
     const rightValue = evaluateExpression(right.trim(), context);
-    const rightNum = Number(rightValue);
     
-    if (isNaN(leftNum) || isNaN(rightNum)) {
-      return false;
+    // 数値比較の場合は数値として比較
+    if (isValidForArithmetic(leftValue) && isValidForArithmetic(rightValue)) {
+      const leftNum = Number(leftValue);
+      const rightNum = Number(rightValue);
+      return leftNum < rightNum;
     }
     
-    return leftNum < rightNum;
+    // どちらかが数値でない場合はfalseを返す
+    return false;
   }
 };
 
@@ -215,4 +238,25 @@ function evaluateExpression(expression: string, context: FormulaContext): string
   
   // その他の場合は文字列として返す
   return expression;
+}
+
+// 値が算術演算に有効かチェックする補助関数
+function isValidForArithmetic(value: unknown): boolean {
+  // null、undefinedは無効（Excelでは#VALUE!エラー）
+  if (value === null || value === undefined) {
+    return false;
+  }
+  // 空文字列は有効（Excelでは0として扱われる）
+  if (value === '') {
+    return true;
+  }
+  // 数値または数値に変換できる文字列は有効
+  if (typeof value === 'number') {
+    return !isNaN(value);
+  }
+  if (typeof value === 'string') {
+    const num = Number(value);
+    return !isNaN(num);
+  }
+  return false;
 }

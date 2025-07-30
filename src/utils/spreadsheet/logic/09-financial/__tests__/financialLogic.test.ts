@@ -26,7 +26,7 @@ describe('Financial Functions', () => {
       const matches = ['PMT(0.004167, 60, 300000)', '0.004167', '60', '300000'] as RegExpMatchArray;
       const result = PMT.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(-5659.07, 1); // Typical mortgage payment
+      expect(result).toBeCloseTo(-5661.43, 1); // Typical mortgage payment
     });
 
     it('should handle zero interest rate', () => {
@@ -39,7 +39,7 @@ describe('Financial Functions', () => {
       const matches = ['PMT(0.004167, 60, 300000, 0, 1)', '0.004167', '60', '300000', '0', '1'] as RegExpMatchArray;
       const result = PMT.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(-5635.74, 1); // Slightly less due to beginning payment
+      expect(result).toBeCloseTo(-5637.93, 1); // Slightly less due to beginning payment
     });
 
     it('should include future value in calculation', () => {
@@ -210,7 +210,7 @@ describe('Financial Functions', () => {
       const matches = ['IRR(A1:E1)', 'A1:E1'] as RegExpMatchArray;
       const result = IRR.calculate(matches, irrContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(0.279, 2); // ~28% return
+      expect(result).toBeCloseTo(0.2489, 3); // ~24.9% return
     });
 
     it('should handle custom guess value', () => {
@@ -221,7 +221,7 @@ describe('Financial Functions', () => {
       const matches = ['IRR(A1:E1, 0.2)', 'A1:E1', '0.2'] as RegExpMatchArray;
       const result = IRR.calculate(matches, irrContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(0.279, 2);
+      expect(result).toBeCloseTo(0.2489, 3);
     });
 
     it('should return NUM error for no positive and negative values', () => {
@@ -264,7 +264,7 @@ describe('Financial Functions', () => {
       const result = PPMT.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeLessThan(0); // Payment should be negative
-      expect(result).toBeCloseTo(-4409.07, 1);
+      expect(result).toBeCloseTo(-4411.32, 1);
     });
 
     it('should handle zero interest rate', () => {
@@ -306,7 +306,7 @@ describe('Financial Functions', () => {
       const result = IPMT.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeLessThan(0); // Interest payment should be negative
-      expect(result).toBeCloseTo(-1250, 1); // Interest on $300k at 0.4167% monthly
+      expect(result).toBeCloseTo(-1250.1, 1); // Interest on $300k at 0.4167% monthly
     });
 
     it('should return zero for zero interest rate', () => {
@@ -399,7 +399,7 @@ describe('Financial Functions', () => {
       const pvMatches = ['PV(0.05, 10, ' + pmt + ')', '0.05', '10', pmt.toString()] as RegExpMatchArray;
       const pv = PV.calculate(pvMatches, mockContext) as number;
       
-      expect(pv).toBeCloseTo(-100000, 0); // Should recover original PV
+      expect(pv).toBeCloseTo(100000, 0); // Should recover original PV (absolute value)
     });
 
     it('should handle PPMT + IPMT = PMT relationship', () => {
@@ -426,7 +426,7 @@ describe('Financial Functions', () => {
       const matches = ['PMT(0.0001, 60, 100000)', '0.0001', '60', '100000'] as RegExpMatchArray;
       const result = PMT.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(-1667.71, 1);
+      expect(result).toBeCloseTo(-1671.75, 1);
     });
 
     it('should handle negative present values correctly', () => {

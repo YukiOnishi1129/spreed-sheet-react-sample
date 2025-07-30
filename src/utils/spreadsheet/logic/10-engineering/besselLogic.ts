@@ -156,15 +156,18 @@ export const BESSELI: CustomFormula = {
     
     try {
       const x = parseFloat(getCellValue(xRef.trim(), context)?.toString() ?? xRef.trim());
-      const n = parseInt(getCellValue(nRef.trim(), context)?.toString() ?? nRef.trim());
+      const nFloat = parseFloat(getCellValue(nRef.trim(), context)?.toString() ?? nRef.trim());
       
-      if (isNaN(x) || isNaN(n)) {
+      if (isNaN(x) || isNaN(nFloat)) {
         return FormulaError.VALUE;
       }
       
-      if (n < 0 || n !== Math.floor(n)) {
+      // nは非負の整数でなければならない
+      if (nFloat < 0 || nFloat !== Math.floor(nFloat)) {
         return FormulaError.NUM;
       }
+      
+      const n = Math.floor(nFloat);
       
       // 修正ベッセル関数I_n(x)の級数展開
       // I_n(x) = Σ(k=0 to ∞) [1 / (k! Γ(n+k+1))] * (x/2)^(n+2k)

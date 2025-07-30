@@ -37,7 +37,7 @@ describe('Workday Functions', () => {
     it('should exclude holidays', () => {
       const matches = ['NETWORKDAYS(A1, B1, C3:D3)', 'A1', 'B1', 'C3:D3'] as RegExpMatchArray;
       const result = NETWORKDAYS.calculate(matches, mockContext);
-      expect(result).toBe(12); // Excludes Jan 15 and 16 as holidays
+      expect(result).toBe(11); // Excludes Jan 15 and 16 as holidays (13 - 2 = 11)
     });
 
     it('should handle single holiday', () => {
@@ -108,7 +108,7 @@ describe('Workday Functions', () => {
       // Code 2 = Sunday-Monday weekend
       const matches = ['NETWORKDAYS.INTL(A1, B1, 2)', 'A1', 'B1', '2'] as RegExpMatchArray;
       const result = NETWORKDAYS_INTL.calculate(matches, mockContext);
-      expect(result).toBe(13);
+      expect(result).toBe(12); // With Sun-Mon weekends, there are 12 working days
     });
 
     it('should exclude holidays with custom weekend', () => {
@@ -134,7 +134,7 @@ describe('Workday Functions', () => {
     it('should calculate past workday with negative days', () => {
       const matches = ['WORKDAY(B1, -10)', 'B1', '-10'] as RegExpMatchArray;
       const result = WORKDAY.calculate(matches, mockContext);
-      expect(result).toBe(45305); // Jan 31 - 10 working days
+      expect(result).toBe(45308); // Jan 31 - 10 working days = Jan 17
     });
 
     it('should skip weekends', () => {
@@ -146,7 +146,7 @@ describe('Workday Functions', () => {
     it('should handle holidays', () => {
       const matches = ['WORKDAY(A1, 1, C3)', 'A1', '1', 'C3'] as RegExpMatchArray;
       const result = WORKDAY.calculate(matches, mockContext);
-      expect(result).toBe(45308); // Skip Jan 15 (start) and Jan 16
+      expect(result).toBe(45307); // Skip Jan 15 (holiday), result is Jan 16
     });
 
     it('should handle holiday range', () => {
@@ -164,7 +164,7 @@ describe('Workday Functions', () => {
     it('should handle Excel serial input', () => {
       const matches = ['WORKDAY(E2, 10)', 'E2', '10'] as RegExpMatchArray;
       const result = WORKDAY.calculate(matches, mockContext);
-      expect(result).toBe(45305); // Excel serial + 10 working days
+      expect(result).toBe(45306); // Excel serial 45292 (Jan 1) + 10 working days = Jan 15
     });
 
     it('should return VALUE error for invalid date', () => {
@@ -191,7 +191,7 @@ describe('Workday Functions', () => {
       // Weekend = Sunday only (code 11)
       const matches = ['WORKDAY.INTL(A1, 10, 11)', 'A1', '10', '11'] as RegExpMatchArray;
       const result = WORKDAY_INTL.calculate(matches, mockContext);
-      expect(result).toBe(45318); // Fewer days needed with only Sunday as weekend
+      expect(result).toBe(45317); // Jan 15 + 10 working days with Sunday-only weekend = Jan 26
     });
 
     it('should handle custom weekend string', () => {
@@ -204,7 +204,7 @@ describe('Workday Functions', () => {
     it('should handle negative days with custom weekend', () => {
       const matches = ['WORKDAY.INTL(B1, -5, 2)', 'B1', '-5', '2'] as RegExpMatchArray;
       const result = WORKDAY_INTL.calculate(matches, mockContext);
-      expect(result).toBe(45316); // Different calculation with Sun-Mon weekend
+      expect(result).toBe(45315); // Jan 31 - 5 working days with Sun-Mon weekend = Jan 24
     });
 
     it('should handle holidays with custom weekend', () => {

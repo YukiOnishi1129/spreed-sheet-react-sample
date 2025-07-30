@@ -66,7 +66,7 @@ describe('Bit Operation Functions', () => {
     });
 
     it('should handle cell references', () => {
-      const matches = ['BITAND(B1, C1)', 'B1', 'C1'] as RegExpMatchArray;
+      const matches = ['BITAND(A2, B2)', 'A2', 'B2'] as RegExpMatchArray;
       const result = BITAND.calculate(matches, mockContext);
       expect(result).toBe(10); // 10 & 15 = 10
     });
@@ -252,7 +252,7 @@ describe('Bit Operation Functions', () => {
     });
 
     it('should handle cell references', () => {
-      const matches = ['BITRSHIFT(C3, A4)', 'C3', 'A4'] as RegExpMatchArray;
+      const matches = ['BITRSHIFT(C3, E1)', 'C3', 'E1'] as RegExpMatchArray;
       const result = BITRSHIFT.calculate(matches, mockContext);
       expect(result).toBe(64); // 1024 >> 4 = 64
     });

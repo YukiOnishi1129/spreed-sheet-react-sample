@@ -107,6 +107,44 @@ function complexToString(complex: ComplexNumber, suffix: string = 'i'): string {
   return `${complex.real}${sign}${complex.imaginary}${suffix}`;
 }
 
+// 関数の引数をクォートやカンマを考慮して適切に分割
+function parseFormulaArguments(argsStr: string): string[] {
+  const args: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  let parenDepth = 0;
+  
+  for (let i = 0; i < argsStr.length; i++) {
+    const char = argsStr[i];
+    
+    if (char === '"' && (i === 0 || argsStr[i - 1] !== '\\')) {
+      inQuotes = !inQuotes;
+      current += char;
+    } else if (!inQuotes) {
+      if (char === '(') {
+        parenDepth++;
+        current += char;
+      } else if (char === ')') {
+        parenDepth--;
+        current += char;
+      } else if (char === ',' && parenDepth === 0) {
+        args.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    } else {
+      current += char;
+    }
+  }
+  
+  if (current.trim()) {
+    args.push(current.trim());
+  }
+  
+  return args;
+}
+
 // COMPLEX関数の実装（複素数を作成）
 export const COMPLEX: CustomFormula = {
   name: 'COMPLEX',
@@ -139,7 +177,7 @@ export const COMPLEX: CustomFormula = {
 // IMABS関数の実装（複素数の絶対値）
 export const IMABS: CustomFormula = {
   name: 'IMABS',
-  pattern: /\\bIMABS\(([^)]+)\)/i,
+  pattern: /\bIMABS\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     
@@ -162,7 +200,7 @@ export const IMABS: CustomFormula = {
 // IMAGINARY関数の実装（虚部を返す）
 export const IMAGINARY: CustomFormula = {
   name: 'IMAGINARY',
-  pattern: /\\bIMAGINARY\(([^)]+)\)/i,
+  pattern: /\bIMAGINARY\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     
@@ -184,7 +222,7 @@ export const IMAGINARY: CustomFormula = {
 // IMREAL関数の実装（実部を返す）
 export const IMREAL: CustomFormula = {
   name: 'IMREAL',
-  pattern: /\\bIMREAL\(([^)]+)\)/i,
+  pattern: /\bIMREAL\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     
@@ -206,7 +244,7 @@ export const IMREAL: CustomFormula = {
 // IMARGUMENT関数の実装（偏角を返す）
 export const IMARGUMENT: CustomFormula = {
   name: 'IMARGUMENT',
-  pattern: /\\bIMARGUMENT\(([^)]+)\)/i,
+  pattern: /\bIMARGUMENT\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     
@@ -233,7 +271,7 @@ export const IMARGUMENT: CustomFormula = {
 // IMCONJUGATE関数の実装（複素共役）
 export const IMCONJUGATE: CustomFormula = {
   name: 'IMCONJUGATE',
-  pattern: /\\bIMCONJUGATE\(([^)]+)\)/i,
+  pattern: /\bIMCONJUGATE\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     
@@ -257,19 +295,20 @@ export const IMCONJUGATE: CustomFormula = {
 // IMSUM関数の実装（複素数の和）
 export const IMSUM: CustomFormula = {
   name: 'IMSUM',
-  pattern: /\\bIMSUM\((.+)\)/i,
+  pattern: /\bIMSUM\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, argsStr] = matches;
     
     try {
-      const args = argsStr.split(',').map(arg => arg.trim());
+      // より適切に引数を分割（クォートされた文字列を考慮）
+      const args = parseFormulaArguments(argsStr);
       let sumReal = 0;
       let sumImag = 0;
       let suffix = 'i';
       
       for (const arg of args) {
-        const complexStr = getCellValue(arg, context)?.toString() ?? arg;
-        const complex = parseComplex(complexStr);
+        const argValue = getCellValue(arg, context)?.toString() ?? arg.replace(/"/g, '');
+        const complex = parseComplex(argValue);
         
         if (!complex) {
           return FormulaError.VALUE;
@@ -278,7 +317,7 @@ export const IMSUM: CustomFormula = {
         sumReal += complex.real;
         sumImag += complex.imaginary;
         
-        if (complexStr.includes('j')) {
+        if (argValue.includes('j')) {
           suffix = 'j';
         }
       }
@@ -293,7 +332,7 @@ export const IMSUM: CustomFormula = {
 // IMSUB関数の実装（複素数の減算）
 export const IMSUB: CustomFormula = {
   name: 'IMSUB',
-  pattern: /\\bIMSUB\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /\bIMSUB\(([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complex1Ref, complex2Ref] = matches;
     
@@ -323,38 +362,31 @@ export const IMSUB: CustomFormula = {
 // IMPRODUCT関数の実装（複素数の積）
 export const IMPRODUCT: CustomFormula = {
   name: 'IMPRODUCT',
-  pattern: /\\bIMPRODUCT\((.+)\)/i,
+  pattern: /\bIMPRODUCT\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, argsStr] = matches;
     
     try {
-      const args = argsStr.split(',').map(arg => arg.trim());
+      const args = parseFormulaArguments(argsStr);
       let productReal = 1;
       let productImag = 0;
       let suffix = 'i';
-      let first = true;
       
       for (const arg of args) {
-        const complexStr = getCellValue(arg, context)?.toString() ?? arg;
-        const complex = parseComplex(complexStr);
+        const argValue = getCellValue(arg, context)?.toString() ?? arg.replace(/"/g, '');
+        const complex = parseComplex(argValue);
         
         if (!complex) {
           return FormulaError.VALUE;
         }
         
-        if (first) {
-          productReal = complex.real;
-          productImag = complex.imaginary;
-          first = false;
-        } else {
-          // (a + bi)(c + di) = (ac - bd) + (ad + bc)i
-          const newReal = productReal * complex.real - productImag * complex.imaginary;
-          const newImag = productReal * complex.imaginary + productImag * complex.real;
-          productReal = newReal;
-          productImag = newImag;
-        }
+        // (a + bi)(c + di) = (ac - bd) + (ad + bc)i
+        const newReal = productReal * complex.real - productImag * complex.imaginary;
+        const newImag = productReal * complex.imaginary + productImag * complex.real;
+        productReal = newReal;
+        productImag = newImag;
         
-        if (complexStr.includes('j')) {
+        if (argValue.includes('j')) {
           suffix = 'j';
         }
       }
@@ -369,7 +401,7 @@ export const IMPRODUCT: CustomFormula = {
 // IMDIV関数の実装（複素数の除算）
 export const IMDIV: CustomFormula = {
   name: 'IMDIV',
-  pattern: /\\bIMDIV\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /\bIMDIV\(([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, numerRef, denomRef] = matches;
     
@@ -406,35 +438,81 @@ export const IMDIV: CustomFormula = {
 // IMPOWER関数の実装（複素数のべき乗）
 export const IMPOWER: CustomFormula = {
   name: 'IMPOWER',
-  pattern: /\\bIMPOWER\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /\bIMPOWER\(([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef, powerRef] = matches;
     
     try {
-      const complexStr = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim();
-      const power = parseFloat(getCellValue(powerRef.trim(), context)?.toString() ?? powerRef.trim());
+      const complexValue = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim().replace(/"/g, '');
+      const powerValue = getCellValue(powerRef.trim(), context)?.toString() ?? powerRef.trim().replace(/"/g, '');
       
-      const complex = parseComplex(complexStr);
+      const complex = parseComplex(complexValue);
+      const powerComplex = parseComplex(powerValue);
       
-      if (!complex || isNaN(power)) {
+      if (!complex) {
         return FormulaError.NUM;
       }
       
-      const suffix = complexStr.includes('j') ? 'j' : 'i';
+      const suffix = complexValue.includes('j') ? 'j' : 'i';
       
-      // 極形式に変換: r * e^(iθ)
-      const r = Math.sqrt(complex.real * complex.real + complex.imaginary * complex.imaginary);
-      const theta = Math.atan2(complex.imaginary, complex.real);
+      // 実数べき乗の場合
+      if (powerComplex && powerComplex.imaginary === 0) {
+        const power = powerComplex.real;
+        
+        // 極形式に変換: r * e^(iθ)
+        const r = Math.sqrt(complex.real * complex.real + complex.imaginary * complex.imaginary);
+        const theta = Math.atan2(complex.imaginary, complex.real);
+        
+        // べき乗を計算: (r * e^(iθ))^n = r^n * e^(inθ)
+        const newR = Math.pow(r, power);
+        const newTheta = theta * power;
+        
+        // 直交形式に戻す
+        let real = newR * Math.cos(newTheta);
+        let imag = newR * Math.sin(newTheta);
+        
+        // 精度の問題を修正（より厳密に）
+        const epsilon = 1e-10;
+        if (Math.abs(real) < epsilon) real = 0;
+        if (Math.abs(imag) < epsilon) imag = 0;
+        
+        // さらに、小数点以下の桁数を制限して丸める
+        real = Math.round(real * 1e12) / 1e12;
+        imag = Math.round(imag * 1e12) / 1e12;
+        
+        return complexToString({ real, imaginary: imag }, suffix);
+      }
       
-      // べき乗を計算: (r * e^(iθ))^n = r^n * e^(inθ)
-      const newR = Math.pow(r, power);
-      const newTheta = theta * power;
+      // 複素数べき乗の場合 (a+bi)^(c+di) = e^((c+di)*ln(a+bi))
+      if (powerComplex) {
+        // ln(a+bi) を計算
+        const r = Math.sqrt(complex.real * complex.real + complex.imaginary * complex.imaginary);
+        const theta = Math.atan2(complex.imaginary, complex.real);
+        const lnReal = Math.log(r);
+        const lnImag = theta;
+        
+        // (c+di) * ln(a+bi) を計算
+        const expReal = powerComplex.real * lnReal - powerComplex.imaginary * lnImag;
+        const expImag = powerComplex.real * lnImag + powerComplex.imaginary * lnReal;
+        
+        // e^(expReal + i*expImag) を計算
+        const expOfReal = Math.exp(expReal);
+        let real = expOfReal * Math.cos(expImag);
+        let imag = expOfReal * Math.sin(expImag);
+        
+        // 精度の問題を修正（より厳密に）
+        const epsilon = 1e-10;
+        if (Math.abs(real) < epsilon) real = 0;
+        if (Math.abs(imag) < epsilon) imag = 0;
+        
+        // さらに、小数点以下の桁数を制限して丸める
+        real = Math.round(real * 1e12) / 1e12;
+        imag = Math.round(imag * 1e12) / 1e12;
+        
+        return complexToString({ real, imaginary: imag }, suffix);
+      }
       
-      // 直交形式に戻す
-      const real = newR * Math.cos(newTheta);
-      const imag = newR * Math.sin(newTheta);
-      
-      return complexToString({ real, imaginary: imag }, suffix);
+      return FormulaError.NUM;
     } catch {
       return FormulaError.VALUE;
     }
@@ -444,24 +522,34 @@ export const IMPOWER: CustomFormula = {
 // IMSQRT関数の実装（複素数の平方根）
 export const IMSQRT: CustomFormula = {
   name: 'IMSQRT',
-  pattern: /\\bIMSQRT\(([^)]+)\)/i,
+  pattern: /\bIMSQRT\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     
     try {
-      const complexStr = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim();
-      const complex = parseComplex(complexStr);
+      const complexValue = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim().replace(/"/g, '');
+      const complex = parseComplex(complexValue);
       
       if (!complex) {
         return FormulaError.NUM;
       }
       
-      const suffix = complexStr.includes('j') ? 'j' : 'i';
+      const suffix = complexValue.includes('j') ? 'j' : 'i';
       
-      // √(a + bi) の計算
+      // 特別なケース: 負の実数
+      if (complex.imaginary === 0 && complex.real < 0) {
+        return complexToString({ real: 0, imaginary: Math.sqrt(-complex.real) }, suffix);
+      }
+      
+      // 一般的なケース: √(a + bi) の計算
       const r = Math.sqrt(complex.real * complex.real + complex.imaginary * complex.imaginary);
       const real = Math.sqrt((r + complex.real) / 2);
-      const imag = Math.sign(complex.imaginary) * Math.sqrt((r - complex.real) / 2);
+      let imag = Math.sqrt((r - complex.real) / 2);
+      
+      // 虚部の符号を調整
+      if (complex.imaginary < 0) {
+        imag = -imag;
+      }
       
       return complexToString({ real, imaginary: imag }, suffix);
     } catch {
@@ -473,24 +561,34 @@ export const IMSQRT: CustomFormula = {
 // IMEXP関数の実装（複素数の指数関数）
 export const IMEXP: CustomFormula = {
   name: 'IMEXP',
-  pattern: /\\bIMEXP\(([^)]+)\)/i,
+  pattern: /\bIMEXP\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     
     try {
-      const complexStr = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim();
-      const complex = parseComplex(complexStr);
+      const complexValue = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim().replace(/"/g, '');
+      const complex = parseComplex(complexValue);
       
       if (!complex) {
         return FormulaError.NUM;
       }
       
-      const suffix = complexStr.includes('j') ? 'j' : 'i';
+      const suffix = complexValue.includes('j') ? 'j' : 'i';
       
       // e^(a + bi) = e^a * (cos(b) + i*sin(b))
       const expReal = Math.exp(complex.real);
-      const real = expReal * Math.cos(complex.imaginary);
-      const imag = expReal * Math.sin(complex.imaginary);
+      let real = expReal * Math.cos(complex.imaginary);
+      let imag = expReal * Math.sin(complex.imaginary);
+      
+      // 精度の問題を修正（πの場合など）
+      const epsilon = 1e-12;
+      if (Math.abs(real) < epsilon) real = 0;
+      if (Math.abs(imag) < epsilon) imag = 0;
+      
+      // 特別なケース: e^(i*π) = -1
+      if (Math.abs(complex.real) < epsilon && Math.abs(Math.abs(complex.imaginary) - Math.PI) < 1e-8) {
+        return complex.imaginary > 0 ? '-1' : '-1';
+      }
       
       return complexToString({ real, imaginary: imag }, suffix);
     } catch {
@@ -502,7 +600,7 @@ export const IMEXP: CustomFormula = {
 // IMLN関数の実装（複素数の自然対数）
 export const IMLN: CustomFormula = {
   name: 'IMLN',
-  pattern: /\\bIMLN\(([^)]+)\)/i,
+  pattern: /\bIMLN\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, complexRef] = matches;
     

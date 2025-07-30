@@ -39,15 +39,21 @@ export const PMT: CustomFormula = {
         // 金利が0の場合
         pmt = -(pv + fv) / nper;
       } else {
-        // Excel-compatible PMT calculation
+        // Excel-compatible PMT calculation - exact Excel formula
+        // PMT = ((PV * rate) + (FV * rate / ((1 + rate)^n - 1))) / (1 - (1 + rate)^(-n)) * -1
         const compoundFactor = Math.pow(1 + rate, nper);
         
         if (type === 0) {
-          // 期末払い (ordinary annuity)
-          pmt = -(pv * compoundFactor + fv) * rate / (compoundFactor - 1);
+          // 期末払い (ordinary annuity) - exact Excel PMT formula
+          // Excel formula: PMT = (PV * rate + FV * rate / ((1 + rate)^n - 1)) / (1 - (1 + rate)^(-n)) * -1
+          const pvFactor = (1 - Math.pow(1 + rate, -nper)) / rate;
+          const fvFactor = Math.pow(1 + rate, -nper);
+          pmt = -(pv / pvFactor + fv * fvFactor);
         } else {
-          // 期初払い (annuity due)
-          pmt = -(pv * compoundFactor + fv) * rate / ((compoundFactor - 1) * (1 + rate));
+          // 期初払い (annuity due) - Excel formula for beginning payments
+          const pvFactor = (1 - Math.pow(1 + rate, -nper)) / rate * (1 + rate);
+          const fvFactor = Math.pow(1 + rate, -nper);
+          pmt = -(pv / pvFactor + fv * fvFactor / (1 + rate));
         }
       }
       
@@ -290,48 +296,51 @@ export const IRR: CustomFormula = {
     }
     if (!hasPositive || !hasNegative) return FormulaError.NUM;
     
-    // Improved Newton-Raphson method for IRR calculation
+    // Excel-compatible IRR calculation using Secant method for better convergence
     let rate = guess;
-    const maxIterations = 200;
-    const precision = 0.0000000001;
+    let prevRate = guess * 1.1;
+    const maxIterations = 100;
+    const tolerance = 0.00000001;
     
     for (let i = 0; i < maxIterations; i++) {
       let npv = 0;
-      let derivative = 0;
+      let prevNpv = 0;
       
-      // Calculate NPV and its derivative
+      // Calculate NPV at current rate
       for (let j = 0; j < values.length; j++) {
-        const factor = Math.pow(1 + rate, j);
-        npv += values[j] / factor;
-        derivative -= j * values[j] / (factor * (1 + rate));
+        npv += values[j] / Math.pow(1 + rate, j + 1);
       }
       
-      if (Math.abs(npv) < precision) {
+      if (Math.abs(npv) < tolerance) {
         return rate;
       }
       
-      if (Math.abs(derivative) < precision) {
-        return FormulaError.NUM;
+      // Calculate NPV at previous rate for secant method
+      for (let j = 0; j < values.length; j++) {
+        prevNpv += values[j] / Math.pow(1 + prevRate, j + 1);
       }
       
-      const newRate = rate - npv / derivative;
+      if (Math.abs(npv - prevNpv) < tolerance) {
+        return rate;
+      }
       
-      if (Math.abs(newRate - rate) < precision) {
+      // Secant method update
+      const newRate = rate - npv * (rate - prevRate) / (npv - prevNpv);
+      
+      if (Math.abs(newRate - rate) < tolerance) {
         return newRate;
       }
       
-      // Improved bounds checking with better convergence
-      if (newRate <= -0.999999) {
-        rate = -0.999999;
-      } else if (newRate > 100) {
-        rate = Math.min(newRate, 100);
+      // Update rates for next iteration
+      prevRate = rate;
+      
+      // Improved bounds checking
+      if (newRate <= -0.999) {
+        rate = -0.999;
+      } else if (newRate > 10) {
+        rate = 10;
       } else {
         rate = newRate;
-      }
-      
-      // If we're making very small progress, try a different approach
-      if (i > 50 && Math.abs(newRate - rate) > 0.01) {
-        rate = guess + (Math.random() - 0.5) * 0.2; // Add some randomness
       }
     }
     
@@ -376,16 +385,18 @@ export const PPMT: CustomFormula = {
         return -(pv + fv) / nper;
       }
       
-      // PMTを計算 (use the improved PMT calculation)
-      const compoundFactor = Math.pow(1 + rate, nper);
-      
+      // PMTを計算 (use Excel-compatible calculation)
       let pmt: number;
       if (type === 0) {
-        // 期末払い (ordinary annuity)
-        pmt = -(pv * compoundFactor + fv) * rate / (compoundFactor - 1);
+        // 期末払い (ordinary annuity) - exact Excel PMT formula
+        const pvFactor = (1 - Math.pow(1 + rate, -nper)) / rate;
+        const fvFactor = Math.pow(1 + rate, -nper);
+        pmt = -(pv / pvFactor + fv * fvFactor);
       } else {
-        // 期初払い (annuity due)
-        pmt = -(pv * compoundFactor + fv) * rate / ((compoundFactor - 1) * (1 + rate));
+        // 期初払い (annuity due) - Excel formula for beginning payments
+        const pvFactor = (1 - Math.pow(1 + rate, -nper)) / rate * (1 + rate);
+        const fvFactor = Math.pow(1 + rate, -nper);
+        pmt = -(pv / pvFactor + fv * fvFactor / (1 + rate));
       }
       
       // 指定期間の開始時点での残高を計算
@@ -453,16 +464,18 @@ export const IPMT: CustomFormula = {
         return 0;
       }
       
-      // PMTを計算 (use the improved PMT calculation)
-      const compoundFactor = Math.pow(1 + rate, nper);
-      
+      // PMTを計算 (use Excel-compatible calculation)
       let pmt: number;
       if (type === 0) {
-        // 期末払い (ordinary annuity)
-        pmt = -(pv * compoundFactor + fv) * rate / (compoundFactor - 1);
+        // 期末払い (ordinary annuity) - exact Excel PMT formula
+        const pvFactor = (1 - Math.pow(1 + rate, -nper)) / rate;
+        const fvFactor = Math.pow(1 + rate, -nper);
+        pmt = -(pv / pvFactor + fv * fvFactor);
       } else {
-        // 期初払い (annuity due)
-        pmt = -(pv * compoundFactor + fv) * rate / ((compoundFactor - 1) * (1 + rate));
+        // 期初払い (annuity due) - Excel formula for beginning payments
+        const pvFactor = (1 - Math.pow(1 + rate, -nper)) / rate * (1 + rate);
+        const fvFactor = Math.pow(1 + rate, -nper);
+        pmt = -(pv / pvFactor + fv * fvFactor / (1 + rate));
       }
       
       // 指定期間の開始時点での残高を計算して利息を求める
