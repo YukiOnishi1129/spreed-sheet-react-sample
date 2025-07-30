@@ -48,9 +48,11 @@ describe('Inverse Distribution Functions', () => {
         expect(T_INV.calculate(matches2, mockContext)).toBe(FormulaError.NUM);
       });
 
-      it('should return NUM error for non-integer degrees of freedom', () => {
+      it('should accept non-integer degrees of freedom', () => {
         const matches = ['T.INV(0.5, 10.5)', '0.5', '10.5'] as RegExpMatchArray;
-        expect(T_INV.calculate(matches, mockContext)).toBe(FormulaError.NUM);
+        const result = T_INV.calculate(matches, mockContext);
+        expect(typeof result).toBe('number');
+        expect(result).toBeCloseTo(0, 5); // T.INV(0.5, df)は常に0
       });
 
       it('should return NUM error for degrees of freedom < 1', () => {
@@ -106,9 +108,11 @@ describe('Inverse Distribution Functions', () => {
         expect(CHISQ_INV.calculate(matches, mockContext)).toBe(FormulaError.NUM);
       });
 
-      it('should return NUM error for non-integer degrees of freedom', () => {
+      it('should accept non-integer degrees of freedom', () => {
         const matches = ['CHISQ.INV(0.5, 10.5)', '0.5', '10.5'] as RegExpMatchArray;
-        expect(CHISQ_INV.calculate(matches, mockContext)).toBe(FormulaError.NUM);
+        const result = CHISQ_INV.calculate(matches, mockContext);
+        expect(typeof result).toBe('number');
+        expect(result).toBeGreaterThan(0);
       });
     });
 
@@ -144,9 +148,11 @@ describe('Inverse Distribution Functions', () => {
         expect(F_INV.calculate(matches, mockContext)).toBe(FormulaError.NUM);
       });
 
-      it('should return NUM error for non-integer degrees of freedom', () => {
+      it('should accept non-integer degrees of freedom', () => {
         const matches = ['F.INV(0.5, 5.5, 10)', '0.5', '5.5', '10'] as RegExpMatchArray;
-        expect(F_INV.calculate(matches, mockContext)).toBe(FormulaError.NUM);
+        const result = F_INV.calculate(matches, mockContext);
+        expect(typeof result).toBe('number');
+        expect(result).toBeGreaterThan(0);
       });
     });
 

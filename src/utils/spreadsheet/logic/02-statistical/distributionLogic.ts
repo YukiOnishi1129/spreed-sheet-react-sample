@@ -107,52 +107,68 @@ function fDistributionCDF(x: number, df1: number, df2: number): number {
   return incompleteBeta(y, df1 / 2, df2 / 2);
 }
 
-// 不完全ベータ関数
+// 不完全ベータ関数（正規化）- 高精度実装
 function incompleteBeta(x: number, a: number, b: number): number {
   if (x <= 0) return 0;
   if (x >= 1) return 1;
   
-  // 連分数展開を使用
-  const bt = Math.exp(
-    Math.log(x) * a + Math.log(1 - x) * b -
-    Math.log(gamma(a) * gamma(b) / gamma(a + b))
-  );
+  // ベータ関数 B(a,b) の対数
+  const logBeta = logGamma(a) + logGamma(b) - logGamma(a + b);
   
+  // x^a * (1-x)^b / B(a,b) の計算
+  const bt = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - logBeta);
+  
+  // 収束を良くするために対称性を利用
   if (x < (a + 1) / (a + b + 2)) {
     // 前方級数展開
     return bt * betaContinuedFraction(x, a, b) / a;
   } else {
-    // 後方級数展開
+    // 対称性を使用: I_x(a,b) = 1 - I_{1-x}(b,a)
     return 1 - bt * betaContinuedFraction(1 - x, b, a) / b;
   }
 }
 
-// ベータ連分数
+// ベータ連分数（Lentz法による高精度実装）
 function betaContinuedFraction(x: number, a: number, b: number): number {
-  const maxIterations = 100;
-  const epsilon = 1e-10;
+  const maxIterations = 200;
+  const fpmin = 1e-30;
+  const eps = 1e-15;
   
-  let d = 1 - (a + b) * x / (a + 1);
-  if (Math.abs(d) < epsilon) d = epsilon;
+  const qab = a + b;
+  const qap = a + 1;
+  const qam = a - 1;
+  
+  // 初期値設定
+  let c = 1;
+  let d = 1 - qab * x / qap;
+  if (Math.abs(d) < fpmin) d = fpmin;
   d = 1 / d;
   let h = d;
   
-  for (let i = 1; i < maxIterations; i++) {
-    const m2 = 2 * i;
-    let aa = i * (b - i) * x / ((a - 1 + m2) * (a + m2));
-    d = 1 + aa * d;
-    if (Math.abs(d) < epsilon) d = epsilon;
-    d = 1 / d;
-    h *= d;
+  for (let m = 1; m <= maxIterations; m++) {
+    const m2 = 2 * m;
     
-    aa = -(a + i) * (a + b + i) * x / ((a + m2) * (a + 1 + m2));
+    // 偶数項
+    let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
     d = 1 + aa * d;
-    if (Math.abs(d) < epsilon) d = epsilon;
+    if (Math.abs(d) < fpmin) d = fpmin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpmin) c = fpmin;
     d = 1 / d;
-    const del = d;
+    h *= d * c;
+    
+    // 奇数項
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d;
+    if (Math.abs(d) < fpmin) d = fpmin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpmin) c = fpmin;
+    d = 1 / d;
+    const del = d * c;
     h *= del;
     
-    if (Math.abs(del - 1) < epsilon) break;
+    // 収束判定
+    if (Math.abs(del - 1) < eps) break;
   }
   
   return h;
@@ -314,22 +330,78 @@ function factorial(n: number): number {
   return gamma(n + 1);
 }
 
-// 不完全ガンマ関数の近似
+// 不完全ガンマ関数（正規化）- 高精度実装
 function incompleteGamma(a: number, x: number): number {
+  if (x <= 0 || a <= 0) return 0;
+  
+  // 正規化された下側不完全ガンマ関数を返す
+  // P(a,x) = γ(a,x) / Γ(a)
+  return gammaP(a, x) * gamma(a);
+}
+
+// 正規化下側不完全ガンマ関数 P(a,x) = γ(a,x) / Γ(a)
+function gammaP(a: number, x: number): number {
+  if (x <= 0 || a <= 0) return 0;
+  
+  // x < a + 1 の場合は級数展開を使用
+  if (x < a + 1) {
+    return gammaPSeries(a, x);
+  } else {
+    // それ以外は連分数展開を使用して Q(a,x) から計算
+    return 1 - gammaQContinuedFraction(a, x);
+  }
+}
+
+// 級数展開による計算
+function gammaPSeries(a: number, x: number): number {
+  const maxIterations = 200;
+  const eps = 1e-15;
+  
   if (x === 0) return 0;
-  if (x < 0) return NaN;
   
-  // 級数展開による近似
-  let sum = 1;
-  let term = 1;
+  let ap = a;
+  let sum = 1 / a;
+  let del = sum;
   
-  for (let n = 1; n < 100; n++) {
-    term *= x / (a + n - 1);
-    sum += term;
-    if (Math.abs(term) < 1e-15) break;
+  for (let n = 1; n <= maxIterations; n++) {
+    ap += 1;
+    del *= x / ap;
+    sum += del;
+    if (Math.abs(del) < Math.abs(sum) * eps) {
+      break;
+    }
   }
   
-  return Math.pow(x, a) * Math.exp(-x) * sum;
+  return sum * Math.exp(-x + a * Math.log(x) - logGamma(a));
+}
+
+// 連分数展開による上側不完全ガンマ関数 Q(a,x) = Γ(a,x) / Γ(a)
+function gammaQContinuedFraction(a: number, x: number): number {
+  const maxIterations = 200;
+  const fpmin = 1e-30;
+  const eps = 1e-15;
+  
+  let b = x + 1 - a;
+  let c = 1 / fpmin;
+  let d = 1 / b;
+  let h = d;
+  
+  for (let i = 1; i <= maxIterations; i++) {
+    const an = -i * (i - a);
+    b += 2;
+    d = an * d + b;
+    if (Math.abs(d) < fpmin) d = fpmin;
+    c = b + an / c;
+    if (Math.abs(c) < fpmin) c = fpmin;
+    d = 1 / d;
+    const del = d * c;
+    h *= del;
+    if (Math.abs(del - 1) < eps) {
+      break;
+    }
+  }
+  
+  return Math.exp(-x + a * Math.log(x) - logGamma(a)) * h;
 }
 
 // t分布の累積分布関数
@@ -1041,19 +1113,23 @@ export const NEGBINOM_DIST: CustomFormula = {
   name: 'NEGBINOM.DIST',
   pattern: /NEGBINOM\.DIST\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, failuresRef, successesRef, probSRef, cumulativeRef] = matches;
+    const [, numberFRef, numberSRef, probabilitySRef, cumulativeRef] = matches;
     
-    const failures = Number(getCellValue(failuresRef.trim(), context) ?? failuresRef);
-    const successes = Number(getCellValue(successesRef.trim(), context) ?? successesRef);
-    const probS = Number(getCellValue(probSRef.trim(), context) ?? probSRef);
+    // ExcelのNEGBINOM.DISTの引数：
+    // number_f: 失敗回数
+    // number_s: 成功回数のしきい値
+    // probability_s: 成功の確率
+    const numberF = Number(getCellValue(numberFRef.trim(), context) ?? numberFRef);
+    const numberS = Number(getCellValue(numberSRef.trim(), context) ?? numberSRef);
+    const probabilityS = Number(getCellValue(probabilitySRef.trim(), context) ?? probabilitySRef);
     const cumulative = getCellValue(cumulativeRef.trim(), context) ?? cumulativeRef;
     
-    if (isNaN(failures) || isNaN(successes) || isNaN(probS)) {
+    if (isNaN(numberF) || isNaN(numberS) || isNaN(probabilityS)) {
       return FormulaError.VALUE;
     }
     
-    if (failures < 0 || successes < 1 || !Number.isInteger(failures) || !Number.isInteger(successes) ||
-        probS <= 0 || probS >= 1) {
+    if (numberF < 0 || numberS < 1 || !Number.isInteger(numberF) || 
+        probabilityS <= 0 || probabilityS > 1) {
       return FormulaError.NUM;
     }
     
@@ -1061,16 +1137,17 @@ export const NEGBINOM_DIST: CustomFormula = {
     
     if (isCumulative) {
       // 累積分布関数
-      let result = 0;
-      for (let k = 0; k <= failures; k++) {
-        const binomCoeff = factorial(successes + k - 1) / (factorial(k) * factorial(successes - 1));
-        result += binomCoeff * Math.pow(probS, successes) * Math.pow(1 - probS, k);
-      }
-      return result;
+      // I(x; r, p) = ベータ分布を使用
+      return incompleteBeta(probabilityS, numberS, numberF + 1);
     } else {
       // 確率質量関数
-      const binomCoeff = factorial(successes + failures - 1) / (factorial(failures) * factorial(successes - 1));
-      return binomCoeff * Math.pow(probS, successes) * Math.pow(1 - probS, failures);
+      // P(X = k) = C(k+r-1, k) * p^r * (1-p)^k
+      // ここで k = numberF, r = numberS, p = probabilityS
+      // factorialが大きい数でオーバーフローする可能性があるため、
+      // 対数を使用した計算を行う
+      const logCoeff = logGamma(numberF + numberS) - logGamma(numberF + 1) - logGamma(numberS);
+      const logResult = logCoeff + numberS * Math.log(probabilityS) + numberF * Math.log(1 - probabilityS);
+      return Math.exp(logResult);
     }
   }
 };
@@ -1184,7 +1261,7 @@ export const CONFIDENCE_T: CustomFormula = {
       return FormulaError.VALUE;
     }
     
-    if (alpha <= 0 || alpha >= 1 || stdDev <= 0 || size < 1 || !Number.isInteger(size)) {
+    if (alpha <= 0 || alpha >= 1 || stdDev <= 0 || size < 1) {
       return FormulaError.NUM;
     }
     
@@ -1314,10 +1391,18 @@ export const T_TEST: CustomFormula = {
     }
     
     // t分布の累積分布関数を使用してp値を計算
-    const p = tCDF(Math.abs(t), df);
-    
-    // tailsに応じてp値を調整
-    return tails === 1 ? (1 - p) : 2 * (1 - p);
+    // tCDFは左側確率を返すので、両側検定の場合は調整が必要
+    if (tails === 1) {
+      // 片側検定
+      if (t >= 0) {
+        return 1 - tCDF(t, df);
+      } else {
+        return tCDF(t, df);
+      }
+    } else {
+      // 両側検定
+      return 2 * (1 - tCDF(Math.abs(t), df));
+    }
   }
 };
 
@@ -1382,11 +1467,22 @@ export const CHISQ_TEST: CustomFormula = {
     const [, actualRef, expectedRef] = matches;
     
     // 観測値と期待値の範囲を取得
-    const actualRangeValues = parseRange(actualRef.trim(), context);
-    const expectedRangeValues = parseRange(expectedRef.trim(), context);
+    // parseRangeがマッチしない場合は、getCellRangeValuesを使用
+    let actualRangeValues = parseRange(actualRef.trim(), context);
+    let expectedRangeValues = parseRange(expectedRef.trim(), context);
     
     if (!actualRangeValues || !expectedRangeValues) {
-      return FormulaError.REF;
+      // 単一列のデータとして処理
+      const actualValues = getCellRangeValues(actualRef.trim(), context);
+      const expectedValues = getCellRangeValues(expectedRef.trim(), context);
+      
+      if (actualValues.length === 0 || expectedValues.length === 0) {
+        return FormulaError.REF;
+      }
+      
+      // 1列のデータを二次元配列に変換
+      actualRangeValues = actualValues.map(v => [Number(v)]);
+      expectedRangeValues = expectedValues.map(v => [Number(v)]);
     }
     
     // 2次元配列として処理
@@ -1430,3 +1526,6 @@ export const CHISQ_TEST: CustomFormula = {
     return 1 - chiSquareCDF(chiSquare, df);
   }
 };
+
+// 内部関数をエクスポート（他のモジュールで使用するため）
+export { incompleteBeta, gamma, logGamma };
