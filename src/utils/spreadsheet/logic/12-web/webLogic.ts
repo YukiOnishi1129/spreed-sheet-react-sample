@@ -28,7 +28,7 @@ export const WEBSERVICE: CustomFormula = {
       
       // 実際のWeb APIコールはセキュリティ上の理由でブラウザ環境では制限される
       // ここでは警告メッセージを返す
-      return '#BLOCKED! Web service calls are not supported in this environment';
+      return '#N/A - Web service calls require external access';
     } catch {
       return FormulaError.VALUE;
     }
@@ -106,6 +106,82 @@ export const ENCODEURL: CustomFormula = {
       return encodeURIComponent(text);
     } catch {
       return FormulaError.VALUE;
+    }
+  }
+};
+
+// HYPERLINK関数の実装（ハイパーリンクの作成）
+export const HYPERLINK: CustomFormula = {
+  name: 'HYPERLINK',
+  pattern: /HYPERLINK\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, linkLocationRef, linkLabelRef] = matches;
+    
+    try {
+      let linkLocation = getCellValue(linkLocationRef.trim(), context)?.toString() ?? linkLocationRef.trim();
+      let linkLabel = linkLabelRef ? 
+        (getCellValue(linkLabelRef.trim(), context)?.toString() ?? linkLabelRef.trim()) :
+        null;
+      
+      // 引用符を除去
+      if (linkLocation.startsWith('"') && linkLocation.endsWith('"')) {
+        linkLocation = linkLocation.slice(1, -1);
+      }
+      if (linkLabel && linkLabel.startsWith('"') && linkLabel.endsWith('"')) {
+        linkLabel = linkLabel.slice(1, -1);
+      }
+      
+      // linkLabelが指定されていない場合は、linkLocationを表示
+      if (linkLabel === null || linkLabel === undefined) {
+        return linkLocation;
+      }
+      
+      // linkLabelが指定されている場合は、それを返す
+      return linkLabel;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// ISURL関数の実装（URLかどうかの検証）
+export const ISURL: CustomFormula = {
+  name: 'ISURL',
+  pattern: /ISURL\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, valueRef] = matches;
+    
+    try {
+      const value = getCellValue(valueRef.trim(), context);
+      
+      // 数値の場合はfalseを返す
+      if (typeof value === 'number') {
+        return false;
+      }
+      
+      let text = value?.toString() ?? valueRef.trim();
+      
+      // 引用符を除去
+      if (text.startsWith('"') && text.endsWith('"')) {
+        text = text.slice(1, -1);
+      }
+      
+      // 空文字列の場合はfalse
+      if (text === '') {
+        return false;
+      }
+      
+      // URLパターンの検証
+      try {
+        const url = new URL(text);
+        // 有効なプロトコルかどうかチェック
+        const validProtocols = ['http:', 'https:', 'ftp:', 'ftps:', 'data:'];
+        return validProtocols.includes(url.protocol);
+      } catch {
+        return false;
+      }
+    } catch {
+      return false;
     }
   }
 };

@@ -276,14 +276,17 @@ describe('Import Functions', () => {
     });
 
     it('should handle all import functions returning consistent error', () => {
-      const functions = [
-        IMPORTDATA, IMPORTFEED, IMPORTHTML, IMPORTXML, IMPORTRANGE
+      // Test each function with appropriate parameters
+      const testCases = [
+        { func: IMPORTDATA, matches: ['IMPORTDATA("https://example.com")', '"https://example.com"'] },
+        { func: IMPORTFEED, matches: ['IMPORTFEED("https://example.com")', '"https://example.com"'] },
+        { func: IMPORTHTML, matches: ['IMPORTHTML("https://example.com", "table", 1)', '"https://example.com"', '"table"', '1'] },
+        { func: IMPORTXML, matches: ['IMPORTXML("https://example.com", "//div")', '"https://example.com"', '"//div"'] },
+        { func: IMPORTRANGE, matches: ['IMPORTRANGE("spreadsheet_id", "Sheet1!A1")', '"spreadsheet_id"', '"Sheet1!A1"'] }
       ];
       
-      for (const func of functions) {
-        const matches = ['FUNC("https://example.com", "param")', 
-          '"https://example.com"', '"param"'] as RegExpMatchArray;
-        const result = func.calculate(matches, mockContext);
+      for (const { func, matches } of testCases) {
+        const result = func.calculate(matches as RegExpMatchArray, mockContext);
         expect(result).toBe('#N/A - Web import functions require external data access');
       }
     });

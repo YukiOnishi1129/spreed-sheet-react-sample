@@ -12,8 +12,8 @@ export const BITAND: CustomFormula = {
     const [, num1Ref, num2Ref] = matches;
     
     try {
-      const num1 = parseInt(getCellValue(num1Ref.trim(), context)?.toString() ?? num1Ref.trim());
-      const num2 = parseInt(getCellValue(num2Ref.trim(), context)?.toString() ?? num2Ref.trim());
+      const num1 = Math.trunc(parseFloat(getCellValue(num1Ref.trim(), context)?.toString() ?? num1Ref.trim()));
+      const num2 = Math.trunc(parseFloat(getCellValue(num2Ref.trim(), context)?.toString() ?? num2Ref.trim()));
       
       if (isNaN(num1) || isNaN(num2)) {
         return FormulaError.VALUE;
@@ -39,8 +39,8 @@ export const BITOR: CustomFormula = {
     const [, num1Ref, num2Ref] = matches;
     
     try {
-      const num1 = parseInt(getCellValue(num1Ref.trim(), context)?.toString() ?? num1Ref.trim());
-      const num2 = parseInt(getCellValue(num2Ref.trim(), context)?.toString() ?? num2Ref.trim());
+      const num1 = Math.trunc(parseFloat(getCellValue(num1Ref.trim(), context)?.toString() ?? num1Ref.trim()));
+      const num2 = Math.trunc(parseFloat(getCellValue(num2Ref.trim(), context)?.toString() ?? num2Ref.trim()));
       
       if (isNaN(num1) || isNaN(num2)) {
         return FormulaError.VALUE;
@@ -66,8 +66,8 @@ export const BITXOR: CustomFormula = {
     const [, num1Ref, num2Ref] = matches;
     
     try {
-      const num1 = parseInt(getCellValue(num1Ref.trim(), context)?.toString() ?? num1Ref.trim());
-      const num2 = parseInt(getCellValue(num2Ref.trim(), context)?.toString() ?? num2Ref.trim());
+      const num1 = Math.trunc(parseFloat(getCellValue(num1Ref.trim(), context)?.toString() ?? num1Ref.trim()));
+      const num2 = Math.trunc(parseFloat(getCellValue(num2Ref.trim(), context)?.toString() ?? num2Ref.trim()));
       
       if (isNaN(num1) || isNaN(num2)) {
         return FormulaError.VALUE;
@@ -93,8 +93,8 @@ export const BITLSHIFT: CustomFormula = {
     const [, numRef, shiftRef] = matches;
     
     try {
-      const num = parseInt(getCellValue(numRef.trim(), context)?.toString() ?? numRef.trim());
-      const shift = parseInt(getCellValue(shiftRef.trim(), context)?.toString() ?? shiftRef.trim());
+      const num = Math.trunc(parseFloat(getCellValue(numRef.trim(), context)?.toString() ?? numRef.trim()));
+      const shift = Math.trunc(parseFloat(getCellValue(shiftRef.trim(), context)?.toString() ?? shiftRef.trim()));
       
       if (isNaN(num) || isNaN(shift)) {
         return FormulaError.VALUE;
@@ -106,22 +106,17 @@ export const BITLSHIFT: CustomFormula = {
       }
       
       // シフト量の制限
-      if (Math.abs(shift) > 53) {
+      if (shift < 0 || shift > 53) {
         return FormulaError.NUM;
       }
       
-      if (shift >= 0) {
-        // 左シフト
-        const result = num << shift;
-        // オーバーフローチェック
-        if (result > 281474976710655) {
-          return FormulaError.NUM;
-        }
-        return result;
-      } else {
-        // 負の値の場合は右シフト
-        return num >>> (-shift);
+      // 左シフト
+      const result = num * Math.pow(2, shift);
+      // オーバーフローチェック
+      if (result > 281474976710655) {
+        return FormulaError.NUM;
       }
+      return Math.trunc(result);
     } catch {
       return FormulaError.VALUE;
     }
@@ -136,8 +131,8 @@ export const BITRSHIFT: CustomFormula = {
     const [, numRef, shiftRef] = matches;
     
     try {
-      const num = parseInt(getCellValue(numRef.trim(), context)?.toString() ?? numRef.trim());
-      const shift = parseInt(getCellValue(shiftRef.trim(), context)?.toString() ?? shiftRef.trim());
+      const num = Math.trunc(parseFloat(getCellValue(numRef.trim(), context)?.toString() ?? numRef.trim()));
+      const shift = Math.trunc(parseFloat(getCellValue(shiftRef.trim(), context)?.toString() ?? shiftRef.trim()));
       
       if (isNaN(num) || isNaN(shift)) {
         return FormulaError.VALUE;
@@ -149,22 +144,12 @@ export const BITRSHIFT: CustomFormula = {
       }
       
       // シフト量の制限
-      if (Math.abs(shift) > 53) {
+      if (shift < 0 || shift > 53) {
         return FormulaError.NUM;
       }
       
-      if (shift >= 0) {
-        // 右シフト（論理シフト）
-        return num >>> shift;
-      } else {
-        // 負の値の場合は左シフト
-        const result = num << (-shift);
-        // オーバーフローチェック
-        if (result > 281474976710655) {
-          return FormulaError.NUM;
-        }
-        return result;
-      }
+      // 右シフト（論理シフト）
+      return Math.trunc(num / Math.pow(2, shift));
     } catch {
       return FormulaError.VALUE;
     }

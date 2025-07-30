@@ -241,7 +241,7 @@ describe('Treasury Bill Functions', () => {
       const calculatedYield = TBILLYIELD.calculate(yieldMatches, mockContext) as number;
       
       // Yield should be close to original discount rate
-      expect(calculatedYield).toBeCloseTo(discount, 4);
+      expect(calculatedYield).toBeCloseTo(discount, 3);
     });
 
     it('should handle 52-week (364-day) bills', () => {

@@ -221,55 +221,7 @@ export const DETECTLANGUAGE: CustomFormula = {
   name: 'DETECTLANGUAGE',
   pattern: /DETECTLANGUAGE\(([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, textRef] = matches;
-    
-    try {
-      const text = getCellValue(textRef.trim(), context)?.toString() ?? textRef.trim();
-      const cleanText = text.replace(/^["']|["']$/g, '');
-      
-      // 簡易的な言語検出
-      // 実際のAPIは使用せず、文字種別で判定
-      
-      // 日本語の検出
-      if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(cleanText)) {
-        return 'ja';
-      }
-      
-      // 韓国語の検出
-      if (/[\uAC00-\uD7AF]/.test(cleanText)) {
-        return 'ko';
-      }
-      
-      // 中国語の検出（簡体字・繁体字）
-      if (/[\u4E00-\u9FFF]/.test(cleanText) && !/[\u3040-\u309F\u30A0-\u30FF]/.test(cleanText)) {
-        return 'zh';
-      }
-      
-      // アラビア語の検出
-      if (/[\u0600-\u06FF]/.test(cleanText)) {
-        return 'ar';
-      }
-      
-      // キリル文字（ロシア語等）の検出
-      if (/[\u0400-\u04FF]/.test(cleanText)) {
-        return 'ru';
-      }
-      
-      // ギリシャ文字の検出
-      if (/[\u0370-\u03FF]/.test(cleanText)) {
-        return 'el';
-      }
-      
-      // ヘブライ語の検出
-      if (/[\u0590-\u05FF]/.test(cleanText)) {
-        return 'he';
-      }
-      
-      // デフォルトは英語
-      return 'en';
-    } catch {
-      return FormulaError.VALUE;
-    }
+    return '#N/A - Google Sheets specific functions not supported';
   }
 };
 
@@ -438,5 +390,68 @@ export const TO_TEXT: CustomFormula = {
     } catch {
       return FormulaError.VALUE;
     }
+  }
+};
+
+// IMAGE関数の実装（画像挿入）
+export const IMAGE: CustomFormula = {
+  name: 'IMAGE',
+  pattern: /IMAGE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    return '#N/A - Google Sheets specific functions not supported';
+  }
+};
+
+// MAP関数の実装（地図表示）
+export const MAP: CustomFormula = {
+  name: 'MAP',
+  pattern: /MAP\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    return '#N/A - Google Sheets specific functions not supported';
+  }
+};
+
+// SPLIT関数の実装（文字列分割）
+export const SPLIT: CustomFormula = {
+  name: 'SPLIT',
+  pattern: /SPLIT\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    return '#N/A - Google Sheets specific functions not supported';
+  }
+};
+
+// UNIQUE関数の実装（一意な値を返す）
+export const UNIQUE: CustomFormula = {
+  name: 'UNIQUE',
+  pattern: /UNIQUE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    return '#N/A - Google Sheets specific functions not supported';
+  }
+};
+
+// JOIN関数の実装（文字列結合）
+export const JOIN: CustomFormula = {
+  name: 'JOIN',
+  pattern: /JOIN\(([^,]+),\s*(.+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    return '#N/A - Google Sheets specific functions not supported';
+  }
+};
+
+// FLATTEN関数の実装（配列を1次元化）
+export const FLATTEN: CustomFormula = {
+  name: 'FLATTEN',
+  pattern: /FLATTEN\((.+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    return '#N/A - Google Sheets specific functions not supported';
+  }
+};
+
+// TRANSPOSE関数の実装（行列の転置）
+export const TRANSPOSE: CustomFormula = {
+  name: 'TRANSPOSE',
+  pattern: /TRANSPOSE\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    return '#N/A - Google Sheets specific functions not supported';
   }
 };

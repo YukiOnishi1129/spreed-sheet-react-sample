@@ -45,9 +45,12 @@ export const parseDate = (dateStr: string): Date | null => {
   // ];
   
   // Check if it's a number (Excel serial date)
-  const num = parseFloat(cleanStr);
-  if (!isNaN(num) && num > 0 && num < 2958466) { // Excel max date
-    return getDateFromExcelSerial(num);
+  // Only treat as Excel serial if the entire string is numeric
+  if (cleanStr.match(/^\d+(\.\d+)?$/)) {
+    const num = parseFloat(cleanStr);
+    if (!isNaN(num) && num > 0 && num < 2958466) { // Excel max date
+      return getDateFromExcelSerial(num);
+    }
   }
   
   // Try parsing as date string

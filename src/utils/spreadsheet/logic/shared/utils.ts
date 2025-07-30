@@ -127,7 +127,7 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
   
   for (let row = start.row; row <= end.row; row++) {
     for (let col = start.col; col <= end.col; col++) {
-      if (row >= 0 && row < context.data.length && col >= 0 && col < context.data[0]?.length) {
+      if (row >= 0 && row < context.data.length && col >= 0 && col < context.data[row]?.length) {
         const cellData = context.data[row][col];
         let value: unknown;
         

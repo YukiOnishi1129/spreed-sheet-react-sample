@@ -18,15 +18,7 @@ export const PMT: CustomFormula = {
       // 期間数
       const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
       // 現在価値（借入額）
-      let pv: number;
-      const pvValue = pvRef.trim();
-      if (pvValue.startsWith('-') && pvValue.length > 1) {
-        const cellRef = pvValue.substring(1);
-        const cellValue = getCellValue(cellRef, context);
-        pv = cellValue !== null && cellValue !== undefined ? -parseFloat(cellValue.toString()) : NaN;
-      } else {
-        pv = parseFloat(getCellValue(pvValue, context)?.toString() ?? pvValue);
-      }
+      const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
       
       // 将来価値（デフォルト0）
       const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
@@ -47,13 +39,15 @@ export const PMT: CustomFormula = {
         // 金利が0の場合
         pmt = -(pv + fv) / nper;
       } else {
-        // 通常の計算
-        const factor = Math.pow(1 + rate, nper);
-        pmt = -(pv * factor + fv) * rate / (factor - 1);
+        // Excel-compatible PMT calculation
+        const compoundFactor = Math.pow(1 + rate, nper);
         
-        if (type === 1) {
-          // 期初払いの場合
-          pmt = pmt / (1 + rate);
+        if (type === 0) {
+          // 期末払い (ordinary annuity)
+          pmt = -(pv * compoundFactor + fv) * rate / (compoundFactor - 1);
+        } else {
+          // 期初払い (annuity due)
+          pmt = -(pv * compoundFactor + fv) * rate / ((compoundFactor - 1) * (1 + rate));
         }
       }
       
@@ -77,15 +71,7 @@ export const PV: CustomFormula = {
       // 期間数
       const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
       // 定期支払額
-      let pmt: number;
-      const pmtValue = pmtRef.trim();
-      if (pmtValue.startsWith('-') && pmtValue.length > 1) {
-        const cellRef = pmtValue.substring(1);
-        const cellValue = getCellValue(cellRef, context);
-        pmt = cellValue !== null && cellValue !== undefined ? -parseFloat(cellValue.toString()) : NaN;
-      } else {
-        pmt = parseFloat(getCellValue(pmtValue, context)?.toString() ?? pmtValue);
-      }
+      const pmt = parseFloat(getCellValue(pmtRef.trim(), context)?.toString() ?? pmtRef.trim());
       // 将来価値（デフォルト0）
       const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
@@ -99,18 +85,11 @@ export const PV: CustomFormula = {
       
       if (rate === 0) {
         // 金利が0の場合
-        pv = -pmt * nper - fv;
+        pv = -(pmt * nper + fv);
       } else {
         // 通常の計算
         const factor = Math.pow(1 + rate, nper);
-        let pvAnnuity = pmt * (1 - 1 / factor) / rate;
-        
-        if (type === 1) {
-          // 期初払いの場合
-          pvAnnuity *= (1 + rate);
-        }
-        
-        pv = -pvAnnuity - fv / factor;
+        pv = -(pmt * (1 + rate * type) * (factor - 1) / rate + fv) / factor;
       }
       
       return pv;
@@ -133,15 +112,7 @@ export const FV: CustomFormula = {
       // 期間数
       const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
       // 定期支払額
-      let pmt: number;
-      const pmtValue = pmtRef.trim();
-      if (pmtValue.startsWith('-') && pmtValue.length > 1) {
-        const cellRef = pmtValue.substring(1);
-        const cellValue = getCellValue(cellRef, context);
-        pmt = cellValue !== null && cellValue !== undefined ? -parseFloat(cellValue.toString()) : NaN;
-      } else {
-        pmt = parseFloat(getCellValue(pmtValue, context)?.toString() ?? pmtValue);
-      }
+      const pmt = parseFloat(getCellValue(pmtRef.trim(), context)?.toString() ?? pmtRef.trim());
       // 現在価値（デフォルト0）
       const pv = pvRef ? parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim()) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
@@ -155,18 +126,11 @@ export const FV: CustomFormula = {
       
       if (rate === 0) {
         // 金利が0の場合
-        fv = -pv - pmt * nper;
+        fv = -(pv + pmt * nper);
       } else {
         // 通常の計算
         const factor = Math.pow(1 + rate, nper);
-        let fvAnnuity = pmt * (factor - 1) / rate;
-        
-        if (type === 1) {
-          // 期初払いの場合
-          fvAnnuity *= (1 + rate);
-        }
-        
-        fv = -pv * factor - fvAnnuity;
+        fv = -(pv * factor + pmt * (1 + rate * type) * (factor - 1) / rate);
       }
       
       return fv;
@@ -204,8 +168,26 @@ export const NPV: CustomFormula = {
           }
         });
       } else {
-        // 複数の引数の場合
-        const args = valuesRef.split(',').map(arg => arg.trim());
+        // 複数の引数の場合 - handle the entire remaining string as comma-separated values
+        // Split by comma but respect nested parentheses
+        const args: string[] = [];
+        let current = '';
+        let depth = 0;
+        
+        for (let i = 0; i < valuesRef.length; i++) {
+          const char = valuesRef[i];
+          if (char === '(') depth++;
+          else if (char === ')') depth--;
+          
+          if (char === ',' && depth === 0) {
+            args.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        if (current) args.push(current.trim());
+        
         for (const arg of args) {
           if (arg.match(/^[A-Z]+\d+$/)) {
             const cellValue = getCellValue(arg, context);
@@ -227,6 +209,8 @@ export const NPV: CustomFormula = {
       }
       
       // NPVを計算
+      // Excel's NPV assumes all cash flows happen at the end of periods
+      // The first value is at the end of period 1, not at time 0
       let npv = 0;
       for (let i = 0; i < values.length; i++) {
         npv += values[i] / Math.pow(1 + rate, i + 1);
@@ -247,17 +231,22 @@ export const IRR: CustomFormula = {
     const valuesRef = matches[1].trim();
     const guessRef = matches[2]?.trim();
     
-    let guess = 0.1; // デフォルトの推定値
-    
-    // 推定値を取得（オプション）
-    if (guessRef) {
-      if (guessRef.match(/^[A-Z]+\d+$/)) {
-        const cellValue = getCellValue(guessRef, context);
-        guess = parseFloat(String(cellValue ?? '0.1'));
-      } else {
-        guess = parseFloat(guessRef);
+    try {
+      let guess = 0.1; // デフォルトの推定値
+      
+      // 推定値を取得（オプション）
+      if (guessRef) {
+        if (guessRef.match(/^[A-Z]+\d+$/)) {
+          const cellValue = getCellValue(guessRef, context);
+          guess = parseFloat(String(cellValue ?? '0.1'));
+        } else {
+          guess = parseFloat(guessRef);
+        }
+        
+        if (isNaN(guess)) {
+          return FormulaError.VALUE;
+        }
       }
-    }
     
     // 値の配列を取得
     const values: number[] = [];
@@ -301,23 +290,28 @@ export const IRR: CustomFormula = {
     }
     if (!hasPositive || !hasNegative) return FormulaError.NUM;
     
-    // ニュートン・ラフソン法でIRRを計算
+    // Improved Newton-Raphson method for IRR calculation
     let rate = guess;
-    const maxIterations = 100;
-    const precision = 0.00000001;
+    const maxIterations = 200;
+    const precision = 0.0000000001;
     
     for (let i = 0; i < maxIterations; i++) {
       let npv = 0;
       let derivative = 0;
       
+      // Calculate NPV and its derivative
       for (let j = 0; j < values.length; j++) {
-        const pv = values[j] / Math.pow(1 + rate, j);
-        npv += pv;
-        derivative -= j * pv / (1 + rate);
+        const factor = Math.pow(1 + rate, j);
+        npv += values[j] / factor;
+        derivative -= j * values[j] / (factor * (1 + rate));
       }
       
       if (Math.abs(npv) < precision) {
         return rate;
+      }
+      
+      if (Math.abs(derivative) < precision) {
+        return FormulaError.NUM;
       }
       
       const newRate = rate - npv / derivative;
@@ -326,10 +320,25 @@ export const IRR: CustomFormula = {
         return newRate;
       }
       
-      rate = newRate;
+      // Improved bounds checking with better convergence
+      if (newRate <= -0.999999) {
+        rate = -0.999999;
+      } else if (newRate > 100) {
+        rate = Math.min(newRate, 100);
+      } else {
+        rate = newRate;
+      }
+      
+      // If we're making very small progress, try a different approach
+      if (i > 50 && Math.abs(newRate - rate) > 0.01) {
+        rate = guess + (Math.random() - 0.5) * 0.2; // Add some randomness
+      }
     }
     
-    return FormulaError.NUM; // 収束しない場合
+      return FormulaError.NUM; // 収束しない場合
+    } catch {
+      return FormulaError.VALUE;
+    }
   }
 };
 
@@ -367,26 +376,43 @@ export const PPMT: CustomFormula = {
         return -(pv + fv) / nper;
       }
       
-      // PMTを計算
-      const factor = Math.pow(1 + rate, nper);
-      let pmt = -(pv * factor + fv) * rate / (factor - 1);
+      // PMTを計算 (use the improved PMT calculation)
+      const compoundFactor = Math.pow(1 + rate, nper);
       
-      if (type === 1) {
-        pmt = pmt / (1 + rate);
-      }
-      
-      // IPMT（利息部分）を計算
-      let ipmt: number;
-      if (type === 1 && per === 1) {
-        ipmt = 0;
+      let pmt: number;
+      if (type === 0) {
+        // 期末払い (ordinary annuity)
+        pmt = -(pv * compoundFactor + fv) * rate / (compoundFactor - 1);
       } else {
-        const adjustedPer = type === 1 ? per - 1 : per;
-        const fvAtPeriod = pv * Math.pow(1 + rate, adjustedPer) + pmt * (Math.pow(1 + rate, adjustedPer) - 1) / rate;
-        ipmt = -fvAtPeriod * rate;
+        // 期初払い (annuity due)
+        pmt = -(pv * compoundFactor + fv) * rate / ((compoundFactor - 1) * (1 + rate));
       }
       
-      // PPMT = PMT - IPMT
-      return pmt - ipmt;
+      // 指定期間の開始時点での残高を計算
+      let balance = pv;
+      if (type === 0) {
+        // 期末払いの場合
+        for (let i = 1; i < per; i++) {
+          const ipmt = -balance * rate;
+          const ppmt = pmt - ipmt;
+          balance = balance + ppmt;
+        }
+        const ipmt = -balance * rate;
+        return pmt - ipmt;
+      } else {
+        // 期初払いの場合
+        if (per === 1) {
+          return pmt; // 初回は全額元金
+        }
+        for (let i = 1; i < per; i++) {
+          const ppmt = pmt;
+          balance = balance + ppmt;
+          const ipmt = -balance * rate;
+          balance = balance + ipmt;
+        }
+        const ipmt = -balance * rate;
+        return pmt - ipmt;
+      }
     } catch {
       return FormulaError.VALUE;
     }
@@ -427,23 +453,41 @@ export const IPMT: CustomFormula = {
         return 0;
       }
       
-      // PMTを計算
-      const factor = Math.pow(1 + rate, nper);
-      let pmt = -(pv * factor + fv) * rate / (factor - 1);
+      // PMTを計算 (use the improved PMT calculation)
+      const compoundFactor = Math.pow(1 + rate, nper);
       
-      if (type === 1) {
-        pmt = pmt / (1 + rate);
+      let pmt: number;
+      if (type === 0) {
+        // 期末払い (ordinary annuity)
+        pmt = -(pv * compoundFactor + fv) * rate / (compoundFactor - 1);
+      } else {
+        // 期初払い (annuity due)
+        pmt = -(pv * compoundFactor + fv) * rate / ((compoundFactor - 1) * (1 + rate));
       }
       
-      // 利息部分を計算
-      if (type === 1 && per === 1) {
-        return 0;
+      // 指定期間の開始時点での残高を計算して利息を求める
+      let balance = pv;
+      if (type === 0) {
+        // 期末払いの場合
+        for (let i = 1; i < per; i++) {
+          const ipmt = -balance * rate;
+          const ppmt = pmt - ipmt;
+          balance = balance + ppmt;
+        }
+        return -balance * rate;
+      } else {
+        // 期初払いの場合
+        if (per === 1) {
+          return 0; // 初回は利息なし
+        }
+        for (let i = 1; i < per; i++) {
+          const ppmt = pmt;
+          balance = balance + ppmt;
+          const ipmt = -balance * rate;
+          balance = balance + ipmt;
+        }
+        return -balance * rate;
       }
-      
-      const adjustedPer = type === 1 ? per - 1 : per;
-      const fvAtPeriod = pv * Math.pow(1 + rate, adjustedPer) + pmt * (Math.pow(1 + rate, adjustedPer) - 1) / rate;
-      
-      return -fvAtPeriod * rate;
     } catch {
       return FormulaError.VALUE;
     }
@@ -484,22 +528,23 @@ export const RATE: CustomFormula = {
         let f: number;
         let df: number;
         
-        if (rate === 0) {
+        if (Math.abs(rate) < precision) {
           f = pv + pmt * nper + fv;
-          df = nper;
+          df = -nper * (nper - 1) * pmt / 2 - nper * pv;
         } else {
           const factor = Math.pow(1 + rate, nper);
-          const annuityFactor = (factor - 1) / rate;
           
-          f = pv + pmt * annuityFactor + fv / factor;
-          if (type === 1) {
-            f += pmt * rate * annuityFactor;
-          }
-          
-          // 導関数
-          df = pmt * (nper * factor - annuityFactor) / (rate * rate * factor) - nper * fv / (factor * (1 + rate));
-          if (type === 1) {
-            df += pmt * (annuityFactor + rate * (nper * factor - annuityFactor) / (rate * rate * factor));
+          if (type === 0) {
+            // 期末払い
+            f = pv * factor + pmt * (factor - 1) / rate + fv;
+            df = nper * pv * Math.pow(1 + rate, nper - 1) + 
+                 pmt * ((nper * Math.pow(1 + rate, nper - 1) * rate - (factor - 1)) / (rate * rate));
+          } else {
+            // 期初払い
+            f = pv * factor + pmt * (1 + rate) * (factor - 1) / rate + fv;
+            df = nper * pv * Math.pow(1 + rate, nper - 1) + 
+                 pmt * (1 + rate) * ((nper * Math.pow(1 + rate, nper - 1) * rate - (factor - 1)) / (rate * rate)) +
+                 pmt * (factor - 1) / rate;
           }
         }
         
@@ -517,11 +562,13 @@ export const RATE: CustomFormula = {
           return newRate;
         }
         
-        rate = newRate;
-        
-        // 金利が負の場合や極端に大きい場合は収束しない
-        if (rate < -1 || rate > 100) {
-          return FormulaError.NUM;
+        // Prevent rate from going too negative or too high
+        if (newRate <= -0.99999) {
+          rate = -0.99999;
+        } else if (newRate > 10) {
+          rate = 10;
+        } else {
+          rate = newRate;
         }
       }
       

@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue } from '../shared/utils';
+import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // NPER関数の実装（支払回数）
 export const NPER: CustomFormula = {
@@ -69,64 +69,48 @@ export const XNPV: CustomFormula = {
       
       // 範囲参照の場合
       if (valuesRef.includes(':') && datesRef.includes(':')) {
-        const valuesRange = valuesRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-        const datesRange = datesRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-        
-        if (!valuesRange || !datesRange) {
-          return FormulaError.REF;
-        }
-        
-        const [, vStartCol, vStartRowStr, vEndCol, vEndRowStr] = valuesRange;
-        const [, dStartCol, dStartRowStr, , dEndRowStr] = datesRange;
-        
-        const vStartRow = parseInt(vStartRowStr) - 1;
-        const vEndRow = parseInt(vEndRowStr) - 1;
-        const vStartColIndex = vStartCol.charCodeAt(0) - 65;
-        const vEndColIndex = vEndCol.charCodeAt(0) - 65;
-        
-        const dStartRow = parseInt(dStartRowStr) - 1;
-        const dEndRow = parseInt(dEndRowStr) - 1;
-        const dStartColIndex = dStartCol.charCodeAt(0) - 65;
-        
         // 値を収集
-        for (let row = vStartRow; row <= vEndRow; row++) {
-          for (let col = vStartColIndex; col <= vEndColIndex; col++) {
-            const cell = context.data[row]?.[col];
-            if (cell) {
-              const val = parseFloat(cell.value?.toString() ?? '');
-              if (!isNaN(val)) {
-                values.push(val);
-              }
-            }
+        const valuesArray = getCellRangeValues(valuesRef.trim(), context);
+        valuesArray.forEach(value => {
+          const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+          if (!isNaN(num)) {
+            values.push(num);
           }
-        }
+        });
         
         // 日付を収集
-        for (let row = dStartRow; row <= dEndRow; row++) {
-          for (let col = dStartColIndex; col <= dStartColIndex + (vEndColIndex - vStartColIndex); col++) {
-            const cell = context.data[row]?.[col];
-            if (cell) {
-              const dateVal = parseFloat(cell.value?.toString() ?? '');
-              if (!isNaN(dateVal)) {
-                dates.push(dateVal);
-              }
-            }
+        const datesArray = getCellRangeValues(datesRef.trim(), context);
+        datesArray.forEach(value => {
+          const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+          if (!isNaN(num)) {
+            dates.push(num);
           }
-        }
+        });
+      } else {
+        // If not a proper range format, return REF error
+        return FormulaError.REF;
       }
       
       if (values.length === 0 || values.length !== dates.length) {
         return FormulaError.VALUE;
       }
       
+      
       // 最初の日付を基準にNPVを計算
       const firstDate = dates[0];
       let npv = 0;
       
-      for (let i = 0; i < values.length; i++) {
-        const daysDiff = dates[i] - firstDate;
-        const yearsDiff = daysDiff / 365;
-        npv += values[i] / Math.pow(1 + rate, yearsDiff);
+      // When rate is 0, just sum the values
+      if (rate === 0) {
+        for (let i = 0; i < values.length; i++) {
+          npv += values[i];
+        }
+      } else {
+        for (let i = 0; i < values.length; i++) {
+          const daysDiff = dates[i] - firstDate;
+          const yearsDiff = daysDiff / 365;
+          npv += values[i] / Math.pow(1 + rate, yearsDiff);
+        }
       }
       
       return npv;
@@ -156,50 +140,26 @@ export const XIRR: CustomFormula = {
       
       // 範囲参照の場合
       if (valuesRef.includes(':') && datesRef.includes(':')) {
-        const valuesRange = valuesRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-        const datesRange = datesRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-        
-        if (!valuesRange || !datesRange) {
-          return FormulaError.REF;
-        }
-        
-        const [, vStartCol, vStartRowStr, vEndCol, vEndRowStr] = valuesRange;
-        const [, dStartCol, dStartRowStr, , dEndRowStr] = datesRange;
-        
-        const vStartRow = parseInt(vStartRowStr) - 1;
-        const vEndRow = parseInt(vEndRowStr) - 1;
-        const vStartColIndex = vStartCol.charCodeAt(0) - 65;
-        const vEndColIndex = vEndCol.charCodeAt(0) - 65;
-        
-        const dStartRow = parseInt(dStartRowStr) - 1;
-        const dEndRow = parseInt(dEndRowStr) - 1;
-        const dStartColIndex = dStartCol.charCodeAt(0) - 65;
-        
         // 値を収集
-        for (let row = vStartRow; row <= vEndRow; row++) {
-          for (let col = vStartColIndex; col <= vEndColIndex; col++) {
-            const cell = context.data[row]?.[col];
-            if (cell) {
-              const val = parseFloat(cell.value?.toString() ?? '');
-              if (!isNaN(val)) {
-                values.push(val);
-              }
-            }
+        const valuesArray = getCellRangeValues(valuesRef.trim(), context);
+        valuesArray.forEach(value => {
+          const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+          if (!isNaN(num)) {
+            values.push(num);
           }
-        }
+        });
         
         // 日付を収集
-        for (let row = dStartRow; row <= dEndRow; row++) {
-          for (let col = dStartColIndex; col <= dStartColIndex + (vEndColIndex - vStartColIndex); col++) {
-            const cell = context.data[row]?.[col];
-            if (cell) {
-              const dateVal = parseFloat(cell.value?.toString() ?? '');
-              if (!isNaN(dateVal)) {
-                dates.push(dateVal);
-              }
-            }
+        const datesArray = getCellRangeValues(datesRef.trim(), context);
+        datesArray.forEach(value => {
+          const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+          if (!isNaN(num)) {
+            dates.push(num);
           }
-        }
+        });
+      } else {
+        // If not a proper range format, return REF error
+        return FormulaError.REF;
       }
       
       if (values.length === 0 || values.length !== dates.length) {
@@ -265,28 +225,13 @@ export const MIRR: CustomFormula = {
       const values: number[] = [];
       
       if (valuesRef.includes(':')) {
-        const rangeMatch = valuesRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-        if (!rangeMatch) {
-          return FormulaError.REF;
-        }
-        
-        const [, startCol, startRowStr, endCol, endRowStr] = rangeMatch;
-        const startRow = parseInt(startRowStr) - 1;
-        const endRow = parseInt(endRowStr) - 1;
-        const startColIndex = startCol.charCodeAt(0) - 65;
-        const endColIndex = endCol.charCodeAt(0) - 65;
-        
-        for (let row = startRow; row <= endRow; row++) {
-          for (let col = startColIndex; col <= endColIndex; col++) {
-            const cell = context.data[row]?.[col];
-            if (cell) {
-              const val = parseFloat(cell.value?.toString() ?? '');
-              if (!isNaN(val)) {
-                values.push(val);
-              }
-            }
+        const valuesArray = getCellRangeValues(valuesRef.trim(), context);
+        valuesArray.forEach(value => {
+          const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+          if (!isNaN(num)) {
+            values.push(num);
           }
-        }
+        });
       }
       
       if (values.length < 2) {

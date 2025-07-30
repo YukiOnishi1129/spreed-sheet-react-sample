@@ -131,7 +131,8 @@ describe('Bond Functions', () => {
     });
 
     it('should handle cell references', () => {
-      const matches = ['DISC(A1, A3, C3, B3)', 'A1', 'A3', 'C3', 'B3'] as RegExpMatchArray;
+      // Use C1 for maturity date instead of A3 (which is a number)
+      const matches = ['DISC(A1, C1, C3, B3)', 'A1', 'C1', 'C3', 'B3'] as RegExpMatchArray;
       const result = DISC.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
     });

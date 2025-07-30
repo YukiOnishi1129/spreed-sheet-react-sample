@@ -134,7 +134,7 @@ describe('Web Functions', () => {
     });
 
     it('should handle cell references', () => {
-      const matches = ['HYPERLINK(A1, C1)', 'A1', 'C1'] as RegExpMatchArray;
+      const matches = ['HYPERLINK(A1, A3)', 'A1', 'A3'] as RegExpMatchArray;
       const result = HYPERLINK.calculate(matches, mockContext);
       expect(result).toBe('Click Here');
     });

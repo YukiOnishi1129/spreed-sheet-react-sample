@@ -26,7 +26,7 @@ export const TBILLEQ: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      if (isNaN(discount) || discount <= 0) {
+      if (isNaN(discount) || discount < 0 || discount >= 1) {
         return FormulaError.NUM;
       }
       
@@ -60,7 +60,7 @@ export const TBILLPRICE: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      if (isNaN(discount) || discount <= 0) {
+      if (isNaN(discount) || discount < 0) {
         return FormulaError.NUM;
       }
       
@@ -94,7 +94,7 @@ export const TBILLYIELD: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      if (isNaN(price) || price <= 0 || price >= 100) {
+      if (isNaN(price) || price <= 0 || price > 100) {
         return FormulaError.NUM;
       }
       

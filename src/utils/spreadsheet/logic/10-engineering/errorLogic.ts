@@ -148,6 +148,16 @@ export const GESTEP: CustomFormula = {
 
 // 誤差関数の計算
 function erfFunction(x: number): number {
+  // Special cases for exact values
+  if (x === 0) return 0;
+  if (x === Infinity) return 1;
+  if (x === -Infinity) return -1;
+  
+  // For very large values
+  if (Math.abs(x) > 6) {
+    return x > 0 ? 1 : -1;
+  }
+  
   // Abramowitz and Stegun approximation
   const a1 = 0.254829592;
   const a2 = -0.284496736;
@@ -159,6 +169,11 @@ function erfFunction(x: number): number {
   const sign = x >= 0 ? 1 : -1;
   x = Math.abs(x);
   
+  // For very small values, use series expansion: erf(x) ≈ 2x/√π
+  if (x < 1e-8) {
+    return sign * (2 * x / Math.sqrt(Math.PI));
+  }
+  
   const t = 1.0 / (1.0 + p * x);
   const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
   
@@ -167,5 +182,20 @@ function erfFunction(x: number): number {
 
 // 相補誤差関数の計算
 function erfcFunction(x: number): number {
+  // Special cases for exact values
+  if (x === 0) return 1;
+  if (x === Infinity) return 0;
+  if (x === -Infinity) return 2;
+  
+  // For very large positive values, use asymptotic expansion to avoid precision loss
+  if (x > 8) {
+    return Math.exp(-x * x) / (Math.sqrt(Math.PI) * x) * (1 - 1/(2 * x * x));
+  }
+  
+  // For very large negative values
+  if (x < -8) {
+    return 2 - erfcFunction(-x);
+  }
+  
   return 1 - erfFunction(x);
 }

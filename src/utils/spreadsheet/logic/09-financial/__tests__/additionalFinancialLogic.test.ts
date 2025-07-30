@@ -65,20 +65,20 @@ describe('Additional Financial Functions', () => {
 
   describe('XNPV Function (Net Present Value with Dates)', () => {
     it('should calculate NPV with specific dates', () => {
-      const matches = ['XNPV(0.1, B1:F1, B3:F3)', '0.1', 'B1:F1', 'B3:F3'] as RegExpMatchArray;
+      const matches = ['XNPV(0.1, A2:E2, A3:E3)', '0.1', 'A2:E2', 'A3:E3'] as RegExpMatchArray;
       const result = XNPV.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(0); // Positive NPV expected
     });
 
     it('should handle zero discount rate', () => {
-      const matches = ['XNPV(0, B1:F1, B3:F3)', '0', 'B1:F1', 'B3:F3'] as RegExpMatchArray;
+      const matches = ['XNPV(0, A2:E2, A3:E3)', '0', 'A2:E2', 'A3:E3'] as RegExpMatchArray;
       const result = XNPV.calculate(matches, mockContext);
       expect(result).toBe(400); // Sum of cash flows: -1000+200+300+400+500
     });
 
     it('should return VALUE error for mismatched arrays', () => {
-      const matches = ['XNPV(0.1, B1:E1, B3:F3)', '0.1', 'B1:E1', 'B3:F3'] as RegExpMatchArray;
+      const matches = ['XNPV(0.1, A2:D2, A3:E3)', '0.1', 'A2:D2', 'A3:E3'] as RegExpMatchArray;
       const result = XNPV.calculate(matches, mockContext);
       expect(result).toBe(FormulaError.VALUE);
     });
@@ -103,7 +103,7 @@ describe('Additional Financial Functions', () => {
 
   describe('XIRR Function (Internal Rate of Return with Dates)', () => {
     it('should calculate IRR with specific dates', () => {
-      const matches = ['XIRR(B1:F1, B3:F3)', 'B1:F1', 'B3:F3'] as RegExpMatchArray;
+      const matches = ['XIRR(A2:E2, A3:E3)', 'A2:E2', 'A3:E3'] as RegExpMatchArray;
       const result = XIRR.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(0); // Positive IRR expected
@@ -111,7 +111,7 @@ describe('Additional Financial Functions', () => {
     });
 
     it('should handle custom guess value', () => {
-      const matches = ['XIRR(B1:F1, B3:F3, 0.2)', 'B1:F1', 'B3:F3', '0.2'] as RegExpMatchArray;
+      const matches = ['XIRR(A2:E2, A3:E3, 0.2)', 'A2:E2', 'A3:E3', '0.2'] as RegExpMatchArray;
       const result = XIRR.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(0);
@@ -137,7 +137,7 @@ describe('Additional Financial Functions', () => {
 
   describe('MIRR Function (Modified Internal Rate of Return)', () => {
     it('should calculate MIRR for mixed cash flows', () => {
-      const matches = ['MIRR(B6:F6, 0.1, 0.12)', 'B6:F6', '0.1', '0.12'] as RegExpMatchArray;
+      const matches = ['MIRR(A6:E6, 0.1, 0.12)', 'A6:E6', '0.1', '0.12'] as RegExpMatchArray;
       const result = MIRR.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(0);
@@ -145,7 +145,7 @@ describe('Additional Financial Functions', () => {
     });
 
     it('should handle different finance and reinvest rates', () => {
-      const matches = ['MIRR(B6:F6, 0.08, 0.15)', 'B6:F6', '0.08', '0.15'] as RegExpMatchArray;
+      const matches = ['MIRR(A6:E6, 0.08, 0.15)', 'A6:E6', '0.08', '0.15'] as RegExpMatchArray;
       const result = MIRR.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(0);
@@ -399,7 +399,7 @@ describe('Additional Financial Functions', () => {
     it('should calculate interest for last period', () => {
       const matches = ['ISPMT(0.1, 10, 10, 100000)', '0.1', '10', '10', '100000'] as RegExpMatchArray;
       const result = ISPMT.calculate(matches, mockContext);
-      expect(result).toBe(-1000); // 10% of balance * rate
+      expect(result).toBeCloseTo(-1000, 10); // 10% of balance * rate
     });
 
     it('should return NUM error for zero periods', () => {
@@ -435,7 +435,7 @@ describe('Additional Financial Functions', () => {
       const matches = ['DB(100000, 99000, 50, 1)', '100000', '99000', '50', '1'] as RegExpMatchArray;
       const result = DB.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeGreaterThan(0);
+      expect(result).toBeGreaterThanOrEqual(0); // May be 0 for very small depreciation rates
       expect(result).toBeLessThan(1000);
     });
 

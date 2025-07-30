@@ -12,23 +12,20 @@ export const IMPORTDATA: CustomFormula = {
     const [, urlRef] = matches;
     
     try {
-      const url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
+      let url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
+      
+      // 引用符を除去
+      if (url.startsWith('"') && url.endsWith('"')) {
+        url = url.slice(1, -1);
+      }
       
       if (!url || url === '') {
         return FormulaError.VALUE;
       }
       
-      // 実際のWebアクセスは実装せず、ダミーデータを返す
+      // 実際のWebアクセスは実装せず、エラーメッセージを返す
       // 本番実装では fetch API を使用
-      const dummyData = [
-        ['Product', 'Price', 'Stock'],
-        ['Apple', '1.99', '100'],
-        ['Banana', '0.99', '150'],
-        ['Orange', '2.49', '80'],
-      ];
-      
-      // 配列データを返す（実際にはスプレッドシートに展開される）
-      return dummyData;
+      return '#N/A - Web import functions require external data access';
     } catch {
       return FormulaError.VALUE;
     }
@@ -43,10 +40,15 @@ export const IMPORTFEED: CustomFormula = {
     const [, urlRef, , headersRef, numItemsRef] = matches;
     
     try {
-      const url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
+      let url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
       // const query = queryRef ? getCellValue(queryRef.trim(), context)?.toString() ?? queryRef.trim() : 'items';
       const includeHeaders = headersRef ? getCellValue(headersRef.trim(), context)?.toString().toLowerCase() === 'true' : true;
       const numItems = numItemsRef ? parseInt(getCellValue(numItemsRef.trim(), context)?.toString() ?? numItemsRef.trim()) : 10;
+      
+      // 引用符を除去
+      if (url.startsWith('"') && url.endsWith('"')) {
+        url = url.slice(1, -1);
+      }
       
       if (!url || url === '') {
         return FormulaError.VALUE;
@@ -56,23 +58,8 @@ export const IMPORTFEED: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // ダミーのRSSフィードデータ
-      const feedData = [];
-      
-      if (includeHeaders) {
-        feedData.push(['Title', 'Link', 'Date', 'Description']);
-      }
-      
-      for (let i = 1; i <= Math.min(numItems, 5); i++) {
-        feedData.push([
-          `Article ${i}`,
-          `https://example.com/article${i}`,
-          new Date(Date.now() - i * 86400000).toISOString(),
-          `This is the description for article ${i}`
-        ]);
-      }
-      
-      return feedData;
+      // 実際のWebアクセスは実装せず、エラーメッセージを返す
+      return '#N/A - Web import functions require external data access';
     } catch {
       return FormulaError.VALUE;
     }
@@ -87,15 +74,25 @@ export const IMPORTHTML: CustomFormula = {
     const [, urlRef, queryRef, indexRef] = matches;
     
     try {
-      const url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
-      const query = getCellValue(queryRef.trim(), context)?.toString() ?? queryRef.trim();
-      const index = parseInt(getCellValue(indexRef.trim(), context)?.toString() ?? indexRef.trim());
+      let url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
+      let query = getCellValue(queryRef.trim(), context)?.toString() ?? queryRef.trim();
+      const indexValue = getCellValue(indexRef.trim(), context)?.toString() ?? indexRef.trim();
+      
+      // 引用符を除去
+      if (url.startsWith('"') && url.endsWith('"')) {
+        url = url.slice(1, -1);
+      }
+      if (query.startsWith('"') && query.endsWith('"')) {
+        query = query.slice(1, -1);
+      }
+      
+      const index = parseInt(indexValue);
       
       if (!url || url === '' || !query) {
         return FormulaError.VALUE;
       }
       
-      if (isNaN(index) || index < 1) {
+      if (isNaN(index) || index < 0) {
         return FormulaError.NUM;
       }
       
@@ -104,24 +101,8 @@ export const IMPORTHTML: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      // ダミーのHTMLテーブルデータ
-      if (queryType === 'table') {
-        return [
-          ['Header 1', 'Header 2', 'Header 3'],
-          ['Row 1 Col 1', 'Row 1 Col 2', 'Row 1 Col 3'],
-          ['Row 2 Col 1', 'Row 2 Col 2', 'Row 2 Col 3'],
-          ['Row 3 Col 1', 'Row 3 Col 2', 'Row 3 Col 3'],
-        ];
-      } else {
-        // リストデータ
-        return [
-          ['Item 1'],
-          ['Item 2'],
-          ['Item 3'],
-          ['Item 4'],
-          ['Item 5'],
-        ];
-      }
+      // 実際のWebアクセスは実装せず、エラーメッセージを返す
+      return '#N/A - Web import functions require external data access';
     } catch {
       return FormulaError.VALUE;
     }
@@ -136,36 +117,23 @@ export const IMPORTXML: CustomFormula = {
     const [, urlRef, xpathRef] = matches;
     
     try {
-      const url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
-      const xpath = getCellValue(xpathRef.trim(), context)?.toString() ?? xpathRef.trim();
+      let url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
+      let xpath = getCellValue(xpathRef.trim(), context)?.toString() ?? xpathRef.trim();
+      
+      // 引用符を除去
+      if (url.startsWith('"') && url.endsWith('"')) {
+        url = url.slice(1, -1);
+      }
+      if (xpath.startsWith('"') && xpath.endsWith('"')) {
+        xpath = xpath.slice(1, -1);
+      }
       
       if (!url || url === '' || !xpath || xpath === '') {
         return FormulaError.VALUE;
       }
       
-      // ダミーのXMLデータ
-      // 実際の実装では、XPath式に基づいてXMLを解析
-      const xpathLower = xpath.toLowerCase();
-      
-      if (xpathLower.includes('title')) {
-        return [
-          ['Page Title 1'],
-          ['Page Title 2'],
-          ['Page Title 3'],
-        ];
-      } else if (xpathLower.includes('price')) {
-        return [
-          ['19.99'],
-          ['29.99'],
-          ['39.99'],
-        ];
-      } else {
-        return [
-          ['XML Data 1'],
-          ['XML Data 2'],
-          ['XML Data 3'],
-        ];
-      }
+      // 実際のWebアクセスは実装せず、エラーメッセージを返す
+      return '#N/A - Web import functions require external data access';
     } catch {
       return FormulaError.VALUE;
     }
@@ -180,36 +148,23 @@ export const IMPORTRANGE: CustomFormula = {
     const [, spreadsheetUrlRef, rangeRef] = matches;
     
     try {
-      const spreadsheetUrl = getCellValue(spreadsheetUrlRef.trim(), context)?.toString() ?? spreadsheetUrlRef.trim();
-      const range = getCellValue(rangeRef.trim(), context)?.toString() ?? rangeRef.trim();
+      let spreadsheetUrl = getCellValue(spreadsheetUrlRef.trim(), context)?.toString() ?? spreadsheetUrlRef.trim();
+      let range = getCellValue(rangeRef.trim(), context)?.toString() ?? rangeRef.trim();
+      
+      // 引用符を除去
+      if (spreadsheetUrl.startsWith('"') && spreadsheetUrl.endsWith('"')) {
+        spreadsheetUrl = spreadsheetUrl.slice(1, -1);
+      }
+      if (range.startsWith('"') && range.endsWith('"')) {
+        range = range.slice(1, -1);
+      }
       
       if (!spreadsheetUrl || spreadsheetUrl === '' || !range || range === '') {
         return FormulaError.VALUE;
       }
       
-      // 範囲の解析（例: "Sheet1!A1:C3"）
-      const rangeMatch = range.match(/^(?:(.+)!)?([A-Z]+)(\d+):([A-Z]+)(\d+)$/i);
-      if (!rangeMatch) {
-        return FormulaError.REF;
-      }
-      
-      const [, , startCol, startRowStr, endCol, endRowStr] = rangeMatch;
-      const startRow = parseInt(startRowStr);
-      const endRow = parseInt(endRowStr);
-      const startColIndex = startCol.charCodeAt(0) - 65;
-      const endColIndex = endCol.charCodeAt(0) - 65;
-      
-      // ダミーデータを生成
-      const data = [];
-      for (let row = 0; row <= endRow - startRow; row++) {
-        const rowData = [];
-        for (let col = 0; col <= endColIndex - startColIndex; col++) {
-          rowData.push(`External ${String.fromCharCode(65 + startColIndex + col)}${startRow + row}`);
-        }
-        data.push(rowData);
-      }
-      
-      return data;
+      // 実際のWebアクセスは実装せず、エラーメッセージを返す
+      return '#N/A - Web import functions require external data access';
     } catch {
       return FormulaError.VALUE;
     }

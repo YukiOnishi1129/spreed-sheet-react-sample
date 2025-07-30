@@ -155,14 +155,14 @@ describe('Financial Functions', () => {
       const matches = ['NPV(0.1, A1:E1)', '0.1', 'A1:E1'] as RegExpMatchArray;
       const result = NPV.calculate(matches, npvContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(169.87, 1); // Positive NPV
+      expect(result).toBeCloseTo(65.26, 1); // Positive NPV
     });
 
     it('should handle individual cell arguments', () => {
       const matches = ['NPV(0.1, -1000, 200, 300, 400, 500)', '0.1', '-1000, 200, 300, 400, 500'] as RegExpMatchArray;
       const result = NPV.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBeCloseTo(169.87, 1);
+      expect(result).toBeCloseTo(65.26, 1);
     });
 
     it('should handle negative NPV', () => {

@@ -63,7 +63,7 @@ export const BESSELJ: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      if (n < 0) {
+      if (n < 0 || n !== Math.floor(n)) {
         return FormulaError.NUM;
       }
       
@@ -102,7 +102,7 @@ export const BESSELY: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      if (x <= 0 || n < 0) {
+      if (x <= 0 || n < 0 || n !== Math.floor(n)) {
         return FormulaError.NUM;
       }
       
@@ -162,7 +162,7 @@ export const BESSELI: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      if (n < 0) {
+      if (n < 0 || n !== Math.floor(n)) {
         return FormulaError.NUM;
       }
       
@@ -201,7 +201,7 @@ export const BESSELK: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      if (x <= 0 || n < 0) {
+      if (x <= 0 || n < 0 || n !== Math.floor(n)) {
         return FormulaError.NUM;
       }
       
@@ -272,21 +272,31 @@ function besselJ1(x: number): number {
 }
 
 function bessely0Approx(x: number): number {
-  if (x < 3) {
-    return (2 / Math.PI) * (Math.log(x / 2) * besselJ0(x) + 
-           0.07832358 - 0.0420024 * x * x);
+  if (x < 8) {
+    const j0 = besselJ0(x);
+    const xx = x * x;
+    return (2 / Math.PI) * (Math.log(x / 2) * j0 + 
+           0.07832358 - 0.04200263 * xx + 0.00978293 * xx * xx / 16 - 0.00267716 * xx * xx * xx / 256);
   } else {
     const sqrtx = Math.sqrt(2 / (Math.PI * x));
-    return sqrtx * Math.sin(x - Math.PI / 4);
+    const z = 8 / x;
+    const p0 = 1 - 0.1098628 * z * z + 0.2734510 * z * z * z * z;
+    const q0 = -0.1562500 * z + 0.1430488 * z * z * z;
+    return sqrtx * (p0 * Math.sin(x - Math.PI / 4) + q0 * Math.cos(x - Math.PI / 4));
   }
 }
 
 function bessely1Approx(x: number): number {
-  if (x < 3) {
-    return (2 / Math.PI) * (Math.log(x / 2) * besselJ1(x) - 1 / x);
+  if (x < 8) {
+    const j1 = besselJ1(x);
+    const xx = x * x;
+    return (2 / Math.PI) * (Math.log(x / 2) * j1 - 1 / x + 0.5 * x - 0.56249985 * x * xx / 8 + 0.21093573 * x * xx * xx / 64);
   } else {
     const sqrtx = Math.sqrt(2 / (Math.PI * x));
-    return sqrtx * Math.sin(x - 3 * Math.PI / 4);
+    const z = 8 / x;
+    const p1 = 1 + 0.1098628 * z * z - 0.2734510 * z * z * z * z;
+    const q1 = 0.1562500 * z - 0.1430488 * z * z * z;
+    return sqrtx * (p1 * Math.sin(x - 3 * Math.PI / 4) + q1 * Math.cos(x - 3 * Math.PI / 4));
   }
 }
 
@@ -315,19 +325,21 @@ function besseli1Approx(x: number): number {
 function besselk0Approx(x: number): number {
   if (x <= 2) {
     const i0 = besseli0Approx(x);
-    return -Math.log(x / 2) * i0 + 0.42278420;
+    const xx = x * x / 4;
+    return -Math.log(x / 2) * i0 + (-0.57721566 + 0.42278420 + 0.23069756 * xx + 0.03488590 * xx * xx);
   } else {
     return Math.sqrt(Math.PI / (2 * x)) * Math.exp(-x) * 
-           (1 + 0.125 / x + 0.125 * 0.125 / (2 * x * x));
+           (1 + 0.125 / x - 0.0703125 / (x * x) + 0.0732421875 / (x * x * x));
   }
 }
 
 function besselk1Approx(x: number): number {
   if (x <= 2) {
     const i1 = besseli1Approx(x);
-    return Math.log(x / 2) * i1 + 1 / x * (1 + 0.5 * x * x / 4);
+    const xx = x * x / 4;
+    return Math.log(x / 2) * i1 + 1 / x * (1 + 0.15443144 - 0.67278579 * xx - 0.18156897 * xx * xx);
   } else {
     return Math.sqrt(Math.PI / (2 * x)) * Math.exp(-x) * 
-           (1 + 0.375 / x + 0.375 * 0.375 / (2 * x * x));
+           (1 + 0.375 / x - 0.1171875 / (x * x) + 0.1025390625 / (x * x * x));
   }
 }

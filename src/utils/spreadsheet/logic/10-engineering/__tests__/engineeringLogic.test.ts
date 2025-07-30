@@ -444,7 +444,7 @@ describe('Engineering Conversion Functions', () => {
     });
 
     it('should handle cell references', () => {
-      const matches = ['DEC2HEX(B3)', 'B3'] as RegExpMatchArray;
+      const matches = ['DEC2HEX(C2)', 'C2'] as RegExpMatchArray;
       const result = DEC2HEX.calculate(matches, mockContext);
       expect(result).toBe('FF'); // 255 -> FF
     });

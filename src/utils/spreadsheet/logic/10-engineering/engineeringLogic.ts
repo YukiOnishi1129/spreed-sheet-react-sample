@@ -166,6 +166,22 @@ const unitConversions: Record<string, Record<string, number>> = {
     'mH': 1000,
     'kH': 0.001,
     'A': 1
+  },
+  // データ単位 - バイナリプレフィックス付き
+  data: {
+    'byte': 1,
+    'bit': 8,
+    'kB': 1/1000,
+    'MB': 1/1000000,
+    'GB': 1/1000000000,
+    'TB': 1/1000000000000,
+    'PB': 1/1000000000000000,
+    'Kibibyte': 1/1024,
+    'Mebibyte': 1/(1024*1024),
+    'Gibibyte': 1/(1024*1024*1024),
+    'Gibyte': 1/(1024*1024*1024), // 同じ単位の別名
+    'Tebibyte': 1/(1024*1024*1024*1024),
+    'Pebibyte': 1/(1024*1024*1024*1024*1024)
   }
 };
 
@@ -230,7 +246,7 @@ function convertTemperature(value: number, fromUnit: string, toUnit: string): nu
 // CONVERT関数の実装
 export const CONVERT: CustomFormula = {
   name: 'CONVERT',
-  pattern: /\bCONVERT\(([^,]+),\s*"?([^",]+)"?,\s*"?([^",)]+)"?\)/i,
+  pattern: /\bCONVERT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, valueRef, fromUnit, toUnit] = matches;
     
@@ -241,14 +257,18 @@ export const CONVERT: CustomFormula = {
         return FormulaError.VALUE;
       }
       
+      // Clean unit strings by removing quotes
+      const fromUnitClean = fromUnit.replace(/['"]/g, '').trim();
+      const toUnitClean = toUnit.replace(/['"]/g, '').trim();
+      
       // 同じ単位の場合
-      if (fromUnit === toUnit) {
+      if (fromUnitClean === toUnitClean) {
         return value;
       }
       
       // 単位のカテゴリーを見つける
-      const fromCategory = findUnitCategory(fromUnit);
-      const toCategory = findUnitCategory(toUnit);
+      const fromCategory = findUnitCategory(fromUnitClean);
+      const toCategory = findUnitCategory(toUnitClean);
       
       if (!fromCategory || !toCategory) {
         return FormulaError.NA;
@@ -260,12 +280,12 @@ export const CONVERT: CustomFormula = {
       
       // 温度の特殊処理
       if (fromCategory === 'temperature') {
-        return convertTemperature(value, fromUnit, toUnit);
+        return convertTemperature(value, fromUnitClean, toUnitClean);
       }
       
       // 通常の単位変換（Excel完全互換：大文字小文字区別）
-      const fromFactor = unitConversions[fromCategory][fromUnit];
-      const toFactor = unitConversions[toCategory][toUnit];
+      const fromFactor = unitConversions[fromCategory][fromUnitClean];
+      const toFactor = unitConversions[toCategory][toUnitClean];
       
       if (fromFactor === undefined || toFactor === undefined) {
         return FormulaError.NA;
@@ -329,8 +349,8 @@ export const DEC2BIN: CustomFormula = {
     const [, decimalRef, placesRef] = matches;
     
     try {
-      const decimal = parseInt(getCellValue(decimalRef.trim(), context)?.toString() ?? decimalRef.trim());
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const decimal = Math.trunc(parseFloat(getCellValue(decimalRef.trim(), context)?.toString() ?? decimalRef.trim()));
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       if (isNaN(decimal)) {
         return FormulaError.VALUE;
@@ -433,16 +453,16 @@ export const DEC2HEX: CustomFormula = {
     const [, decimalRef, placesRef] = matches;
     
     try {
-      const decimal = parseInt(getCellValue(decimalRef.trim(), context)?.toString() ?? decimalRef.trim());
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const decimal = Math.trunc(parseFloat(getCellValue(decimalRef.trim(), context)?.toString() ?? decimalRef.trim()));
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       if (isNaN(decimal)) {
         return FormulaError.VALUE;
       }
       
-      // 範囲チェック
-      const minValue = -Math.pow(16, 9); // -68719476736
-      const maxValue = Math.pow(16, 9) - 1; // 68719476735
+      // 範囲チェック（40-bit signed range）
+      const minValue = -549755813888; // -2^39
+      const maxValue = 549755813887; // 2^39 - 1
       
       if (decimal < minValue || decimal > maxValue) {
         return FormulaError.NUM;
@@ -492,7 +512,23 @@ export const BIN2HEX: CustomFormula = {
       
       // 10進数から16進数に変換
       const decimal = decimalResult as number;
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
+      
+      // 10進数から16進数への変換を直接実行して文字列長をチェック
+      let hex: string;
+      if (decimal >= 0) {
+        hex = decimal.toString(16).toUpperCase();
+      } else {
+        // 負の数は2の補数で表現
+        const maxHexValue = Math.pow(16, 10);
+        const positiveEquivalent = maxHexValue + decimal;
+        hex = positiveEquivalent.toString(16).toUpperCase();
+      }
+      
+      // places が指定されており、16進数の結果より小さい場合はNUM error
+      if (places !== undefined && hex.length > places) {
+        return FormulaError.NUM;
+      }
       
       return DEC2HEX.calculate([matches[0], String(decimal), places ? String(places) : ''], context);
     } catch {
@@ -524,7 +560,7 @@ export const HEX2BIN: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       return DEC2BIN.calculate([matches[0], String(decimal), places ? String(places) : ''], context);
     } catch {
@@ -581,8 +617,8 @@ export const DEC2OCT: CustomFormula = {
     const [, decimalRef, placesRef] = matches;
     
     try {
-      const decimal = parseInt(getCellValue(decimalRef.trim(), context)?.toString() ?? decimalRef.trim());
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const decimal = Math.trunc(parseFloat(getCellValue(decimalRef.trim(), context)?.toString() ?? decimalRef.trim()));
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       if (isNaN(decimal)) {
         return FormulaError.VALUE;
@@ -640,7 +676,7 @@ export const BIN2OCT: CustomFormula = {
       
       // 10進数から8進数に変換
       const decimal = decimalResult as number;
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       return DEC2OCT.calculate([matches[0], String(decimal), places ? String(places) : ''], context);
     } catch {
@@ -666,7 +702,7 @@ export const HEX2OCT: CustomFormula = {
       
       // 10進数から8進数に変換
       const decimal = decimalResult as number;
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       return DEC2OCT.calculate([matches[0], String(decimal), places ? String(places) : ''], context);
     } catch {
@@ -698,7 +734,7 @@ export const OCT2BIN: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       return DEC2BIN.calculate([matches[0], String(decimal), places ? String(places) : ''], context);
     } catch {
@@ -724,9 +760,57 @@ export const OCT2HEX: CustomFormula = {
       
       // 10進数から16進数に変換
       const decimal = decimalResult as number;
-      const places = placesRef ? parseInt(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim()) : undefined;
+      const places = placesRef ? Math.trunc(parseFloat(getCellValue(placesRef.trim(), context)?.toString() ?? placesRef.trim())) : undefined;
       
       return DEC2HEX.calculate([matches[0], String(decimal), places ? String(places) : ''], context);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// DELTA関数の実装（クロネッカーのデルタ）
+export const DELTA: CustomFormula = {
+  name: 'DELTA',
+  pattern: /\bDELTA\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, num1Ref, num2Ref] = matches;
+    
+    try {
+      const num1 = parseFloat(getCellValue(num1Ref.trim(), context)?.toString() ?? num1Ref.trim());
+      const num2 = num2Ref ? 
+        parseFloat(getCellValue(num2Ref.trim(), context)?.toString() ?? num2Ref.trim()) : 0;
+      
+      if (isNaN(num1) || isNaN(num2)) {
+        return FormulaError.VALUE;
+      }
+      
+      // 数値が等しい場合は1、そうでない場合は0を返す
+      return num1 === num2 ? 1 : 0;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// GESTEP関数の実装（ステップ関数）
+export const GESTEP: CustomFormula = {
+  name: 'GESTEP',
+  pattern: /\bGESTEP\(([^,)]+)(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, numRef, stepRef] = matches;
+    
+    try {
+      const num = parseFloat(getCellValue(numRef.trim(), context)?.toString() ?? numRef.trim());
+      const step = stepRef ? 
+        parseFloat(getCellValue(stepRef.trim(), context)?.toString() ?? stepRef.trim()) : 0;
+      
+      if (isNaN(num) || isNaN(step)) {
+        return FormulaError.VALUE;
+      }
+      
+      // 数値がステップ以上の場合は1、そうでない場合は0を返す
+      return num >= step ? 1 : 0;
     } catch {
       return FormulaError.VALUE;
     }

@@ -109,15 +109,29 @@ export const ODDFPRICE: CustomFormula = {
     const [, settlementRef, maturityRef, issueRef, firstCouponRef, rateRef, yieldRef, redemptionRef, freqRef, basisRef] = matches;
     
     try {
-      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
-      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
-      const issue = parseDate(getCellValue(issueRef.trim(), context)?.toString() ?? issueRef.trim());
-      const firstCoupon = parseDate(getCellValue(firstCouponRef.trim(), context)?.toString() ?? firstCouponRef.trim());
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
-      const yld = parseFloat(getCellValue(yieldRef.trim(), context)?.toString() ?? yieldRef.trim());
-      const redemption = parseFloat(getCellValue(redemptionRef.trim(), context)?.toString() ?? redemptionRef.trim());
-      const frequency = parseInt(getCellValue(freqRef.trim(), context)?.toString() ?? freqRef.trim());
-      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      // Get cell values first
+      const settlementValue = getCellValue(settlementRef.trim(), context);
+      const maturityValue = getCellValue(maturityRef.trim(), context);
+      const issueValue = getCellValue(issueRef.trim(), context);
+      const firstCouponValue = getCellValue(firstCouponRef.trim(), context);
+      const rateValue = getCellValue(rateRef.trim(), context);
+      const yldValue = getCellValue(yieldRef.trim(), context);
+      const redemptionValue = getCellValue(redemptionRef.trim(), context);
+      const freqValue = getCellValue(freqRef.trim(), context);
+      const basisValue = basisRef ? getCellValue(basisRef.trim(), context) : null;
+      
+      // Parse dates
+      const settlement = parseDate(settlementValue?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(maturityValue?.toString() ?? maturityRef.trim());
+      const issue = parseDate(issueValue?.toString() ?? issueRef.trim());
+      const firstCoupon = parseDate(firstCouponValue?.toString() ?? firstCouponRef.trim());
+      
+      // Parse numbers
+      const rate = typeof rateValue === 'number' ? rateValue : parseFloat(rateValue?.toString() ?? rateRef.trim());
+      const yld = typeof yldValue === 'number' ? yldValue : parseFloat(yldValue?.toString() ?? yieldRef.trim());
+      const redemption = typeof redemptionValue === 'number' ? redemptionValue : parseFloat(redemptionValue?.toString() ?? redemptionRef.trim());
+      const frequency = typeof freqValue === 'number' ? freqValue : parseInt(freqValue?.toString() ?? freqRef.trim());
+      const basis = basisValue ? (typeof basisValue === 'number' ? basisValue : parseInt(basisValue.toString())) : 0;
       
       if (!settlement || !maturity || !issue || !firstCoupon) {
         return FormulaError.VALUE;
@@ -181,15 +195,29 @@ export const ODDFYIELD: CustomFormula = {
     const [, settlementRef, maturityRef, issueRef, firstCouponRef, rateRef, priceRef, redemptionRef, freqRef, basisRef] = matches;
     
     try {
-      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
-      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
-      const issue = parseDate(getCellValue(issueRef.trim(), context)?.toString() ?? issueRef.trim());
-      const firstCoupon = parseDate(getCellValue(firstCouponRef.trim(), context)?.toString() ?? firstCouponRef.trim());
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
-      const price = parseFloat(getCellValue(priceRef.trim(), context)?.toString() ?? priceRef.trim());
-      const redemption = parseFloat(getCellValue(redemptionRef.trim(), context)?.toString() ?? redemptionRef.trim());
-      const frequency = parseInt(getCellValue(freqRef.trim(), context)?.toString() ?? freqRef.trim());
-      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      // Get cell values first
+      const settlementValue = getCellValue(settlementRef.trim(), context);
+      const maturityValue = getCellValue(maturityRef.trim(), context);
+      const issueValue = getCellValue(issueRef.trim(), context);
+      const firstCouponValue = getCellValue(firstCouponRef.trim(), context);
+      const rateValue = getCellValue(rateRef.trim(), context);
+      const priceValue = getCellValue(priceRef.trim(), context);
+      const redemptionValue = getCellValue(redemptionRef.trim(), context);
+      const freqValue = getCellValue(freqRef.trim(), context);
+      const basisValue = basisRef ? getCellValue(basisRef.trim(), context) : null;
+      
+      // Parse dates
+      const settlement = parseDate(settlementValue?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(maturityValue?.toString() ?? maturityRef.trim());
+      const issue = parseDate(issueValue?.toString() ?? issueRef.trim());
+      const firstCoupon = parseDate(firstCouponValue?.toString() ?? firstCouponRef.trim());
+      
+      // Parse numbers
+      const rate = typeof rateValue === 'number' ? rateValue : parseFloat(rateValue?.toString() ?? rateRef.trim());
+      const price = typeof priceValue === 'number' ? priceValue : parseFloat(priceValue?.toString() ?? priceRef.trim());
+      const redemption = typeof redemptionValue === 'number' ? redemptionValue : parseFloat(redemptionValue?.toString() ?? redemptionRef.trim());
+      const frequency = typeof freqValue === 'number' ? freqValue : parseInt(freqValue?.toString() ?? freqRef.trim());
+      const basis = basisValue ? (typeof basisValue === 'number' ? basisValue : parseInt(basisValue.toString())) : 0;
       
       if (!settlement || !maturity || !issue || !firstCoupon) {
         return FormulaError.VALUE;
@@ -211,10 +239,10 @@ export const ODDFYIELD: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // Newton-Raphson法で利回りを計算（簡易実装）
+      // Improved Newton-Raphson method for yield calculation
       let yld = rate; // 初期値
-      const maxIterations = 100;
-      const tolerance = 0.0000001;
+      const maxIterations = 200;
+      const tolerance = 0.00000001;
       
       const yearDays = getDaysInYear(basis);
       const coupon = rate * redemption / frequency;
@@ -222,21 +250,33 @@ export const ODDFYIELD: CustomFormula = {
       const daysSF = calculateDaysFraction(settlement, firstCoupon, basis);
       const normalPeriod = yearDays / frequency;
       const oddCoupon = coupon * daysIF / normalPeriod;
-      const n = Math.ceil((actualDays(firstCoupon, maturity) / 365) * frequency);
+      const n = Math.ceil(((maturity.getTime() - firstCoupon.getTime()) / (1000 * 60 * 60 * 24) / 365) * frequency);
+      
+      // Validate inputs
+      if (n <= 0 || normalPeriod <= 0 || daysSF <= 0) {
+        return FormulaError.NUM;
+      }
       
       for (let iter = 0; iter < maxIterations; iter++) {
         const r = yld / frequency;
         
-        // 価格を計算
-        let calcPrice = oddCoupon / Math.pow(1 + r, daysSF / normalPeriod);
+        // Calculate price and derivative
+        let calcPrice = 0;
+        let derivative = 0;
         
+        // First odd coupon
+        const oddDiscount = Math.pow(1 + r, daysSF / normalPeriod);
+        calcPrice += oddCoupon / oddDiscount;
+        derivative -= oddCoupon * (daysSF / normalPeriod) / (frequency * oddDiscount * (1 + r));
+        
+        // Regular coupons and principal
         for (let i = 1; i <= n; i++) {
-          const discountFactor = Math.pow(1 + r, i + daysSF / normalPeriod);
-          if (i < n) {
-            calcPrice += coupon / discountFactor;
-          } else {
-            calcPrice += (coupon + redemption) / discountFactor;
-          }
+          const totalPeriods = i + daysSF / normalPeriod;
+          const discountFactor = Math.pow(1 + r, totalPeriods);
+          const cashFlow = i < n ? coupon : coupon + redemption;
+          
+          calcPrice += cashFlow / discountFactor;
+          derivative -= cashFlow * totalPeriods / (frequency * discountFactor * (1 + r));
         }
         
         const diff = calcPrice - price;
@@ -245,11 +285,27 @@ export const ODDFYIELD: CustomFormula = {
           return yld;
         }
         
-        // 導関数を近似計算して更新
-        yld = yld - diff * 0.01; // 簡易的な更新
+        if (Math.abs(derivative) < tolerance) {
+          return FormulaError.NUM;
+        }
+        
+        const newYld = yld - diff / derivative;
+        
+        if (Math.abs(newYld - yld) < tolerance) {
+          return newYld;
+        }
+        
+        // Prevent unrealistic yields
+        if (newYld <= -0.999) {
+          yld = -0.999;
+        } else if (newYld > 10) {
+          yld = 10;
+        } else {
+          yld = newYld;
+        }
       }
       
-      return yld;
+      return FormulaError.NUM;
     } catch {
       return FormulaError.VALUE;
     }
@@ -264,14 +320,27 @@ export const ODDLPRICE: CustomFormula = {
     const [, settlementRef, maturityRef, lastCouponRef, rateRef, yieldRef, redemptionRef, freqRef, basisRef] = matches;
     
     try {
-      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
-      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
-      const lastCoupon = parseDate(getCellValue(lastCouponRef.trim(), context)?.toString() ?? lastCouponRef.trim());
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
-      const yld = parseFloat(getCellValue(yieldRef.trim(), context)?.toString() ?? yieldRef.trim());
-      const redemption = parseFloat(getCellValue(redemptionRef.trim(), context)?.toString() ?? redemptionRef.trim());
-      const frequency = parseInt(getCellValue(freqRef.trim(), context)?.toString() ?? freqRef.trim());
-      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      // Get cell values first
+      const settlementValue = getCellValue(settlementRef.trim(), context);
+      const maturityValue = getCellValue(maturityRef.trim(), context);
+      const lastCouponValue = getCellValue(lastCouponRef.trim(), context);
+      const rateValue = getCellValue(rateRef.trim(), context);
+      const yldValue = getCellValue(yieldRef.trim(), context);
+      const redemptionValue = getCellValue(redemptionRef.trim(), context);
+      const freqValue = getCellValue(freqRef.trim(), context);
+      const basisValue = basisRef ? getCellValue(basisRef.trim(), context) : null;
+      
+      // Parse dates
+      const settlement = parseDate(settlementValue?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(maturityValue?.toString() ?? maturityRef.trim());
+      const lastCoupon = parseDate(lastCouponValue?.toString() ?? lastCouponRef.trim());
+      
+      // Parse numbers
+      const rate = typeof rateValue === 'number' ? rateValue : parseFloat(rateValue?.toString() ?? rateRef.trim());
+      const yld = typeof yldValue === 'number' ? yldValue : parseFloat(yldValue?.toString() ?? yieldRef.trim());
+      const redemption = typeof redemptionValue === 'number' ? redemptionValue : parseFloat(redemptionValue?.toString() ?? redemptionRef.trim());
+      const frequency = typeof freqValue === 'number' ? freqValue : parseInt(freqValue?.toString() ?? freqRef.trim());
+      const basis = basisValue ? (typeof basisValue === 'number' ? basisValue : parseInt(basisValue.toString())) : 0;
       
       if (!settlement || !maturity || !lastCoupon) {
         return FormulaError.VALUE;
@@ -289,7 +358,7 @@ export const ODDLPRICE: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      if (settlement >= maturity || lastCoupon >= maturity || lastCoupon <= settlement) {
+      if (settlement >= maturity || lastCoupon >= maturity) {
         return FormulaError.NUM;
       }
       
@@ -305,9 +374,14 @@ export const ODDLPRICE: CustomFormula = {
       
       // 変則最終期のクーポンと償還額
       const oddCoupon = coupon * daysLM / normalPeriod;
-      const price = (oddCoupon + redemption) / Math.pow(1 + r, daysSM / normalPeriod);
+      const discountPeriods = daysSM / normalPeriod;
+      const price = (oddCoupon + redemption) / Math.pow(1 + r, discountPeriods);
       
-      return price;
+      // Ensure we always return a number
+      if (isNaN(price) || !isFinite(price)) {
+        return FormulaError.NUM;
+      }
+      return Number(price);
     } catch {
       return FormulaError.VALUE;
     }
@@ -322,14 +396,27 @@ export const ODDLYIELD: CustomFormula = {
     const [, settlementRef, maturityRef, lastCouponRef, rateRef, priceRef, redemptionRef, freqRef, basisRef] = matches;
     
     try {
-      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
-      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
-      const lastCoupon = parseDate(getCellValue(lastCouponRef.trim(), context)?.toString() ?? lastCouponRef.trim());
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
-      const price = parseFloat(getCellValue(priceRef.trim(), context)?.toString() ?? priceRef.trim());
-      const redemption = parseFloat(getCellValue(redemptionRef.trim(), context)?.toString() ?? redemptionRef.trim());
-      const frequency = parseInt(getCellValue(freqRef.trim(), context)?.toString() ?? freqRef.trim());
-      const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
+      // Get cell values first
+      const settlementValue = getCellValue(settlementRef.trim(), context);
+      const maturityValue = getCellValue(maturityRef.trim(), context);
+      const lastCouponValue = getCellValue(lastCouponRef.trim(), context);
+      const rateValue = getCellValue(rateRef.trim(), context);
+      const priceValue = getCellValue(priceRef.trim(), context);
+      const redemptionValue = getCellValue(redemptionRef.trim(), context);
+      const freqValue = getCellValue(freqRef.trim(), context);
+      const basisValue = basisRef ? getCellValue(basisRef.trim(), context) : null;
+      
+      // Parse dates
+      const settlement = parseDate(settlementValue?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(maturityValue?.toString() ?? maturityRef.trim());
+      const lastCoupon = parseDate(lastCouponValue?.toString() ?? lastCouponRef.trim());
+      
+      // Parse numbers
+      const rate = typeof rateValue === 'number' ? rateValue : parseFloat(rateValue?.toString() ?? rateRef.trim());
+      const price = typeof priceValue === 'number' ? priceValue : parseFloat(priceValue?.toString() ?? priceRef.trim());
+      const redemption = typeof redemptionValue === 'number' ? redemptionValue : parseFloat(redemptionValue?.toString() ?? redemptionRef.trim());
+      const frequency = typeof freqValue === 'number' ? freqValue : parseInt(freqValue?.toString() ?? freqRef.trim());
+      const basis = basisValue ? (typeof basisValue === 'number' ? basisValue : parseInt(basisValue.toString())) : 0;
       
       if (!settlement || !maturity || !lastCoupon) {
         return FormulaError.VALUE;
@@ -347,7 +434,7 @@ export const ODDLYIELD: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      if (settlement >= maturity || lastCoupon >= maturity || lastCoupon <= settlement) {
+      if (settlement >= maturity || lastCoupon >= maturity) {
         return FormulaError.NUM;
       }
       
@@ -362,9 +449,16 @@ export const ODDLYIELD: CustomFormula = {
       const oddCoupon = coupon * daysLM / normalPeriod;
       
       // 利回り = ((変則クーポン + 償還額) / 価格)^(正規期間/経過日数) - 1) × 頻度
-      const yld = (Math.pow((oddCoupon + redemption) / price, normalPeriod / daysSM) - 1) * frequency;
+      const totalReturn = (oddCoupon + redemption) / price;
+      const periodRatio = normalPeriod / daysSM;
+      const yld = (Math.pow(totalReturn, periodRatio) - 1) * frequency;
       
-      return yld;
+      // Ensure we always return a number, handle edge cases
+      if (isNaN(yld) || !isFinite(yld)) {
+        return FormulaError.NUM;
+      }
+      
+      return Number(yld);
     } catch {
       return FormulaError.VALUE;
     }

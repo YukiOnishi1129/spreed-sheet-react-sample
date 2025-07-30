@@ -51,7 +51,7 @@ describe('Coupon Functions', () => {
         '"2024-04-15"', '"2026-01-15"', '2', '1'] as RegExpMatchArray;
       const result = COUPDAYBS.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBe(90); // Actual days from Jan 15 to Apr 15
+      expect(result).toBe(91); // Actual days from Jan 15 to Apr 15 (2024 is leap year)
     });
 
     it('should return NUM error for invalid frequency', () => {
@@ -141,14 +141,14 @@ describe('Coupon Functions', () => {
         '"2024-04-15"', '"2026-01-15"', '2', '1'] as RegExpMatchArray;
       const result = COUPDAYSNC.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
-      expect(result).toBe(92); // Actual days from Apr 15 to Jul 15
+      expect(result).toBe(91); // Actual days from Apr 15 to Jul 15
     });
 
     it('should handle quarterly frequency', () => {
       const matches = ['COUPDAYSNC("2024-02-15", "2026-01-15", 4)', 
         '"2024-02-15"', '"2026-01-15"', '4'] as RegExpMatchArray;
       const result = COUPDAYSNC.calculate(matches, mockContext);
-      expect(result).toBe(30); // One month to next quarterly payment
+      expect(result).toBe(60); // Two months to next quarterly payment (Apr 15)
     });
 
     it('should return VALUE error for invalid dates', () => {
@@ -332,9 +332,11 @@ describe('Coupon Functions', () => {
     });
 
     it('should handle cell references', () => {
-      const matches = ['COUPDAYS(A1, A3, B2)', 'A1', 'A3', 'B2'] as RegExpMatchArray;
-      const result = COUPDAYS.calculate(matches, mockContext);
+      // A4 = '2024-07-15' (row 3, col 0), C1 = '2026-01-15' (row 0, col 2), B2 = 2 (row 1, col 1)
+      const matches = ['COUPDAYBS(A4, C1, B2)', 'A4', 'C1', 'B2'] as RegExpMatchArray;
+      const result = COUPDAYBS.calculate(matches, mockContext);
       expect(typeof result).toBe('number');
+      expect(result).toBe(0); // July 15 is a coupon date for semi-annual with maturity Jan 15
     });
   });
 });

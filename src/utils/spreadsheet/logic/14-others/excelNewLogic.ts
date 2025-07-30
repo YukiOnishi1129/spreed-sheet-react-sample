@@ -158,3 +158,93 @@ export const GPT: CustomFormula = {
     }
   }
 };
+
+// LAMBDA関数の実装 - Excel 365専用
+export const LAMBDA: CustomFormula = {
+  name: 'LAMBDA',
+  pattern: /LAMBDA\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// MAKEARRAY関数の実装 - Excel 365専用
+export const MAKEARRAY: CustomFormula = {
+  name: 'MAKEARRAY',
+  pattern: /MAKEARRAY\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// BYROW関数の実装 - Excel 365専用
+export const BYROW: CustomFormula = {
+  name: 'BYROW',
+  pattern: /BYROW\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// BYCOL関数の実装 - Excel 365専用
+export const BYCOL: CustomFormula = {
+  name: 'BYCOL',
+  pattern: /BYCOL\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// REDUCE関数の実装 - Excel 365専用
+export const REDUCE: CustomFormula = {
+  name: 'REDUCE',
+  pattern: /REDUCE\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// SCAN関数の実装 - Excel 365専用
+export const SCAN: CustomFormula = {
+  name: 'SCAN',
+  pattern: /SCAN\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// MAP関数の実装 - Excel 365専用
+export const MAP: CustomFormula = {
+  name: 'MAP',
+  pattern: /MAP\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// FILTER関数の実装 - Excel 365専用
+export const FILTER: CustomFormula = {
+  name: 'FILTER',
+  pattern: /FILTER\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};
+
+// SORT関数の実装 - Excel 365専用
+export const SORT: CustomFormula = {
+  name: 'SORT',
+  pattern: /SORT\((.+)\)/i,
+  calculate: (): FormulaResult => {
+    // Excel 365の機能はサポートしない
+    return '#N/A - Lambda functions require Excel 365';
+  }
+};

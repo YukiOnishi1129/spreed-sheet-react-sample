@@ -194,10 +194,32 @@ export const DISC: CustomFormula = {
     const [, settlementRef, maturityRef, priceRef, redemptionRef] = matches;
     
     try {
-      const settlement = parseDate(getCellValue(settlementRef.trim(), context)?.toString() ?? settlementRef.trim());
-      const maturity = parseDate(getCellValue(maturityRef.trim(), context)?.toString() ?? maturityRef.trim());
-      const price = parseFloat(getCellValue(priceRef.trim(), context)?.toString() ?? priceRef.trim());
-      const redemption = parseFloat(getCellValue(redemptionRef.trim(), context)?.toString() ?? redemptionRef.trim());
+      const settlementValue = getCellValue(settlementRef.trim(), context);
+      const maturityValue = getCellValue(maturityRef.trim(), context);
+      const priceValue = getCellValue(priceRef.trim(), context);  
+      const redemptionValue = getCellValue(redemptionRef.trim(), context);
+      
+      // Parse dates
+      const settlement = parseDate(settlementValue?.toString() ?? settlementRef.trim());
+      const maturity = parseDate(maturityValue?.toString() ?? maturityRef.trim());
+      
+      
+      // Parse numbers - handle various formats
+      let price: number;
+      let redemption: number;
+      
+      if (typeof priceValue === 'number') {
+        price = priceValue;
+      } else {
+        price = parseFloat(priceValue?.toString() ?? priceRef.trim());
+      }
+      
+      if (typeof redemptionValue === 'number') {
+        redemption = redemptionValue;
+      } else {
+        redemption = parseFloat(redemptionValue?.toString() ?? redemptionRef.trim());
+      }
+      
       // basis parameter is 5th parameter (optional, defaults to 0)
       const basisRef = matches[5];
       const basis = basisRef ? parseInt(getCellValue(basisRef.trim(), context)?.toString() ?? basisRef.trim()) : 0;
@@ -218,7 +240,9 @@ export const DISC: CustomFormula = {
       const daysInYear = getDaysInYear(basis, settlement.getFullYear());
       
       // 割引率 = (償還価額 - 価格) / 償還価額 × (年間日数 / 経過日数)
-      return ((redemption - price) / redemption) * (daysInYear / days);
+      const result = ((redemption - price) / redemption) * (daysInYear / days);
+      
+      return result;
     } catch {
       return FormulaError.VALUE;
     }
@@ -390,25 +414,33 @@ export const PRICE: CustomFormula = {
         return FormulaError.NUM;
       }
       
-      // 証券価格の計算 - 正確な日数計算を使用
-      const years = calculateYearFraction(settlement, maturity, 1); // Actual/Actual basis
-      const periods = Math.ceil(years * frequency);
-      const c = rate / frequency; // クーポンレートを期間ごとに分割
+      // Excel-compatible price calculation using 30/360 basis for periods
+      const days = calculateDaysFraction(settlement, maturity, 0); // Use 30/360 basis
+      const years = days / 360;
+      const periodsToMaturity = years * frequency;
       
-      let price = 0;
-      let daysFromSettlement = 0;
-      
-      // 各クーポン支払いの現在価値
-      for (let t = 1; t <= periods; t++) {
-        daysFromSettlement = (t * 365) / frequency;
-        const yearsFromSettlement = daysFromSettlement / 365;
-        const discountFactor = Math.pow(1 + yld, -yearsFromSettlement);
-        price += c * redemption * discountFactor;
+      // If less than one period to maturity, use simple present value
+      if (periodsToMaturity <= 1) {
+        const couponPayment = (rate * redemption) / frequency;
+        const totalPayment = couponPayment * (days / (360 / frequency)) + redemption;
+        const discountFactor = Math.pow(1 + yld / frequency, periodsToMaturity);
+        return totalPayment / discountFactor;
       }
       
-      // 元本の現在価値
-      const finalDiscountFactor = Math.pow(1 + yld, -years);
-      price += redemption * finalDiscountFactor;
+      // For multiple periods, use standard bond pricing formula
+      const r = yld / frequency;
+      const c = rate * redemption / frequency;
+      const n = Math.ceil(periodsToMaturity);
+      
+      let price = 0;
+      
+      // Present value of coupon payments
+      for (let i = 1; i <= n; i++) {
+        price += c / Math.pow(1 + r, i);
+      }
+      
+      // Present value of principal repayment
+      price += redemption / Math.pow(1 + r, n);
       
       return price;
     } catch {

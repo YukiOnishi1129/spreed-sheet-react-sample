@@ -12,7 +12,7 @@ interface ComplexNumber {
 
 // 複素数を文字列から解析
 function parseComplex(value: string): ComplexNumber | null {
-  const str = value.toString().trim();
+  const str = value.toString().trim().replace(/"/g, '');
   
   // 純実数の場合
   const realOnly = parseFloat(str);
@@ -20,21 +20,68 @@ function parseComplex(value: string): ComplexNumber | null {
     return { real: realOnly, imaginary: 0 };
   }
   
-  // 純虚数の場合（例：3i, -2j）
+  // 単独のi/jの場合
+  if (str === 'i' || str === 'j') {
+    return { real: 0, imaginary: 1 };
+  }
+  if (str === '-i' || str === '-j') {
+    return { real: 0, imaginary: -1 };
+  }
+  if (str === '+i' || str === '+j') {
+    return { real: 0, imaginary: 1 };
+  }
+  
+  // 純虚数の場合（例：3i, -2j, 1.5i）
   const pureImagMatch = str.match(/^([+-]?\d*\.?\d*)([ij])$/);
   if (pureImagMatch) {
-    const imagPart = pureImagMatch[1] || '1';
-    const imag = imagPart === '-' ? -1 : (imagPart === '+' || imagPart === '' ? 1 : parseFloat(imagPart));
+    const imagPart = pureImagMatch[1];
+    let imag: number;
+    if (imagPart === '' || imagPart === '+') {
+      imag = 1;
+    } else if (imagPart === '-') {
+      imag = -1;
+    } else {
+      imag = parseFloat(imagPart);
+    }
     return { real: 0, imaginary: imag };
   }
   
-  // 複素数の場合（例：3+4i, -2-3j）
+  // 複素数の場合（例：3+4i, -2-3j, 1.5-2.3i）
   const complexMatch = str.match(/^([+-]?\d*\.?\d+)\s*([+-])\s*(\d*\.?\d*)([ij])$/);
   if (complexMatch) {
     const real = parseFloat(complexMatch[1]);
     const sign = complexMatch[2] === '-' ? -1 : 1;
-    const imagPart = complexMatch[3] || '1';
-    const imag = sign * (imagPart === '' ? 1 : parseFloat(imagPart));
+    const imagPart = complexMatch[3];
+    let imag: number;
+    if (imagPart === '' || imagPart === '+') {
+      imag = sign * 1;
+    } else {
+      imag = sign * parseFloat(imagPart);
+    }
+    return { real, imaginary: imag };
+  }
+  
+  // より複雑なパターンのための追加マッチング
+  const altComplexMatch = str.match(/^([+-]?\d*\.?\d*)\s*([+-])\s*([+-]?\d*\.?\d*)([ij])$/);
+  if (altComplexMatch) {
+    const realPart = altComplexMatch[1];
+    const sign = altComplexMatch[2] === '-' ? -1 : 1;
+    const imagPart = altComplexMatch[3];
+    
+    let real = 0;
+    if (realPart !== '' && realPart !== '+' && realPart !== '-') {
+      real = parseFloat(realPart);
+    }
+    
+    let imag: number;
+    if (imagPart === '' || imagPart === '+') {
+      imag = sign * 1;
+    } else if (imagPart === '-') {
+      imag = sign * -1;
+    } else {
+      imag = sign * parseFloat(imagPart);
+    }
+    
     return { real, imaginary: imag };
   }
   
@@ -63,7 +110,7 @@ function complexToString(complex: ComplexNumber, suffix: string = 'i'): string {
 // COMPLEX関数の実装（複素数を作成）
 export const COMPLEX: CustomFormula = {
   name: 'COMPLEX',
-  pattern: /\\bCOMPLEX\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
+  pattern: /\bCOMPLEX\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, realRef, imagRef, suffixRef] = matches;
     
@@ -339,7 +386,7 @@ export const IMDIV: CustomFormula = {
       
       // ゼロ除算チェック
       if (denom.real === 0 && denom.imaginary === 0) {
-        return FormulaError.DIV0;
+        return FormulaError.NUM;
       }
       
       const suffix = numerStr.includes('j') || denomStr.includes('j') ? 'j' : 'i';

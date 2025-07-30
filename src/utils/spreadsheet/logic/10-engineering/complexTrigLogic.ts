@@ -12,7 +12,7 @@ interface ComplexNumber {
 
 // 複素数を文字列から解析
 function parseComplex(value: string): ComplexNumber | null {
-  const str = value.toString().trim();
+  const str = value.toString().trim().replace(/"/g, '');
   
   // 純実数の場合
   const realOnly = parseFloat(str);
@@ -20,21 +20,68 @@ function parseComplex(value: string): ComplexNumber | null {
     return { real: realOnly, imaginary: 0 };
   }
   
-  // 純虚数の場合（例：3i, -2j）
+  // 単独のi/jの場合
+  if (str === 'i' || str === 'j') {
+    return { real: 0, imaginary: 1 };
+  }
+  if (str === '-i' || str === '-j') {
+    return { real: 0, imaginary: -1 };
+  }
+  if (str === '+i' || str === '+j') {
+    return { real: 0, imaginary: 1 };
+  }
+  
+  // 純虚数の場合（例：3i, -2j, 1.5i）
   const pureImagMatch = str.match(/^([+-]?\d*\.?\d*)([ij])$/);
   if (pureImagMatch) {
-    const imagPart = pureImagMatch[1] || '1';
-    const imag = imagPart === '-' ? -1 : (imagPart === '+' || imagPart === '' ? 1 : parseFloat(imagPart));
+    const imagPart = pureImagMatch[1];
+    let imag: number;
+    if (imagPart === '' || imagPart === '+') {
+      imag = 1;
+    } else if (imagPart === '-') {
+      imag = -1;
+    } else {
+      imag = parseFloat(imagPart);
+    }
     return { real: 0, imaginary: imag };
   }
   
-  // 複素数の場合（例：3+4i, -2-3j）
+  // 複素数の場合（例：3+4i, -2-3j, 1.5-2.3i）
   const complexMatch = str.match(/^([+-]?\d*\.?\d+)\s*([+-])\s*(\d*\.?\d*)([ij])$/);
   if (complexMatch) {
     const real = parseFloat(complexMatch[1]);
     const sign = complexMatch[2] === '-' ? -1 : 1;
-    const imagPart = complexMatch[3] || '1';
-    const imag = sign * (imagPart === '' ? 1 : parseFloat(imagPart));
+    const imagPart = complexMatch[3];
+    let imag: number;
+    if (imagPart === '' || imagPart === '+') {
+      imag = sign * 1;
+    } else {
+      imag = sign * parseFloat(imagPart);
+    }
+    return { real, imaginary: imag };
+  }
+  
+  // より複雑なパターンのための追加マッチング
+  const altComplexMatch = str.match(/^([+-]?\d*\.?\d*)\s*([+-])\s*([+-]?\d*\.?\d*)([ij])$/);
+  if (altComplexMatch) {
+    const realPart = altComplexMatch[1];
+    const sign = altComplexMatch[2] === '-' ? -1 : 1;
+    const imagPart = altComplexMatch[3];
+    
+    let real = 0;
+    if (realPart !== '' && realPart !== '+' && realPart !== '-') {
+      real = parseFloat(realPart);
+    }
+    
+    let imag: number;
+    if (imagPart === '' || imagPart === '+') {
+      imag = sign * 1;
+    } else if (imagPart === '-') {
+      imag = sign * -1;
+    } else {
+      imag = sign * parseFloat(imagPart);
+    }
+    
     return { real, imaginary: imag };
   }
   
@@ -137,8 +184,8 @@ export const IMTAN: CustomFormula = {
       // 分母の計算
       const denom = Math.cos(2 * complex.real) + Math.cosh(2 * complex.imaginary);
       
-      if (Math.abs(denom) < 1e-10) {
-        return FormulaError.DIV0;
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
       }
       
       const real = Math.sin(2 * complex.real) / denom;
@@ -230,8 +277,8 @@ export const IMCSC: CustomFormula = {
       
       const denom = sinReal * sinReal + sinImag * sinImag;
       
-      if (Math.abs(denom) < 1e-10) {
-        return FormulaError.DIV0;
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
       }
       
       const real = sinReal / denom;
@@ -267,8 +314,8 @@ export const IMSEC: CustomFormula = {
       
       const denom = cosReal * cosReal + cosImag * cosImag;
       
-      if (Math.abs(denom) < 1e-10) {
-        return FormulaError.DIV0;
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
       }
       
       const real = cosReal / denom;
@@ -299,10 +346,11 @@ export const IMCOT: CustomFormula = {
       const suffix = complexStr.includes('j') ? 'j' : 'i';
       
       // cot(z) = cos(z) / sin(z)
-      const denom = Math.sin(2 * complex.real) + Math.sinh(2 * complex.imaginary) * Math.sinh(2 * complex.imaginary) / (Math.sin(2 * complex.real) + 1e-10);
+      // Using the identity: cot(a+bi) = (sin(2a) - i*sinh(2b)) / (cosh(2b) - cos(2a))
+      const denom = Math.cosh(2 * complex.imaginary) - Math.cos(2 * complex.real);
       
-      if (Math.abs(denom) < 1e-10) {
-        return FormulaError.DIV0;
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
       }
       
       const real = Math.sin(2 * complex.real) / denom;
@@ -338,12 +386,47 @@ export const IMCSCH: CustomFormula = {
       
       const denom = sinhReal * sinhReal + sinhImag * sinhImag;
       
-      if (Math.abs(denom) < 1e-10) {
-        return FormulaError.DIV0;
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
       }
       
       const real = sinhReal / denom;
       const imag = -sinhImag / denom;
+      
+      return complexToString({ real, imaginary: imag }, suffix);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// IMTANH関数の実装（複素数の双曲線正接）
+export const IMTANH: CustomFormula = {
+  name: 'IMTANH',
+  pattern: /IMTANH\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, complexRef] = matches;
+    
+    try {
+      const complexStr = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim();
+      const complex = parseComplex(complexStr);
+      
+      if (!complex) {
+        return FormulaError.NUM;
+      }
+      
+      const suffix = complexStr.includes('j') ? 'j' : 'i';
+      
+      // tanh(z) = sinh(z) / cosh(z)
+      // Using the identity: tanh(a+bi) = (sinh(2a) + i*sin(2b)) / (cosh(2a) + cos(2b))
+      const denom = Math.cosh(2 * complex.real) + Math.cos(2 * complex.imaginary);
+      
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
+      }
+      
+      const real = Math.sinh(2 * complex.real) / denom;
+      const imag = Math.sin(2 * complex.imaginary) / denom;
       
       return complexToString({ real, imaginary: imag }, suffix);
     } catch {
@@ -375,12 +458,47 @@ export const IMSECH: CustomFormula = {
       
       const denom = coshReal * coshReal + coshImag * coshImag;
       
-      if (Math.abs(denom) < 1e-10) {
-        return FormulaError.DIV0;
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
       }
       
       const real = coshReal / denom;
       const imag = -coshImag / denom;
+      
+      return complexToString({ real, imaginary: imag }, suffix);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// IMCOTH関数の実装（複素数の双曲線余接）
+export const IMCOTH: CustomFormula = {
+  name: 'IMCOTH',
+  pattern: /IMCOTH\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, complexRef] = matches;
+    
+    try {
+      const complexStr = getCellValue(complexRef.trim(), context)?.toString() ?? complexRef.trim();
+      const complex = parseComplex(complexStr);
+      
+      if (!complex) {
+        return FormulaError.NUM;
+      }
+      
+      const suffix = complexStr.includes('j') ? 'j' : 'i';
+      
+      // coth(z) = cosh(z) / sinh(z)
+      // Using the identity: coth(a+bi) = (sinh(2a) - i*sin(2b)) / (cosh(2a) - cos(2b))
+      const denom = Math.cosh(2 * complex.real) - Math.cos(2 * complex.imaginary);
+      
+      if (Math.abs(denom) < 1e-15) {
+        return FormulaError.NUM;
+      }
+      
+      const real = Math.sinh(2 * complex.real) / denom;
+      const imag = -Math.sin(2 * complex.imaginary) / denom;
       
       return complexToString({ real, imaginary: imag }, suffix);
     } catch {
