@@ -125,7 +125,7 @@ describe('Advanced Statistics Functions', () => {
       it('should calculate kurtosis', () => {
         const matches = ['KURT(D1:D5)', 'D1:D5'] as RegExpMatchArray;
         const result = KURT.calculate(matches, mockContext);
-        expect(result).toBeCloseTo(-1.912); // 簡易実装の結果
+        expect(result).toBeCloseTo(-1.2, 2); // Excel result for [10,20,30,40,50]
       });
 
       it('should return DIV0 error for less than 4 values', () => {

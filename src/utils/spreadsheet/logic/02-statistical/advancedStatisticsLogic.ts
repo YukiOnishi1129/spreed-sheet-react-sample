@@ -174,24 +174,29 @@ export const KURT: CustomFormula = {
     
     const n = numbers.length;
     const mean = numbers.reduce((sum, num) => sum + num, 0) / n;
+    
+    // Excel の KURT 関数は標本の尖度を計算（n-1で正規化）
     const variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / (n - 1);
     
     if (variance === 0) {
       return FormulaError.DIV0;
     }
     
+    // 標準偏差
     const standardDev = Math.sqrt(variance);
     
-    // Excelの正確な尖度計算式
+    // 4次中心モーメントを計算
     const fourthMoment = numbers.reduce((sum, num) => {
-      return sum + Math.pow((num - mean) / standardDev, 4);
+      return sum + Math.pow(num - mean, 4);
     }, 0);
     
-    // Excel KURT = (n*(n+1)/((n-1)*(n-2)*(n-3))) * fourthMoment - (3*(n-1)^2)/((n-2)*(n-3))
+    // Excel の KURT 公式（過剰尖度）
+    // KURT = [n(n+1) / ((n-1)(n-2)(n-3))] * [Σ(xi-mean)^4 / s^4] - [3(n-1)^2 / ((n-2)(n-3))]
     const factor1 = (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3));
+    const normalizedFourthMoment = fourthMoment / Math.pow(standardDev, 4);
     const factor2 = (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
     
-    return factor1 * fourthMoment - factor2;
+    return factor1 * normalizedFourthMoment - factor2;
   }
 };
 

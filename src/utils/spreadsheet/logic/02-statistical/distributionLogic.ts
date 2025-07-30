@@ -796,20 +796,39 @@ export const T_DIST_2T: CustomFormula = {
   calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
     const [, xRef, degFreedomRef] = matches;
     
-    const x = Math.abs(Number(getCellValue(xRef.trim(), context) ?? xRef));
+    const xOriginal = Number(getCellValue(xRef.trim(), context) ?? xRef);
     const degFreedom = Number(getCellValue(degFreedomRef.trim(), context) ?? degFreedomRef);
     
-    if (isNaN(x) || isNaN(degFreedom)) {
+    if (isNaN(xOriginal) || isNaN(degFreedom)) {
       return FormulaError.VALUE;
+    }
+    
+    if (xOriginal < 0) {
+      return FormulaError.NUM;
     }
     
     if (degFreedom < 1 || !Number.isInteger(degFreedom)) {
       return FormulaError.NUM;
     }
     
-    // 両側確率 = 2 * P(T > |x|)
-    const z = degFreedom / (degFreedom + x * x);
-    return incompleteBeta(z, degFreedom / 2, 0.5);
+    // T.DIST.2T(x, deg) = 2 * P(T > |x|) where T ~ t(deg)
+    // For t-distribution with degrees of freedom df:
+    // P(|T| > x) = 1 - I_(x²/(x²+df))(1/2, df/2) where I is the regularized incomplete beta function
+    const x = Math.abs(xOriginal);
+    
+    if (x === 0) {
+      return 1; // P(|T| > 0) = 1
+    }
+    
+    // Calculate the regularized incomplete beta function
+    // w = x² / (x² + df)
+    const w = (x * x) / (x * x + degFreedom);
+    const betaValue = incompleteBeta(w, 0.5, degFreedom / 2);
+    
+    // T.DIST.2T = 2 * P(T > |x|) = 1 - I_w(1/2, df/2)
+    const result = 1 - betaValue;
+    
+    return Math.max(0, Math.min(1, result));
   }
 };
 

@@ -102,6 +102,9 @@ function evaluateFormulaResult(resultStr: string, context: FormulaContext): Form
   if (trimmed.match(/^[A-Z_]+\s*\(/i)) {
     try {
       const result = matchFormula(trimmed, context);
+      if (result === null || result === undefined) {
+        return FormulaError.VALUE;
+      }
       return result;
     } catch (error) {
       // 関数評価エラーの場合、エラーを伝播
@@ -113,7 +116,7 @@ function evaluateFormulaResult(resultStr: string, context: FormulaContext): Form
         if (errorStr.includes('DIV')) return FormulaError.DIV0;
         if (errorStr.includes('NA')) return FormulaError.NA;
       }
-      throw error;
+      return FormulaError.VALUE;
     }
   }
   
