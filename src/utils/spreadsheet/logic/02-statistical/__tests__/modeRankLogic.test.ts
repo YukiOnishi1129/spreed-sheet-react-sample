@@ -143,7 +143,7 @@ describe('Mode and Rank Functions', () => {
       });
 
       it('should ignore non-numeric values', () => {
-        const matches = ['RANK.AVG(2, A1:D3)', '2', 'A1:D3'] as RegExpMatchArray;
+        const matches = ['RANK.AVG(2, A1:A4)', '2', 'A1:A4'] as RegExpMatchArray;
         const result = RANK_AVG.calculate(matches, mockContext);
         expect(result).toBe(2.5); // 2 appears twice, tied for 2nd and 3rd
       });

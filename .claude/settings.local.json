@@ -68,7 +68,9 @@
       "Bash(kill:*)",
       "Bash(timeout 30 npm run test:e2e -- --grep \"DSUM - 条件付き合計\")",
       "Bash(perl:*)",
-      "Bash(timeout 60s npm run test:e2e)"
+      "Bash(timeout 60s npm run test:e2e)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

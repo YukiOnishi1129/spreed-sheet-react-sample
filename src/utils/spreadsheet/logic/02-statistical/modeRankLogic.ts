@@ -13,8 +13,8 @@ export const MODE_SNGL: CustomFormula = {
     
     try {
       const values: number[] = [];
-      // 複数の範囲を正しく分割する
-      const argList = args.match(/([A-Z]+\d+(?::[A-Z]+\d+)?|[^,]+)/g) || [];
+      // 複数の範囲を正しく分割する（カンマの後のスペースを考慮）
+      const argList = args.split(',').map(arg => arg.trim()).filter(arg => arg);
       
       for (const arg of argList) {
         const trimmedArg = arg.trim();
@@ -32,10 +32,19 @@ export const MODE_SNGL: CustomFormula = {
           
           for (let row = startRow; row <= endRow; row++) {
             for (let col = startColIndex; col <= endColIndex; col++) {
-              const cell = context.data[row]?.[col];
-              const cellValue = cell?.value !== undefined ? cell.value : cell;
-              if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
-                values.push(Number(cellValue));
+              // data配列とcellsオブジェクトの両方をサポート
+              if (context.data) {
+                const cell = context.data[row]?.[col];
+                const cellValue = cell?.value !== undefined ? cell.value : cell;
+                if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+                  values.push(Number(cellValue));
+                }
+              } else if ((context as any).cells) {
+                const cellRef = String.fromCharCode(65 + col) + (row + 1);
+                const cell = (context as any).cells[cellRef];
+                if (cell && cell.value !== null && cell.value !== '' && !isNaN(Number(cell.value))) {
+                  values.push(Number(cell.value));
+                }
               }
             }
           }
@@ -62,9 +71,16 @@ export const MODE_SNGL: CustomFormula = {
       let mode: number | null = null;
       let maxFreq = 0;
       
-      for (const [value, freq] of frequency) {
+      // 最大頻度を先に見つける
+      for (const freq of frequency.values()) {
         if (freq > maxFreq) {
           maxFreq = freq;
+        }
+      }
+      
+      // 最大頻度を持つ値の中で最大値を選ぶ
+      for (const [value, freq] of frequency) {
+        if (freq === maxFreq && (mode === null || value > mode)) {
           mode = value;
         }
       }
@@ -94,8 +110,8 @@ export const MODE_MULT: CustomFormula = {
     
     try {
       const values: number[] = [];
-      // 複数の範囲を正しく分割する
-      const argList = args.match(/([A-Z]+\d+(?::[A-Z]+\d+)?|[^,]+)/g) || [];
+      // 複数の範囲を正しく分割する（カンマの後のスペースを考慮）
+      const argList = args.split(',').map(arg => arg.trim()).filter(arg => arg);
       
       for (const arg of argList) {
         const trimmedArg = arg.trim();
@@ -113,10 +129,19 @@ export const MODE_MULT: CustomFormula = {
           
           for (let row = startRow; row <= endRow; row++) {
             for (let col = startColIndex; col <= endColIndex; col++) {
-              const cell = context.data[row]?.[col];
-              const cellValue = cell?.value !== undefined ? cell.value : cell;
-              if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
-                values.push(Number(cellValue));
+              // data配列とcellsオブジェクトの両方をサポート
+              if (context.data) {
+                const cell = context.data[row]?.[col];
+                const cellValue = cell?.value !== undefined ? cell.value : cell;
+                if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+                  values.push(Number(cellValue));
+                }
+              } else if ((context as any).cells) {
+                const cellRef = String.fromCharCode(65 + col) + (row + 1);
+                const cell = (context as any).cells[cellRef];
+                if (cell && cell.value !== null && cell.value !== '' && !isNaN(Number(cell.value))) {
+                  values.push(Number(cell.value));
+                }
               }
             }
           }
@@ -211,6 +236,19 @@ export const RANK_AVG: CustomFormula = {
             }
           }
         }
+      } else {
+        // 単一セルの場合
+        const cellMatch = arrayRef.trim().match(/([A-Z]+)(\d+)/);
+        if (cellMatch) {
+          const [, col, rowStr] = cellMatch;
+          const row = parseInt(rowStr) - 1;
+          const colIndex = col.charCodeAt(0) - 65;
+          const cell = context.data[row]?.[colIndex];
+          const cellValue = cell?.value !== undefined ? cell.value : cell;
+          if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+            values.push(Number(cellValue));
+          }
+        }
       }
       
       if (values.length === 0) {
@@ -279,6 +317,19 @@ export const RANK_EQ: CustomFormula = {
             if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
               values.push(Number(cellValue));
             }
+          }
+        }
+      } else {
+        // 単一セルの場合
+        const cellMatch = arrayRef.trim().match(/([A-Z]+)(\d+)/);
+        if (cellMatch) {
+          const [, col, rowStr] = cellMatch;
+          const row = parseInt(rowStr) - 1;
+          const colIndex = col.charCodeAt(0) - 65;
+          const cell = context.data[row]?.[colIndex];
+          const cellValue = cell?.value !== undefined ? cell.value : cell;
+          if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
+            values.push(Number(cellValue));
           }
         }
       }
