@@ -2025,8 +2025,13 @@ export const ISO_CEILING: CustomFormula = {
     
     try {
       const numberValue = getCellValue(numberRef.trim(), context);
-      const number = toNumber(numberValue) ?? parseFloat(numberRef.trim());
       
+      // エラー値を直接返す
+      if (typeof numberValue === 'string' && numberValue.startsWith('#')) {
+        return numberValue as FormulaResult;
+      }
+      
+      const number = toNumber(numberValue) ?? parseFloat(numberRef.trim());
       
       if (isNaN(number)) {
         return FormulaError.VALUE;
@@ -2036,6 +2041,12 @@ export const ISO_CEILING: CustomFormula = {
       let significance = 1;
       if (significanceRef) {
         const significanceValue = getCellValue(significanceRef.trim(), context);
+        
+        // エラー値を直接返す
+        if (typeof significanceValue === 'string' && significanceValue.startsWith('#')) {
+          return significanceValue as FormulaResult;
+        }
+        
         significance = toNumber(significanceValue) ?? parseFloat(significanceRef.trim());
         
         if (isNaN(significance)) {
@@ -2050,14 +2061,15 @@ export const ISO_CEILING: CustomFormula = {
       // ISO.CEILINGは負の数の場合はゼロ方向に切り上げる（絶対値が小さくなる方向）
       if (number < 0) {
         // 負の数はゼロ方向に切り上げ
-        const result = Math.ceil(number / significance) * significance;
+        const result = Math.ceil(number / Math.abs(significance)) * Math.abs(significance);
         return result;
       } else {
         // 正の数は正の無限大方向に切り上げ
         const result = Math.ceil(number / Math.abs(significance)) * Math.abs(significance);
         return result;
       }
-    } catch {
+    } catch (error) {
+      console.error('ISO.CEILING error:', error);
       return FormulaError.VALUE;
     }
   }
@@ -2399,6 +2411,11 @@ export const SEQUENCE: CustomFormula = {
     // 1x1の場合は単一の値を返す
     if (rows === 1 && cols === 1) {
       return result[0][0];
+    }
+    
+    // 単一列の場合は1次元配列として返す
+    if (cols === 1) {
+      return result.map(row => row[0]);
     }
     
     return result;

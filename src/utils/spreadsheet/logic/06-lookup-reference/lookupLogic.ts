@@ -805,9 +805,8 @@ export const TRANSPOSE: CustomFormula = {
         transposed.push(newRow);
       }
       
-      // 1次元配列として返す（フラット化）
-      const result = transposed.flat();
-      return result.length === 1 ? result[0] as FormulaResult : result as FormulaResult;
+      // 2次元配列として返す
+      return transposed as FormulaResult;
     } catch {
       return FormulaError.VALUE;
     }
@@ -822,28 +821,53 @@ export const FILTER: CustomFormula = {
     const [, arrayRef, includeRef, ifEmptyRef] = matches;
     
     try {
+      // 範囲を解析して行列のサイズを判定
+      const rangeParts = arrayRef.trim().split(':');
+      let isMultiColumn = false;
+      let cols = 1;
+      
+      if (rangeParts.length === 2) {
+        const startMatch = rangeParts[0].match(/([A-Z]+)(\d+)/);
+        const endMatch = rangeParts[1].match(/([A-Z]+)(\d+)/);
+        
+        if (startMatch && endMatch) {
+          const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+          const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+          cols = endCol - startCol + 1;
+          isMultiColumn = cols > 1;
+        }
+      }
+      
       // 配列データを取得
       const arrayValues = getCellRangeValues(arrayRef.trim(), context);
       const includeValues = getCellRangeValues(includeRef.trim(), context);
       
-      if (arrayValues.length !== includeValues.length) {
+      // フィルタ条件の数を計算
+      const rows = arrayValues.length / cols;
+      if (includeValues.length !== rows) {
         return FormulaError.VALUE;
       }
       
-      // フィルタ条件に基づいて要素を抽出
-      const filteredValues: unknown[] = [];
-      for (let i = 0; i < arrayValues.length; i++) {
+      // フィルタ条件に基づいて行を抽出
+      const filteredRows: unknown[][] = [];
+      for (let i = 0; i < rows; i++) {
         const includeValue = includeValues[i];
         // TRUE、1、または0以外の数値をTRUEとして扱う
         if (includeValue === true || includeValue === 1 || 
             (typeof includeValue === 'string' && includeValue.toUpperCase() === 'TRUE') ||
             (typeof includeValue === 'number' && includeValue !== 0)) {
-          filteredValues.push(arrayValues[i]);
+          // 行全体を抽出
+          const row: unknown[] = [];
+          for (let j = 0; j < cols; j++) {
+            const index = i * cols + j;
+            row.push(arrayValues[index]);
+          }
+          filteredRows.push(row);
         }
       }
       
       // 結果が空の場合
-      if (filteredValues.length === 0) {
+      if (filteredRows.length === 0) {
         if (ifEmptyRef) {
           let emptyValue = getCellValue(ifEmptyRef.trim(), context);
           // If it's a cell reference that doesn't exist, treat as string literal
@@ -861,7 +885,15 @@ export const FILTER: CustomFormula = {
         return FormulaError.CALC; // #CALC!エラー
       }
       
-      return filteredValues.length === 1 ? filteredValues[0] as FormulaResult : filteredValues as FormulaResult;
+      // 結果を返す
+      if (isMultiColumn) {
+        // 複数列の場合は2次元配列として返す
+        return filteredRows as FormulaResult;
+      } else {
+        // 単一列の場合は1次元配列として返す
+        const flatResult = filteredRows.map(row => row[0]);
+        return flatResult.length === 1 ? flatResult[0] as FormulaResult : flatResult as FormulaResult;
+      }
     } catch {
       return FormulaError.VALUE;
     }
