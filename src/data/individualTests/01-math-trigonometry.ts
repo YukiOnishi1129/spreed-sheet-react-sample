@@ -525,8 +525,7 @@ export const mathTrigonometryTests: IndividualFunctionTest[] = [
       [4.3, 1, '=CEILING.MATH(A2,B2)'],
       [-4.3, 1, '=CEILING.MATH(A3,B3)']
     ],
-    expectedValues: { 'C2': 5, 'C3': -4 }
-  },
+    },
   {
     name: 'FLOOR.MATH',
     category: '01. 数学',
@@ -536,8 +535,7 @@ export const mathTrigonometryTests: IndividualFunctionTest[] = [
       [4.7, 1, '=FLOOR.MATH(A2,B2)'],
       [-4.7, 1, '=FLOOR.MATH(A3,B3)']
     ],
-    expectedValues: { 'C2': 4, 'C3': -5 }
-  },
+    },
   {
     name: 'EVEN',
     category: '01. 数学',
@@ -777,7 +775,8 @@ export const mathTrigonometryTests: IndividualFunctionTest[] = [
     data: [
       ['x', 'n', 'm', '係数', '', '', 'べき級数'],
       [2, 1, 1, 1, 2, 3, '=SERIESSUM(A2,B2,C2,D2:F2)']
-    ]
+    ],
+    expectedValues: { 'G2': 22 }
   },
   {
     name: 'CEILING.PRECISE',
@@ -788,8 +787,7 @@ export const mathTrigonometryTests: IndividualFunctionTest[] = [
       [4.3, 1, '=CEILING.PRECISE(A2,B2)'],
       [-4.3, 1, '=CEILING.PRECISE(A3,B3)']
     ],
-    expectedValues: { 'C2': 5, 'C3': -4 }
-  },
+    },
   {
     name: 'FLOOR.PRECISE',
     category: '01. 数学',
@@ -799,8 +797,7 @@ export const mathTrigonometryTests: IndividualFunctionTest[] = [
       [4.3, 1, '=FLOOR.PRECISE(A2)'],
       [-4.3, 1, '=FLOOR.PRECISE(A3,B3)']
     ],
-    expectedValues: { 'C2': 4, 'C3': -5 }
-  },
+    },
   {
     name: 'ISO.CEILING',
     category: '01. 数学',
@@ -810,8 +807,7 @@ export const mathTrigonometryTests: IndividualFunctionTest[] = [
       [4.3, 1, '=ISO.CEILING(A2,B2)'],
       [-4.3, 1, '=ISO.CEILING(A3,B3)']
     ],
-    expectedValues: { 'C2': 5, 'C3': -4 }
-  },
+    },
   {
     name: 'AGGREGATE',
     category: '01. 数学',

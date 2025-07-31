@@ -2079,7 +2079,48 @@ export const ISO_CEILING: CustomFormula = {
 export const SERIESSUM: CustomFormula = {
   name: 'SERIESSUM',
   pattern: /SERIESSUM\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  calculate: () => null // HyperFormulaに処理を委譲
+  calculate: (matches, evalCell) => {
+    const x = parseFloat(evalCell(matches[1]));
+    const n = parseFloat(evalCell(matches[2]));
+    const m = parseFloat(evalCell(matches[3]));
+    const coefficientsStr = matches[4];
+    
+    // 係数配列を取得
+    let coefficients: number[];
+    
+    // 範囲指定の場合（D2:F2のような形式）
+    if (coefficientsStr.includes(':')) {
+      // 範囲から値を取得
+      const rangeMatch = coefficientsStr.match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
+      if (!rangeMatch) return null;
+      
+      const startCol = rangeMatch[1].charCodeAt(0) - 65; // A=0, B=1, ...
+      const startRow = parseInt(rangeMatch[2]) - 1;
+      const endCol = rangeMatch[3].charCodeAt(0) - 65;
+      const endRow = parseInt(rangeMatch[4]) - 1;
+      
+      coefficients = [];
+      for (let col = startCol; col <= endCol; col++) {
+        const cellRef = String.fromCharCode(65 + col) + (startRow + 1);
+        const value = parseFloat(evalCell(cellRef));
+        if (!isNaN(value)) {
+          coefficients.push(value);
+        }
+      }
+    } else {
+      // カンマ区切りの値の場合
+      coefficients = coefficientsStr.split(',').map(c => parseFloat(evalCell(c.trim())));
+    }
+    
+    // べき級数の計算: Σ(a_i * x^(n + i*m))
+    let sum = 0;
+    for (let i = 0; i < coefficients.length; i++) {
+      const power = n + i * m;
+      sum += coefficients[i] * Math.pow(x, power);
+    }
+    
+    return sum;
+  }
 };
 
 // RANDARRAY関数（ランダム配列を生成）

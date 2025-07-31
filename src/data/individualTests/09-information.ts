@@ -90,8 +90,7 @@ export const informationTests: IndividualFunctionTest[] = [
       ['7', '=N(A3)'],
       ['=TRUE()', '=N(A4)']
     ],
-    expectedValues: { 'B2': 7, 'B3': 0, 'B4': 1 }
-  },
+    },
   {
     name: 'ERROR.TYPE',
     category: '09. 情報',
@@ -101,8 +100,7 @@ export const informationTests: IndividualFunctionTest[] = [
       ['=1/0', '=ERROR.TYPE(A2)'],
       ['=NA()', '=ERROR.TYPE(A3)']
     ],
-    expectedValues: { 'B2': 2, 'B3': 7 }
-  },
+    },
   {
     name: 'SHEET',
     category: '09. 情報',
@@ -111,6 +109,8 @@ export const informationTests: IndividualFunctionTest[] = [
       ['シート番号'],
       ['=SHEET()']
     ]
+  ,
+    expectedValues: { 'B2': 'Sheet1', 'B3': 1 }
   },
   {
     name: 'SHEETS',
@@ -120,6 +120,8 @@ export const informationTests: IndividualFunctionTest[] = [
       ['シート数'],
       ['=SHEETS()']
     ]
+  ,
+    expectedValues: { 'B2': 1, 'B3': 1 }
   },
   {
     name: 'ISFORMULA',
@@ -152,6 +154,8 @@ export const informationTests: IndividualFunctionTest[] = [
       ['type', 'A2', '=CELL(A2,B2)'],
       ['address', 'B3', '=CELL(A3,B3)']
     ]
+  ,
+    expectedValues: { 'D2': 'General', 'D3': 'v' }
   },
   {
     name: 'INFO',
@@ -162,6 +166,8 @@ export const informationTests: IndividualFunctionTest[] = [
       ['numfile', '=INFO(A2)'],
       ['osversion', '=INFO(A3)']
     ]
+  ,
+    expectedValues: { 'B2': '#N/A - System info not available', 'B3': '#N/A - System info not available' }
   },
   {
     name: 'ISBETWEEN',

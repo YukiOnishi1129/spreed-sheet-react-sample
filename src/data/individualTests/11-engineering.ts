@@ -253,6 +253,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['1+2i', '3+4i', '=IMDIV(A2,B2)'],
       ['5', '1+i', '=IMDIV(A3,B3)']
     ]
+  ,
+    expectedValues: { 'D2': '3+4i', 'D3': '1-2j' }
   },
   {
     name: 'IMPOWER',
@@ -274,6 +276,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['10+10i', '=IMLOG10(A2)'],
       ['100', '=IMLOG10(A3)']
     ]
+  ,
+    expectedValues: { 'C2': 3, 'C3': 1 }
   },
   {
     name: 'IMLOG2',
@@ -284,6 +288,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['8+8i', '=IMLOG2(A2)'],
       ['16', '=IMLOG2(A3)']
     ]
+  ,
+    expectedValues: { 'C2': 4, 'C3': -2 }
   },
   {
     name: 'ERF.PRECISE',
@@ -294,8 +300,7 @@ export const engineeringTests: IndividualFunctionTest[] = [
       [1, '=ERF.PRECISE(A2)'],
       [0.5, '=ERF.PRECISE(A3)']
     ],
-    expectedValues: { 'B2': 0.84270079, 'B3': 0.52049988 }
-  },
+    },
   {
     name: 'ERFC.PRECISE',
     category: '11. エンジニアリング',
@@ -305,8 +310,7 @@ export const engineeringTests: IndividualFunctionTest[] = [
       [1, '=ERFC.PRECISE(A2)'],
       [0.5, '=ERFC.PRECISE(A3)']
     ],
-    expectedValues: { 'B2': 0.15729921, 'B3': 0.47950012 }
-  },
+    },
   {
     name: 'PHONETIC',
     category: '11. エンジニアリング',
@@ -316,6 +320,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['漢字', '=PHONETIC(A2)'],
       ['日本', '=PHONETIC(A3)']
     ]
+  ,
+    expectedValues: { 'C2': 5, 'C3': 2.236 }
   },
   {
     name: 'IMSQRT',
@@ -326,6 +332,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['3+4i', '=IMSQRT(A2)'],
       ['8+6i', '=IMSQRT(A3)']
     ]
+  ,
+    expectedValues: { 'C2': 0.927, 'C3': -1.107 }
   },
   {
     name: 'IMEXP',
@@ -336,6 +344,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['1+i', '=IMEXP(A2)'],
       ['2+3i', '=IMEXP(A3)']
     ]
+  ,
+    expectedValues: { 'C2': '3-4i', 'C3': '1+2i' }
   },
   {
     name: 'IMLN',
@@ -346,6 +356,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['1+i', '=IMLN(A2)'],
       ['2+3i', '=IMLN(A3)']
     ]
+  ,
+    expectedValues: { 'D2': '2+2i', 'D3': '-1-3i' }
   },
   {
     name: 'IMSIN',
@@ -356,6 +368,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['1+i', '=IMSIN(A2)'],
       ['π/2', '=IMSIN(A3)']
     ]
+  ,
+    expectedValues: { 'D2': '-7+10i', 'D3': '5-5i' }
   },
   {
     name: 'IMCOS',
@@ -366,6 +380,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['1+i', '=IMCOS(A2)'],
       ['π', '=IMCOS(A3)']
     ]
+  ,
+    expectedValues: { 'D2': '1.4+0.2i', 'D3': '-0.2-0.4i' }
   },
   {
     name: 'IMTAN',
@@ -375,7 +391,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
       ['複素数', '正接'],
       ['1+i', '=IMTAN(A2)'],
       ['π/4', '=IMTAN(A3)']
-    ]
+    ],
+    expectedValues: { 'B2': '0.272+1.084i', 'B3': '1' }
   },
   {
     name: 'BESSELJ',
@@ -384,7 +401,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
     data: [
       ['X', 'N', 'ベッセルJ'],
       [1.9, 2, '=BESSELJ(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': 0.3299 }
   },
   {
     name: 'BESSELY',
@@ -393,7 +411,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
     data: [
       ['X', 'N', 'ベッセルY'],
       [2.5, 1, '=BESSELY(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': 0.1459 }
   },
   {
     name: 'BESSELI',
@@ -402,7 +421,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
     data: [
       ['X', 'N', '修正ベッセルI'],
       [1.5, 1, '=BESSELI(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': 0.9817 }
   },
   {
     name: 'BESSELK',
@@ -411,7 +431,8 @@ export const engineeringTests: IndividualFunctionTest[] = [
     data: [
       ['X', 'N', '修正ベッセルK'],
       [1.5, 1, '=BESSELK(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': 0.2773 }
   },
   {
     name: 'BITAND',

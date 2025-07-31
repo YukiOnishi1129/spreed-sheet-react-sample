@@ -171,6 +171,8 @@ export const lookupReferenceTests: IndividualFunctionTest[] = [
       ['URL', '表示テキスト', 'リンク'],
       ['https://example.com', 'Example', '=HYPERLINK(A2,B2)']
     ]
+  ,
+    expectedValues: { 'E2': 'B', 'E3': '#N/A' }
   },
   {
     name: 'LOOKUP',

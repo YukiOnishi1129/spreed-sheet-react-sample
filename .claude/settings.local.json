@@ -72,7 +72,20 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(TZ=UTC node:*)",
-      "Bash(tsc --noEmit)"
+      "Bash(tsc --noEmit)",
+      "Bash(src/components/__tests__/TestSpreadsheet.allCategoryFailures.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.allFinancialComprehensive.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.allFinancialTest.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.categoryFailures.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.completeFailures.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.comprehensive.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.databaseTest.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.expectedValues.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.failureDetection.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.financialAccuracy.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.financialDebug.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.isoCeilingTest.test.tsx )",
+      "Bash(src/components/__tests__/TestSpreadsheet.realFailures.test.tsx)"
     ],
     "deny": []
   }

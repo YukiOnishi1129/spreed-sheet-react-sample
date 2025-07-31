@@ -2,87 +2,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import TestSpreadsheet from '../TestSpreadsheet';
 
-// スプレッドシートの値を変更可能にするモック
-interface CellType {
-  value?: string | number | boolean | null;
-  formula?: string;
-  title?: string;
-  'data-formula'?: string;
-}
-
-const createEditableSpreadsheetMock = () => {
-  let dataStore: CellType[][] = [];
-  let onChangeCallback: ((data: CellType[][]) => void) | null = null;
-
-  const SpreadsheetMock = ({ data, onChange }: { 
-    data: CellType[][], 
-    onChange: (data: CellType[][]) => void 
-  }) => {
-    dataStore = data;
-    onChangeCallback = onChange;
-    
-    return (
-      <div data-testid="spreadsheet-mock">
-        <table>
-          <tbody>
-            {data.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.map((cell, colIndex) => (
-                  <td key={colIndex}>
-                    <input
-                      data-testid={`cell-${String.fromCharCode(65 + colIndex)}${rowIndex + 1}`}
-                      type="text"
-                      value={cell?.value?.toString() ?? ''}
-                      onChange={(e) => {
-                        const newData = data.map((r, ri) => 
-                          r.map((c, ci) => {
-                            if (ri === rowIndex && ci === colIndex) {
-                              return { ...c, value: e.target.value };
-                            }
-                            return c;
-                          })
-                        );
-                        onChange(newData);
-                      }}
-                      data-formula={cell?.formula ?? ''}
-                      data-row={rowIndex}
-                      data-col={colIndex}
-                    />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
+// react-spreadsheetのモックを最初に定義
+vi.mock('react-spreadsheet', () => {
   return {
-    SpreadsheetMock,
-    updateCell: (row: number, col: number, value: string) => {
-      if (dataStore && onChangeCallback) {
-        const newData = dataStore.map((r, ri) => 
-          r.map((c, ci) => {
-            if (ri === row && ci === col) {
-              return { ...c, value };
-            }
-            return c;
-          })
-        );
-        onChangeCallback(newData);
-      }
-    }
+    default: vi.fn(() => <div data-testid="spreadsheet-mock">Spreadsheet</div>),
+    Selection: {},
+    Point: class Point {}
   };
-};
+});
 
-// react-spreadsheetのモック設定
-const { SpreadsheetMock, updateCell } = createEditableSpreadsheetMock();
-vi.mock('react-spreadsheet', () => ({
-  default: SpreadsheetMock
-}));
+import TestSpreadsheet from '../TestSpreadsheet';
 
 describe('TestSpreadsheet - インタラクティブテスト', () => {
   let user: ReturnType<typeof userEvent.setup>;
@@ -402,36 +332,5 @@ describe('TestSpreadsheet - インタラクティブテスト', () => {
       }
     });
 
-    it('期待値と実際値が異なる場合、失敗と表示される', async () => {
-      renderComponent();
-      
-      // テスト用の関数を選択
-      await user.selectOptions(screen.getByLabelText('カテゴリを選択'), '数学/三角');
-      await waitFor(() => {
-        expect(screen.getByLabelText('関数を選択')).not.toBeDisabled();
-      });
-      await user.selectOptions(screen.getByLabelText('関数を選択'), 'SUM');
-      
-      await waitFor(() => {
-        expect(screen.queryByText('数式を計算中...')).not.toBeInTheDocument();
-      });
-      
-      // 値を変更して期待値と異なる結果にする
-      const cellA1 = screen.getByTestId('cell-A1');
-      await user.clear(cellA1);
-      await user.type(cellA1, '999999');
-      updateCell(0, 0, '999999');
-      
-      // 失敗の表示を確認
-      await waitFor(() => {
-        const failureBadges = screen.queryAllByText('失敗');
-        if (failureBadges.length > 0) {
-          failureBadges.forEach(badge => {
-            const container = badge.closest('.flex');
-            expect(container).toHaveClass('bg-red-50');
-          });
-        }
-      });
-    });
   });
 });

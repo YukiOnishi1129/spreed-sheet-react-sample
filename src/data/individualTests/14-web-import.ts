@@ -20,8 +20,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       ['テキスト', '区切り文字', '分割結果'],
       ['apple,banana,orange', ',', '=SPLIT(A2,B2)'],
       ['one-two-three', '-', '=SPLIT(A3,B3)']
-    ]
-  },
+    ],
+    },
   {
     name: 'JOIN',
     category: '14. Web・インポート',
@@ -42,7 +42,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       ['田中', 25, '営業', '', '=QUERY(A2:C4,"SELECT A, B WHERE B > 25")'],
       ['佐藤', 30, '技術', '', ''],
       ['鈴木', 28, '人事', '', '']
-    ]
+    ],
+    expectedValues: { 'E2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'FLATTEN',
@@ -52,7 +53,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       ['配列1', '', '配列2', '', 'フラット化'],
       [1, 2, 5, 6, '=FLATTEN(A2:D3)'],
       [3, 4, 7, 8, '']
-    ]
+    ],
+    expectedValues: { 'E2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'ARRAYFORMULA',
@@ -111,7 +113,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       [78, ''],
       [95, ''],
       [88, '']
-    ]
+    ],
+    expectedValues: { 'C2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'WEBSERVICE',
@@ -120,7 +123,8 @@ export const webImportTests: IndividualFunctionTest[] = [
     data: [
       ['URL', '取得結果'],
       ['https://api.example.com/data', '=WEBSERVICE(A2)']
-    ]
+    ],
+    expectedValues: { 'B2': '#N/A - Web functions not available' }
   },
   {
     name: 'FILTERXML',
@@ -140,7 +144,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       ['データ', '', '', '', 'スパークライン'],
       [1, 3, 2, 5, '=SPARKLINE(A2:D2)'],
       [4, 2, 6, 3, '=SPARKLINE(A3:D3,{"charttype","column"})']
-    ]
+    ],
+    expectedValues: { 'B2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'IMPORTDATA',
@@ -149,7 +154,8 @@ export const webImportTests: IndividualFunctionTest[] = [
     data: [
       ['URL', 'インポート結果'],
       ['https://example.com/data.csv', '=IMPORTDATA(A2)']
-    ]
+    ],
+    expectedValues: { 'B2': '#N/A - Import functions not available' }
   },
   {
     name: 'IMPORTFEED',
@@ -158,7 +164,8 @@ export const webImportTests: IndividualFunctionTest[] = [
     data: [
       ['フィードURL', 'クエリ', 'ヘッダー', 'アイテム数', 'インポート結果'],
       ['https://example.com/feed.rss', 'items title', true, 5, '=IMPORTFEED(A2,B2,C2,D2)']
-    ]
+    ],
+    expectedValues: { 'E2': '#N/A - Import functions not available' }
   },
   {
     name: 'IMPORTHTML',
@@ -167,7 +174,8 @@ export const webImportTests: IndividualFunctionTest[] = [
     data: [
       ['URL', 'クエリ', 'インデックス', 'インポート結果'],
       ['https://example.com/page.html', 'table', 1, '=IMPORTHTML(A2,B2,C2)']
-    ]
+    ],
+    expectedValues: { 'D2': '#N/A - Import functions not available' }
   },
   {
     name: 'IMPORTXML',
@@ -176,7 +184,8 @@ export const webImportTests: IndividualFunctionTest[] = [
     data: [
       ['URL', 'XPathクエリ', 'インポート結果'],
       ['https://example.com/data.xml', '//item/title', '=IMPORTXML(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': '#N/A - Import functions not available' }
   },
   {
     name: 'IMPORTRANGE',
@@ -185,7 +194,8 @@ export const webImportTests: IndividualFunctionTest[] = [
     data: [
       ['スプレッドシートURL', '範囲', 'インポート結果'],
       ['https://docs.google.com/spreadsheets/d/abc123', 'Sheet1!A1:C10', '=IMPORTRANGE(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': '#N/A - Import functions not available' }
   },
   {
     name: 'IMAGE',
@@ -194,7 +204,8 @@ export const webImportTests: IndividualFunctionTest[] = [
     data: [
       ['画像URL', 'モード', '高さ', '幅', '画像'],
       ['https://example.com/image.png', 1, 100, 100, '=IMAGE(A2,B2,C2,D2)']
-    ]
+    ],
+    expectedValues: { 'B2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'GOOGLEFINANCE',
@@ -204,7 +215,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       ['銘柄', '属性', '開始日', '終了日', '間隔', '結果'],
       ['GOOG', 'price', '', '', '', '=GOOGLEFINANCE(A2,B2)'],
       ['AAPL', 'volume', '2024/1/1', '2024/1/31', 'DAILY', '=GOOGLEFINANCE(A3,B3,C3,D3,E3)']
-    ]
+    ],
+    expectedValues: { 'C2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'GOOGLETRANSLATE',
@@ -214,7 +226,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       ['テキスト', '元言語', '翻訳先言語', '翻訳結果'],
       ['Hello', 'en', 'ja', '=GOOGLETRANSLATE(A2,B2,C2)'],
       ['こんにちは', 'ja', 'en', '=GOOGLETRANSLATE(A3,B3,C3)']
-    ]
+    ],
+    expectedValues: { 'C2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'DETECTLANGUAGE',
@@ -236,7 +249,8 @@ export const webImportTests: IndividualFunctionTest[] = [
       ['値', '日付'],
       [44926, '=TO_DATE(A2)'],
       ['2023/1/1', '=TO_DATE(A3)']
-    ]
+    ],
+    expectedValues: { 'B2': '#N/A - Google Sheets specific functions not supported' }
   },
   {
     name: 'TO_PERCENT',

@@ -280,10 +280,21 @@ export const EXPAND: CustomFormula = {
       
       const newRows = parseInt(getCellValue(rowsRef.trim(), context)?.toString() ?? rowsRef.trim());
       const newCols = parseInt(getCellValue(colsRef.trim(), context)?.toString() ?? colsRef.trim());
-      let padValue = padRef ? getCellValue(padRef.trim(), context) ?? padRef.trim() : FormulaError.NA;
-      // Convert numeric pad value to string if necessary
-      if (typeof padValue === 'number') {
-        padValue = padValue.toString();
+      let padValue = FormulaError.NA;
+      if (padRef) {
+        const trimmedPadRef = padRef.trim();
+        // 引用符で囲まれた文字列の場合
+        if ((trimmedPadRef.startsWith('"') && trimmedPadRef.endsWith('"')) ||
+            (trimmedPadRef.startsWith("'") && trimmedPadRef.endsWith("'"))) {
+          padValue = trimmedPadRef.slice(1, -1);
+        } else {
+          // セル参照または直接値
+          padValue = getCellValue(trimmedPadRef, context) ?? trimmedPadRef;
+          // Convert numeric pad value to string if necessary
+          if (typeof padValue === 'number') {
+            padValue = padValue.toString();
+          }
+        }
       }
       
       if (isNaN(newRows) || isNaN(newCols)) {

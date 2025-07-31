@@ -1,4 +1,4 @@
 
-> spreed-sheet-react-sample@0.0.0 test:e2e
-> playwright test --reporter=json
+> spreed-sheet-react-sample@0.0.0 test
+> vitest --run --reporter=json
 

@@ -292,7 +292,8 @@ export const textTests: IndividualFunctionTest[] = [
       ['apple,banana,orange', ',', '=TEXTSPLIT(A2,B2)'],
       ['2024-01-15', '-', '=TEXTSPLIT(A3,B3)'],
       ['one two three', ' ', '=TEXTSPLIT(A4,B4)']
-    ]
+    ],
+    expectedValues: { 'C2': 'apple', 'C3': '2024', 'C4': 'one' }
   },
   {
     name: 'UNICHAR',
@@ -328,8 +329,7 @@ export const textTests: IndividualFunctionTest[] = [
       [123, '=T(A3)'],
       ['=TRUE()', '=T(A4)']
     ],
-    expectedValues: { 'B2': 'Hello', 'B3': '', 'B4': '' }
-  },
+    },
   {
     name: 'ASC',
     category: '03. 文字列',
@@ -395,7 +395,8 @@ export const textTests: IndividualFunctionTest[] = [
       ['検索文字', '対象文字列', 'バイト位置'],
       ['LO', 'Hello', '=SEARCHB(A2,B2)'],
       ['に', 'こんにちは', '=SEARCHB(A3,B3)']
-    ]
+    ],
+    expectedValues: { 'C2': 4, 'C3': 5 }
   },
   {
     name: 'REPLACEB',

@@ -961,8 +961,24 @@ export const TEXT: CustomFormula = {
     
     // 簡単なフォーマット処理
     if (typeof value === 'number') {
+      // Helper function to add thousand separators
+      const addThousandSeparators = (numStr: string): string => {
+        const parts = numStr.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return parts.join('.');
+      };
+
+      // #,##0 形式を処理（より具体的なパターンを先に評価）
       if (format.includes('#,##0')) {
-        return value.toLocaleString();
+        const decimalMatch = format.match(/\.0+/);
+        const decimalPlaces = decimalMatch ? decimalMatch[0].length - 1 : 0;
+        if (decimalPlaces > 0) {
+          const fixed = value.toFixed(decimalPlaces);
+          return addThousandSeparators(fixed);
+        } else {
+          const rounded = Math.round(value).toString();
+          return addThousandSeparators(rounded);
+        }
       } else if (format.includes('0.00')) {
         return value.toFixed(2);
       } else if (format.includes('0.0')) {

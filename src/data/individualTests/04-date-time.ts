@@ -114,10 +114,10 @@ export const dateTimeTests: IndividualFunctionTest[] = [
     category: '04. 日付',
     description: '日付間の期間を計算',
     data: [
-      ['開始日', '終了日', '単位', '期間'],
-      ['2024/1/1', '2024/12/31', '"D"', '=DATEDIF(A2,B2,C2)']
+      ['開始日', '終了日', '期間（日）', '期間（月）', '期間（年）'],
+      ['2024/1/1', '2024/12/31', '=DATEDIF(A2,B2,"D")', '=DATEDIF(A2,B2,"M")', '=DATEDIF(A2,B2,"Y")']
     ],
-    expectedValues: { 'D2': 365 }
+    expectedValues: { 'C2': 365, 'D2': 11, 'E2': 0 }
   },
   {
     name: 'DAYS',
@@ -136,7 +136,8 @@ export const dateTimeTests: IndividualFunctionTest[] = [
     data: [
       ['開始日', '月数', '結果'],
       ['2024/1/15', 3, '=EDATE(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': 44946 }
   },
   {
     name: 'EOMONTH',
@@ -145,7 +146,8 @@ export const dateTimeTests: IndividualFunctionTest[] = [
     data: [
       ['開始日', '月数', '月末日'],
       ['2024/2/15', 0, '=EOMONTH(A2,B2)']
-    ]
+    ],
+    expectedValues: { 'C2': 45352 }
   },
   {
     name: 'NETWORKDAYS',
@@ -166,7 +168,8 @@ export const dateTimeTests: IndividualFunctionTest[] = [
       ['開始日', '営業日数', '結果日'],
       ['2024/1/1', 10, '=WORKDAY(A2,B2)'],
       ['2024/1/15', 5, '=WORKDAY(A3,B3)']
-    ]
+    ],
+    expectedValues: { 'C2': 45303, 'C3': 45317 }
   },
   {
     name: 'DATEVALUE',
@@ -176,7 +179,8 @@ export const dateTimeTests: IndividualFunctionTest[] = [
       ['日付文字列', '日付値'],
       ['2024/12/25', '=DATEVALUE(A2)'],
       ['2024-01-15', '=DATEVALUE(A3)']
-    ]
+    ],
+    expectedValues: { 'B2': 45651, 'B3': 45306 }
   },
   {
     name: 'TIMEVALUE',
@@ -186,7 +190,8 @@ export const dateTimeTests: IndividualFunctionTest[] = [
       ['時刻文字列', '時刻値'],
       ['13:30:45', '=TIMEVALUE(A2)'],
       ['9:15 AM', '=TIMEVALUE(A3)']
-    ]
+    ],
+    expectedValues: { 'B2': 0.5630208, 'B3': 0.3854167 }
   },
   {
     name: 'WEEKNUM',
@@ -207,7 +212,8 @@ export const dateTimeTests: IndividualFunctionTest[] = [
       ['日付', 'ISO週番号'],
       ['2024/1/1', '=ISOWEEKNUM(A2)'],
       ['2024/12/31', '=ISOWEEKNUM(A3)']
-    ]
+    ],
+    expectedValues: { 'B2': 1, 'B3': 1 }
   },
   {
     name: 'YEARFRAC',
@@ -239,8 +245,8 @@ export const dateTimeTests: IndividualFunctionTest[] = [
       ['開始日', '終了日', '週末', '営業日数'],
       ['2024/1/1', '2024/1/31', 1, '=NETWORKDAYS.INTL(A2,B2,C2)'],
       ['2024/1/1', '2024/1/15', '"0000011"', '=NETWORKDAYS.INTL(A3,B3,C3)']
-    ]
-  },
+    ],
+    },
   {
     name: 'WORKDAY.INTL',
     category: '04. 日付',
@@ -249,6 +255,6 @@ export const dateTimeTests: IndividualFunctionTest[] = [
       ['開始日', '営業日数', '週末', '結果日'],
       ['2024/1/1', 10, 1, '=WORKDAY.INTL(A2,B2,C2)'],
       ['2024/1/1', 5, '"0000011"', '=WORKDAY.INTL(A3,B3,C3)']
-    ]
-  }
+    ],
+    }
 ];
