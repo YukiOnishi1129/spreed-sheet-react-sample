@@ -41,7 +41,6 @@ export const PMT: CustomFormula = {
       } else {
         // Excel-compatible PMT calculation - exact Excel formula
         // PMT = ((PV * rate) + (FV * rate / ((1 + rate)^n - 1))) / (1 - (1 + rate)^(-n)) * -1
-        const compoundFactor = Math.pow(1 + rate, nper);
         
         if (type === 0) {
           // 期末払い (ordinary annuity) - exact Excel PMT formula

@@ -42,7 +42,6 @@ export const IMPORTFEED: CustomFormula = {
     try {
       let url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
       // const query = queryRef ? getCellValue(queryRef.trim(), context)?.toString() ?? queryRef.trim() : 'items';
-      const includeHeaders = headersRef ? getCellValue(headersRef.trim(), context)?.toString().toLowerCase() === 'true' : true;
       const numItems = numItemsRef ? parseInt(getCellValue(numItemsRef.trim(), context)?.toString() ?? numItemsRef.trim()) : 10;
       
       // 引用符を除去

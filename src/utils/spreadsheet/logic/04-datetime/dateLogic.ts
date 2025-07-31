@@ -563,12 +563,12 @@ export const YEARFRAC: CustomFormula = {
 
 // 30/360 US (NASD) 方式 - Excel完全互換
 function yearfrac30_360US(startDate: Date, endDate: Date): number {
-  let startYear = startDate.getFullYear();
-  let startMonth = startDate.getMonth() + 1;
+  const startYear = startDate.getFullYear();
+  const startMonth = startDate.getMonth() + 1;
   let startDay = startDate.getDate();
   
-  let endYear = endDate.getFullYear();
-  let endMonth = endDate.getMonth() + 1;
+  const endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth() + 1;
   let endDay = endDate.getDate();
   
   // US 30/360の特殊ルール（Excel互換）
@@ -601,12 +601,12 @@ function yearfrac30_360US(startDate: Date, endDate: Date): number {
 
 // 30/360 European方式 - Excel完全互換
 function yearfrac30_360European(startDate: Date, endDate: Date): number {
-  let startYear = startDate.getFullYear();
-  let startMonth = startDate.getMonth() + 1;
+  const startYear = startDate.getFullYear();
+  const startMonth = startDate.getMonth() + 1;
   let startDay = startDate.getDate();
   
-  let endYear = endDate.getFullYear();
-  let endMonth = endDate.getMonth() + 1;
+  const endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth() + 1;
   let endDay = endDate.getDate();
   
   // European 30/360のルール（Excel互換、basis 0と同じ）
@@ -658,7 +658,6 @@ function yearfracActualActual(startDate: Date, endDate: Date): number {
   
   while (currentDate.getFullYear() <= endYear) {
     const currentYear = currentDate.getFullYear();
-    const yearStart = new Date(currentYear, 0, 1);
     const yearEnd = new Date(currentYear + 1, 0, 1); // 次年の1月1日
     
     const periodStart = currentDate;

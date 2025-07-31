@@ -6,7 +6,7 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 export const CUBEVALUE: CustomFormula = {
   name: 'CUBEVALUE',
   pattern: /CUBEVALUE\(([^,]+)(?:,\s*(.+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // OLAP接続が必要なため、常にエラーを返す
     return '#N/A - Cube functions require OLAP connection';
   }
@@ -16,7 +16,7 @@ export const CUBEVALUE: CustomFormula = {
 export const CUBEMEMBER: CustomFormula = {
   name: 'CUBEMEMBER',
   pattern: /CUBEMEMBER\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // OLAP接続が必要なため、常にエラーを返す
     return '#N/A - Cube functions require OLAP connection';
   }
@@ -26,7 +26,7 @@ export const CUBEMEMBER: CustomFormula = {
 export const CUBESET: CustomFormula = {
   name: 'CUBESET',
   pattern: /CUBESET\(([^,]+),\s*([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // OLAP接続が必要なため、常にエラーを返す
     return '#N/A - Cube functions require OLAP connection';
   }
@@ -36,7 +36,7 @@ export const CUBESET: CustomFormula = {
 export const CUBESETCOUNT: CustomFormula = {
   name: 'CUBESETCOUNT',
   pattern: /CUBESETCOUNT\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // OLAP接続が必要なため、常にエラーを返す
     return '#N/A - Cube functions require OLAP connection';
   }
@@ -46,7 +46,7 @@ export const CUBESETCOUNT: CustomFormula = {
 export const CUBERANKEDMEMBER: CustomFormula = {
   name: 'CUBERANKEDMEMBER',
   pattern: /CUBERANKEDMEMBER\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // OLAP接続が必要なため、常にエラーを返す
     return '#N/A - Cube functions require OLAP connection';
   }
@@ -56,7 +56,7 @@ export const CUBERANKEDMEMBER: CustomFormula = {
 export const CUBEMEMBERPROPERTY: CustomFormula = {
   name: 'CUBEMEMBERPROPERTY',
   pattern: /CUBEMEMBERPROPERTY\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // OLAP接続が必要なため、常にエラーを返す
     return '#N/A - Cube functions require OLAP connection';
   }
@@ -66,7 +66,7 @@ export const CUBEMEMBERPROPERTY: CustomFormula = {
 export const CUBEKPIMEMBER: CustomFormula = {
   name: 'CUBEKPIMEMBER',
   pattern: /CUBEKPIMEMBER\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     // OLAP接続が必要なため、常にエラーを返す
     return '#N/A - Cube functions require OLAP connection';
   }

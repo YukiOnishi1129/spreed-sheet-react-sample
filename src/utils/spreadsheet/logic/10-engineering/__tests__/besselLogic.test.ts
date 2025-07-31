@@ -244,7 +244,6 @@ describe('Bessel Functions', () => {
       // Wronskian relation: |J_n(x)*Y_{n+1}(x) - J_{n+1}(x)*Y_n(x)| = 2/(πx)
       // Note: Skipped due to approximation limitations in current implementation
       const x = 2;
-      const n = 1;
       
       const j1Matches = ['BESSELJ(2, 1)', '2', '1'] as RegExpMatchArray;
       const j1 = BESSELJ.calculate(j1Matches, mockContext) as number;

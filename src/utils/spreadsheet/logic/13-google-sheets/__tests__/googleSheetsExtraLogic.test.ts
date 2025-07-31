@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
   DETECTLANGUAGE, IMAGE, MAP, SPLIT, UNIQUE, JOIN, FLATTEN, TRANSPOSE
 } from '../googleSheetsExtraLogic';
-import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext

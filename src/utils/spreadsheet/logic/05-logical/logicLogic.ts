@@ -125,7 +125,7 @@ function evaluateFormulaResult(resultStr: string, context: FormulaContext): Form
     try {
       const result = evaluateExpression(trimmed, context);
       return result;
-    } catch (error) {
+    } catch {
       throw FormulaError.VALUE;
     }
   }

@@ -3,7 +3,7 @@
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
-import { inverseTDistribution as inverseTDist, incompleteBeta as incompleteBetaHighPrecision, gamma, logGamma as logGammaHighPrecision } from './distributionLogic';
+import { inverseTDistribution as inverseTDist, incompleteBeta as incompleteBetaHighPrecision, logGamma as logGammaHighPrecision } from './distributionLogic';
 // 標準正規分布の逆関数（近似）
 // function normSInv(p: number): number {
 //   if (p <= 0 || p >= 1) return NaN;
@@ -61,61 +61,61 @@ import { inverseTDistribution as inverseTDist, incompleteBeta as incompleteBetaH
 const logGamma = logGammaHighPrecision;
 
 // ガンマ関数の対数（古い実装 - バックアップ）
-function logGammaOld(x: number): number {
-  if (x <= 0) return NaN;
+// function logGammaOld(x: number): number {
+//   if (x <= 0) return NaN;
   
-  // Stirlingの近似を使用
-  if (x >= 10) {
-    const series = 1 / (12 * x) - 1 / (360 * x * x * x) + 1 / (1260 * x * x * x * x * x);
-    return (x - 0.5) * Math.log(x) - x + 0.5 * Math.log(2 * Math.PI) + series;
-  }
+//   // Stirlingの近似を使用
+//   if (x >= 10) {
+//     const series = 1 / (12 * x) - 1 / (360 * x * x * x) + 1 / (1260 * x * x * x * x * x);
+//     return (x - 0.5) * Math.log(x) - x + 0.5 * Math.log(2 * Math.PI) + series;
+//   }
   
-  // 小さな値の場合は再帰的に計算
-  return logGamma(x + 1) - Math.log(x);
-}
+//   // 小さな値の場合は再帰的に計算
+//   return logGamma(x + 1) - Math.log(x);
+// }
 
 // 高精度版incompleteBetaを使用（引数順に注意：incompleteBeta(x, a, b)）
 const betaIncomplete = (x: number, a: number, b: number) => incompleteBetaHighPrecision(x, a, b);
 
 // 正規化された不完全ベータ関数（古い実装 - バックアップ）
-function betaIncompleteOld(a: number, b: number, x: number): number {
-  if (x < 0 || x > 1) return NaN;
-  if (x === 0) return 0;
-  if (x === 1) return 1;
+// function betaIncompleteOld(a: number, b: number, x: number): number {
+//   if (x < 0 || x > 1) return NaN;
+//   if (x === 0) return 0;
+//   if (x === 1) return 1;
   
-  const lbeta = logGamma(a) + logGamma(b) - logGamma(a + b);
-  const front = Math.exp(Math.log(x) * a + Math.log(1 - x) * b - lbeta) / a;
+//   const lbeta = logGamma(a) + logGamma(b) - logGamma(a + b);
+//   const front = Math.exp(Math.log(x) * a + Math.log(1 - x) * b - lbeta) / a;
   
-  // 連分数展開
-  const TINY = 1e-30;
-  let f = 1, c = 1, d = 0;
+//   // 連分数展開
+//   const TINY = 1e-30;
+//   let f = 1, c = 1, d = 0;
   
-  for (let i = 0; i <= 50; i++) {  // 反復回数を削減
-    const m = i / 2;
+//   for (let i = 0; i <= 50; i++) {  // 反復回数を削減
+//     const m = i / 2;
     
-    let numerator;
-    if (i === 0) {
-      numerator = 1;
-    } else if (i % 2 === 0) {
-      numerator = (m * (b - m) * x) / ((a + 2 * m - 1) * (a + 2 * m));
-    } else {
-      numerator = -((a + m) * (a + b + m) * x) / ((a + 2 * m) * (a + 2 * m + 1));
-    }
+//     let numerator;
+//     if (i === 0) {
+//       numerator = 1;
+//     } else if (i % 2 === 0) {
+//       numerator = (m * (b - m) * x) / ((a + 2 * m - 1) * (a + 2 * m));
+//     } else {
+//       numerator = -((a + m) * (a + b + m) * x) / ((a + 2 * m) * (a + 2 * m + 1));
+//     }
     
-    d = 1 + numerator * d;
-    if (Math.abs(d) < TINY) d = TINY;
-    d = 1 / d;
+//     d = 1 + numerator * d;
+//     if (Math.abs(d) < TINY) d = TINY;
+//     d = 1 / d;
     
-    c = 1 + numerator / c;
-    if (Math.abs(c) < TINY) c = TINY;
+//     c = 1 + numerator / c;
+//     if (Math.abs(c) < TINY) c = TINY;
     
-    f *= c * d;
+//     f *= c * d;
     
-    if (Math.abs(1 - c * d) < 1e-5) break;  // 収束判定を緩和
-  }
+//     if (Math.abs(1 - c * d) < 1e-5) break;  // 収束判定を緩和
+//   }
   
-  return front * (f - 1);
-}
+//   return front * (f - 1);
+// }
 
 // T分布の逆関数（Newton-Raphson法） - 未使用のため削除
 // function tInv(p: number, df: number): number {
@@ -236,12 +236,12 @@ function fInv(p: number, df1: number, df2: number): number {
   if (df1 <= 0 || df2 <= 0) return NaN;
   
   // 特殊なケースでの初期値の精度向上
-  if (p === 0.05 && df1 === 5 && df2 === 10) {
-    // より正確な初期値を設定
-    // Excelの結果に近い値
-    const targetValue = 0.2107;
-    // 以下の計算でこの値に近づく
-  }
+  // if (p === 0.05 && df1 === 5 && df2 === 10) {
+  //   // より正確な初期値を設定
+  //   // Excelの結果に近い値
+  //   const targetValue = 0.2107;
+  //   // 以下の計算でこの値に近づく
+  // }
   
   // Newton-Raphson法を使用してF分布の逆関数を計算
   // ベータ分布との関係を使用した初期推定値

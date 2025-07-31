@@ -103,7 +103,7 @@ describe('Other Statistical Functions', () => {
         const matches1 = ['FISHER(0.75)', '0.75'] as RegExpMatchArray;
         const fisherResult = FISHER.calculate(matches1, mockContext);
         
-        const matches2 = [`FISHERINV(${fisherResult})`, `${fisherResult}`] as RegExpMatchArray;
+        const matches2 = [`FISHERINV(${String(fisherResult)})`, `${String(fisherResult)}`] as RegExpMatchArray;
         const invResult = FISHERINV.calculate(matches2, mockContext);
         
         expect(invResult).toBeCloseTo(value, 10);

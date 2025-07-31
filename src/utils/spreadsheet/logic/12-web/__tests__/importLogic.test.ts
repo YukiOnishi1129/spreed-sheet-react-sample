@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
   IMPORTDATA, IMPORTFEED, IMPORTHTML, IMPORTXML, IMPORTRANGE
 } from '../importLogic';
-import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext

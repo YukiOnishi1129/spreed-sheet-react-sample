@@ -25,7 +25,7 @@ const createSpreadsheetContext = (
   // Initialize empty spreadsheet
   const spreadsheet: (string | number | boolean | null)[][] = [];
   for (let r = 0; r < maxRows; r++) {
-    spreadsheet[r] = new Array(maxCols).fill(null);
+    spreadsheet[r] = new Array<string | number | boolean | null>(maxCols).fill(null);
   }
   
   // Place database data

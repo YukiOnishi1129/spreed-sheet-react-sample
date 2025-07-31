@@ -146,7 +146,7 @@ function DemoSpreadsheet() {
           
           if (typeof cell === 'object' && 'value' in cell) {
             const cellObj = cell as any;
-            let value = cellObj.value ?? '';
+            const value = cellObj.value ?? '';
             
             // 数値文字列はそのまま保持（Excel関数の動作に合わせる）
             // String numbers should remain as strings for proper Excel function behavior

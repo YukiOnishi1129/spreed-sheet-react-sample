@@ -120,7 +120,6 @@ describe('Error Functions', () => {
     });
 
     it('should verify erfc(x) = 1 - erf(x)', () => {
-      const x = 0.7;
       const erfMatches = ['ERF(0.7)', '0.7'] as RegExpMatchArray;
       const erfResult = ERF.calculate(erfMatches, mockContext) as number;
       
@@ -153,7 +152,6 @@ describe('Error Functions', () => {
     });
 
     it('should match ERF for single argument', () => {
-      const x = 1.5;
       const erfMatches = ['ERF(1.5)', '1.5'] as RegExpMatchArray;
       const erfResult = ERF.calculate(erfMatches, mockContext);
       
@@ -198,7 +196,6 @@ describe('Error Functions', () => {
     });
 
     it('should match ERFC for positive values', () => {
-      const x = 0.8;
       const erfcMatches = ['ERFC(0.8)', '0.8'] as RegExpMatchArray;
       const erfcResult = ERFC.calculate(erfcMatches, mockContext);
       
@@ -222,7 +219,6 @@ describe('Error Functions', () => {
     });
 
     it('should verify erfc.precise(x) = 1 - erf.precise(x)', () => {
-      const x = 1.2;
       const erfMatches = ['ERF.PRECISE(1.2)', '1.2'] as RegExpMatchArray;
       const erfResult = ERF_PRECISE.calculate(erfMatches, mockContext) as number;
       
@@ -252,7 +248,6 @@ describe('Error Functions', () => {
 
     it('should verify symmetry properties', () => {
       // erf(-x) = -erf(x)
-      const x = 1.5;
       const posMatches = ['ERF(1.5)', '1.5'] as RegExpMatchArray;
       const posResult = ERF.calculate(posMatches, mockContext) as number;
       
@@ -275,7 +270,6 @@ describe('Error Functions', () => {
 
     it('should handle the Gaussian integral relationship', () => {
       // ∫[0,x] e^(-t²)dt = √π/2 * erf(x)
-      const x = 1;
       const matches = ['ERF(1)', '1'] as RegExpMatchArray;
       const erfResult = ERF.calculate(matches, mockContext) as number;
       

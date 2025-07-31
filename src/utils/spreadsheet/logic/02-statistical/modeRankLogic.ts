@@ -39,9 +39,10 @@ export const MODE_SNGL: CustomFormula = {
                 if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
                   values.push(Number(cellValue));
                 }
-              } else if ((context as any).cells) {
+              } else if ((context as Record<string, unknown>).cells) {
                 const cellRef = String.fromCharCode(65 + col) + (row + 1);
-                const cell = (context as any).cells[cellRef];
+                const cells = (context as unknown as { cells: Record<string, { value: unknown }> }).cells;
+                const cell = cells[cellRef];
                 if (cell && cell.value !== null && cell.value !== '' && !isNaN(Number(cell.value))) {
                   values.push(Number(cell.value));
                 }
@@ -136,9 +137,10 @@ export const MODE_MULT: CustomFormula = {
                 if (cellValue !== null && cellValue !== '' && !isNaN(Number(cellValue))) {
                   values.push(Number(cellValue));
                 }
-              } else if ((context as any).cells) {
+              } else if ((context as Record<string, unknown>).cells) {
                 const cellRef = String.fromCharCode(65 + col) + (row + 1);
-                const cell = (context as any).cells[cellRef];
+                const cells = (context as unknown as { cells: Record<string, { value: unknown }> }).cells;
+                const cell = cells[cellRef];
                 if (cell && cell.value !== null && cell.value !== '' && !isNaN(Number(cell.value))) {
                   values.push(Number(cell.value));
                 }

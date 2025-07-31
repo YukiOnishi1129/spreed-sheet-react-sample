@@ -415,7 +415,7 @@ describe('Engineering Conversion Functions', () => {
       const binMatches = ['DEC2BIN(42)', '42'] as RegExpMatchArray;
       const bin = DEC2BIN.calculate(binMatches, mockContext);
       
-      const decMatches = ['BIN2DEC("' + bin + '")', '"' + bin + '"'] as RegExpMatchArray;
+      const decMatches = ['BIN2DEC("' + String(bin) + '")', '"' + String(bin) + '"'] as RegExpMatchArray;
       const result = BIN2DEC.calculate(decMatches, mockContext);
       
       expect(result).toBe(dec);

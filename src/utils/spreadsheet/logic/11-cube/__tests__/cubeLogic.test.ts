@@ -3,7 +3,6 @@ import {
   CUBEKPIMEMBER, CUBEMEMBER, CUBEMEMBERPROPERTY, CUBERANKEDMEMBER,
   CUBESET, CUBESETCOUNT, CUBEVALUE
 } from '../cubeLogic';
-import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext

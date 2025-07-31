@@ -1,14 +1,12 @@
 // Google Sheets specific functions
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
-import { FormulaError } from '../shared/types';
-import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // JOIN関数の実装（配列を文字列に結合）
 export const JOIN: CustomFormula = {
   name: 'JOIN',
   pattern: /\bJOIN\(([^,]+),\s*(.+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -17,7 +15,7 @@ export const JOIN: CustomFormula = {
 export const ARRAYFORMULA: CustomFormula = {
   name: 'ARRAYFORMULA',
   pattern: /ARRAYFORMULA\((.+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -26,7 +24,7 @@ export const ARRAYFORMULA: CustomFormula = {
 export const QUERY: CustomFormula = {
   name: 'QUERY',
   pattern: /QUERY\(([^,]+)(?:,\s*"([^"]*)")?(?:,\s*(-?\d+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -36,7 +34,7 @@ export const QUERY: CustomFormula = {
 export const REGEXMATCH: CustomFormula = {
   name: 'REGEXMATCH',
   pattern: /REGEXMATCH\(([^,]+),\s*"([^"]+)"\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -45,7 +43,7 @@ export const REGEXMATCH: CustomFormula = {
 export const REGEXEXTRACT: CustomFormula = {
   name: 'REGEXEXTRACT',
   pattern: /REGEXEXTRACT\(([^,]+),\s*"([^"]+)"\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -54,7 +52,7 @@ export const REGEXEXTRACT: CustomFormula = {
 export const REGEXREPLACE: CustomFormula = {
   name: 'REGEXREPLACE',
   pattern: /REGEXREPLACE\(([^,]+),\s*"([^"]+)",\s*"([^"]*)"\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -63,7 +61,7 @@ export const REGEXREPLACE: CustomFormula = {
 export const FLATTEN: CustomFormula = {
   name: 'FLATTEN',
   pattern: /FLATTEN\((.+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };

@@ -299,7 +299,7 @@ export const WORKDAY: CustomFormula = {
       const holidays = holidaysRef ? parseHolidays(holidaysRef.trim(), context) : [];
       
       // 稼働日を計算
-      let current = new Date(startDate);
+      const current = new Date(startDate);
       let remainingDays = Math.abs(days);
       const isForward = days >= 0;
       
@@ -374,7 +374,7 @@ export const WORKDAY_INTL: CustomFormula = {
       const holidays = holidaysRef ? parseHolidays(holidaysRef.trim(), context) : [];
       
       // 稼働日を計算
-      let current = new Date(startDate);
+      const current = new Date(startDate);
       let remainingDays = Math.abs(days);
       const isForward = days >= 0;
       

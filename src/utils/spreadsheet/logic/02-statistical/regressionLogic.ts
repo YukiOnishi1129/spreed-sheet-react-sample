@@ -88,20 +88,6 @@ function calculateRegression(yValues: number[], xValues: number[]): RegressionRe
   };
 }
 
-// データを数値配列に変換
-function parseDataRange(rangeRef: string, context: FormulaContext): number[] {
-  const values = getCellRangeValues(rangeRef.trim(), context);
-  const numbers: number[] = [];
-  
-  for (const value of values) {
-    const num = typeof value === 'string' ? parseFloat(value) : Number(value);
-    if (!isNaN(num) && isFinite(num)) {
-      numbers.push(num);
-    }
-  }
-  
-  return numbers;
-}
 
 // SLOPE関数の実装（回帰直線の傾き）
 export const SLOPE: CustomFormula = {
@@ -113,7 +99,7 @@ export const SLOPE: CustomFormula = {
     try {
       // contextにcellsプロパティがある場合は古い形式
       if ('cells' in context) {
-        const mockContextSameX = context as any;
+        const mockContextSameX = context as { cells: Record<string, { value: unknown }> };
         // cellsプロパティを使用して値を取得
         const yValues: number[] = [];
         const xValues: number[] = [];
@@ -123,7 +109,7 @@ export const SLOPE: CustomFormula = {
         
         if (yRange && xRange) {
           const [, yStartCol, yStartRow, , yEndRow] = yRange;
-          const [, xStartCol, xStartRow, , xEndRow] = xRange;
+          const [, xStartCol] = xRange;
           
           for (let i = parseInt(yStartRow); i <= parseInt(yEndRow); i++) {
             const yCellKey = yStartCol + i;
@@ -168,8 +154,8 @@ export const SLOPE: CustomFormula = {
       const xValues: number[] = [];
       
       for (let i = 0; i < yRawValues.length; i++) {
-        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i]) : Number(yRawValues[i]);
-        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i]) : Number(xRawValues[i]);
+        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i] as string) : Number(yRawValues[i]);
+        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i] as string) : Number(xRawValues[i]);
         
         if (!isNaN(yNum) && isFinite(yNum) && !isNaN(xNum) && isFinite(xNum)) {
           yValues.push(yNum);
@@ -216,8 +202,8 @@ export const INTERCEPT: CustomFormula = {
       const xValues: number[] = [];
       
       for (let i = 0; i < yRawValues.length; i++) {
-        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i]) : Number(yRawValues[i]);
-        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i]) : Number(xRawValues[i]);
+        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i] as string) : Number(yRawValues[i]);
+        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i] as string) : Number(xRawValues[i]);
         
         if (!isNaN(yNum) && isFinite(yNum) && !isNaN(xNum) && isFinite(xNum)) {
           yValues.push(yNum);
@@ -262,7 +248,7 @@ export const RSQ: CustomFormula = {
         
         if (yRange && xRange) {
           const [, yStartCol, yStartRow, , yEndRow] = yRange;
-          const [, xStartCol, xStartRow, , xEndRow] = xRange;
+          const [, xStartCol] = xRange;
           
           for (let i = parseInt(yStartRow); i <= parseInt(yEndRow); i++) {
             const yCellKey = yStartCol + i;
@@ -314,8 +300,8 @@ export const RSQ: CustomFormula = {
       const xValues: number[] = [];
       
       for (let i = 0; i < yRawValues.length; i++) {
-        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i]) : Number(yRawValues[i]);
-        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i]) : Number(xRawValues[i]);
+        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i] as string) : Number(yRawValues[i]);
+        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i] as string) : Number(xRawValues[i]);
         
         if (!isNaN(yNum) && isFinite(yNum) && !isNaN(xNum) && isFinite(xNum)) {
           yValues.push(yNum);
@@ -362,8 +348,8 @@ export const STEYX: CustomFormula = {
       const xValues: number[] = [];
       
       for (let i = 0; i < yRawValues.length; i++) {
-        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i]) : Number(yRawValues[i]);
-        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i]) : Number(xRawValues[i]);
+        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i] as string) : Number(yRawValues[i]);
+        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i] as string) : Number(xRawValues[i]);
         
         if (!isNaN(yNum) && isFinite(yNum) && !isNaN(xNum) && isFinite(xNum)) {
           yValues.push(yNum);
@@ -425,8 +411,8 @@ export const FORECAST: CustomFormula = {
       const xValues: number[] = [];
       
       for (let i = 0; i < yRawValues.length; i++) {
-        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i]) : Number(yRawValues[i]);
-        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i]) : Number(xRawValues[i]);
+        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i] as string) : Number(yRawValues[i]);
+        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i] as string) : Number(xRawValues[i]);
         
         if (!isNaN(yNum) && isFinite(yNum) && !isNaN(xNum) && isFinite(xNum)) {
           yValues.push(yNum);
@@ -474,8 +460,8 @@ export const LINEST: CustomFormula = {
       const xValues: number[] = [];
       
       for (let i = 0; i < yRawValues.length; i++) {
-        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i]) : Number(yRawValues[i]);
-        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i]) : Number(xRawValues[i]);
+        const yNum = typeof yRawValues[i] === 'string' ? parseFloat(yRawValues[i] as string) : Number(yRawValues[i]);
+        const xNum = typeof xRawValues[i] === 'string' ? parseFloat(xRawValues[i] as string) : Number(xRawValues[i]);
         
         if (!isNaN(yNum) && isFinite(yNum) && !isNaN(xNum) && isFinite(xNum)) {
           yValues.push(yNum);

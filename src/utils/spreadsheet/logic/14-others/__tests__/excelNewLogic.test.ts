@@ -3,7 +3,6 @@ import {
   LAMBDA, MAKEARRAY, BYROW, BYCOL, REDUCE, SCAN, 
   MAP as MAP_FUNC, FILTER as FILTER_FUNC, SORT as SORT_FUNC
 } from '../excelNewLogic';
-import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext

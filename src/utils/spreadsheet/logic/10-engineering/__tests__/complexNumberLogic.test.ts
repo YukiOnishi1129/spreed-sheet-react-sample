@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   COMPLEX, IMABS, IMAGINARY, IMREAL, IMCONJUGATE,
-  IMARGUMENT, IMDIV, IMEXP, IMLN, IMLOG10, IMLOG2,
+  IMARGUMENT, IMDIV, IMEXP, IMLN, IMLOG2,
   IMPOWER, IMPRODUCT, IMSQRT, IMSUB, IMSUM
 } from '../complexNumberLogic';
 import { FormulaError } from '../../shared/types';

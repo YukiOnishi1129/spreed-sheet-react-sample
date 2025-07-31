@@ -262,8 +262,7 @@ describe('Bit Operation Functions', () => {
     it('should verify bit operation identities', () => {
       // De Morgan's law: ~(A & B) = ~A | ~B
       // In limited bit context: (A XOR all_ones) = bit complement
-      const a = 170; // 10101010
-      const b = 85;  // 01010101
+      // a = 170 (10101010), b = 85 (01010101)
       
       const andMatches = ['BITAND(170, 85)', '170', '85'] as RegExpMatchArray;
       const andResult = BITAND.calculate(andMatches, mockContext);

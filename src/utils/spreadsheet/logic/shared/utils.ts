@@ -226,9 +226,9 @@ export const evaluateExpression = (expression: string, context: FormulaContext):
     }
     
     // 算術式を評価
-    const result = Function('"use strict"; return (' + evaluatedExpr + ')')();
+    const result = Function('"use strict"; return (' + evaluatedExpr + ')')() as unknown;
     return typeof result === 'number' ? result : expression;
-  } catch (error) {
+  } catch {
     // エラーの場合は元の式を返す
     return expression;
   }
@@ -278,18 +278,18 @@ export const evaluateFormulaWithErrorCheck = (expression: string, context: Formu
     }
     
     // 算術式を評価
-    const result = Function('"use strict"; return (' + evaluatedExpr + ')')();
+    const result = Function('"use strict"; return (' + evaluatedExpr + ')')() as unknown;
     
     // 無限大やNaNのチェック
-    if (!isFinite(result)) {
+    if (!isFinite(result as number)) {
       return '#DIV/0!';
     }
-    if (isNaN(result)) {
+    if (isNaN(result as number)) {
       return '#VALUE!';
     }
     
     return typeof result === 'number' ? result : '#VALUE!';
-  } catch (error) {
+  } catch {
     // エラーの場合は#VALUE!エラーを返す
     return '#VALUE!';
   }

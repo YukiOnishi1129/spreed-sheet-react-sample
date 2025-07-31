@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
   ENCODEURL, HYPERLINK, ISURL, WEBSERVICE
 } from '../webLogic';
-import { FormulaError } from '../../shared/types';
 import type { FormulaContext } from '../../shared/types';
 
 // Helper function to create FormulaContext

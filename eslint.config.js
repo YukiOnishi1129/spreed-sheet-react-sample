@@ -8,7 +8,7 @@ import { globalIgnores } from 'eslint/config'
 export default tseslint.config([
   globalIgnores(['dist']),
   {
-    ignores: ['vite.config.ts', 'vitest.config.ts'],
+    ignores: ['vite.config.ts', 'vitest.config.ts', 'e2e/**', 'playwright.config.ts'],
   },
   {
     files: ['**/*.{ts,tsx}'],

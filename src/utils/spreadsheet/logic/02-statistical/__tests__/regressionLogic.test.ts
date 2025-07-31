@@ -96,7 +96,7 @@ describe('Regression Analysis Functions', () => {
       const intercept = INTERCEPT.calculate(interceptMatches, mockContext);
       
       // Verify: y = slope * x + intercept
-      expect(slope * 3 + intercept).toBe(7); // Point (3, 7)
+      expect(Number(slope) * 3 + Number(intercept)).toBe(7); // Point (3, 7)
     });
   });
 

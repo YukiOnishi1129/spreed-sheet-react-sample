@@ -421,7 +421,7 @@ export function inverseTDistribution(p: number, df: number): number {
   
   // 改良された初期推定値
   const z = inverseStandardNormal(p);
-  let x;
+  let x: number;
   
   if (df > 30) {
     // 大きい自由度の場合は正規分布に近似
@@ -842,7 +842,6 @@ export const T_DIST: CustomFormula = {
     if (isCumulative) {
       // 累積分布関数（不完全ベータ関数を使用）
       // t分布のCDF: P(T ≤ x) = I_{x/(√(x²+ν))}(ν/2, 1/2) for x ≥ 0
-      const sign = x < 0 ? -1 : 1;
       const absX = Math.abs(x);
       const z = degFreedom / (degFreedom + absX * absX);
       

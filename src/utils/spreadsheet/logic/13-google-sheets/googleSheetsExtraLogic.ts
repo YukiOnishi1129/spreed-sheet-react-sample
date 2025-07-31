@@ -220,7 +220,7 @@ export const GOOGLETRANSLATE: CustomFormula = {
 export const DETECTLANGUAGE: CustomFormula = {
   name: 'DETECTLANGUAGE',
   pattern: /DETECTLANGUAGE\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -397,7 +397,7 @@ export const TO_TEXT: CustomFormula = {
 export const IMAGE: CustomFormula = {
   name: 'IMAGE',
   pattern: /IMAGE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -406,7 +406,7 @@ export const IMAGE: CustomFormula = {
 export const MAP: CustomFormula = {
   name: 'MAP',
   pattern: /MAP\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -415,7 +415,7 @@ export const MAP: CustomFormula = {
 export const SPLIT: CustomFormula = {
   name: 'SPLIT',
   pattern: /SPLIT\(([^,]+),\s*([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -424,7 +424,7 @@ export const SPLIT: CustomFormula = {
 export const UNIQUE: CustomFormula = {
   name: 'UNIQUE',
   pattern: /UNIQUE\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -433,7 +433,7 @@ export const UNIQUE: CustomFormula = {
 export const JOIN: CustomFormula = {
   name: 'JOIN',
   pattern: /JOIN\(([^,]+),\s*(.+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -442,7 +442,7 @@ export const JOIN: CustomFormula = {
 export const FLATTEN: CustomFormula = {
   name: 'FLATTEN',
   pattern: /FLATTEN\((.+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };
@@ -451,7 +451,7 @@ export const FLATTEN: CustomFormula = {
 export const TRANSPOSE: CustomFormula = {
   name: 'TRANSPOSE',
   pattern: /TRANSPOSE\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+  calculate: (): FormulaResult => {
     return '#N/A - Google Sheets specific functions not supported';
   }
 };

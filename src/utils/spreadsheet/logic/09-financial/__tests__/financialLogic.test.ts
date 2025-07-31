@@ -242,7 +242,7 @@ describe('Financial Functions', () => {
       const matches = ['IRR(A1:E1)', 'A1:E1'] as RegExpMatchArray;
       const result = IRR.calculate(matches, badContext);
       // May return NUM error if it doesn't converge
-      expect(typeof result).toBe('number' || result === FormulaError.NUM);
+      expect(typeof result === 'number' || result === FormulaError.NUM).toBe(true);
     });
 
     it('should handle cell reference for guess', () => {

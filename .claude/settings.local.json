@@ -71,7 +71,8 @@
       "Bash(timeout 60s npm run test:e2e)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(TZ=UTC node:*)"
+      "Bash(TZ=UTC node:*)",
+      "Bash(tsc --noEmit)"
     ],
     "deny": []
   }

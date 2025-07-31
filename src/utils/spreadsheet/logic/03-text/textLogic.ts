@@ -88,7 +88,6 @@ const toProperCase = (str: string): string => {
   if (typeof Intl !== 'undefined' && Intl.Segmenter) {
     const wordSegmenter = new Intl.Segmenter('en', { granularity: 'word' });
     let result = '';
-    let isFirstLetterOfWord = true;
     
     for (const segment of wordSegmenter.segment(str)) {
       if (segment.isWordLike) {
@@ -105,10 +104,8 @@ const toProperCase = (str: string): string => {
           }
         }
         result += wordResult;
-        isFirstLetterOfWord = false;
       } else {
         result += segment.segment;
-        isFirstLetterOfWord = true;
       }
     }
     return result;
@@ -753,7 +750,7 @@ export const SEARCH: CustomFormula = {
     const searchText = withinText.substring(startNum - 1);
     const match = searchText.match(regex);
     
-    if (!match || match.index === undefined) {
+    if (match?.index === undefined) {
       return FormulaError.VALUE;
     }
     

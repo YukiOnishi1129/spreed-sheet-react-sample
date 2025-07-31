@@ -76,7 +76,7 @@ export function getGlobalDateConfig(): DateConfig {
 /**
  * タイムゾーン対応の日付作成
  */
-export function createDateInTimezone(year: number, month: number, day: number, config?: DateConfig): Date {
+export function createDateInTimezone(year: number, month: number, day: number): Date {
   // 基本的にはローカル時間で日付を作成する
   // タイムゾーンの指定があっても、基本的な日付作成には影響しない
   return new Date(year, month - 1, day);

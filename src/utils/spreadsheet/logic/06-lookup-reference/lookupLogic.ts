@@ -1007,37 +1007,36 @@ export const UNIQUE: CustomFormula = {
       
       // 単純な配列の場合
       const rangeParts = arrayRef.trim().split(':');
-      if (true) { // Always treat as single dimensional array for now
-        // 単一列の場合
-        const uniqueValues: unknown[] = [];
-        const seen = new Map<string, number>();
+      // Always treat as single dimensional array for now
+      // 単一列の場合
+      const uniqueValues: unknown[] = [];
+      const seen = new Map<string, number>();
+      
+      // 出現回数をカウント
+      for (const value of values) {
+        const key = String(value ?? '');
+        seen.set(key, (seen.get(key) ?? 0) + 1);
+      }
+      
+      // exactlyOnceフラグに基づいて結果を決定
+      for (const value of values) {
+        const key = String(value ?? '');
+        const count = seen.get(key) ?? 0;
         
-        // 出現回数をカウント
-        for (const value of values) {
-          const key = String(value ?? '');
-          seen.set(key, (seen.get(key) ?? 0) + 1);
-        }
-        
-        // exactlyOnceフラグに基づいて結果を決定
-        for (const value of values) {
-          const key = String(value ?? '');
-          const count = seen.get(key) ?? 0;
-          
-          if (exactlyOnce) {
-            // 一度だけ出現する要素
-            if (count === 1 && !uniqueValues.some(v => String(v ?? '') === key)) {
-              uniqueValues.push(value);
-            }
-          } else {
-            // 最初の出現を残す
-            if (!uniqueValues.some(v => String(v ?? '') === key)) {
-              uniqueValues.push(value);
-            }
+        if (exactlyOnce) {
+          // 一度だけ出現する要素
+          if (count === 1 && !uniqueValues.some(v => String(v ?? '') === key)) {
+            uniqueValues.push(value);
+          }
+        } else {
+          // 最初の出現を残す
+          if (!uniqueValues.some(v => String(v ?? '') === key)) {
+            uniqueValues.push(value);
           }
         }
-        
-        return uniqueValues as FormulaResult;
       }
+      
+      return uniqueValues as FormulaResult;
       
       // 2次元配列の場合（行での一意性判定）
       const [startCell, endCell] = rangeParts;
