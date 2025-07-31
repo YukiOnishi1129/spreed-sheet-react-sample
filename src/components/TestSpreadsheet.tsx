@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Spreadsheet, { type Matrix, type CellBase } from 'react-spreadsheet';
+import Spreadsheet, { type Matrix, type CellBase, type Point } from 'react-spreadsheet';
 import { allIndividualFunctionTests as individualFunctionTests } from '../data/individualFunctionTests';
 import type { IndividualFunctionTest } from '../types/spreadsheet';
 import { calculateSingleFormula as calculateFormula } from './utils/customFormulaCalculations';
@@ -11,6 +11,8 @@ function TestSpreadsheet() {
   const [spreadsheetData, setSpreadsheetData] = useState<Matrix<CellBase>>([]);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [testResults, setTestResults] = useState<{ [key: string]: { expected: unknown, actual: unknown, passed: boolean } }>({});
+  const [selectedCell, setSelectedCell] = useState<Point | null>(null);
+  const [selectedCellInfo, setSelectedCellInfo] = useState<{ value: string | number | boolean | null; formula?: string } | null>(null);
 
   // カテゴリ一覧を取得
   const categories = Array.from(new Set(individualFunctionTests.map(f => f.category))).sort();
@@ -171,6 +173,37 @@ function TestSpreadsheet() {
     }
   };
 
+  // スプレッドシートのデータが変更されたときの処理
+  const handleSpreadsheetChange = (newData: Matrix<CellBase>) => {
+    setSpreadsheetData(newData);
+    
+    // 再計算をトリガー
+    setTimeout(() => {
+      calculateFormulas(newData);
+    }, 100);
+  };
+
+  // セルが選択されたときの処理
+  const handleCellSelect = (point: Point) => {
+    setSelectedCell(point);
+  };
+
+  // 選択されたセルの情報を更新
+  useEffect(() => {
+    if (selectedCell && spreadsheetData[selectedCell.row]) {
+      const cell = spreadsheetData[selectedCell.row][selectedCell.column];
+      if (cell) {
+        const cellWithFormula = cell as CellBase & { formula?: string; 'data-formula'?: string };
+        setSelectedCellInfo({
+          value: cell.value as string | number | boolean | null,
+          formula: cellWithFormula.formula || cellWithFormula['data-formula']
+        });
+      } else {
+        setSelectedCellInfo({ value: null });
+      }
+    }
+  }, [selectedCell, spreadsheetData]);
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -280,6 +313,34 @@ function TestSpreadsheet() {
           </div>
         )}
 
+        {/* セル情報バー */}
+        {selectedFunction && selectedCellInfo && (
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium text-gray-600">セル:</span>
+                <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                  {selectedCell ? `${String.fromCharCode(65 + selectedCell.column)}${selectedCell.row + 1}` : '-'}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium text-gray-600">値:</span>
+                <span className="font-mono text-sm bg-blue-50 px-2 py-1 rounded">
+                  {selectedCellInfo.value ?? ''}
+                </span>
+              </div>
+              {selectedCellInfo.formula && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-gray-600">数式:</span>
+                  <span className="font-mono text-sm bg-green-50 px-2 py-1 rounded">
+                    {selectedCellInfo.formula}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* スプレッドシート */}
         {selectedFunction && (
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -295,7 +356,8 @@ function TestSpreadsheet() {
               <div className="border rounded-lg overflow-hidden">
                 <Spreadsheet
                   data={spreadsheetData}
-                  onChange={() => {}} // 読み取り専用
+                  onChange={handleSpreadsheetChange}
+                  onSelect={handleCellSelect}
                   darkMode={false}
                 />
               </div>
