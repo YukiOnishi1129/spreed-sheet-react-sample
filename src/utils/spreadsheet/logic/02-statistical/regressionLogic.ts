@@ -238,7 +238,7 @@ export const RSQ: CustomFormula = {
     try {
       // contextにcellsプロパティがある場合は古い形式
       if ('cells' in context) {
-        const mockContext = context as any;
+        const mockContext = context as unknown as { cells: Record<string, { value: unknown }> };
         // cellsプロパティを使用して値を取得
         const yValues: number[] = [];
         const xValues: number[] = [];

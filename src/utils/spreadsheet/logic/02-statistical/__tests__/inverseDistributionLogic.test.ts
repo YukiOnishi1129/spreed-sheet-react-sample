@@ -130,7 +130,9 @@ describe('Inverse Distribution Functions', () => {
         const matches2 = ['CHISQ.INV.RT(0.95, 10)', '0.95', '10'] as RegExpMatchArray;
         const result2 = CHISQ_INV_RT.calculate(matches2, mockContext);
         
-        expect(result1).toBeCloseTo(result2, 4);
+        expect(typeof result1).toBe('number');
+        expect(typeof result2).toBe('number');
+        expect(result1 as number).toBeCloseTo(result2 as number, 4);
       });
     });
   });
@@ -170,7 +172,9 @@ describe('Inverse Distribution Functions', () => {
         const matches2 = ['F.INV.RT(0.95, 5, 10)', '0.95', '5', '10'] as RegExpMatchArray;
         const result2 = F_INV_RT.calculate(matches2, mockContext);
         
-        expect(result1).toBeCloseTo(result2, 4);
+        expect(typeof result1).toBe('number');
+        expect(typeof result2).toBe('number');
+        expect(result1 as number).toBeCloseTo(result2 as number, 4);
       });
     });
   });

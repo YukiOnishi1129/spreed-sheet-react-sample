@@ -44,16 +44,11 @@ describe('Regression Analysis Functions', () => {
     });
 
     it('should return DIV0 error for zero variance in x', () => {
-      const mockContextSameX = {
-        cells: {
-          A1: { value: 5 },
-          A2: { value: 5 },
-          A3: { value: 5 },
-          B1: { value: 1 },
-          B2: { value: 2 },
-          B3: { value: 3 },
-        }
-      };
+      const mockContextSameX = createContext([
+        [5, 1],
+        [5, 2],
+        [5, 3]
+      ]);
       const matches = ['SLOPE(B1:B3, A1:A3)', 'B1:B3', 'A1:A3'] as RegExpMatchArray;
       expect(SLOPE.calculate(matches, mockContextSameX)).toBe(FormulaError.DIV0);
     });
@@ -127,16 +122,11 @@ describe('Regression Analysis Functions', () => {
     });
 
     it('should return DIV0 error for constant y values', () => {
-      const mockContextConstY = {
-        cells: {
-          A1: { value: 1 },
-          A2: { value: 2 },
-          A3: { value: 3 },
-          B1: { value: 5 },
-          B2: { value: 5 },
-          B3: { value: 5 },
-        }
-      };
+      const mockContextConstY = createContext([
+        [1, 5],
+        [2, 5],
+        [3, 5]
+      ]);
       const matches = ['RSQ(B1:B3, A1:A3)', 'B1:B3', 'A1:A3'] as RegExpMatchArray;
       expect(RSQ.calculate(matches, mockContextConstY)).toBe(FormulaError.DIV0);
     });
@@ -215,17 +205,18 @@ describe('Regression Analysis Functions', () => {
       const result = LINEST.calculate(matches, mockContext);
       
       expect(Array.isArray(result)).toBe(true);
-      expect(result).toHaveLength(5);  // LINEST returns 5 rows when stats=TRUE
-      expect(result[0]).toHaveLength(2);
-      expect(result[1]).toHaveLength(2);
+      const resultArray = result as number[][];
+      expect(resultArray).toHaveLength(5);  // LINEST returns 5 rows when stats=TRUE
+      expect(resultArray[0]).toHaveLength(2);
+      expect(resultArray[1]).toHaveLength(2);
       
       // First row: [slope, intercept]
-      expect(result[0][0]).toBe(2);     // slope
-      expect(result[0][1]).toBe(1);     // intercept
+      expect(resultArray[0][0]).toBe(2);     // slope
+      expect(resultArray[0][1]).toBe(1);     // intercept
       
       // Second row should contain standard errors (0 for perfect fit)
-      expect(result[1][0]).toBe(0);     // se of slope
-      expect(result[1][1]).toBe(0);     // se of intercept
+      expect(resultArray[1][0]).toBe(0);     // se of slope
+      expect(resultArray[1][1]).toBe(0);     // se of intercept
     });
 
     it('should return only coefficients when stats=FALSE', () => {
@@ -240,19 +231,21 @@ describe('Regression Analysis Functions', () => {
       const result = LINEST.calculate(matches, mockContext);
       
       expect(Array.isArray(result)).toBe(true);
-      expect(result).toHaveLength(2);
-      expect(result[0]).toBeCloseTo(2.27, 1); // slope will be different without intercept
-      expect(result[1]).toBe(0); // no intercept
+      const resultArray = result as number[];
+      expect(resultArray).toHaveLength(2);
+      expect(resultArray[0]).toBeCloseTo(2.27, 1); // slope will be different without intercept
+      expect(resultArray[1]).toBe(0); // no intercept
     });
 
     it('should handle imperfect data', () => {
       const matches = ['LINEST(C1:C5, A1:A5, TRUE, TRUE)', 'C1:C5', 'A1:A5', 'TRUE', 'TRUE'] as RegExpMatchArray;
       const result = LINEST.calculate(matches, mockContext);
       
-      expect(result[0][0]).toBeCloseTo(2, 1);     // slope ≈ 2
-      expect(result[0][1]).toBeCloseTo(1, 1);     // intercept ≈ 1
-      expect(result[1][0]).toBeGreaterThan(0);    // non-zero standard error
-      expect(result[1][1]).toBeGreaterThan(0);    // non-zero standard error
+      const resultArray = result as number[][];
+      expect(resultArray[0][0]).toBeCloseTo(2, 1);     // slope ≈ 2
+      expect(resultArray[0][1]).toBeCloseTo(1, 1);     // intercept ≈ 1
+      expect(resultArray[1][0]).toBeGreaterThan(0);    // non-zero standard error
+      expect(resultArray[1][1]).toBeGreaterThan(0);    // non-zero standard error
     });
 
     it('should return NA error for different array lengths', () => {

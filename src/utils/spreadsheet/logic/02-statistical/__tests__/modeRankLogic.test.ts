@@ -91,18 +91,16 @@ describe('Mode and Rank Functions', () => {
       });
 
       it('should handle complex multi-modal data', () => {
-        const mockContextMultiModal = {
-          cells: {
-            A1: { value: 1 },
-            A2: { value: 1 },
-            A3: { value: 2 },
-            A4: { value: 2 },
-            A5: { value: 3 },
-            A6: { value: 3 },
-            A7: { value: 4 },
-            A8: { value: 4 },
-          }
-        };
+        const mockContextMultiModal = createContext([
+          [1],
+          [1],
+          [2],
+          [2],
+          [3],
+          [3],
+          [4],
+          [4]
+        ]);
         const matches = ['MODE.MULT(A1:A8)', 'A1:A8'] as RegExpMatchArray;
         const result = MODE_MULT.calculate(matches, mockContextMultiModal);
         expect(result).toEqual([1, 2, 3, 4]); // all appear twice
