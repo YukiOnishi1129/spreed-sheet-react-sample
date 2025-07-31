@@ -26,7 +26,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '開発', 120],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DAVERAGE(A1:C4,C1,A6:A7)']
     ],
@@ -42,7 +41,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '開発', 120],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DCOUNT(A1:C4,C1,A6:A7)']
     ],
@@ -58,7 +56,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', ''],
       ['鈴木', '開発', 120],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DCOUNTA(A1:C4,A1,A6:A7)']
     ],
@@ -74,7 +71,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '開発', 120],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DMAX(A1:C4,C1,A6:A7)']
     ],
@@ -90,7 +86,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '開発', 120],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DMIN(A1:C4,C1,A6:A7)']
     ],
@@ -106,7 +101,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['B', '文具', 3],
       ['C', '家電', 4],
       ['', '', ''],
-      ['条件', '', ''],
       ['カテゴリ', '', ''],
       ['文具', '', '=DPRODUCT(A1:C4,C1,A6:A7)']
     ],
@@ -122,10 +116,10 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '営業', 200],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DSTDEV(A1:C4,C1,A6:A7)']
-    ]
+    ],
+    expectedValues: { 'C7': 50 }
   },
   {
     name: 'DSTDEVP',
@@ -137,10 +131,10 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '営業', 200],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DSTDEVP(A1:C4,C1,A6:A7)']
-    ]
+    ],
+    expectedValues: { 'C7': 40.82 }
   },
   {
     name: 'DVAR',
@@ -152,10 +146,10 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '営業', 200],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DVAR(A1:C4,C1,A6:A7)']
-    ]
+    ],
+    expectedValues: { 'C7': 2500 }
   },
   {
     name: 'DVARP',
@@ -167,10 +161,10 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '営業', 200],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DVARP(A1:C4,C1,A6:A7)']
-    ]
+    ],
+    expectedValues: { 'C7': 1666.67 }
   },
   {
     name: 'DGET',
@@ -182,7 +176,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       [102, '佐藤', '技術'],
       [103, '鈴木', '人事'],
       ['', '', ''],
-      ['条件', '', ''],
       ['ID', '', ''],
       [102, '', '=DGET(A1:C4,B1,A6:A7)']
     ],

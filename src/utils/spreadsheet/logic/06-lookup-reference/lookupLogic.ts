@@ -154,92 +154,129 @@ export const HLOOKUP: CustomFormula = {
     const [, lookupValue, tableArray, rowIndex, rangeLookup] = matches;
     
     try {
-      // 検索値を取得
-      const searchValue = getCellValue(lookupValue.trim(), context) ?? lookupValue.trim().replace(/^["']|["']$/g, '');
+      // Parse search value
+      let searchValue = getCellValue(lookupValue.trim(), context);
+      if (searchValue === lookupValue.trim()) {
+        searchValue = lookupValue.trim().replace(/^["']|["']$/g, '');
+      }
       
-      // 行インデックスを数値に変換
+      // Parse row index
       const rowIndexNum = parseInt(rowIndex);
       if (rowIndexNum < 1) {
         return FormulaError.VALUE;
       }
       
-      // テーブル配列から値を取得
-      const tableValues = getCellRangeValues(tableArray.trim(), context);
-      
-      // 範囲検索の設定（デフォルトはTRUE）
-      const exactMatch = rangeLookup && (rangeLookup.toUpperCase() === 'FALSE' || rangeLookup === '0');
-      
-      // テーブルが配列になっているかチェック
-      if (!Array.isArray(tableValues) || tableValues.length === 0) {
+      // Parse range coordinates
+      const rangeCoords = parseCellRange(tableArray.trim());
+      if (!rangeCoords) {
         return FormulaError.REF;
       }
       
-      // 行数と列数を計算（範囲から推定）
-      const rangeParts = tableArray.trim().split(':');
-      if (rangeParts.length !== 2) {
-        return FormulaError.REF;
-      }
-      
-      // セル範囲から行数と列数を計算
-      const [startCell, endCell] = rangeParts;
-      const startMatch = startCell.match(/([A-Z]+)(\d+)/);
-      const endMatch = endCell.match(/([A-Z]+)(\d+)/);
-      
-      if (!startMatch || !endMatch) {
-        return FormulaError.REF;
-      }
-      
-      const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const startRow = parseInt(startMatch[2]);
-      const endRow = parseInt(endMatch[2]);
-      
-      const cols = endCol - startCol + 1;
-      const rows = endRow - startRow + 1;
+      const { start, end } = rangeCoords;
+      const rows = end.row - start.row + 1;
+      const cols = end.col - start.col + 1;
       
       if (rowIndexNum > rows) {
         return FormulaError.REF;
       }
       
-      // 2次元配列に変換
-      const table: unknown[][] = [];
-      for (let i = 0; i < rows; i++) {
-        const row: unknown[] = [];
-        for (let j = 0; j < cols; j++) {
-          const index = i * cols + j;
-          row.push(index < tableValues.length ? tableValues[index] : null);
+      // Determine search mode
+      const exactMatch = rangeLookup && (rangeLookup.toUpperCase() === 'FALSE' || rangeLookup === '0');
+      
+      // Search in the first row
+      for (let col = 0; col < cols; col++) {
+        const cellRow = start.row;
+        const cellCol = start.col + col;
+        const cellValue = context.data[cellRow]?.[cellCol];
+        let compareValue: unknown;
+        
+        // Handle both direct values and object values
+        if (typeof cellValue === 'string' || typeof cellValue === 'number' || cellValue === null || cellValue === undefined) {
+          compareValue = cellValue;
+        } else if (cellValue && typeof cellValue === 'object') {
+          compareValue = cellValue.value ?? cellValue.v ?? cellValue._ ?? cellValue;
+        } else {
+          compareValue = cellValue;
         }
-        table.push(row);
-      }
-      
-      // 最初の行で検索
-      const firstRow = table[0];
-      
-      for (let j = 0; j < firstRow.length; j++) {
-        const cellValue = firstRow[j];
+        
+        // Skip empty cells
+        if (compareValue === '' || compareValue === null || compareValue === undefined) {
+          continue;
+        }
         
         if (exactMatch) {
-          // 完全一致検索
-          if (String(cellValue) === String(searchValue)) {
-            const result = table[rowIndexNum - 1][j];
-            return result === undefined ? null : result as FormulaResult;
+          // Exact match search
+          if (String(compareValue) === String(searchValue)) {
+            // Get result from the specified row
+            const resultRow = start.row + rowIndexNum - 1;
+            const resultCol = start.col + col;
+            const resultCell = context.data[resultRow]?.[resultCol];
+            
+            // Handle both direct values and object values
+            if (typeof resultCell === 'string' || typeof resultCell === 'number' || resultCell === null || resultCell === undefined) {
+              return resultCell as FormulaResult;
+            } else if (resultCell && typeof resultCell === 'object') {
+              return (resultCell.value ?? resultCell.v ?? resultCell._ ?? resultCell) as FormulaResult;
+            } else {
+              return resultCell as FormulaResult;
+            }
           }
-        } else {
-          // 範囲検索（近似一致）
-          const numericSearch = Number(searchValue);
-          const numericCell = Number(cellValue);
+        }
+      }
+      
+      // Handle approximate match (range lookup = TRUE, default)
+      if (!exactMatch) {
+        let bestMatch: { col: number; value: unknown } | null = null;
+        
+        // Find the largest value <= search value (assumes sorted data)
+        for (let col = 0; col < cols; col++) {
+          const cellRow = start.row;
+          const cellCol = start.col + col;
+          const cellValue = context.data[cellRow]?.[cellCol];
+          let compareValue: unknown;
           
-          if (!isNaN(numericSearch) && !isNaN(numericCell)) {
-            if (numericCell <= numericSearch) {
-              // 次の列をチェック
-              if (j === firstRow.length - 1 || Number(firstRow[j + 1]) > numericSearch) {
-                const result = table[rowIndexNum - 1][j];
-                return result === undefined ? null : result as FormulaResult;
+          if (typeof cellValue === 'string' || typeof cellValue === 'number' || cellValue === null || cellValue === undefined) {
+            compareValue = cellValue;
+          } else if (cellValue && typeof cellValue === 'object') {
+            compareValue = cellValue.value ?? cellValue.v ?? cellValue._ ?? cellValue;
+          } else {
+            compareValue = cellValue;
+          }
+          
+          // Skip empty cells
+          if (compareValue === '' || compareValue === null || compareValue === undefined) {
+            continue;
+          }
+          
+          // Attempt numeric comparison first
+          const numSearchValue = typeof searchValue === 'number' ? searchValue : parseFloat(String(searchValue));
+          const numCompareValue = typeof compareValue === 'number' ? compareValue : parseFloat(String(compareValue));
+          
+          if (!isNaN(numSearchValue) && !isNaN(numCompareValue)) {
+            if (numCompareValue <= numSearchValue) {
+              if (!bestMatch || numCompareValue > (bestMatch.value as number)) {
+                bestMatch = { col, value: numCompareValue };
               }
             }
-          } else if (String(cellValue) === String(searchValue)) {
-            const result = table[rowIndexNum - 1][j];
-            return result === undefined ? null : result as FormulaResult;
+          } else if (String(compareValue) <= String(searchValue)) {
+            // String comparison
+            if (!bestMatch || String(compareValue) > String(bestMatch.value)) {
+              bestMatch = { col, value: compareValue };
+            }
+          }
+        }
+        
+        if (bestMatch) {
+          const resultRow = start.row + rowIndexNum - 1;
+          const resultCol = start.col + bestMatch.col;
+          const resultCell = context.data[resultRow]?.[resultCol];
+          
+          if (typeof resultCell === 'string' || typeof resultCell === 'number' || resultCell === null || resultCell === undefined) {
+            return resultCell as FormulaResult;
+          } else if (resultCell && typeof resultCell === 'object') {
+            return (resultCell.value ?? resultCell.v ?? resultCell._ ?? resultCell) as FormulaResult;
+          } else {
+            return resultCell as FormulaResult;
           }
         }
       }
@@ -821,60 +858,109 @@ export const FILTER: CustomFormula = {
     const [, arrayRef, includeRef, ifEmptyRef] = matches;
     
     try {
-      // 範囲を解析して行列のサイズを判定
-      const rangeParts = arrayRef.trim().split(':');
-      let isMultiColumn = false;
-      let cols = 1;
+      // Parse array range
+      const arrayRange = parseCellRange(arrayRef.trim());
+      if (!arrayRange) {
+        return FormulaError.REF;
+      }
       
-      if (rangeParts.length === 2) {
-        const startMatch = rangeParts[0].match(/([A-Z]+)(\d+)/);
-        const endMatch = rangeParts[1].match(/([A-Z]+)(\d+)/);
-        
-        if (startMatch && endMatch) {
-          const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-          const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-          cols = endCol - startCol + 1;
-          isMultiColumn = cols > 1;
+      // Get array data
+      const { start: arrayStart, end: arrayEnd } = arrayRange;
+      const rows = arrayEnd.row - arrayStart.row + 1;
+      const cols = arrayEnd.col - arrayStart.col + 1;
+      
+      // Extract array values
+      const arrayData: unknown[][] = [];
+      for (let r = 0; r < rows; r++) {
+        const row: unknown[] = [];
+        for (let c = 0; c < cols; c++) {
+          const cellValue = context.data[arrayStart.row + r]?.[arrayStart.col + c];
+          row.push(cellValue?.value ?? cellValue?.v ?? cellValue ?? null);
         }
+        arrayData.push(row);
       }
       
-      // 配列データを取得
-      const arrayValues = getCellRangeValues(arrayRef.trim(), context);
-      const includeValues = getCellRangeValues(includeRef.trim(), context);
+      // Handle condition evaluation
+      let conditionResults: boolean[] = [];
       
-      // フィルタ条件の数を計算
-      const rows = arrayValues.length / cols;
-      if (includeValues.length !== rows) {
-        return FormulaError.VALUE;
+      // Check if includeRef contains a comparison operator
+      const comparisonMatch = includeRef.trim().match(/^([^<>=!]+)([<>=!]+)(.+)$/);
+      if (comparisonMatch) {
+        const [, leftSide, operator, rightSide] = comparisonMatch;
+        
+        // Parse left side range
+        const conditionRange = parseCellRange(leftSide.trim());
+        if (!conditionRange) {
+          return FormulaError.REF;
+        }
+        
+        // Get right side value
+        let rightValue: unknown;
+        if (rightSide.trim().match(/^-?\d+(\.\d+)?$/)) {
+          rightValue = parseFloat(rightSide.trim());
+        } else {
+          rightValue = getCellValue(rightSide.trim(), context);
+        }
+        
+        // Extract condition values and evaluate
+        const { start: condStart, end: condEnd } = conditionRange;
+        const condRows = condEnd.row - condStart.row + 1;
+        
+        if (condRows !== rows) {
+          return FormulaError.VALUE;
+        }
+        
+        for (let r = 0; r < condRows; r++) {
+          const condValue = context.data[condStart.row + r]?.[condStart.col];
+          const leftValue = condValue?.value ?? condValue?.v ?? condValue ?? null;
+          
+          let result = false;
+          if (leftValue !== null && rightValue !== null) {
+            const left = typeof leftValue === 'number' ? leftValue : parseFloat(String(leftValue));
+            const right = typeof rightValue === 'number' ? rightValue : parseFloat(String(rightValue));
+            
+            if (!isNaN(left) && !isNaN(right)) {
+              switch (operator) {
+                case '>': result = left > right; break;
+                case '<': result = left < right; break;
+                case '>=': result = left >= right; break;
+                case '<=': result = left <= right; break;
+                case '=': case '==': result = left === right; break;
+                case '<>': case '!=': result = left !== right; break;
+              }
+            }
+          }
+          conditionResults.push(result);
+        }
+      } else {
+        // Direct boolean array
+        const includeValues = getCellRangeValues(includeRef.trim(), context);
+        if (includeValues.length !== rows) {
+          return FormulaError.VALUE;
+        }
+        
+        conditionResults = includeValues.map(val => {
+          return val === true || val === 1 || 
+                 (typeof val === 'string' && val.toUpperCase() === 'TRUE') ||
+                 (typeof val === 'number' && val !== 0);
+        });
       }
       
-      // フィルタ条件に基づいて行を抽出
+      // Filter rows based on conditions
       const filteredRows: unknown[][] = [];
       for (let i = 0; i < rows; i++) {
-        const includeValue = includeValues[i];
-        // TRUE、1、または0以外の数値をTRUEとして扱う
-        if (includeValue === true || includeValue === 1 || 
-            (typeof includeValue === 'string' && includeValue.toUpperCase() === 'TRUE') ||
-            (typeof includeValue === 'number' && includeValue !== 0)) {
-          // 行全体を抽出
-          const row: unknown[] = [];
-          for (let j = 0; j < cols; j++) {
-            const index = i * cols + j;
-            row.push(arrayValues[index]);
-          }
-          filteredRows.push(row);
+        if (conditionResults[i]) {
+          filteredRows.push(arrayData[i]);
         }
       }
       
-      // 結果が空の場合
+      // Handle empty result
       if (filteredRows.length === 0) {
         if (ifEmptyRef) {
           let emptyValue = getCellValue(ifEmptyRef.trim(), context);
-          // If it's a cell reference that doesn't exist, treat as string literal
           if (emptyValue === ifEmptyRef.trim()) {
             emptyValue = ifEmptyRef.trim();
           }
-          // Remove quotes from string literals
           if (typeof emptyValue === 'string' && 
               ((emptyValue.startsWith('"') && emptyValue.endsWith('"')) ||
                (emptyValue.startsWith("'") && emptyValue.endsWith("'")))) {
@@ -882,17 +968,15 @@ export const FILTER: CustomFormula = {
           }
           return emptyValue as FormulaResult;
         }
-        return FormulaError.CALC; // #CALC!エラー
+        return FormulaError.CALC;
       }
       
-      // 結果を返す
-      if (isMultiColumn) {
-        // 複数列の場合は2次元配列として返す
+      // Return results
+      if (cols > 1) {
         return filteredRows as FormulaResult;
       } else {
-        // 単一列の場合は1次元配列として返す
-        const flatResult = filteredRows.map(row => row[0]);
-        return flatResult.length === 1 ? flatResult[0] as FormulaResult : flatResult as FormulaResult;
+        // Single column - return as spill array
+        return filteredRows.map(row => row[0]) as FormulaResult;
       }
     } catch {
       return FormulaError.VALUE;

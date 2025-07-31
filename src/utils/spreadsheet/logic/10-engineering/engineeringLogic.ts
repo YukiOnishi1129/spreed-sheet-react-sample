@@ -248,7 +248,7 @@ export const CONVERT: CustomFormula = {
   name: 'CONVERT',
   pattern: /\bCONVERT\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, valueRef, fromUnit, toUnit] = matches;
+    const [, valueRef, fromUnitRef, toUnitRef] = matches;
     
     try {
       const value = parseFloat(getCellValue(valueRef.trim(), context)?.toString() ?? valueRef.trim());
@@ -257,16 +257,29 @@ export const CONVERT: CustomFormula = {
         return FormulaError.VALUE;
       }
       
-      // Clean unit strings by removing quotes
-      const fromUnitClean = fromUnit.replace(/['"]/g, '').trim();
-      const toUnitClean = toUnit.replace(/['"]/g, '').trim();
+      // Get unit strings from cells or literal values
+      let fromUnitStr = getCellValue(fromUnitRef.trim(), context)?.toString();
+      if (!fromUnitStr || fromUnitStr === fromUnitRef.trim()) {
+        // If cell value not found, treat as literal string
+        fromUnitStr = fromUnitRef.trim().replace(/^["']|["']$/g, '');
+      }
       
-      // 同じ単位の場合
+      let toUnitStr = getCellValue(toUnitRef.trim(), context)?.toString();
+      if (!toUnitStr || toUnitStr === toUnitRef.trim()) {
+        // If cell value not found, treat as literal string  
+        toUnitStr = toUnitRef.trim().replace(/^["']|["']$/g, '');
+      }
+      
+      // Clean unit strings
+      const fromUnitClean = fromUnitStr.trim();
+      const toUnitClean = toUnitStr.trim();
+      
+      // Same unit case
       if (fromUnitClean === toUnitClean) {
         return value;
       }
       
-      // 単位のカテゴリーを見つける
+      // Find unit categories
       const fromCategory = findUnitCategory(fromUnitClean);
       const toCategory = findUnitCategory(toUnitClean);
       
@@ -278,12 +291,12 @@ export const CONVERT: CustomFormula = {
         return FormulaError.NA;
       }
       
-      // 温度の特殊処理
+      // Special temperature handling
       if (fromCategory === 'temperature') {
         return convertTemperature(value, fromUnitClean, toUnitClean);
       }
       
-      // 通常の単位変換（Excel完全互換：大文字小文字区別）
+      // Normal unit conversion
       const fromFactor = unitConversions[fromCategory][fromUnitClean];
       const toFactor = unitConversions[toCategory][toUnitClean];
       
@@ -291,8 +304,11 @@ export const CONVERT: CustomFormula = {
         return FormulaError.NA;
       }
       
-      // 基準単位に変換してから目的の単位に変換
-      return (value / fromFactor) * toFactor;
+      // Convert to base unit then to target unit
+      const result = (value / fromFactor) * toFactor;
+      
+      // Round to avoid floating point precision issues
+      return Math.round(result * 1000000) / 1000000;
     } catch {
       return FormulaError.VALUE;
     }

@@ -6,28 +6,51 @@ import { getCellValue, getCellRangeValues } from '../shared/utils';
 
 // 2次元配列として行列を解析するヘルパー関数
 function parseMatrix(rangeRef: string, context: FormulaContext): number[][] {
-  const values = getCellRangeValues(rangeRef, context);
-  const matrix: number[][] = [];
+  // Parse the range to get actual dimensions
+  const rangeParts = rangeRef.trim().split(':');
+  if (rangeParts.length !== 2) {
+    throw new Error('Invalid range format');
+  }
   
-  // 行数と列数を推定（簡単な実装）
-  // 実際の実装では、rangeRefから正確な行列サイズを取得する必要がある
-  const totalValues = values.length;
-  const rows = Math.ceil(Math.sqrt(totalValues));
-  const cols = Math.ceil(totalValues / rows);
+  const [startCell, endCell] = rangeParts;
+  const startMatch = startCell.match(/([A-Z]+)(\d+)/);
+  const endMatch = endCell.match(/([A-Z]+)(\d+)/);
+  
+  if (!startMatch || !endMatch) {
+    throw new Error('Invalid cell references');
+  }
+  
+  const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+  const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
+  const startRow = parseInt(startMatch[2]) - 1; // Convert to 0-based
+  const endRow = parseInt(endMatch[2]) - 1;
+  
+  const rows = endRow - startRow + 1;
+  const cols = endCol - startCol + 1;
+  
+  const matrix: number[][] = [];
   
   for (let i = 0; i < rows; i++) {
     const row: number[] = [];
     for (let j = 0; j < cols; j++) {
-      const index = i * cols + j;
-      if (index < values.length) {
-        const num = Number(values[index]);
-        if (isNaN(num)) {
-          throw new Error('Matrix contains non-numeric values');
-        }
-        row.push(num);
+      const cellRow = startRow + i;
+      const cellCol = startCol + j;
+      const cellValue = context.data[cellRow]?.[cellCol];
+      
+      let value: unknown;
+      if (typeof cellValue === 'string' || typeof cellValue === 'number' || cellValue === null || cellValue === undefined) {
+        value = cellValue;
+      } else if (cellValue && typeof cellValue === 'object') {
+        value = cellValue.value ?? cellValue.v ?? cellValue._ ?? cellValue;
       } else {
-        row.push(0);
+        value = cellValue;
       }
+      
+      const num = Number(value);
+      if (isNaN(num)) {
+        throw new Error('Matrix contains non-numeric values');
+      }
+      row.push(num);
     }
     matrix.push(row);
   }
