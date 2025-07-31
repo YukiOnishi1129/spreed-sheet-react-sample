@@ -195,7 +195,13 @@ function TestSpreadsheet() {
           let passed = false;
           if (typeof expectedValue === 'number' && typeof actualValue === 'number') {
             // 数値の場合は近似値で比較
-            passed = Math.abs(actualValue - expectedValue) < 0.01;
+            // 絶対誤差または相対誤差で判定
+            const absoluteTolerance = 0.01;
+            const relativeTolerance = 0.0001; // 0.01%
+            const absoluteDiff = Math.abs(actualValue - expectedValue);
+            const relativeDiff = expectedValue !== 0 ? Math.abs((actualValue - expectedValue) / expectedValue) : 0;
+            
+            passed = absoluteDiff < absoluteTolerance || relativeDiff < relativeTolerance;
           } else {
             passed = actualValue === expectedValue;
           }

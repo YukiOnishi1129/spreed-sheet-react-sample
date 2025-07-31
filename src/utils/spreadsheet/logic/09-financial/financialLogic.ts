@@ -4,6 +4,41 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 import { FormulaError } from '../shared/types';
 import { getCellValue, getCellRangeValues } from '../shared/utils';
 
+// 値または式を評価する
+function evaluateValueOrExpression(value: string, context: FormulaContext): number {
+  // 簡単な四則演算を処理（例: A2/12, A2*12）
+  const operatorMatch = value.match(/^([^+\-*/]+)([+\-*/])(.+)$/);
+  if (operatorMatch) {
+    const [, left, operator, right] = operatorMatch;
+    const leftValue = evaluateValueOrExpression(left.trim(), context);
+    const rightValue = evaluateValueOrExpression(right.trim(), context);
+    
+    switch (operator) {
+      case '+': return leftValue + rightValue;
+      case '-': return leftValue - rightValue;
+      case '*': return leftValue * rightValue;
+      case '/': return rightValue !== 0 ? leftValue / rightValue : NaN;
+    }
+  }
+  
+  // 負の符号で始まる場合の処理（例: -A2）
+  if (value.startsWith('-')) {
+    const baseValue = value.substring(1);
+    const result = evaluateValueOrExpression(baseValue, context);
+    return -result;
+  }
+  
+  // セル参照かどうか確認
+  const cellValue = getCellValue(value, context);
+  if (cellValue !== value) {
+    // セル参照だった場合
+    return parseFloat(cellValue?.toString() ?? '0');
+  }
+  
+  // 数値として解析
+  return parseFloat(value);
+}
+
 // PMT関数の実装（定期支払額）
 export const PMT: CustomFormula = {
   name: 'PMT',
@@ -13,17 +48,17 @@ export const PMT: CustomFormula = {
     
     try {
       // 金利（期間金利）
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       
       // 期間数
-      const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
+      const nper = evaluateValueOrExpression(nperRef.trim(), context);
       // 現在価値（借入額）
-      const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
+      const pv = evaluateValueOrExpression(pvRef.trim(), context);
       
       // 将来価値（デフォルト0）
-      const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
+      const fv = fvRef ? evaluateValueOrExpression(fvRef.trim(), context) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
-      const type = typeRef ? parseFloat(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
+      const type = typeRef ? evaluateValueOrExpression(typeRef.trim(), context) : 0;
       
       if (isNaN(rate) || isNaN(nper) || isNaN(pv)) {
         return FormulaError.VALUE;
@@ -72,15 +107,15 @@ export const PV: CustomFormula = {
     
     try {
       // 金利（期間金利）
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       // 期間数
-      const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
+      const nper = evaluateValueOrExpression(nperRef.trim(), context);
       // 定期支払額
-      const pmt = parseFloat(getCellValue(pmtRef.trim(), context)?.toString() ?? pmtRef.trim());
+      const pmt = evaluateValueOrExpression(pmtRef.trim(), context);
       // 将来価値（デフォルト0）
-      const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
+      const fv = fvRef ? evaluateValueOrExpression(fvRef.trim(), context) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
-      const type = typeRef ? parseFloat(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
+      const type = typeRef ? evaluateValueOrExpression(typeRef.trim(), context) : 0;
       
       if (isNaN(rate) || isNaN(nper) || isNaN(pmt)) {
         return FormulaError.VALUE;
@@ -113,15 +148,15 @@ export const FV: CustomFormula = {
     
     try {
       // 金利（期間金利）
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       // 期間数
-      const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
+      const nper = evaluateValueOrExpression(nperRef.trim(), context);
       // 定期支払額
-      const pmt = parseFloat(getCellValue(pmtRef.trim(), context)?.toString() ?? pmtRef.trim());
+      const pmt = evaluateValueOrExpression(pmtRef.trim(), context);
       // 現在価値（デフォルト0）
-      const pv = pvRef ? parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim()) : 0;
+      const pv = pvRef ? evaluateValueOrExpression(pvRef.trim(), context) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
-      const type = typeRef ? parseFloat(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
+      const type = typeRef ? evaluateValueOrExpression(typeRef.trim(), context) : 0;
       
       if (isNaN(rate) || isNaN(nper) || isNaN(pmt)) {
         return FormulaError.VALUE;
@@ -154,7 +189,7 @@ export const NPV: CustomFormula = {
     
     try {
       // 割引率
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       
       if (isNaN(rate)) {
         return FormulaError.VALUE;
@@ -167,7 +202,7 @@ export const NPV: CustomFormula = {
         // セル範囲の場合
         const rangeValues = getCellRangeValues(valuesRef.trim(), context);
         rangeValues.forEach(value => {
-          const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+          const num = typeof value === 'string' || typeof value === 'number' ? evaluateValueOrExpression(value.toString(), context) : NaN;
           if (!isNaN(num)) {
             values.push(num);
           }
@@ -195,13 +230,12 @@ export const NPV: CustomFormula = {
         
         for (const arg of args) {
           if (arg.match(/^[A-Z]+\d+$/)) {
-            const cellValue = getCellValue(arg, context);
-            const num = typeof cellValue === 'string' ? parseFloat(cellValue) : Number(cellValue);
+            const num = evaluateValueOrExpression(arg, context);
             if (!isNaN(num)) {
               values.push(num);
             }
           } else {
-            const num = parseFloat(arg);
+            const num = evaluateValueOrExpression(arg, context);
             if (!isNaN(num)) {
               values.push(num);
             }
@@ -260,7 +294,7 @@ export const IRR: CustomFormula = {
       // セル範囲の場合
       const rangeValues = getCellRangeValues(valuesRef, context);
       rangeValues.forEach(value => {
-        const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+        const num = typeof value === 'string' || typeof value === 'number' ? evaluateValueOrExpression(value.toString(), context) : NaN;
         if (!isNaN(num)) {
           values.push(num);
         }
@@ -270,13 +304,12 @@ export const IRR: CustomFormula = {
       const args = valuesRef.split(',').map(arg => arg.trim());
       for (const arg of args) {
         if (arg.match(/^[A-Z]+\d+$/)) {
-          const cellValue = getCellValue(arg, context);
-          const num = typeof cellValue === 'string' ? parseFloat(cellValue) : Number(cellValue);
+          const num = evaluateValueOrExpression(arg, context);
           if (!isNaN(num)) {
             values.push(num);
           }
         } else {
-          const num = parseFloat(arg);
+          const num = evaluateValueOrExpression(arg, context);
           if (!isNaN(num)) {
             values.push(num);
           }
@@ -359,17 +392,17 @@ export const PPMT: CustomFormula = {
     
     try {
       // 金利（期間金利）
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       // 対象期間
-      const per = parseFloat(getCellValue(perRef.trim(), context)?.toString() ?? perRef.trim());
+      const per = evaluateValueOrExpression(perRef.trim(), context);
       // 総期間数
-      const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
+      const nper = evaluateValueOrExpression(nperRef.trim(), context);
       // 現在価値（借入額）
-      const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
+      const pv = evaluateValueOrExpression(pvRef.trim(), context);
       // 将来価値（デフォルト0）
-      const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
+      const fv = fvRef ? evaluateValueOrExpression(fvRef.trim(), context) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
-      const type = typeRef ? parseFloat(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
+      const type = typeRef ? evaluateValueOrExpression(typeRef.trim(), context) : 0;
       
       if (isNaN(rate) || isNaN(per) || isNaN(nper) || isNaN(pv)) {
         return FormulaError.VALUE;
@@ -438,17 +471,17 @@ export const IPMT: CustomFormula = {
     
     try {
       // 金利（期間金利）
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       // 対象期間
-      const per = parseFloat(getCellValue(perRef.trim(), context)?.toString() ?? perRef.trim());
+      const per = evaluateValueOrExpression(perRef.trim(), context);
       // 総期間数
-      const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
+      const nper = evaluateValueOrExpression(nperRef.trim(), context);
       // 現在価値（借入額）
-      const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
+      const pv = evaluateValueOrExpression(pvRef.trim(), context);
       // 将来価値（デフォルト0）
-      const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
+      const fv = fvRef ? evaluateValueOrExpression(fvRef.trim(), context) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
-      const type = typeRef ? parseFloat(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
+      const type = typeRef ? evaluateValueOrExpression(typeRef.trim(), context) : 0;
       
       if (isNaN(rate) || isNaN(per) || isNaN(nper) || isNaN(pv)) {
         return FormulaError.VALUE;
@@ -515,17 +548,17 @@ export const RATE: CustomFormula = {
     
     try {
       // 期間数
-      const nper = parseFloat(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
+      const nper = evaluateValueOrExpression(nperRef.trim(), context);
       // 定期支払額
-      const pmt = parseFloat(getCellValue(pmtRef.trim(), context)?.toString() ?? pmtRef.trim());
+      const pmt = evaluateValueOrExpression(pmtRef.trim(), context);
       // 現在価値
-      const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
+      const pv = evaluateValueOrExpression(pvRef.trim(), context);
       // 将来価値（デフォルト0）
-      const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
+      const fv = fvRef ? evaluateValueOrExpression(fvRef.trim(), context) : 0;
       // 支払タイプ（0=期末、1=期初、デフォルト0）
-      const type = typeRef ? parseFloat(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
+      const type = typeRef ? evaluateValueOrExpression(typeRef.trim(), context) : 0;
       // 推定値（デフォルト0.1）
-      const guess = guessRef ? parseFloat(getCellValue(guessRef.trim(), context)?.toString() ?? guessRef.trim()) : 0.1;
+      const guess = guessRef ? evaluateValueOrExpression(guessRef.trim(), context) : 0.1;
       
       if (isNaN(nper) || isNaN(pmt) || isNaN(pv) || nper <= 0) {
         return FormulaError.VALUE;

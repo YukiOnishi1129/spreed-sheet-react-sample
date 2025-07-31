@@ -4,6 +4,14 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 import { FormulaError } from '../shared/types';
 import { getCellValue } from '../shared/utils';
 
+// デバッグ用のログ関数
+const DEBUG = false;
+function debugLog(...args: unknown[]): void {
+  if (DEBUG) {
+    console.log(...args);
+  }
+}
+
 // Convert column letter to index (A=0, B=1, ... Z=25, AA=26, etc.)
 function columnToIndex(column: string): number {
   let index = 0;
@@ -28,6 +36,15 @@ function indexToColumn(index: number): string {
 // データベース範囲を2次元配列として取得するヘルパー関数
 function getDatabaseArray(databaseRef: string, context: FormulaContext): unknown[][] {
   if (!databaseRef.includes(':')) {
+    // 単一セルの場合
+    const match = databaseRef.match(/([A-Z]+)(\d+)/);
+    if (match) {
+      const [, col, rowStr] = match;
+      const row = parseInt(rowStr) - 1;
+      const colIndex = columnToIndex(col);
+      const value = context.data[row]?.[colIndex] ?? '';
+      return [[value]];
+    }
     return [[getCellValue(databaseRef, context)]];
   }
 
@@ -42,8 +59,8 @@ function getDatabaseArray(databaseRef: string, context: FormulaContext): unknown
   const [, startCol, startRowStr] = startMatch;
   const [, endCol, endRowStr] = endMatch;
   
-  const startRow = parseInt(startRowStr);
-  const endRow = parseInt(endRowStr);
+  const startRow = parseInt(startRowStr) - 1; // 0ベースに変換
+  const endRow = parseInt(endRowStr) - 1; // 0ベースに変換
   
   const startColIndex = columnToIndex(startCol);
   const endColIndex = columnToIndex(endCol);
@@ -53,9 +70,9 @@ function getDatabaseArray(databaseRef: string, context: FormulaContext): unknown
   for (let row = startRow; row <= endRow; row++) {
     const rowData: unknown[] = [];
     for (let col = startColIndex; col <= endColIndex; col++) {
-      const colName = indexToColumn(col);
-      const cellRef = `${colName}${row}`;
-      rowData.push(getCellValue(cellRef, context));
+      // 直接context.dataから値を取得（getCellValueは1ベースなので）
+      const value = context.data[row]?.[col] ?? '';
+      rowData.push(value);
     }
     result.push(rowData);
   }
@@ -182,6 +199,9 @@ export const DSUM: CustomFormula = {
       const database = getDatabaseArray(databaseRef.trim(), context);
       const criteria = getDatabaseArray(criteriaRef.trim(), context);
       
+      debugLog('DSUM - Database:', database);
+      debugLog('DSUM - Criteria:', criteria);
+      
       if (database.length < 2 || criteria.length < 1) {
         return FormulaError.VALUE;
       }
@@ -194,14 +214,22 @@ export const DSUM: CustomFormula = {
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
-        // If field looks like a cell reference (e.g., B1), get its value
-        const cellValue = getCellValue(field, context);
-        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
-          field = cellValue;
+        // If field looks like a cell reference (e.g., C1), get its value
+        const match = field.match(/([A-Z]+)(\d+)/);
+        if (match) {
+          const [, col, rowStr] = match;
+          const row = parseInt(rowStr) - 1;
+          const colIndex = columnToIndex(col);
+          const cellValue = context.data[row]?.[colIndex];
+          debugLog('Field cell reference:', field, 'Value:', cellValue);
+          if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+            field = cellValue;
+          }
         }
-        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
+      
+      debugLog('DSUM - Field:', field, 'FieldIndex:', fieldIndex);
       
       if (fieldIndex === -1) {
         return FormulaError.VALUE;
@@ -210,14 +238,18 @@ export const DSUM: CustomFormula = {
       let sum = 0;
       for (let i = 1; i < database.length; i++) {
         const row = database[i];
-        if (matchesCriteria(row, headers, criteria)) {
+        const matches = matchesCriteria(row, headers, criteria);
+        debugLog(`Row ${i}:`, row, 'Matches:', matches);
+        if (matches) {
           const value = Number(row[fieldIndex]);
+          debugLog(`Value at fieldIndex ${fieldIndex}:`, value);
           if (!isNaN(value)) {
             sum += value;
           }
         }
       }
       
+      debugLog('DSUM - Final sum:', sum);
       return sum;
     } catch {
       return FormulaError.VALUE;

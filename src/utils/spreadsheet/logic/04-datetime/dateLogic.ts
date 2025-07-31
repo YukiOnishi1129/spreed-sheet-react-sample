@@ -34,7 +34,11 @@ export const DATEDIF: CustomFormula = {
     if (startRef.startsWith('"') && startRef.endsWith('"')) {
       startValue = startRef.slice(1, -1);
     } else if (startRef.match(/^[A-Z]+\d+$/)) {
-      startValue = getCellValue(startRef, context);
+      startValue = getCellValue(startRef.trim(), context);
+      // エラー値を直接返す
+      if (typeof startValue === 'string' && startValue.startsWith('#')) {
+        return startValue as FormulaResult;
+      }
     } else {
       startValue = startRef;
     }
@@ -43,7 +47,11 @@ export const DATEDIF: CustomFormula = {
     if (endRef.startsWith('"') && endRef.endsWith('"')) {
       endValue = endRef.slice(1, -1);
     } else if (endRef.match(/^[A-Z]+\d+$/)) {
-      endValue = getCellValue(endRef, context);
+      endValue = getCellValue(endRef.trim(), context);
+      // エラー値を直接返す
+      if (typeof endValue === 'string' && endValue.startsWith('#')) {
+        return endValue as FormulaResult;
+      }
     } else {
       endValue = endRef;
     }
@@ -53,7 +61,11 @@ export const DATEDIF: CustomFormula = {
     if (unitRef.startsWith('"') && unitRef.endsWith('"')) {
       unit = unitRef.slice(1, -1);
     } else if (unitRef.match(/^[A-Z]+\d+$/)) {
-      unit = getCellValue(unitRef, context);
+      unit = getCellValue(unitRef.trim(), context);
+      // エラー値を直接返す
+      if (typeof unit === 'string' && unit.startsWith('#')) {
+        return unit as FormulaResult;
+      }
     } else {
       unit = unitRef;
     }

@@ -367,6 +367,16 @@ function parseDateString(dateStr: string): Date | null {
     return date;
   }
   
+  // YYYY/MM/DD形式を変換
+  const yyyymmdd = dateStr.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+  if (yyyymmdd) {
+    const [, year, month, day] = yyyymmdd;
+    date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    if (isValidDate(date)) {
+      return date;
+    }
+  }
+  
   // MM/DD/YYYY形式を変換
   const mmddyyyy = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (mmddyyyy) {

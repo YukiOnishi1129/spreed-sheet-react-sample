@@ -11,7 +11,6 @@ export const databaseTests: IndividualFunctionTest[] = [
       ['佐藤', '営業', 150],
       ['鈴木', '開発', 120],
       ['', '', ''],
-      ['条件', '', ''],
       ['部署', '', ''],
       ['営業', '', '=DSUM(A1:C4,C1,A6:A7)']
     ],

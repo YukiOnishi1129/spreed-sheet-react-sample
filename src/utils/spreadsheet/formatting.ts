@@ -16,7 +16,7 @@ export function isDateSerial(value: unknown): boolean {
   return value >= 1 && value <= 100000;
 }
 
-// Format a date serial number as YYYY/MM/DD
+// Format a date serial number as YYYY-MM-DD
 export function formatDateSerial(serial: number, includeTime: boolean = false): string {
   const date = excelSerialToDate(serial);
   const year = date.getFullYear();
@@ -28,10 +28,10 @@ export function formatDateSerial(serial: number, includeTime: boolean = false): 
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
   
-  return `${year}/${month}/${day}`;
+  return `${year}-${month}-${day}`;
 }
 
 // Check if a string is a date in ISO format (YYYY-MM-DD)

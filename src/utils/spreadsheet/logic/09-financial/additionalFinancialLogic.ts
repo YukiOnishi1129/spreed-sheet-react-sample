@@ -4,6 +4,41 @@ import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/typ
 import { FormulaError } from '../shared/types';
 import { getCellValue, getCellRangeValues } from '../shared/utils';
 
+// 値または式を評価する
+function evaluateValueOrExpression(value: string, context: FormulaContext): number {
+  // 簡単な四則演算を処理（例: A2/12, A2*12）
+  const operatorMatch = value.match(/^([^+\-*/]+)([+\-*/])(.+)$/);
+  if (operatorMatch) {
+    const [, left, operator, right] = operatorMatch;
+    const leftValue = evaluateValueOrExpression(left.trim(), context);
+    const rightValue = evaluateValueOrExpression(right.trim(), context);
+    
+    switch (operator) {
+      case '+': return leftValue + rightValue;
+      case '-': return leftValue - rightValue;
+      case '*': return leftValue * rightValue;
+      case '/': return rightValue !== 0 ? leftValue / rightValue : NaN;
+    }
+  }
+  
+  // 負の符号で始まる場合の処理（例: -A2）
+  if (value.startsWith('-')) {
+    const baseValue = value.substring(1);
+    const result = evaluateValueOrExpression(baseValue, context);
+    return -result;
+  }
+  
+  // セル参照かどうか確認
+  const cellValue = getCellValue(value, context);
+  if (cellValue !== value) {
+    // セル参照だった場合
+    return parseFloat(cellValue?.toString() ?? '0');
+  }
+  
+  // 数値として解析
+  return parseFloat(value);
+}
+
 // NPER関数の実装（支払回数）
 export const NPER: CustomFormula = {
   name: 'NPER',
@@ -12,11 +47,11 @@ export const NPER: CustomFormula = {
     const [, rateRef, pmtRef, pvRef, fvRef, typeRef] = matches;
     
     try {
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
-      const pmt = parseFloat(getCellValue(pmtRef.trim(), context)?.toString() ?? pmtRef.trim());
-      const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
-      const fv = fvRef ? parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim()) : 0;
-      const type = typeRef ? parseInt(getCellValue(typeRef.trim(), context)?.toString() ?? typeRef.trim()) : 0;
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
+      const pmt = evaluateValueOrExpression(pmtRef.trim(), context);
+      const pv = evaluateValueOrExpression(pvRef.trim(), context);
+      const fv = fvRef ? evaluateValueOrExpression(fvRef.trim(), context) : 0;
+      const type = typeRef ? Math.round(evaluateValueOrExpression(typeRef.trim(), context)) : 0;
       
       if (isNaN(rate) || isNaN(pmt) || isNaN(pv)) {
         return FormulaError.VALUE;
@@ -57,7 +92,7 @@ export const XNPV: CustomFormula = {
     const [, rateRef, valuesRef, datesRef] = matches;
     
     try {
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       
       if (isNaN(rate)) {
         return FormulaError.VALUE;
@@ -510,7 +545,7 @@ export const PDURATION: CustomFormula = {
     const [, rateRef, pvRef, fvRef] = matches;
     
     try {
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
       const fv = parseFloat(getCellValue(fvRef.trim(), context)?.toString() ?? fvRef.trim());
       
@@ -566,7 +601,7 @@ export const ISPMT: CustomFormula = {
     const [, rateRef, perRef, nperRef, pvRef] = matches;
     
     try {
-      const rate = parseFloat(getCellValue(rateRef.trim(), context)?.toString() ?? rateRef.trim());
+      const rate = evaluateValueOrExpression(rateRef.trim(), context);
       const per = parseInt(getCellValue(perRef.trim(), context)?.toString() ?? perRef.trim());
       const nper = parseInt(getCellValue(nperRef.trim(), context)?.toString() ?? nperRef.trim());
       const pv = parseFloat(getCellValue(pvRef.trim(), context)?.toString() ?? pvRef.trim());
