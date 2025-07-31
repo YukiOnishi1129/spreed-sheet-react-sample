@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import Spreadsheet, { type Matrix, type CellBase, type Point } from 'react-spreadsheet';
+import Spreadsheet, { type Matrix, type CellBase, type Point, type Selection } from 'react-spreadsheet';
 import { allIndividualFunctionTests as individualFunctionTests } from '../data/individualFunctionTests';
 import type { IndividualFunctionTest } from '../types/spreadsheet';
 import { calculateSingleFormula as calculateFormula } from './utils/customFormulaCalculations';
+import { isRangeSelection } from './utils/typeGuards';
 import type { CellData } from "../utils/spreadsheet/logic";
 
 function TestSpreadsheet() {
@@ -13,6 +14,8 @@ function TestSpreadsheet() {
   const [testResults, setTestResults] = useState<{ [key: string]: { expected: unknown, actual: unknown, passed: boolean } }>({});
   const [selectedCell, setSelectedCell] = useState<Point | null>(null);
   const [selectedCellInfo, setSelectedCellInfo] = useState<{ value: string | number | boolean | null; formula?: string } | null>(null);
+  const [editingFormula, setEditingFormula] = useState<string>('');
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // カテゴリ一覧を取得
   const categories = Array.from(new Set(individualFunctionTests.map(f => f.category))).sort();
@@ -184,25 +187,111 @@ function TestSpreadsheet() {
   };
 
   // セルが選択されたときの処理
-  const handleCellSelect = (point: Point) => {
-    setSelectedCell(point);
+  const handleCellSelect = (selection: Selection) => {
+    // selection が null または undefined の場合は何もしない
+    if (!selection) return;
+    
+    // RangeSelectionの場合（ChatGPTSpreadsheetと同じ実装）
+    if (isRangeSelection(selection)) {
+      const row = selection.range.start.row;
+      const column = selection.range.start.column;
+      setSelectedCell({ row, column });
+    }
   };
 
   // 選択されたセルの情報を更新
   useEffect(() => {
+    console.log('Selected cell:', selectedCell);
+    console.log('Spreadsheet data:', spreadsheetData);
+    
     if (selectedCell && spreadsheetData[selectedCell.row]) {
       const cell = spreadsheetData[selectedCell.row][selectedCell.column];
+      console.log('Cell data:', cell);
+      
       if (cell) {
         const cellWithFormula = cell as CellBase & { formula?: string; 'data-formula'?: string };
+        const formula = cellWithFormula.formula ?? cellWithFormula['data-formula'];
+        
+        console.log('Cell value:', cell.value);
+        console.log('Cell formula:', formula);
+        
         setSelectedCellInfo({
           value: cell.value as string | number | boolean | null,
-          formula: cellWithFormula.formula || cellWithFormula['data-formula']
+          formula: formula ?? undefined
         });
+        
+        // 編集フィールドには数式がある場合は数式を、ない場合は値を表示
+        if (formula) {
+          setEditingFormula(formula);
+        } else {
+          setEditingFormula(String(cell.value ?? ''));
+        }
       } else {
         setSelectedCellInfo({ value: null });
+        setEditingFormula('');
       }
     }
   }, [selectedCell, spreadsheetData]);
+
+  // 数式エディタの値が変更されたときの処理
+  const handleFormulaChange = (newFormula: string) => {
+    setEditingFormula(newFormula);
+    
+    if (selectedCell) {
+      const newData = [...spreadsheetData];
+      const cell = newData[selectedCell.row][selectedCell.column] ?? {};
+      
+      if (newFormula.startsWith('=')) {
+        newData[selectedCell.row][selectedCell.column] = {
+          ...cell,
+          value: '',
+          formula: newFormula
+        };
+      } else {
+        newData[selectedCell.row][selectedCell.column] = {
+          ...cell,
+          value: newFormula,
+          formula: undefined
+        };
+      }
+      
+      handleSpreadsheetChange(newData);
+    }
+  };
+
+  // Excel用コピー機能
+  const handleExcelCopy = async () => {
+    try {
+      const excelData: string[][] = [];
+      
+      for (let row = 0; row < spreadsheetData.length; row++) {
+        const rowData: string[] = [];
+        for (let col = 0; col < spreadsheetData[row].length; col++) {
+          const cell = spreadsheetData[row][col];
+          if (cell) {
+            const cellWithFormula = cell as CellBase & { formula?: string; 'data-formula'?: string };
+            if (cellWithFormula.formula || cellWithFormula['data-formula']) {
+              rowData.push(cellWithFormula.formula ?? cellWithFormula['data-formula'] ?? '');
+            } else {
+              rowData.push(String(cell.value ?? ''));
+            }
+          } else {
+            rowData.push('');
+          }
+        }
+        excelData.push(rowData);
+      }
+      
+      // タブ区切りテキストとして整形
+      const tsvData = excelData.map(row => row.join('\t')).join('\n');
+      
+      await navigator.clipboard.writeText(tsvData);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (error) {
+      console.error('コピーに失敗しました:', error);
+    }
+  };
 
 
   return (
@@ -313,28 +402,87 @@ function TestSpreadsheet() {
           </div>
         )}
 
-        {/* セル情報バー */}
-        {selectedFunction && selectedCellInfo && (
+        {/* セル編集バー */}
+        {selectedFunction && (
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-gray-600">セル:</span>
-                <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                  {selectedCell ? `${String.fromCharCode(65 + selectedCell.column)}${selectedCell.row + 1}` : '-'}
-                </span>
+            <div className="space-y-4">
+              {/* ChatGPTSpreadsheet.tsxと同じスタイルのセル情報表示 */}
+              {console.log('selectedCellInfo:', selectedCellInfo)}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-600 mb-2">セルアドレス:</p>
+                  <div className="bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 text-sm font-mono">
+                    {selectedCell && selectedCell.row !== undefined && selectedCell.column !== undefined 
+                      ? `${String.fromCharCode(65 + selectedCell.column)}${selectedCell.row + 1}` 
+                      : 'A1'}
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-sm font-semibold text-gray-600 mb-2">数式/値:</p>
+                  <div className="bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 text-sm font-mono">
+                    <input
+                      type="text"
+                      value={
+                        selectedCellInfo?.formula ?? 
+                        (selectedCellInfo?.value !== null && selectedCellInfo?.value !== undefined 
+                          ? String(selectedCellInfo.value) 
+                          : '')
+                      }
+                      readOnly
+                      className="w-full bg-transparent border-none outline-none text-gray-800"
+                      placeholder="数式や値が表示されます"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-gray-600">値:</span>
-                <span className="font-mono text-sm bg-blue-50 px-2 py-1 rounded">
-                  {selectedCellInfo.value ?? ''}
-                </span>
+              
+              {/* 編集用入力フィールド */}
+              <div>
+                <p className="text-sm font-semibold text-gray-600 mb-2">編集:</p>
+                <input
+                  type="text"
+                  value={editingFormula}
+                  onChange={(e) => handleFormulaChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      // Enterキーで確定
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  placeholder="値または数式を入力"
+                />
               </div>
-              {selectedCellInfo.formula && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-600">数式:</span>
-                  <span className="font-mono text-sm bg-green-50 px-2 py-1 rounded">
-                    {selectedCellInfo.formula}
-                  </span>
+              
+              {/* Excel用コピーボタン */}
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-500">
+                  {selectedCellInfo?.formula && (
+                    <span className="flex items-center space-x-1">
+                      <span className="text-green-600">fx</span>
+                      <span>数式モード</span>
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={handleExcelCopy}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  <span>📋 Excel用コピー</span>
+                </button>
+              </div>
+              
+              {/* コピー成功メッセージ */}
+              {copySuccess && (
+                <div className="absolute top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in-out">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>コピーしました！</span>
                 </div>
               )}
             </div>
