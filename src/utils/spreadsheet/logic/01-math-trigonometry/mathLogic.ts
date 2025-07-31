@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue, getCellRangeValues, parseCellRange } from '../shared/utils';
+import { getCellValue, getCellRangeValues, parseCellRange, toNumber } from '../shared/utils';
 
 // 引数を数値の配列に変換するユーティリティ関数
 function parseArgumentsToNumbers(args: string, context: FormulaContext): number[] {
@@ -2020,21 +2020,46 @@ export const FLOOR_PRECISE: CustomFormula = {
 export const ISO_CEILING: CustomFormula = {
   name: 'ISO.CEILING',
   pattern: /ISO\.CEILING\(([^,)]+)(?:,\s*([^)]+))?\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, numberRef, significanceRef] = matches;
     
-    const number = Number(getCellValue(numberRef, context) ?? numberRef);
-    const significance = significanceRef ? Number(getCellValue(significanceRef, context) ?? significanceRef) : 1;
-    
-    if (isNaN(number) || isNaN(significance)) {
+    try {
+      const numberValue = getCellValue(numberRef.trim(), context);
+      const number = toNumber(numberValue) ?? parseFloat(numberRef.trim());
+      
+      
+      if (isNaN(number)) {
+        return FormulaError.VALUE;
+      }
+      
+      // significanceのデフォルトは1
+      let significance = 1;
+      if (significanceRef) {
+        const significanceValue = getCellValue(significanceRef.trim(), context);
+        significance = toNumber(significanceValue) ?? parseFloat(significanceRef.trim());
+        
+        if (isNaN(significance)) {
+          return FormulaError.VALUE;
+        }
+      }
+      
+      if (significance === 0) {
+        return 0;
+      }
+      
+      // ISO.CEILINGは負の数の場合はゼロ方向に切り上げる（絶対値が小さくなる方向）
+      if (number < 0) {
+        // 負の数はゼロ方向に切り上げ
+        const result = Math.ceil(number / significance) * significance;
+        return result;
+      } else {
+        // 正の数は正の無限大方向に切り上げ
+        const result = Math.ceil(number / Math.abs(significance)) * Math.abs(significance);
+        return result;
+      }
+    } catch {
       return FormulaError.VALUE;
     }
-    
-    if (significance === 0) {
-      return 0;
-    }
-    
-    return Math.ceil(number / Math.abs(significance)) * Math.abs(significance);
   }
 };
 

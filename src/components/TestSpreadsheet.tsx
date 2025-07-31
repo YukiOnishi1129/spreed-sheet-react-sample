@@ -6,10 +6,16 @@ import { calculateSingleFormula as calculateFormula } from './utils/customFormul
 import { isRangeSelection } from './utils/typeGuards';
 import type { CellData } from "../utils/spreadsheet/logic";
 
+// Extend CellBase to include formula
+type ExtendedCell = CellBase & {
+  formula?: string;
+  'data-formula'?: string;
+};
+
 function TestSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
-  const [spreadsheetData, setSpreadsheetData] = useState<Matrix<CellBase>>([]);
+  const [spreadsheetData, setSpreadsheetData] = useState<Matrix<ExtendedCell>>([]);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [testResults, setTestResults] = useState<{ [key: string]: { expected: unknown, actual: unknown, passed: boolean } }>({});
   const [selectedCell, setSelectedCell] = useState<Point | null>(null);
@@ -38,7 +44,7 @@ function TestSpreadsheet() {
     setIsCalculating(true);
     setTestResults({});
     
-    const initialData: Matrix<CellBase> = selectedFunction.data.map((row: (string | number | boolean | null)[]) => 
+    const initialData: Matrix<ExtendedCell> = selectedFunction.data.map((row: (string | number | boolean | null)[]) => 
       row.map((cellValue: string | number | boolean | null) => {
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
           return {
@@ -70,7 +76,42 @@ function TestSpreadsheet() {
           if (cell.formula) {
             const newValue = calculateFormula(cell.formula, result, rowIndex, colIndex);
             
-            if (newValue !== cell.value) {
+            // 配列の場合はスピル処理
+            if (Array.isArray(newValue)) {
+              // 2次元配列の場合
+              if (Array.isArray(newValue[0])) {
+                for (let i = 0; i < newValue.length; i++) {
+                  for (let j = 0; j < (newValue[i] as any[]).length; j++) {
+                    const targetRow = rowIndex + i;
+                    const targetCol = colIndex + j;
+                    if (targetRow < result.length && targetCol < result[targetRow].length) {
+                      if (i === 0 && j === 0) {
+                        // 元のセルには最初の値を設定
+                        cell.value = (newValue[i] as any[])[j];
+                      } else {
+                        // 他のセルに値をスピル
+                        result[targetRow][targetCol] = { value: (newValue[i] as any[])[j] };
+                      }
+                    }
+                  }
+                }
+                hasChanges = true;
+              } else {
+                // 1次元配列の場合（縦方向にスピル）
+                for (let i = 0; i < newValue.length; i++) {
+                  const targetRow = rowIndex + i;
+                  if (targetRow < result.length) {
+                    if (i === 0) {
+                      cell.value = newValue[i];
+                    } else {
+                      result[targetRow][colIndex] = { value: newValue[i] };
+                    }
+                  }
+                }
+                hasChanges = true;
+              }
+            } else if (newValue !== cell.value) {
+              // 通常の値の場合
               cell.value = newValue;
               hasChanges = true;
             }
@@ -86,7 +127,7 @@ function TestSpreadsheet() {
     return result;
   };
 
-  const calculateFormulas = (data: Matrix<CellBase>) => {
+  const calculateFormulas = (data: Matrix<ExtendedCell>) => {
     try {
       setIsCalculating(true);
       
@@ -177,7 +218,7 @@ function TestSpreadsheet() {
   };
 
   // スプレッドシートのデータが変更されたときの処理
-  const handleSpreadsheetChange = (newData: Matrix<CellBase>) => {
+  const handleSpreadsheetChange = (newData: Matrix<ExtendedCell>) => {
     setSpreadsheetData(newData);
     
     // 再計算をトリガー
@@ -201,19 +242,12 @@ function TestSpreadsheet() {
 
   // 選択されたセルの情報を更新
   useEffect(() => {
-    console.log('Selected cell:', selectedCell);
-    console.log('Spreadsheet data:', spreadsheetData);
-    
     if (selectedCell && spreadsheetData[selectedCell.row]) {
       const cell = spreadsheetData[selectedCell.row][selectedCell.column];
-      console.log('Cell data:', cell);
       
       if (cell) {
         const cellWithFormula = cell as CellBase & { formula?: string; 'data-formula'?: string };
         const formula = cellWithFormula.formula ?? cellWithFormula['data-formula'];
-        
-        console.log('Cell value:', cell.value);
-        console.log('Cell formula:', formula);
         
         setSelectedCellInfo({
           value: cell.value as string | number | boolean | null,
@@ -407,7 +441,6 @@ function TestSpreadsheet() {
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
             <div className="space-y-4">
               {/* ChatGPTSpreadsheet.tsxと同じスタイルのセル情報表示 */}
-              {console.log('selectedCellInfo:', selectedCellInfo)}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-semibold text-gray-600 mb-2">セルアドレス:</p>

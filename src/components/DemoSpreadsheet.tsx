@@ -7,9 +7,15 @@ import { calculateSingleFormula as calculateFormula } from './utils/customFormul
 import { FunctionSelectorModal } from './FunctionSelectorModal';
 import type { CellData } from "../utils/spreadsheet/logic";
 
+// Extend CellBase to include formula
+type ExtendedCell = CellBase & {
+  formula?: string;
+  'data-formula'?: string;
+};
+
 function DemoSpreadsheet() {
   const [selectedCategory, setSelectedCategory] = useState<DemoCategory>(demoSpreadsheetData[0]);
-  const [spreadsheetData, setSpreadsheetData] = useState<Matrix<CellBase>>([]);
+  const [spreadsheetData, setSpreadsheetData] = useState<Matrix<ExtendedCell>>([]);
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number; formula?: string; value?: string | number | null } | null>(null);
   const [demoMode, setDemoMode] = useState<'grouped' | 'individual'>('grouped');
   const [selectedFunction, setSelectedFunction] = useState<IndividualFunctionTest | null>(null);
@@ -46,7 +52,7 @@ function DemoSpreadsheet() {
     );
     setOriginalFormulas(formulas);
     
-    const initialData: Matrix<CellBase> = selectedCategory.data.map((row: (string | number | boolean | null)[]) => 
+    const initialData: Matrix<ExtendedCell> = selectedCategory.data.map((row: (string | number | boolean | null)[]) => 
       row.map((cellValue: string | number | boolean | null) => {
         // 数式が直接入っている場合
         if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
@@ -118,7 +124,42 @@ function DemoSpreadsheet() {
           if (cell.formula) {
             const newValue = calculateFormula(cell.formula, result, rowIndex, colIndex);
             
-            if (newValue !== cell.value) {
+            // 配列の場合はスピル処理
+            if (Array.isArray(newValue)) {
+              // 2次元配列の場合
+              if (Array.isArray(newValue[0])) {
+                for (let i = 0; i < newValue.length; i++) {
+                  for (let j = 0; j < (newValue[i] as any[]).length; j++) {
+                    const targetRow = rowIndex + i;
+                    const targetCol = colIndex + j;
+                    if (targetRow < result.length && targetCol < result[targetRow].length) {
+                      if (i === 0 && j === 0) {
+                        // 元のセルには最初の値を設定
+                        cell.value = (newValue[i] as any[])[j];
+                      } else {
+                        // 他のセルに値をスピル
+                        result[targetRow][targetCol] = { value: (newValue[i] as any[])[j] };
+                      }
+                    }
+                  }
+                }
+                hasChanges = true;
+              } else {
+                // 1次元配列の場合（縦方向にスピル）
+                for (let i = 0; i < newValue.length; i++) {
+                  const targetRow = rowIndex + i;
+                  if (targetRow < result.length) {
+                    if (i === 0) {
+                      cell.value = newValue[i];
+                    } else {
+                      result[targetRow][colIndex] = { value: newValue[i] };
+                    }
+                  }
+                }
+                hasChanges = true;
+              }
+            } else if (newValue !== cell.value) {
+              // 通常の値の場合
               cell.value = newValue;
               hasChanges = true;
             }

@@ -68,9 +68,12 @@ export const dynamicArraysTests: IndividualFunctionTest[] = [
     description: 'ランダム配列を生成',
     data: [
       ['行数', '列数', '最小', '最大', '整数', 'ランダム配列'],
-      [3, 3, 1, 10, 'TRUE', '=RANDARRAY(A2,B2,C2,D2,E2)']
+      [3, 3, 1, 10, 'TRUE', '=RANDARRAY(A2,B2,C2,D2,E2)'],
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, null]
     ],
-    expectedValues: { 'F2': 5 }
+    // RANDARRAYは乱数なので期待値の検証はスキップ
+    expectedValues: {}
   },
   {
     name: 'LAMBDA',
