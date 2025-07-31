@@ -101,11 +101,12 @@ function evaluateFormulaResult(resultStr: string, context: FormulaContext): Form
   // 関数呼び出しの場合（ネストされた関数）
   if (trimmed.match(/^[A-Z_]+\s*\(/i)) {
     try {
-      const result = matchFormula(trimmed, context);
-      if (result === null || result === undefined) {
+      const matchResult = matchFormula(trimmed);
+      if (matchResult === null || matchResult === undefined) {
         return FormulaError.VALUE;
       }
-      return result;
+      // matchResultは{ function: CustomFormula; matches: RegExpMatchArray }なので、実際に関数を実行
+      return matchResult.function.calculate(matchResult.matches, context);
     } catch (error) {
       // 関数評価エラーの場合、エラーを伝播
       if (typeof error === 'object' && error !== null && 'toString' in error) {
@@ -205,13 +206,13 @@ export const IF: CustomFormula = {
       // 左辺と右辺の値を改善された方法で取得
       try {
         leftValue = evaluateFormulaResult(leftExpr.trim(), context);
-      } catch (error) {
+      } catch {
         leftValue = leftExpr.trim();
       }
       
       try {
         rightValue = evaluateFormulaResult(rightExpr.trim(), context);
-      } catch (error) {
+      } catch {
         rightValue = rightExpr.trim();
       }
       
@@ -248,7 +249,7 @@ export const IF: CustomFormula = {
       try {
         const conditionResult = evaluateFormulaResult(conditionStr, context);
         condition = toLogical(conditionResult);
-      } catch (error) {
+      } catch {
         // エラーの場合はfalseとして扱う
         condition = false;
       }

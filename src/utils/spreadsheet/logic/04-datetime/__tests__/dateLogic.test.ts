@@ -20,7 +20,7 @@ describe('Date Functions', () => {
   const mockContext = createContext([
     ['2024-01-15', '2024-12-31', '2023-01-01', '2024-02-29', 'invalid'],
     ['2025-01-15', '2024-01-01', '2024-03-01', '2024-04-30', 45292],
-    [new Date('2024-01-15'), new Date('2024-12-31'), '15:30:45', '23:59:59', '00:00:01'],
+    ['2024-01-15', '2024-12-31', '15:30:45', '23:59:59', '00:00:01'],
     ['1/15/2024', '12/31/2024', '2024', '1', '15'],
     ['text', '', null, true, false],
   ]);
@@ -105,7 +105,7 @@ describe('Date Functions', () => {
       expect(typeof result).toBe('number');
       expect(result).toBeGreaterThan(44000); // After year 2020
       expect(result).toBeLessThan(50000); // Before year 2037
-      expect(result % 1).toBe(0); // Should be a whole number (no time component)
+      expect((result as number) % 1).toBe(0); // Should be a whole number (no time component)
     });
   });
 

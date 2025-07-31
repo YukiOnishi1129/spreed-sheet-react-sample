@@ -24,7 +24,7 @@ describe('Text Functions', () => {
     ['World', 45.67, 'apple,banana,orange', ' '],           // Row 2 (A2-D2)
     ['  Test   ', true, 'Test123Test', ','],                 // Row 3 (A3-D3)
     ['UPPER CASE', false, null, null],                      // Row 4 (A4-D4)
-    ['lower case', new Date('2024-01-15'), '', null]        // Row 5 (A5-D5)
+    ['lower case', '2024-01-15', '', null]                  // Row 5 (A5-D5)
   ]);
 
   describe('Concatenation Functions', () => {

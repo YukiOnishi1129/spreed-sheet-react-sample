@@ -658,7 +658,7 @@ function yearfracActualActual(startDate: Date, endDate: Date): number {
   
   while (currentDate.getFullYear() <= endYear) {
     const currentYear = currentDate.getFullYear();
-    const yearEnd = new Date(currentYear + 1, 0, 1); // 次年の1月1日
+    // const yearEnd = new Date(currentYear + 1, 0, 1); // 次年の1月1日
     
     const periodStart = currentDate;
     const periodEnd = currentYear === endYear ? endDate : new Date(currentYear, 11, 31);

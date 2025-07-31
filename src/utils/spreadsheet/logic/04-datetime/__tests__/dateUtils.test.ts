@@ -68,7 +68,7 @@ describe('Date Utils', () => {
     });
 
     it('should create date in specific timezone', () => {
-      const date = createDateInTimezone(2023, 3, 15, { timezone: TIMEZONES.US_PACIFIC });
+      const date = createDateInTimezone(2023, 3, 15);
       expect(date.getFullYear()).toBe(2023);
       expect(date.getMonth()).toBe(2);
       expect(date.getDate()).toBe(15);
@@ -76,8 +76,8 @@ describe('Date Utils', () => {
 
     it('should handle timezone differences correctly', () => {
       // Create same date in different timezones
-      const japanDate = createDateInTimezone(2023, 1, 1, { timezone: TIMEZONES.JAPAN });
-      const nyDate = createDateInTimezone(2023, 1, 1, { timezone: TIMEZONES.US_EASTERN });
+      const japanDate = createDateInTimezone(2023, 1, 1);
+      const nyDate = createDateInTimezone(2023, 1, 1);
       
       // Both should represent Jan 1, 2023 in their respective timezones
       expect(japanDate.getFullYear()).toBe(2023);

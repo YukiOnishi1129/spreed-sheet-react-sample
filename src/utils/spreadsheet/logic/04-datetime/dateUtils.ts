@@ -76,9 +76,47 @@ export function getGlobalDateConfig(): DateConfig {
 /**
  * タイムゾーン対応の日付作成
  */
-export function createDateInTimezone(year: number, month: number, day: number): Date {
-  // 基本的にはローカル時間で日付を作成する
-  // タイムゾーンの指定があっても、基本的な日付作成には影響しない
+export function createDateInTimezone(year: number, month: number, day: number, config?: DateConfig): Date {
+  const timezone = config?.timezone ?? globalDateConfig.timezone;
+  
+  if (timezone) {
+    // タイムゾーンを考慮した日付を作成
+    // UTCで日付を作成してから、指定のタイムゾーンでの時刻に調整
+    const utcDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+    
+    // 指定タイムゾーンでの表現を取得
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false
+    });
+    
+    const parts = formatter.formatToParts(utcDate);
+    const dateParts: { [key: string]: string } = {};
+    
+    parts.forEach(part => {
+      if (part.type !== 'literal') {
+        dateParts[part.type] = part.value;
+      }
+    });
+    
+    // ローカル時刻として新しいDateオブジェクトを作成
+    return new Date(
+      parseInt(dateParts.year),
+      parseInt(dateParts.month) - 1,
+      parseInt(dateParts.day),
+      parseInt(dateParts.hour || '0'),
+      parseInt(dateParts.minute || '0'),
+      parseInt(dateParts.second || '0')
+    );
+  }
+  
+  // タイムゾーン指定がない場合は通常の日付作成
   return new Date(year, month - 1, day);
 }
 
@@ -510,7 +548,40 @@ export function diffDaysMD(startDate: Date, endDate: Date): number {
  * 現在の日時を取得（タイムゾーン対応）
  */
 export function now(config?: DateConfig): Date {
-  // シンプルに現在の時刻を返す（テストでタイミングエラーを避ける）
+  const timezone = config?.timezone ?? globalDateConfig.timezone;
+  
+  if (timezone) {
+    // タイムゾーンを考慮した現在時刻を取得
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false
+    });
+    
+    const parts = formatter.formatToParts(new Date());
+    const dateParts: { [key: string]: string } = {};
+    
+    parts.forEach(part => {
+      if (part.type !== 'literal') {
+        dateParts[part.type] = part.value;
+      }
+    });
+    
+    return new Date(
+      parseInt(dateParts.year),
+      parseInt(dateParts.month) - 1,
+      parseInt(dateParts.day),
+      parseInt(dateParts.hour),
+      parseInt(dateParts.minute),
+      parseInt(dateParts.second)
+    );
+  }
+  
   return new Date();
 }
 
