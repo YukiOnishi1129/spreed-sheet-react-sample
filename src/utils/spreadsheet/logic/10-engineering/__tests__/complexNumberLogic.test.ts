@@ -432,7 +432,10 @@ describe('Complex Number Functions', () => {
       const conjMatches = ['IMCONJUGATE("3+4i")', '"3+4i"'] as RegExpMatchArray;
       const conj = IMCONJUGATE.calculate(conjMatches, mockContext);
       
-      const prodMatches = ['IMPRODUCT("3+4i", "' + String(conj) + '")', '"3+4i"', '"' + String(conj) + '"'] as RegExpMatchArray;
+      // conj should be "3-4i"
+      expect(conj).toBe('3-4i');
+      
+      const prodMatches = ['IMPRODUCT("3+4i", "3-4i")', '"3+4i", "3-4i"'] as RegExpMatchArray;
       const product = IMPRODUCT.calculate(prodMatches, mockContext);
       
       expect(product).toBe('25'); // 3^2 + 4^2 = 25

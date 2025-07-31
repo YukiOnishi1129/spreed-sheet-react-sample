@@ -70,6 +70,36 @@ const evaluateLambda = (
         }
       });
       
+      // MAX(accumulator, value) のような特殊なケースを処理
+      const maxMatch = evaluatedBody.match(/MAX\(([^,]+),\s*([^)]+)\)/i);
+      if (maxMatch && lambdaParams.length >= 2) {
+        const [, arg1, arg2] = maxMatch;
+        const idx1 = lambdaParams.findIndex(p => p === arg1.trim());
+        const idx2 = lambdaParams.findIndex(p => p === arg2.trim());
+        if (idx1 >= 0 && idx2 >= 0 && idx1 < paramValues.length && idx2 < paramValues.length) {
+          const val1 = toNumber(paramValues[idx1]);
+          const val2 = toNumber(paramValues[idx2]);
+          if (val1 !== null && val2 !== null) {
+            return Math.max(val1, val2);
+          }
+        }
+      }
+      
+      // MIN(accumulator, value) のような特殊なケースを処理
+      const minMatch = evaluatedBody.match(/MIN\(([^,]+),\s*([^)]+)\)/i);
+      if (minMatch && lambdaParams.length >= 2) {
+        const [, arg1, arg2] = minMatch;
+        const idx1 = lambdaParams.findIndex(p => p === arg1.trim());
+        const idx2 = lambdaParams.findIndex(p => p === arg2.trim());
+        if (idx1 >= 0 && idx2 >= 0 && idx1 < paramValues.length && idx2 < paramValues.length) {
+          const val1 = toNumber(paramValues[idx1]);
+          const val2 = toNumber(paramValues[idx2]);
+          if (val1 !== null && val2 !== null) {
+            return Math.min(val1, val2);
+          }
+        }
+      }
+      
       // 特別な関数を含む場合はフォーミュラ評価へ
       if (evaluatedBody.toUpperCase().includes('MAX(') || 
           evaluatedBody.toUpperCase().includes('MIN(') ||
@@ -150,6 +180,12 @@ const evaluateFormulaExpression = (expression: string, context: FormulaContext):
     const maxMatch = expression.match(/MAX\(([^,]+),\s*([^)]+)\)/i);
     if (maxMatch) {
       const [, arg1, arg2] = maxMatch;
+      // 引数が変数名（accumulator, value など）の場合は評価できないのでエラー
+      if (/^[a-zA-Z_]\w*$/.test(arg1.trim()) || /^[a-zA-Z_]\w*$/.test(arg2.trim())) {
+        // 変数名が含まれている場合は、evaluateExpression に委譲
+        const result = evaluateExpression(expression, context);
+        return result;
+      }
       const val1 = isNaN(Number(arg1)) ? getCellValue(arg1.trim(), context) : Number(arg1);
       const val2 = isNaN(Number(arg2)) ? getCellValue(arg2.trim(), context) : Number(arg2);
       const num1 = toNumber(val1);
@@ -163,6 +199,12 @@ const evaluateFormulaExpression = (expression: string, context: FormulaContext):
     const minMatch = expression.match(/MIN\(([^,]+),\s*([^)]+)\)/i);
     if (minMatch) {
       const [, arg1, arg2] = minMatch;
+      // 引数が変数名（accumulator, value など）の場合は評価できないのでエラー
+      if (/^[a-zA-Z_]\w*$/.test(arg1.trim()) || /^[a-zA-Z_]\w*$/.test(arg2.trim())) {
+        // 変数名が含まれている場合は、evaluateExpression に委譲
+        const result = evaluateExpression(expression, context);
+        return result;
+      }
       const val1 = isNaN(Number(arg1)) ? getCellValue(arg1.trim(), context) : Number(arg1);
       const val2 = isNaN(Number(arg2)) ? getCellValue(arg2.trim(), context) : Number(arg2);
       const num1 = toNumber(val1);

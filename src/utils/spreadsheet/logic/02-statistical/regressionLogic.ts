@@ -313,6 +313,13 @@ export const RSQ: CustomFormula = {
         return FormulaError.DIV0;
       }
       
+      // すべてのY値が同じかチェック
+      const firstY = yValues[0];
+      const allSameY = yValues.every(y => y === firstY);
+      if (allSameY) {
+        return FormulaError.DIV0; // Yの分散が0
+      }
+      
       const result = calculateRegression(yValues, xValues);
       
       if (!result) {

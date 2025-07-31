@@ -87,16 +87,19 @@ export const getCellValue = (cellRef: string, context: FormulaContext): unknown 
   
   // セルデータがオブジェクトの場合のみプロパティを探す
   if (cellData && typeof cellData === 'object') {
+    // Type assertion for cell data object
+    const cell = cellData as Record<string, unknown>;
+    
     // If the object itself has a numeric or string representation, return it
     // Check for value property (handling null as a valid value)
-    if ('value' in cellData) {
-      return cellData.value;
+    if ('value' in cell) {
+      return cell.value;
     }
-    if ('v' in cellData) {
-      return cellData.v;
+    if ('v' in cell) {
+      return cell.v;
     }
-    if ('_' in cellData) {
-      return cellData._;
+    if ('_' in cell) {
+      return cell._;
     }
     // If we have a formula cell that hasn't been calculated yet, return empty
     if ('formula' in cellData || 'f' in cellData) {
@@ -136,13 +139,16 @@ export const getCellRangeValues = (range: string, context: FormulaContext): unkn
         if (typeof cellData === 'string' || typeof cellData === 'number' || cellData === null || cellData === undefined) {
           value = cellData;
         } else if (cellData && typeof cellData === 'object') {
+          // Type assertion for cell data object
+          const cell = cellData as Record<string, unknown>;
+          
           // Check for value property (handling null as a valid value)
-          if ('value' in cellData) {
-            value = cellData.value;
-          } else if ('v' in cellData) {
-            value = cellData.v;
-          } else if ('_' in cellData) {
-            value = cellData._;
+          if ('value' in cell) {
+            value = cell.value;
+          } else if ('v' in cell) {
+            value = cell.v;
+          } else if ('_' in cell) {
+            value = cell._;
           } else if ('formula' in cellData || 'f' in cellData) {
             // Skip formula cells that haven't been calculated yet
             continue;
@@ -226,6 +232,7 @@ export const evaluateExpression = (expression: string, context: FormulaContext):
     }
     
     // 算術式を評価
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const result = Function('"use strict"; return (' + evaluatedExpr + ')')() as unknown;
     return typeof result === 'number' ? result : expression;
   } catch {
@@ -278,6 +285,7 @@ export const evaluateFormulaWithErrorCheck = (expression: string, context: Formu
     }
     
     // 算術式を評価
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const result = Function('"use strict"; return (' + evaluatedExpr + ')')() as unknown;
     
     // 無限大やNaNのチェック
