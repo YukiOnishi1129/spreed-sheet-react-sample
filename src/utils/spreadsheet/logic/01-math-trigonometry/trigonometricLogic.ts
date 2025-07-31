@@ -424,49 +424,6 @@ export const ATANH: CustomFormula = {
   }
 };
 
-// DEGREES関数（ラジアンを度に変換）
-export const DEGREES: CustomFormula = {
-  name: 'DEGREES',
-  pattern: /DEGREES\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, angleRef] = matches;
-    
-    const angle = Number(getCellValue(angleRef, context) ?? angleRef);
-    
-    if (isNaN(angle)) {
-      return FormulaError.VALUE;
-    }
-    
-    return angle * (180 / Math.PI);
-  }
-};
-
-// RADIANS関数（度をラジアンに変換）
-export const RADIANS: CustomFormula = {
-  name: 'RADIANS',
-  pattern: /RADIANS\(([^)]+)\)/i,
-  calculate: (matches: RegExpMatchArray, context: FormulaContext) => {
-    const [, angleRef] = matches;
-    
-    const angle = Number(getCellValue(angleRef, context) ?? angleRef);
-    
-    if (isNaN(angle)) {
-      return FormulaError.VALUE;
-    }
-    
-    return angle * (Math.PI / 180);
-  }
-};
-
-// PI関数（円周率を返す）
-export const PI: CustomFormula = {
-  name: 'PI',
-  pattern: /PI\(\)/i,
-  calculate: () => {
-    return Math.PI;
-  }
-};
-
 // CSC関数（余割）
 export const CSC: CustomFormula = {
   name: 'CSC',

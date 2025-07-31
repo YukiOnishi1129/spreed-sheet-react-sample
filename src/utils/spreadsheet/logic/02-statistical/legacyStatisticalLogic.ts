@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue } from '../shared/utils';
+import { getCellValue, getCellRangeValues, toNumber } from '../shared/utils';
 
 // 標準正規分布の累積分布関数
 function normalCDF(x: number): number {
@@ -868,6 +868,118 @@ export const HYPGEOMDIST: CustomFormula = {
       const denominator = combination(numberPop, numberSample);
       
       return numerator / denominator;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// PERCENTRANK.INC関数の実装（パーセントランク - 含む）
+export const PERCENTRANK_INC: CustomFormula = {
+  name: 'PERCENTRANK.INC',
+  pattern: /PERCENTRANK\.INC\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, arrayRef, xRef, significanceRef] = matches;
+    
+    try {
+      // 配列を取得
+      const values = getCellRangeValues(arrayRef.trim(), context);
+      
+      // xの値を取得
+      const xValue = xRef ? getCellValue(xRef.trim(), context) : null;
+      const x = toNumber(xValue) ?? (xRef ? parseFloat(xRef.trim()) : NaN);
+      
+      if (isNaN(x)) {
+        return FormulaError.VALUE;
+      }
+      
+      // 有効桁数（デフォルトは3）
+      const significanceValue = significanceRef ? getCellValue(significanceRef.trim(), context) : 3;
+      const significance = toNumber(significanceValue) ?? (significanceRef ? parseInt(significanceRef.trim()) : 3);
+      
+      if (significance < 1) {
+        return FormulaError.NUM;
+      }
+      
+      // 数値のみを抽出してソート
+      const numericValues = values
+        .map(v => toNumber(v))
+        .filter(n => n !== null) as number[];
+      
+      if (numericValues.length === 0) {
+        return FormulaError.NUM;
+      }
+      
+      numericValues.sort((a, b) => a - b);
+      
+      const n = numericValues.length;
+      const min = numericValues[0];
+      const max = numericValues[n - 1];
+      
+      // xが範囲外の場合
+      if (x < min || x > max) {
+        return FormulaError.NA;
+      }
+      
+      // xが配列内にある場合
+      const exactIndex = numericValues.indexOf(x);
+      if (exactIndex !== -1) {
+        // 同じ値が複数ある場合は平均を取る
+        let count = 1;
+        let sumRank = exactIndex;
+        
+        // 前方向を確認
+        let i = exactIndex - 1;
+        while (i >= 0 && numericValues[i] === x) {
+          sumRank += i;
+          count++;
+          i--;
+        }
+        
+        // 後方向を確認
+        i = exactIndex + 1;
+        while (i < n && numericValues[i] === x) {
+          sumRank += i;
+          count++;
+          i++;
+        }
+        
+        const avgRank = sumRank / count;
+        const percentRank = avgRank / (n - 1);
+        
+        // 有効桁数で丸める
+        const factor = Math.pow(10, significance);
+        return Math.round(percentRank * factor) / factor;
+      }
+      
+      // xが配列内にない場合は補間
+      let lowerIndex = -1;
+      let upperIndex = -1;
+      
+      for (let i = 0; i < n - 1; i++) {
+        if (numericValues[i] < x && x < numericValues[i + 1]) {
+          lowerIndex = i;
+          upperIndex = i + 1;
+          break;
+        }
+      }
+      
+      if (lowerIndex === -1) {
+        return FormulaError.NA;
+      }
+      
+      // 線形補間
+      const lowerValue = numericValues[lowerIndex];
+      const upperValue = numericValues[upperIndex];
+      const fraction = (x - lowerValue) / (upperValue - lowerValue);
+      
+      const lowerRank = lowerIndex / (n - 1);
+      const upperRank = upperIndex / (n - 1);
+      const percentRank = lowerRank + fraction * (upperRank - lowerRank);
+      
+      // 有効桁数で丸める
+      const factor = Math.pow(10, significance);
+      return Math.round(percentRank * factor) / factor;
     } catch {
       return FormulaError.VALUE;
     }

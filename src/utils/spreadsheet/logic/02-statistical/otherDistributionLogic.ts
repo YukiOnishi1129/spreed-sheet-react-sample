@@ -2,7 +2,7 @@
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue } from '../shared/utils';
+import { getCellValue, toNumber } from '../shared/utils';
 
 // ガンマ関数
 function gamma(x: number): number {
@@ -546,6 +546,58 @@ export const CHIINV: CustomFormula = {
       }
       
       return x;
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// GAMMA関数の実装（ガンマ関数）
+export const GAMMA: CustomFormula = {
+  name: 'GAMMA',
+  pattern: /GAMMA\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, xRef] = matches;
+    
+    try {
+      const xValue = getCellValue(xRef.trim(), context);
+      const x = toNumber(xValue) ?? parseFloat(xRef.trim());
+      
+      if (isNaN(x)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (x <= 0 && Number.isInteger(x)) {
+        return FormulaError.NUM;
+      }
+      
+      return gamma(x);
+    } catch {
+      return FormulaError.VALUE;
+    }
+  }
+};
+
+// GAMMALN.PRECISE関数の実装（ガンマ関数の自然対数 - 高精度）
+export const GAMMALN_PRECISE: CustomFormula = {
+  name: 'GAMMALN.PRECISE',
+  pattern: /GAMMALN\.PRECISE\(([^)]+)\)/i,
+  calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
+    const [, xRef] = matches;
+    
+    try {
+      const xValue = getCellValue(xRef.trim(), context);
+      const x = toNumber(xValue) ?? parseFloat(xRef.trim());
+      
+      if (isNaN(x)) {
+        return FormulaError.VALUE;
+      }
+      
+      if (x <= 0) {
+        return FormulaError.NUM;
+      }
+      
+      return Math.log(gamma(x));
     } catch {
       return FormulaError.VALUE;
     }

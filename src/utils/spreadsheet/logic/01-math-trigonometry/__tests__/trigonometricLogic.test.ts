@@ -3,10 +3,10 @@ import type { FormulaContext } from '../../shared/types';
 import {
   SIN, COS, TAN, ASIN, ACOS, ATAN, ATAN2,
   SINH, COSH, TANH, ASINH, ACOSH, ATANH,
-  DEGREES, RADIANS, PI,
   CSC, SEC, COT, ACOT,
   CSCH, SECH, COTH, ACOTH
 } from '../trigonometricLogic';
+import { DEGREES, RADIANS, PI } from '../mathLogic';
 import { FormulaError } from '../../shared/types';
 
 // Helper function to create FormulaContext
