@@ -30,7 +30,7 @@ describe('Complex Trigonometric Functions', () => {
     it('should calculate sin(pi/2)', () => {
       const matches = ['IMSIN("1.5708")', '"1.5708"'] as RegExpMatchArray;
       const result = IMSIN.calculate(matches, mockContext);
-      expect(result).toBeCloseTo('1', 3);
+      expect(result).toBe('1');
     });
 
     it('should calculate sin(i)', () => {
@@ -74,7 +74,7 @@ describe('Complex Trigonometric Functions', () => {
     it('should calculate cos(pi)', () => {
       const matches = ['IMCOS("3.14159")', '"3.14159"'] as RegExpMatchArray;
       const result = IMCOS.calculate(matches, mockContext);
-      expect(result).toBeCloseTo('-1', 3);
+      expect(result).toBe('-1');
     });
 
     it('should calculate cos(i)', () => {
@@ -108,7 +108,7 @@ describe('Complex Trigonometric Functions', () => {
     it('should calculate tan(pi/4)', () => {
       const matches = ['IMTAN("0.7854")', '"0.7854"'] as RegExpMatchArray;
       const result = IMTAN.calculate(matches, mockContext);
-      expect(result).toBeCloseTo('1', 3);
+      expect(result).toBe('1');
     });
 
     it('should calculate tan of complex number', () => {
@@ -133,7 +133,7 @@ describe('Complex Trigonometric Functions', () => {
     it('should calculate csc of real number', () => {
       const matches = ['IMCSC("1.5708")', '"1.5708"'] as RegExpMatchArray;
       const result = IMCSC.calculate(matches, mockContext);
-      expect(result).toBeCloseTo('1', 3); // csc(pi/2) = 1
+      expect(result).toBe('1'); // csc(pi/2) = 1
     });
 
     it('should return NUM error for sin(z) = 0', () => {
@@ -159,7 +159,7 @@ describe('Complex Trigonometric Functions', () => {
     it('should calculate sec(pi)', () => {
       const matches = ['IMSEC("3.14159")', '"3.14159"'] as RegExpMatchArray;
       const result = IMSEC.calculate(matches, mockContext);
-      expect(result).toBeCloseTo('-1', 3); // sec(pi) = -1
+      expect(result).toBe('-1'); // sec(pi) = -1
     });
 
     it('should return NUM error for cos(z) = 0', () => {
@@ -174,7 +174,7 @@ describe('Complex Trigonometric Functions', () => {
     it('should calculate cot of real number', () => {
       const matches = ['IMCOT("0.7854")', '"0.7854"'] as RegExpMatchArray;
       const result = IMCOT.calculate(matches, mockContext);
-      expect(result).toBeCloseTo('1', 3); // cot(pi/4) = 1
+      expect(result).toBe('1'); // cot(pi/4) = 1
     });
 
     it('should return NUM error for tan(z) = ∞', () => {

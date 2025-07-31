@@ -188,14 +188,18 @@ export const DSUM: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       
@@ -238,14 +242,18 @@ export const DAVERAGE: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       
@@ -290,14 +298,18 @@ export const DCOUNT: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       
@@ -340,14 +352,18 @@ export const DCOUNTA: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       
@@ -390,14 +406,18 @@ export const DMAX: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       
@@ -442,14 +462,18 @@ export const DMIN: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       
@@ -494,14 +518,18 @@ export const DPRODUCT: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       
@@ -546,14 +574,18 @@ export const DGET: CustomFormula = {
       
       const headers = database[0];
       // Handle field reference - could be a cell reference or a direct field name/number
-      let field = fieldRef.trim();
+      let field: string | number = fieldRef.trim();
       // Check if field is a number
       const fieldNum = Number(field);
       if (!isNaN(fieldNum)) {
         field = fieldNum;
       } else if (/^[A-Z]+\d+$/.test(field)) {
         // If field looks like a cell reference (e.g., B1), get its value
-        field = getCellValue(field, context) ?? field;
+        const cellValue = getCellValue(field, context);
+        if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+          field = cellValue;
+        }
+        // else keep field as is
       }
       const fieldIndex = getFieldIndex(field, headers);
       

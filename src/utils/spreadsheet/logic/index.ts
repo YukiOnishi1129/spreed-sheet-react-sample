@@ -117,7 +117,10 @@ import {
 import {
   SORTBY, TAKE, DROP, EXPAND, HSTACK, VSTACK, TOCOL, TOROW, WRAPROWS, WRAPCOLS
 } from './06-lookup-reference/dynamicArrayLogic';
-import { BYROW, BYCOL, MAP, REDUCE, SCAN, MAKEARRAY } from './06-lookup-reference/lambdaArrayLogic';
+
+import {
+  BYROW, BYCOL, MAP, REDUCE, SCAN, MAKEARRAY
+} from './06-lookup-reference/lambdaArrayLogic';
 
 import { MDETERM, MINVERSE, MMULT, MUNIT } from './01-math-trigonometry/matrixLogic';
 import { WEBSERVICE, FILTERXML, ENCODEURL } from './12-web/webLogic';
@@ -382,6 +385,7 @@ export * from './10-engineering/errorLogic';
 export * from './10-engineering/bitLogic';
 export * from './06-lookup-reference/additionalLookupLogic';
 export * from './06-lookup-reference/dynamicArrayLogic';
+export * from './06-lookup-reference/lambdaArrayLogic';
 export * from './08-database/statisticalDatabaseLogic';
 export * from './12-web/webLogic';
 export * from './01-math-trigonometry/matrixLogic';

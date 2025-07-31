@@ -293,8 +293,8 @@ describe('Web Functions', () => {
       const encodedMatches = ['ENCODEURL("' + text + '")', '"' + text + '"'] as RegExpMatchArray;
       const encoded = ENCODEURL.calculate(encodedMatches, mockContext);
       
-      const hyperlinkMatches = ['HYPERLINK("https://example.com/search?q=' + encoded + '", "Search")', 
-        '"https://example.com/search?q=' + encoded + '"', '"Search"'] as RegExpMatchArray;
+      const hyperlinkMatches = ['HYPERLINK("https://example.com/search?q=' + String(encoded) + '", "Search")', 
+        '"https://example.com/search?q=' + String(encoded) + '"', '"Search"'] as RegExpMatchArray;
       const result = HYPERLINK.calculate(hyperlinkMatches, mockContext);
       
       expect(result).toBe('Search');

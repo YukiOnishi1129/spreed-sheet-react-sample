@@ -348,7 +348,8 @@ describe('Complex Number Functions', () => {
     it('should calculate e^(real number)', () => {
       const matches = ['IMEXP("1")', '"1"'] as RegExpMatchArray;
       const result = IMEXP.calculate(matches, mockContext);
-      expect(result).toBeCloseTo(Math.E.toString(), 5);
+      const real = parseFloat(String(result));
+      expect(real).toBeCloseTo(Math.E, 5);
     });
 
     it('should calculate e^(i*pi)', () => {
@@ -363,7 +364,8 @@ describe('Complex Number Functions', () => {
     it('should calculate ln of positive real', () => {
       const matches = ['IMLN("2.71828")', '"2.71828"'] as RegExpMatchArray;
       const result = IMLN.calculate(matches, mockContext);
-      expect(result).toBeCloseTo('1', 3);
+      const real = parseFloat(String(result));
+      expect(real).toBeCloseTo(1, 3);
     });
 
     it('should calculate ln of negative real', () => {
@@ -378,6 +380,32 @@ describe('Complex Number Functions', () => {
     it('should return NUM error for zero', () => {
       const matches = ['IMLN("0")', '"0"'] as RegExpMatchArray;
       const result = IMLN.calculate(matches, mockContext);
+      expect(result).toBe(FormulaError.NUM);
+    });
+  });
+
+  describe('IMLOG2 Function (Complex Logarithm Base 2)', () => {
+    it('should calculate log2 of positive real', () => {
+      const matches = ['IMLOG2("8")', '"8"'] as RegExpMatchArray;
+      const result = IMLOG2.calculate(matches, mockContext);
+      const real = parseFloat(String(result));
+      expect(real).toBeCloseTo(3, 5);
+    });
+
+    it('should calculate log2 of complex number', () => {
+      const matches = ['IMLOG2("2+2i")', '"2+2i"'] as RegExpMatchArray;
+      const result = IMLOG2.calculate(matches, mockContext) as string;
+      // log2(2+2i) = log2(2√2 * e^(i*π/4)) = log2(2√2) + i*π/4/ln(2)
+      const parts = result.split('+');
+      const real = parseFloat(parts[0]);
+      const imag = parseFloat(parts[1].replace('i', ''));
+      expect(real).toBeCloseTo(1.5, 3); // log2(2√2) = 1.5
+      expect(imag).toBeCloseTo((Math.PI/4)/Math.LN2, 3);
+    });
+
+    it('should return NUM error for zero', () => {
+      const matches = ['IMLOG2("0")', '"0"'] as RegExpMatchArray;
+      const result = IMLOG2.calculate(matches, mockContext);
       expect(result).toBe(FormulaError.NUM);
     });
   });
@@ -404,7 +432,7 @@ describe('Complex Number Functions', () => {
       const conjMatches = ['IMCONJUGATE("3+4i")', '"3+4i"'] as RegExpMatchArray;
       const conj = IMCONJUGATE.calculate(conjMatches, mockContext);
       
-      const prodMatches = ['IMPRODUCT("3+4i", "' + conj + '")', '"3+4i", "' + conj + '"'] as RegExpMatchArray;
+      const prodMatches = ['IMPRODUCT("3+4i", "' + String(conj) + '")', '"3+4i"', '"' + String(conj) + '"'] as RegExpMatchArray;
       const product = IMPRODUCT.calculate(prodMatches, mockContext);
       
       expect(product).toBe('25'); // 3^2 + 4^2 = 25
@@ -413,7 +441,7 @@ describe('Complex Number Functions', () => {
     it('should verify Euler formula', () => {
       // e^(ix) = cos(x) + i*sin(x)
       const angle = Math.PI / 4;
-      const matches = ['IMEXP("' + angle + 'i")', '"' + angle + 'i"'] as RegExpMatchArray;
+      const matches = ['IMEXP("' + String(angle) + 'i")', '"' + String(angle) + 'i"'] as RegExpMatchArray;
       const result = IMEXP.calculate(matches, mockContext) as string;
       
       const parts = result.split('+');

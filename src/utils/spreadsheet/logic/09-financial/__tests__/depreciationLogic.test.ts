@@ -247,7 +247,7 @@ describe('Depreciation Functions', () => {
 
   describe('Edge Cases and Integration', () => {
     it('should verify CUMIPMT + CUMPRINC equals total payment', () => {
-      const nper = 60;
+      // const nper = 60;
       const pv = 100000;
       
       const ipmtMatches = ['CUMIPMT(0.004167, 60, 100000, 1, 60, 0)', 

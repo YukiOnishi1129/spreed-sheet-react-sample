@@ -275,7 +275,7 @@ describe('Bit Operation Functions', () => {
 
     it('should verify shift operations are inverse', () => {
       const value = 100;
-      const shift = 5;
+      // const shift = 5;
       
       const leftMatches = ['BITLSHIFT(100, 5)', '100', '5'] as RegExpMatchArray;
       const leftResult = BITLSHIFT.calculate(leftMatches, mockContext) as number;
@@ -296,7 +296,7 @@ describe('Bit Operation Functions', () => {
 
     it('should verify XOR encryption property', () => {
       const data = 42;
-      const key = 123;
+      // const key = 123;
       
       // Encrypt
       const encryptMatches = ['BITXOR(42, 123)', '42', '123'] as RegExpMatchArray;

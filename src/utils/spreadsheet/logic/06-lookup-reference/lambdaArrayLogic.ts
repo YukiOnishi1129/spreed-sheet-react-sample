@@ -2,74 +2,238 @@
 
 import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
 import { FormulaError } from '../shared/types';
-import { getCellValue } from '../shared/utils';
+import { getCellValue, parseCellRange, evaluateExpression, toNumber } from '../shared/utils';
+import { matchFormula } from '../index';
+
+// Lambda式の評価を行うヘルパー関数
+const evaluateLambda = (
+  lambdaExpression: string,
+  paramNames: string[],
+  paramValues: unknown[],
+  context: FormulaContext
+): FormulaResult => {
+  try {
+    // LAMBDA関数の形式を解析
+    const lambdaMatch = lambdaExpression.match(/LAMBDA\(([^,)]+(?:,[^,)]+)*),\s*(.+)\)$/i);
+    if (lambdaMatch) {
+      const [, params, body] = lambdaMatch;
+      const lambdaParams = params.split(',').map(p => p.trim());
+      
+      // パラメータを実際の値に置換
+      let evaluatedBody = body.trim();
+      
+      // 単一のパラメータが配列の場合、特別な処理
+      if (lambdaParams.length === 1 && paramValues.length === 1 && Array.isArray(paramValues[0])) {
+        const arrayParam = paramValues[0] as unknown[];
+        
+        // SUM(row)のような関数呼び出しを検出
+        if (evaluatedBody.toUpperCase() === `SUM(${lambdaParams[0].toUpperCase()})`) {
+          const sum = arrayParam.reduce((acc: number, val) => {
+            const num = toNumber(val);
+            return num !== null ? acc + num : acc;
+          }, 0);
+          return sum;
+        }
+        
+        if (evaluatedBody.toUpperCase() === `AVERAGE(${lambdaParams[0].toUpperCase()})`) {
+          const nums = arrayParam.map(val => toNumber(val)).filter(n => n !== null) as number[];
+          return nums.length > 0 ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+        }
+        
+        if (evaluatedBody.toUpperCase() === `COUNT(${lambdaParams[0].toUpperCase()})`) {
+          return arrayParam.filter(val => toNumber(val) !== null).length;
+        }
+        
+        if (evaluatedBody.toUpperCase() === `MAX(${lambdaParams[0].toUpperCase()})`) {
+          const nums = arrayParam.map(val => toNumber(val)).filter(n => n !== null) as number[];
+          return nums.length > 0 ? Math.max(...nums) : 0;
+        }
+        
+        if (evaluatedBody.toUpperCase() === `MIN(${lambdaParams[0].toUpperCase()})`) {
+          const nums = arrayParam.map(val => toNumber(val)).filter(n => n !== null) as number[];
+          return nums.length > 0 ? Math.min(...nums) : 0;
+        }
+      }
+      
+      // 通常のパラメータ置換
+      lambdaParams.forEach((param, index) => {
+        if (index < paramValues.length) {
+          const value = paramValues[index];
+          const regex = new RegExp(`\\b${param}\\b`, 'gi');
+          
+          // 配列の場合はJSON形式で置換
+          if (Array.isArray(value)) {
+            evaluatedBody = evaluatedBody.replace(regex, JSON.stringify(value));
+          } else {
+            evaluatedBody = evaluatedBody.replace(regex, String(value));
+          }
+        }
+      });
+      
+      // 特別な関数を含む場合はフォーミュラ評価へ
+      if (evaluatedBody.toUpperCase().includes('MAX(') || 
+          evaluatedBody.toUpperCase().includes('MIN(') ||
+          evaluatedBody.toUpperCase().includes('SUM(') ||
+          evaluatedBody.toUpperCase().includes('AVERAGE(')) {
+        return evaluateFormulaExpression(evaluatedBody, context);
+      }
+      
+      // 簡単な演算子を含む式の評価
+      if (/^[a-z0-9\s+\-*/().,]+$/i.test(evaluatedBody)) {
+        try {
+          // 安全な評価のためにeval の代わりに計算を実行
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-implied-eval
+          const result = new Function('return (' + evaluatedBody + ')')() as unknown;
+          if (typeof result === 'number' && !isNaN(result)) {
+            return result;
+          }
+        } catch {
+          // 評価に失敗した場合は下記の処理に進む
+        }
+      }
+      
+      // 関数式を評価
+      return evaluateFormulaExpression(evaluatedBody, context);
+    }
+    
+    // LAMBDA関数でない場合、単純な関数名の可能性
+    const functionName = lambdaExpression.trim().toUpperCase();
+    
+    // 組み込み関数を処理
+    if (functionName === 'SUM' || lambdaExpression.toUpperCase().includes('SUM(')) {
+      const sum = paramValues.reduce((acc: number, val) => {
+        const num = toNumber(val);
+        return num !== null ? acc + num : acc;
+      }, 0);
+      return sum;
+    }
+    
+    if (functionName === 'AVERAGE' || lambdaExpression.toUpperCase().includes('AVERAGE(')) {
+      const nums = paramValues.map(val => toNumber(val)).filter(n => n !== null) as number[];
+      return nums.length > 0 ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+    }
+    
+    if (functionName === 'COUNT' || lambdaExpression.toUpperCase().includes('COUNT(')) {
+      return paramValues.filter(val => toNumber(val) !== null).length;
+    }
+    
+    if (functionName === 'MAX' || lambdaExpression.toUpperCase().includes('MAX(')) {
+      const nums = paramValues.map(val => toNumber(val)).filter(n => n !== null) as number[];
+      return nums.length > 0 ? Math.max(...nums) : 0;
+    }
+    
+    if (functionName === 'MIN' || lambdaExpression.toUpperCase().includes('MIN(')) {
+      const nums = paramValues.map(val => toNumber(val)).filter(n => n !== null) as number[];
+      return nums.length > 0 ? Math.min(...nums) : 0;
+    }
+    
+    // その他の関数式を評価
+    let expression = lambdaExpression;
+    paramNames.forEach((param, index) => {
+      if (index < paramValues.length) {
+        const value = paramValues[index];
+        const regex = new RegExp(`\\b${param}\\b`, 'gi');
+        expression = expression.replace(regex, String(value));
+      }
+    });
+    
+    return evaluateFormulaExpression(expression, context);
+  } catch {
+    return FormulaError.VALUE;
+  }
+};
+
+// 数式を評価するヘルパー関数
+const evaluateFormulaExpression = (expression: string, context: FormulaContext): FormulaResult => {
+  try {
+    // MAX関数の特別処理
+    const maxMatch = expression.match(/MAX\(([^,]+),\s*([^)]+)\)/i);
+    if (maxMatch) {
+      const [, arg1, arg2] = maxMatch;
+      const val1 = isNaN(Number(arg1)) ? getCellValue(arg1.trim(), context) : Number(arg1);
+      const val2 = isNaN(Number(arg2)) ? getCellValue(arg2.trim(), context) : Number(arg2);
+      const num1 = toNumber(val1);
+      const num2 = toNumber(val2);
+      if (num1 !== null && num2 !== null) {
+        return Math.max(num1, num2);
+      }
+    }
+    
+    // MIN関数の特別処理
+    const minMatch = expression.match(/MIN\(([^,]+),\s*([^)]+)\)/i);
+    if (minMatch) {
+      const [, arg1, arg2] = minMatch;
+      const val1 = isNaN(Number(arg1)) ? getCellValue(arg1.trim(), context) : Number(arg1);
+      const val2 = isNaN(Number(arg2)) ? getCellValue(arg2.trim(), context) : Number(arg2);
+      const num1 = toNumber(val1);
+      const num2 = toNumber(val2);
+      if (num1 !== null && num2 !== null) {
+        return Math.min(num1, num2);
+      }
+    }
+    
+    // 組み込み関数をチェック
+    const matchResult = matchFormula(expression.toUpperCase());
+    if (matchResult) {
+      const { function: func, matches } = matchResult;
+      return func.calculate(matches, context);
+    }
+    
+    // 単純な算術式を評価
+    const result = evaluateExpression(expression, context);
+    return result;
+  } catch {
+    return FormulaError.VALUE;
+  }
+};
+
+// 配列データを取得するヘルパー関数
+const getArrayData = (arrayRef: string, context: FormulaContext): (number | string | boolean | null)[][] => {
+  const rangeCoords = parseCellRange(arrayRef.trim());
+  if (!rangeCoords) {
+    throw new Error('Invalid range');
+  }
+  
+  const { start, end } = rangeCoords;
+  const data: (number | string | boolean | null)[][] = [];
+  
+  for (let row = start.row; row <= end.row && row < context.data.length; row++) {
+    const rowData: (number | string | boolean | null)[] = [];
+    for (let col = start.col; col <= end.col && col < context.data[row]?.length; col++) {
+      const cellValue = getCellValue(`${String.fromCharCode(65 + col)}${row + 1}`, context);
+      rowData.push(cellValue as (number | string | boolean | null));
+    }
+    data.push(rowData);
+  }
+  
+  return data;
+};
 
 // BYROW関数の実装（行ごとに関数を適用）
 export const BYROW: CustomFormula = {
   name: 'BYROW',
-  pattern: /BYROW\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /BYROW\(([^,]+),\s*(.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, arrayRef, lambdaRef] = matches;
     
     try {
       // データ配列を取得
-      const data: (number | string | boolean | null)[][] = [];
-      const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-      
-      if (!rangeMatch) {
-        return FormulaError.REF;
-      }
-      
-      const [, startCol, startRowStr, endCol, endRowStr] = rangeMatch;
-      const startRow = parseInt(startRowStr) - 1;
-      const endRow = parseInt(endRowStr) - 1;
-      const startColIndex = startCol.charCodeAt(0) - 65;
-      const endColIndex = endCol.charCodeAt(0) - 65;
-      
-      for (let row = startRow; row <= endRow; row++) {
-        const rowData: (number | string | boolean | null)[] = [];
-        for (let col = startColIndex; col <= endColIndex; col++) {
-          const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
-        }
-        data.push(rowData);
-      }
-      
-      // Lambda関数の解析（簡易実装）
-      // 実際のLAMBDA関数のサポートにはより複雑な実装が必要
-      const lambdaStr = lambdaRef.trim().toUpperCase();
-      
+      const data = getArrayData(arrayRef, context);
       const results: (number | string | boolean | null)[][] = [];
       
+      // 各行に対してLambda関数を適用
       for (const row of data) {
-        let result: (number | string | boolean | null);
+        const result = evaluateLambda(lambdaRef.trim(), ['row'], [row], context);
         
-        // 簡易的な関数適用
-        if (lambdaStr.includes('SUM')) {
-          result = row.reduce((sum: number, val) => {
-            const num = Number(val);
-            return isNaN(num) ? sum : sum + num;
-          }, 0);
-        } else if (lambdaStr.includes('AVERAGE')) {
-          const nums = row.filter(val => !isNaN(Number(val))).map(Number);
-          result = nums.length > 0 ? nums.reduce((sum: number, val: number) => sum + val, 0) / nums.length : 0;
-        } else if (lambdaStr.includes('COUNT')) {
-          result = row.filter(val => !isNaN(Number(val))).length;
-        } else if (lambdaStr.includes('MAX')) {
-          const nums = row.filter(val => !isNaN(Number(val))).map(Number);
-          result = nums.length > 0 ? Math.max(...nums) : 0;
-        } else if (lambdaStr.includes('MIN')) {
-          const nums = row.filter(val => !isNaN(Number(val))).map(Number);
-          result = nums.length > 0 ? Math.min(...nums) : 0;
+        // 結果を単一セルの配列として追加
+        if (Array.isArray(result) && Array.isArray(result[0])) {
+          // 二次元配列の場合は最初の要素を取得
+          results.push([(result[0] as (number | string | boolean | null)[])[0]]);
+        } else if (Array.isArray(result)) {
+          results.push([result[0] as (number | string | boolean | null)]);
         } else {
-          // デフォルトは合計
-          result = row.reduce((sum: number, val) => {
-            const num = Number(val);
-            return isNaN(num) ? sum : sum + num;
-          }, 0);
+          results.push([result as (number | string | boolean | null)]);
         }
-        
-        results.push([result]);
       }
       
       return results;
@@ -82,70 +246,35 @@ export const BYROW: CustomFormula = {
 // BYCOL関数の実装（列ごとに関数を適用）
 export const BYCOL: CustomFormula = {
   name: 'BYCOL',
-  pattern: /BYCOL\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /BYCOL\(([^,]+),\s*(.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
     const [, arrayRef, lambdaRef] = matches;
     
     try {
       // データ配列を取得
-      const data: (number | string | boolean | null)[][] = [];
-      const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
+      const data = getArrayData(arrayRef, context);
       
-      if (!rangeMatch) {
-        return FormulaError.REF;
+      if (data.length === 0 || data[0].length === 0) {
+        return FormulaError.VALUE;
       }
       
-      const [, startCol, startRowStr, endCol, endRowStr] = rangeMatch;
-      const startRow = parseInt(startRowStr) - 1;
-      const endRow = parseInt(endRowStr) - 1;
-      const startColIndex = startCol.charCodeAt(0) - 65;
-      const endColIndex = endCol.charCodeAt(0) - 65;
+      const results: (number | string | boolean | null)[][] = [[]]; // 1行の結果配列
+      const numCols = data[0].length;
       
-      for (let row = startRow; row <= endRow; row++) {
-        const rowData: (number | string | boolean | null)[] = [];
-        for (let col = startColIndex; col <= endColIndex; col++) {
-          const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
-        }
-        data.push(rowData);
-      }
-      
-      // Lambda関数の解析（簡易実装）
-      const lambdaStr = lambdaRef.trim().toUpperCase();
-      
-      const results: (number | string | boolean | null)[][] = [];
-      const numCols = data[0]?.length ?? 0;
-      
+      // 各列に対してLambda関数を適用
       for (let col = 0; col < numCols; col++) {
         const column = data.map(row => row[col]);
-        let result: (number | string | boolean | null);
+        const result = evaluateLambda(lambdaRef.trim(), ['column'], [column], context);
         
-        // 簡易的な関数適用
-        if (lambdaStr.includes('SUM')) {
-          result = column.reduce((sum: number, val) => {
-            const num = Number(val);
-            return isNaN(num) ? sum : sum + num;
-          }, 0);
-        } else if (lambdaStr.includes('AVERAGE')) {
-          const nums = column.filter(val => !isNaN(Number(val))).map(Number);
-          result = nums.length > 0 ? nums.reduce((sum: number, val: number) => sum + val, 0) / nums.length : 0;
-        } else if (lambdaStr.includes('COUNT')) {
-          result = column.filter(val => !isNaN(Number(val))).length;
-        } else if (lambdaStr.includes('MAX')) {
-          const nums = column.filter(val => !isNaN(Number(val))).map(Number);
-          result = nums.length > 0 ? Math.max(...nums) : 0;
-        } else if (lambdaStr.includes('MIN')) {
-          const nums = column.filter(val => !isNaN(Number(val))).map(Number);
-          result = nums.length > 0 ? Math.min(...nums) : 0;
+        // 結果を横一列に追加
+        if (Array.isArray(result) && Array.isArray(result[0])) {
+          // 二次元配列の場合は最初の要素を取得
+          results[0].push((result[0] as (number | string | boolean | null)[])[0]);
+        } else if (Array.isArray(result)) {
+          results[0].push(result[0] as (number | string | boolean | null));
         } else {
-          // デフォルトは合計
-          result = column.reduce((sum: number, val) => {
-            const num = Number(val);
-            return isNaN(num) ? sum : sum + num;
-          }, 0);
+          results[0].push(result as (number | string | boolean | null));
         }
-        
-        results.push([result]);
       }
       
       return results;
@@ -158,64 +287,55 @@ export const BYCOL: CustomFormula = {
 // MAP関数の実装（配列の各要素に関数を適用）
 export const MAP: CustomFormula = {
   name: 'MAP',
-  pattern: /MAP\(([^,]+),\s*([^)]+)\)/i,
+  pattern: /MAP\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, arrayRef, lambdaRef] = matches;
+    const [, args] = matches;
     
     try {
-      // データ配列を取得
-      const data: (number | string | boolean | null)[][] = [];
-      const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-      
-      if (!rangeMatch) {
-        return FormulaError.REF;
+      // 引数を解析（複数の配列とLambda関数）
+      const argParts = parseArguments(args);
+      if (argParts.length < 2) {
+        return FormulaError.VALUE;
       }
       
-      const [, startCol, startRowStr, endCol, endRowStr] = rangeMatch;
-      const startRow = parseInt(startRowStr) - 1;
-      const endRow = parseInt(endRowStr) - 1;
-      const startColIndex = startCol.charCodeAt(0) - 65;
-      const endColIndex = endCol.charCodeAt(0) - 65;
+      const lambdaRef = argParts[argParts.length - 1];
+      const arrayRefs = argParts.slice(0, -1);
       
-      for (let row = startRow; row <= endRow; row++) {
-        const rowData: (number | string | boolean | null)[] = [];
-        for (let col = startColIndex; col <= endColIndex; col++) {
-          const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
+      // 各配列のデータを取得
+      const arrays = arrayRefs.map(ref => getArrayData(ref, context));
+      
+      if (arrays.length === 0) {
+        return FormulaError.VALUE;
+      }
+      
+      // すべての配列のサイズを確認
+      const rows = arrays[0].length;
+      const cols = arrays[0][0]?.length ?? 0;
+      
+      for (const arr of arrays) {
+        if (arr.length !== rows || (arr[0]?.length ?? 0) !== cols) {
+          return FormulaError.VALUE; // サイズが一致しない
         }
-        data.push(rowData);
       }
-      
-      // Lambda関数の解析（簡易実装）
-      const lambdaStr = lambdaRef.trim().toUpperCase();
       
       const results: (number | string | boolean | null)[][] = [];
       
-      for (const row of data) {
+      // 各要素に対してLambda関数を適用
+      for (let row = 0; row < rows; row++) {
         const resultRow: (number | string | boolean | null)[] = [];
-        for (const value of row) {
-          let result: (number | string | boolean | null);
+        for (let col = 0; col < cols; col++) {
+          // 各配列から対応する要素を取得
+          const values = arrays.map(arr => arr[row][col]);
+          const result = evaluateLambda(lambdaRef.trim(), ['a', 'b', 'c', 'd', 'e'].slice(0, values.length), values, context);
           
-          // 簡易的な関数適用
-          if (lambdaStr.includes('*2')) {
-            const num = Number(value);
-            result = isNaN(num) ? value : num * 2;
-          } else if (lambdaStr.includes('+1')) {
-            const num = Number(value);
-            result = isNaN(num) ? value : num + 1;
-          } else if (lambdaStr.includes('SQRT')) {
-            const num = Number(value);
-            result = isNaN(num) || num < 0 ? FormulaError.NUM : Math.sqrt(num);
-          } else if (lambdaStr.includes('UPPER')) {
-            result = String(value).toUpperCase();
-          } else if (lambdaStr.includes('LOWER')) {
-            result = String(value).toLowerCase();
+          if (Array.isArray(result) && Array.isArray(result[0])) {
+            // 二次元配列の場合は最初の要素を取得
+            resultRow.push((result[0] as (number | string | boolean | null)[])[0]);
+          } else if (Array.isArray(result)) {
+            resultRow.push(result[0] as (number | string | boolean | null));
           } else {
-            // デフォルトはそのまま返す
-            result = value;
+            resultRow.push(result as (number | string | boolean | null));
           }
-          
-          resultRow.push(result);
         }
         results.push(resultRow);
       }
@@ -227,81 +347,113 @@ export const MAP: CustomFormula = {
   }
 };
 
+// 引数を解析するヘルパー関数
+const parseArguments = (args: string): string[] => {
+  const result: string[] = [];
+  let current = '';
+  let depth = 0;
+  let inQuote = false;
+  
+  for (let i = 0; i < args.length; i++) {
+    const char = args[i];
+    
+    if (char === '"' && (i === 0 || args[i - 1] !== '\\')) {
+      inQuote = !inQuote;
+    }
+    
+    if (!inQuote) {
+      if (char === '(') depth++;
+      else if (char === ')') depth--;
+      else if (char === ',' && depth === 0) {
+        result.push(current.trim());
+        current = '';
+        continue;
+      }
+    }
+    
+    current += char;
+  }
+  
+  if (current.trim()) {
+    result.push(current.trim());
+  }
+  
+  return result;
+};
+
 // REDUCE関数の実装（配列を単一の値に縮約）
 export const REDUCE: CustomFormula = {
   name: 'REDUCE',
-  pattern: /REDUCE\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /REDUCE\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, initialRef, arrayRef, lambdaRef] = matches;
+    const [, args] = matches;
     
     try {
-      // 初期値を取得
-      const initial = getCellValue(initialRef.trim(), context) ?? 0;
+      const argParts = parseArguments(args);
+      if (argParts.length < 3) {
+        return FormulaError.VALUE;
+      }
       
-      // データ配列を取得
+      const [initialRef, arrayRef, lambdaRef] = argParts;
+      
+      // 初期値を取得
+      let initial: unknown;
+      if (initialRef.match(/^-?\d+(\.\d+)?$/)) {
+        initial = parseFloat(initialRef);
+      } else if (initialRef.startsWith('"') && initialRef.endsWith('"')) {
+        initial = initialRef.slice(1, -1);
+      } else {
+        initial = getCellValue(initialRef, context);
+      }
+      
+      // データ配列を取得（フラット化）
+      const data = getArrayData(arrayRef, context);
       const values: (number | string | boolean | null)[] = [];
       
-      if (arrayRef.includes(':')) {
-        const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-        if (!rangeMatch) {
-          return FormulaError.REF;
-        }
-        
-        const [, startCol, startRowStr, endCol, endRowStr] = rangeMatch;
-        const startRow = parseInt(startRowStr) - 1;
-        const endRow = parseInt(endRowStr) - 1;
-        const startColIndex = startCol.charCodeAt(0) - 65;
-        const endColIndex = endCol.charCodeAt(0) - 65;
-        
-        for (let row = startRow; row <= endRow; row++) {
-          for (let col = startColIndex; col <= endColIndex; col++) {
-            const cell = context.data[row]?.[col];
-            if (cell) {
-              values.push(cell.value as (number | string | boolean | null));
-            }
+      for (const row of data) {
+        for (const value of row) {
+          if (value !== null && value !== '') {
+            values.push(value);
           }
         }
-      } else {
-        values.push(getCellValue(arrayRef.trim(), context) as (number | string | boolean | null));
       }
       
-      // Lambda関数の解析（簡易実装）
-      const lambdaStr = lambdaRef.trim().toUpperCase();
+      // Lambda関数を順次適用
+      let accumulator = initial;
       
-      let result: (number | string | boolean | null) = initial as (number | string | boolean | null);
+      // 特別なケース: &演算子の処理
+      if (lambdaRef.includes('&')) {
+        for (const value of values) {
+          // 文字列連結
+          accumulator = String(accumulator) + String(value);
+        }
+        return accumulator as string;
+      }
       
       for (const value of values) {
-        // 簡易的な関数適用
-        if (lambdaStr.includes('+')) {
-          const num = Number(value);
-          if (!isNaN(num)) {
-            result = Number(result) + num;
-          }
-        } else if (lambdaStr.includes('*')) {
-          const num = Number(value);
-          if (!isNaN(num)) {
-            result = Number(result) * num;
-          }
-        } else if (lambdaStr.includes('MAX')) {
-          const num = Number(value);
-          if (!isNaN(num)) {
-            result = Math.max(Number(result), num);
-          }
-        } else if (lambdaStr.includes('MIN')) {
-          const num = Number(value);
-          if (!isNaN(num)) {
-            result = Math.min(Number(result), num);
-          }
-        } else {
-          // デフォルトは加算
-          const num = Number(value);
-          if (!isNaN(num)) {
-            result = Number(result) + num;
-          }
+        accumulator = evaluateLambda(lambdaRef.trim(), ['accumulator', 'value'], [accumulator, value], context);
+        
+        // エラーが発生した場合は即座に返す
+        if (typeof accumulator === 'string' && accumulator.startsWith('#')) {
+          return accumulator;
         }
       }
       
-      return result;
+      // accumulator の型をチェックして適切な FormulaResult を返す
+      if (typeof accumulator === 'string' || typeof accumulator === 'number' || typeof accumulator === 'boolean' || accumulator === null) {
+        return accumulator;
+      } else if (Array.isArray(accumulator)) {
+        // 配列の場合はそのまま返せない可能性があるため、最初の要素を返す
+        if (Array.isArray(accumulator[0])) {
+          return accumulator as (number | string | boolean | null)[][];
+        } else {
+          return accumulator as (number | string | boolean | null)[];
+        }
+      } else if (accumulator instanceof Date) {
+        return accumulator;
+      } else {
+        return FormulaError.VALUE;
+      }
     } catch {
       return FormulaError.VALUE;
     }
@@ -311,76 +463,58 @@ export const REDUCE: CustomFormula = {
 // SCAN関数の実装（配列の累積計算）
 export const SCAN: CustomFormula = {
   name: 'SCAN',
-  pattern: /SCAN\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /SCAN\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, initialRef, arrayRef, lambdaRef] = matches;
+    const [, args] = matches;
     
     try {
+      const argParts = parseArguments(args);
+      if (argParts.length < 3) {
+        return FormulaError.VALUE;
+      }
+      
+      const [initialRef, arrayRef, lambdaRef] = argParts;
+      
       // 初期値を取得
-      const initial = getCellValue(initialRef.trim(), context) ?? 0;
+      let initial: unknown;
+      if (initialRef.match(/^-?\d+(\.\d+)?$/)) {
+        initial = parseFloat(initialRef);
+      } else if (initialRef.startsWith('"') && initialRef.endsWith('"')) {
+        initial = initialRef.slice(1, -1);
+      } else {
+        initial = getCellValue(initialRef, context);
+      }
       
       // データ配列を取得
-      const data: (number | string | boolean | null)[][] = [];
-      const rangeMatch = arrayRef.trim().match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
-      
-      if (!rangeMatch) {
-        return FormulaError.REF;
-      }
-      
-      const [, startCol, startRowStr, endCol, endRowStr] = rangeMatch;
-      const startRow = parseInt(startRowStr) - 1;
-      const endRow = parseInt(endRowStr) - 1;
-      const startColIndex = startCol.charCodeAt(0) - 65;
-      const endColIndex = endCol.charCodeAt(0) - 65;
-      
-      for (let row = startRow; row <= endRow; row++) {
-        const rowData: (number | string | boolean | null)[] = [];
-        for (let col = startColIndex; col <= endColIndex; col++) {
-          const cell = context.data[row]?.[col];
-          rowData.push(cell ? cell.value as (number | string | boolean | null) : null);
-        }
-        data.push(rowData);
-      }
-      
-      // Lambda関数の解析（簡易実装）
-      const lambdaStr = lambdaRef.trim().toUpperCase();
-      
+      const data = getArrayData(arrayRef, context);
       const results: (number | string | boolean | null)[][] = [];
-      let accumulator: (number | string | boolean | null) = initial as (number | string | boolean | null);
+      let accumulator = initial;
       
-      for (const row of data) {
+      // 各要素に対して累積計算を実行
+      for (let row = 0; row < data.length; row++) {
         const resultRow: (number | string | boolean | null)[] = [];
-        for (const value of row) {
-          // 簡易的な関数適用
-          if (lambdaStr.includes('+')) {
-            const num = Number(value);
-            if (!isNaN(num)) {
-              accumulator = Number(accumulator) + num;
-            }
-          } else if (lambdaStr.includes('*')) {
-            const num = Number(value);
-            if (!isNaN(num)) {
-              accumulator = Number(accumulator) * num;
-            }
-          } else if (lambdaStr.includes('MAX')) {
-            const num = Number(value);
-            if (!isNaN(num)) {
-              accumulator = Math.max(Number(accumulator), num);
-            }
-          } else if (lambdaStr.includes('MIN')) {
-            const num = Number(value);
-            if (!isNaN(num)) {
-              accumulator = Math.min(Number(accumulator), num);
+        for (let col = 0; col < data[row].length; col++) {
+          const value = data[row][col];
+          
+          if (value !== null && value !== '') {
+            accumulator = evaluateLambda(lambdaRef.trim(), ['accumulator', 'value'], [accumulator, value], context);
+            
+            // エラーが発生した場合
+            if (typeof accumulator === 'string' && accumulator.startsWith('#')) {
+              resultRow.push(accumulator as string);
+            } else if (Array.isArray(accumulator)) {
+              resultRow.push(accumulator[0] as (number | string | boolean | null));
+            } else {
+              resultRow.push(accumulator as (number | string | boolean | null));
             }
           } else {
-            // デフォルトは加算
-            const num = Number(value);
-            if (!isNaN(num)) {
-              accumulator = Number(accumulator) + num;
+            // 空のセルの場合は前の累積値を保持
+            if (Array.isArray(accumulator)) {
+              resultRow.push(accumulator[0] as (number | string | boolean | null));
+            } else {
+              resultRow.push(accumulator as (number | string | boolean | null));
             }
           }
-          
-          resultRow.push(accumulator);
         }
         results.push(resultRow);
       }
@@ -395,50 +529,61 @@ export const SCAN: CustomFormula = {
 // MAKEARRAY関数の実装（指定サイズの配列を作成）
 export const MAKEARRAY: CustomFormula = {
   name: 'MAKEARRAY',
-  pattern: /MAKEARRAY\(([^,]+),\s*([^,]+),\s*([^)]+)\)/i,
+  pattern: /MAKEARRAY\((.+)\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, rowsRef, colsRef, lambdaRef] = matches;
+    const [, args] = matches;
     
     try {
-      const rows = parseInt(getCellValue(rowsRef.trim(), context)?.toString() ?? rowsRef.trim());
-      const cols = parseInt(getCellValue(colsRef.trim(), context)?.toString() ?? colsRef.trim());
-      
-      if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
+      const argParts = parseArguments(args);
+      if (argParts.length < 3) {
         return FormulaError.VALUE;
       }
       
-      // Lambda関数の解析（簡易実装）
-      const lambdaStr = lambdaRef.trim().toUpperCase();
+      const [rowsRef, colsRef, lambdaRef] = argParts;
+      
+      // 行数と列数を取得
+      let rows: number;
+      let cols: number;
+      
+      if (rowsRef.match(/^\d+$/)) {
+        rows = parseInt(rowsRef);
+      } else {
+        const rowsValue = getCellValue(rowsRef, context);
+        rows = parseInt(String(rowsValue));
+      }
+      
+      if (colsRef.match(/^\d+$/)) {
+        cols = parseInt(colsRef);
+      } else {
+        const colsValue = getCellValue(colsRef, context);
+        cols = parseInt(String(colsValue));
+      }
+      
+      if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0 || rows > 1048576 || cols > 16384) {
+        return FormulaError.VALUE;
+      }
       
       const results: (number | string | boolean | null)[][] = [];
       
+      // 各セルに対してLambda関数を適用
       for (let row = 0; row < rows; row++) {
         const resultRow: (number | string | boolean | null)[] = [];
         for (let col = 0; col < cols; col++) {
-          let result: (number | string | boolean | null);
+          // Lambda関数内でROW()とCOLUMN()を使用できるようにコンテキストを準備
+          const lambdaExpression = lambdaRef.trim()
+            .replace(/\bROW\(\)/gi, String(row + 1))
+            .replace(/\bCOLUMN\(\)/gi, String(col + 1));
           
-          // 簡易的な関数適用
-          if (lambdaStr.includes('ROW') && lambdaStr.includes('COLUMN')) {
-            // 行番号 + 列番号
-            result = (row + 1) + (col + 1);
-          } else if (lambdaStr.includes('ROW') && lambdaStr.includes('*')) {
-            // 行番号 * 列番号
-            result = (row + 1) * (col + 1);
-          } else if (lambdaStr.includes('ROW')) {
-            // 行番号のみ
-            result = row + 1;
-          } else if (lambdaStr.includes('COLUMN')) {
-            // 列番号のみ
-            result = col + 1;
-          } else if (lambdaStr.includes('RAND')) {
-            // ランダム値
-            result = Math.random();
+          const result = evaluateLambda(lambdaExpression, ['row', 'column'], [row + 1, col + 1], context);
+          
+          if (Array.isArray(result) && Array.isArray(result[0])) {
+            // 二次元配列の場合は最初の要素を取得
+            resultRow.push((result[0] as (number | string | boolean | null)[])[0]);
+          } else if (Array.isArray(result)) {
+            resultRow.push(result[0] as (number | string | boolean | null));
           } else {
-            // デフォルトは行番号 * 列番号
-            result = (row + 1) * (col + 1);
+            resultRow.push(result as (number | string | boolean | null));
           }
-          
-          resultRow.push(result);
         }
         results.push(resultRow);
       }

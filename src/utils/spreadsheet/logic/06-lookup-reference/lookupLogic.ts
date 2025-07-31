@@ -1006,7 +1006,7 @@ export const UNIQUE: CustomFormula = {
       }
       
       // 単純な配列の場合
-      const rangeParts = arrayRef.trim().split(':');
+      // const rangeParts = arrayRef.trim().split(':');
       // Always treat as single dimensional array for now
       // 単一列の場合
       const uniqueValues: unknown[] = [];
@@ -1037,66 +1037,6 @@ export const UNIQUE: CustomFormula = {
       }
       
       return uniqueValues as FormulaResult;
-      
-      // 2次元配列の場合（行での一意性判定）
-      const [startCell, endCell] = rangeParts;
-      const startMatch = startCell.match(/([A-Z]+)(\d+)/);
-      const endMatch = endCell.match(/([A-Z]+)(\d+)/);
-      
-      if (!startMatch || !endMatch) {
-        return FormulaError.REF;
-      }
-      
-      const startCol = startMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const endCol = endMatch[1].charCodeAt(0) - 'A'.charCodeAt(0);
-      const startRow = parseInt(startMatch[2]);
-      const endRow = parseInt(endMatch[2]);
-      
-      const cols = endCol - startCol + 1;
-      const rows = endRow - startRow + 1;
-      
-      // 2次元配列に変換
-      const matrix: unknown[][] = [];
-      for (let i = 0; i < rows; i++) {
-        const row: unknown[] = [];
-        for (let j = 0; j < cols; j++) {
-          const index = i * cols + j;
-          row.push(index < values.length ? values[index] : null);
-        }
-        matrix.push(row);
-      }
-      
-      // 行の一意性を判定
-      const uniqueRows: unknown[][] = [];
-      const rowKeys = new Map<string, number>();
-      
-      // 各行をキーとして出現回数をカウント
-      for (const row of matrix) {
-        const key = row.map(cell => String(cell ?? '')).join('|');
-        rowKeys.set(key, (rowKeys.get(key) ?? 0) + 1);
-      }
-      
-      // exactlyOnceフラグに基づいて結果を決定
-      for (const row of matrix) {
-        const key = row.map(cell => String(cell ?? '')).join('|');
-        const count = rowKeys.get(key) ?? 0;
-        
-        if (exactlyOnce) {
-          // 一度だけ出現する行
-          if (count === 1 && !uniqueRows.some(r => r.map(cell => String(cell ?? '')).join('|') === key)) {
-            uniqueRows.push(row);
-          }
-        } else {
-          // 最初の出現を残す
-          if (!uniqueRows.some(r => r.map(cell => String(cell ?? '')).join('|') === key)) {
-            uniqueRows.push(row);
-          }
-        }
-      }
-      
-      // 1次元配列に戻す
-      const result = uniqueRows.flat();
-      return result as FormulaResult;
     } catch {
       return FormulaError.VALUE;
     }

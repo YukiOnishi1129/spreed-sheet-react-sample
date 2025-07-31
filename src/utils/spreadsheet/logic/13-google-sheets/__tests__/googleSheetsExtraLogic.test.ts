@@ -20,7 +20,7 @@ describe('Google Sheets Extra Functions', () => {
     ['Apple', 'Banana', 'Apple', 'Orange', 'Banana', 'Apple'], // data with duplicates
     [1, 2, 3, 4, 5], // numbers
     ['A', 'B', 'C'], // letters
-    [[1, 2], [3, 4], [5, 6]], // nested arrays representation
+    ['[1, 2]', '[3, 4]', '[5, 6]'], // nested arrays representation
   ]);
 
   describe('DETECTLANGUAGE Function', () => {

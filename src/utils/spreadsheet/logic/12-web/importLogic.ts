@@ -37,7 +37,7 @@ export const IMPORTFEED: CustomFormula = {
   name: 'IMPORTFEED',
   pattern: /IMPORTFEED\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [, urlRef, , headersRef, numItemsRef] = matches;
+    const [urlRef, numItemsRef] = matches;
     
     try {
       let url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();

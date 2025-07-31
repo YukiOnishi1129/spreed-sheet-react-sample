@@ -1,6 +1,6 @@
 // キューブ（OLAP）関数の実装
 
-import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
+import type { CustomFormula, FormulaResult } from '../shared/types';
 
 // CUBEVALUE関数の実装（キューブから集計値を返す）
 export const CUBEVALUE: CustomFormula = {

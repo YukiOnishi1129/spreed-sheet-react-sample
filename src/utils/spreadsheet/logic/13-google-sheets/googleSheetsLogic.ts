@@ -1,6 +1,6 @@
 // Google Sheets specific functions
 
-import type { CustomFormula, FormulaContext, FormulaResult } from '../shared/types';
+import type { CustomFormula, FormulaResult } from '../shared/types';
 
 // JOIN関数の実装（配列を文字列に結合）
 export const JOIN: CustomFormula = {
