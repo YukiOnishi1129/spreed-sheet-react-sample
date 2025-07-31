@@ -37,12 +37,10 @@ export const IMPORTFEED: CustomFormula = {
   name: 'IMPORTFEED',
   pattern: /IMPORTFEED\(([^,)]+)(?:,\s*([^,)]+))?(?:,\s*([^,)]+))?(?:,\s*([^)]+))?\)/i,
   calculate: (matches: RegExpMatchArray, context: FormulaContext): FormulaResult => {
-    const [urlRef, numItemsRef] = matches;
+    const [, urlRef] = matches;
     
     try {
-      let url = getCellValue(urlRef.trim(), context)?.toString() ?? urlRef.trim();
-      // const query = queryRef ? getCellValue(queryRef.trim(), context)?.toString() ?? queryRef.trim() : 'items';
-      const numItems = numItemsRef ? parseInt(getCellValue(numItemsRef.trim(), context)?.toString() ?? numItemsRef.trim()) : 10;
+      let url = getCellValue(urlRef?.trim(), context)?.toString() ?? urlRef?.trim() ?? '';
       
       // 引用符を除去
       if (url.startsWith('"') && url.endsWith('"')) {
@@ -51,10 +49,6 @@ export const IMPORTFEED: CustomFormula = {
       
       if (!url || url === '') {
         return FormulaError.VALUE;
-      }
-      
-      if (isNaN(numItems) || numItems < 1) {
-        return FormulaError.NUM;
       }
       
       // 実際のWebアクセスは実装せず、エラーメッセージを返す

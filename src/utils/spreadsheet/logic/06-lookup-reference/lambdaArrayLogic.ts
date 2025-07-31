@@ -13,10 +13,30 @@ const evaluateLambda = (
   context: FormulaContext
 ): FormulaResult => {
   try {
-    // LAMBDA関数の形式を解析
-    const lambdaMatch = lambdaExpression.match(/LAMBDA\(([^,)]+(?:,[^,)]+)*),\s*(.+)\)$/i);
+    // LAMBDA関数の形式を解析（改善版：ネストした括弧を考慮）
+    const lambdaMatch = lambdaExpression.match(/^LAMBDA\((.*)\)$/i);
     if (lambdaMatch) {
-      const [, params, body] = lambdaMatch;
+      const content = lambdaMatch[1];
+      // 最後のカンマを見つけて、パラメータとボディを分離
+      let depth = 0;
+      let lastCommaIndex = -1;
+      
+      for (let i = content.length - 1; i >= 0; i--) {
+        const char = content[i];
+        if (char === ')') depth++;
+        else if (char === '(') depth--;
+        else if (char === ',' && depth === 0) {
+          lastCommaIndex = i;
+          break;
+        }
+      }
+      
+      if (lastCommaIndex === -1) {
+        return FormulaError.VALUE;
+      }
+      
+      const params = content.substring(0, lastCommaIndex);
+      const body = content.substring(lastCommaIndex + 1).trim();
       const lambdaParams = params.split(',').map(p => p.trim());
       
       // パラメータを実際の値に置換
